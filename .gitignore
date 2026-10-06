@@ -17,3 +17,4 @@
 /parity.json
 /composer.dev.json
 /composer.dev.lock
+/.tmp/

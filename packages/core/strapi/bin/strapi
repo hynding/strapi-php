@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * `strapi` CLI (port of packages/core/strapi/bin/strapi.js). Runs against the Strapi project in the
+ * current working directory: `php vendor/bin/strapi routes:list`.
+ */
+$autoloads = [
+    __DIR__ . '/../../../../autoload.php', // installed in a project: vendor/strapi/strapi/bin → vendor/autoload.php
+    __DIR__ . '/../../../../vendor/autoload.php', // monorepo: packages/core/strapi/bin → <root>/vendor/autoload.php
+    __DIR__ . '/../vendor/autoload.php',
+    getcwd() . '/vendor/autoload.php',
+];
+foreach ($autoloads as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+
+if (!class_exists(\Strapi\Cli\Cli\Cli::class)) {
+    fwrite(STDERR, "strapi/strapi is not installed. Run `composer install` first.\n");
+    exit(1);
+}
+
+exit(\Strapi\Cli\Cli\Cli::run((string) getcwd()));

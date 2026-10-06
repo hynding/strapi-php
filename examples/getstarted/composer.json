@@ -1,0 +1,32 @@
+{
+    "name": "strapi/getstarted",
+    "description": "The upstream getstarted example project, PHP edition",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "strapi/strapi": "^5.56"
+    },
+    "repositories": [
+        { "type": "path", "url": "../../packages/core/*", "options": { "symlink": true } },
+        { "type": "path", "url": "../../packages/plugins/*", "options": { "symlink": true } },
+        { "type": "path", "url": "../../packages/providers/*", "options": { "symlink": true } },
+        { "type": "path", "url": "../../packages/utils/*", "options": { "symlink": true } }
+    ],
+    "scripts": {
+        "develop": "@php bin/strapi develop",
+        "start": "@php bin/strapi start",
+        "build": "@php bin/strapi build",
+        "strapi": "@php bin/strapi"
+    },
+    "extra": {
+        "strapi": {
+            "uuid": "getstarted"
+        }
+    },
+    "config": {
+        "allow-plugins": false
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

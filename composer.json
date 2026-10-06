@@ -67,7 +67,9 @@
             "Strapi\\Utils\\Tests\\": "packages/core/utils/tests/",
             "Strapi\\Permissions\\Tests\\": "packages/core/permissions/tests/",
             "Strapi\\Logger\\Tests\\": "packages/utils/logger/tests/",
-            "Strapi\\Database\\Tests\\": "packages/core/database/tests/"
+            "Strapi\\Database\\Tests\\": "packages/core/database/tests/",
+            "Strapi\\Core\\Tests\\": "packages/core/core/tests/",
+            "Strapi\\Cli\\Tests\\": "packages/core/strapi/tests/"
         }
     },
     "scripts": {

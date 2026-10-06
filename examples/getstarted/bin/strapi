@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Project-local `strapi` CLI: delegates to the strapi/strapi package with this project as root.
+ * Works from the monorepo (vendor at the repository root) and from a standalone install (vendor here).
+ */
+$root = dirname(__DIR__);
+$autoloads = [$root . '/vendor/autoload.php', dirname($root, 2) . '/vendor/autoload.php'];
+foreach ($autoloads as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+if (!class_exists(\Strapi\Cli\Cli\Cli::class)) {
+    fwrite(STDERR, "strapi/strapi is not installed. Run `composer install` first.\n");
+    exit(1);
+}
+
+exit(\Strapi\Cli\Cli\Cli::run($root));

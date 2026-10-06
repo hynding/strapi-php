@@ -1,0 +1,9 @@
+.env
+.tmp/
+.strapi/
+build/
+dist/
+node_modules/
+vendor/
+public/uploads/*
+!public/uploads/.gitkeep

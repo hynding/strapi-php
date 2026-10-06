@@ -1,0 +1,25 @@
+{
+  "name": "getstarted",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A Strapi application (PHP backend). The admin panel is the upstream React bundle: @strapi/admin must match the strapi/strapi Composer version exactly (bin/strapi build checks it).",
+  "scripts": {
+    "build": "php bin/strapi build",
+    "develop": "php bin/strapi develop",
+    "start": "php bin/strapi start"
+  },
+  "dependencies": {
+    "@strapi/admin": "5.56.0",
+    "@strapi/strapi": "5.56.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.6",
+    "styled-components": "6.4.1"
+  },
+  "engines": {
+    "node": ">=20.0.0 <=26.x.x"
+  },
+  "strapi": {
+    "uuid": "getstarted"
+  }
+}
