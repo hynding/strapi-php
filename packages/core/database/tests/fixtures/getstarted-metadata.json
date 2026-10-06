@@ -1,0 +1,1064 @@
+{
+  "admin::user": {
+    "tableName": "admin_users",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "firstname": "firstname",
+      "lastname": "lastname",
+      "username": "username",
+      "email": "email",
+      "password": "password",
+      "reset_password_token": "resetPasswordToken",
+      "registration_token": "registrationToken",
+      "is_active": "isActive",
+      "blocked": "blocked",
+      "prefered_language": "preferedLanguage",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "plugin::upload.folder": {
+    "tableName": "upload_folders",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "path_id": "pathId",
+      "parent": "parent",
+      "children": "children",
+      "files": "files",
+      "path": "path",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "plugin::upload.file": {
+    "tableName": "files",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "alternative_text": "alternativeText",
+      "caption": "caption",
+      "focal_point": "focalPoint",
+      "width": "width",
+      "height": "height",
+      "formats": "formats",
+      "hash": "hash",
+      "ext": "ext",
+      "mime": "mime",
+      "size": "size",
+      "url": "url",
+      "preview_url": "previewUrl",
+      "provider": "provider",
+      "provider_metadata": "provider_metadata",
+      "related": "related",
+      "folder": "folder",
+      "folder_path": "folderPath",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "plugin::users-permissions.user": {
+    "tableName": "up_users",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "username": "username",
+      "email": "email",
+      "provider": "provider",
+      "password": "password",
+      "reset_password_token": "resetPasswordToken",
+      "confirmation_token": "confirmationToken",
+      "confirmed": "confirmed",
+      "blocked": "blocked",
+      "role": "role",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "plugin::users-permissions.role": {
+    "tableName": "up_roles",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "description": "description",
+      "type": "type",
+      "permissions": "permissions",
+      "users": "users",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "plugin::users-permissions.permission": {
+    "tableName": "up_permissions",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "action": "action",
+      "role": "role",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "abouts_cmps": {
+    "tableName": "abouts_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::about.about": {
+    "tableName": "abouts",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "title": "title",
+      "content": "content",
+      "teamMembers": "teamMembers",
+      "coverImage": "coverImage",
+      "dynamiczone": "dynamiczone",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "addresses_cmps": {
+    "tableName": "addresses_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::address.address": {
+    "tableName": "addresses",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "postal_code": "postal_code",
+      "categories": "categories",
+      "cover": "cover",
+      "images": "images",
+      "city": "city",
+      "json": "json",
+      "slug": "slug",
+      "notrepeat_req": "notrepeat_req",
+      "notrepeat_optional": "notrepeat_optional",
+      "repeat_req": "repeat_req",
+      "repeat_req_min": "repeat_req_min",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::article.article": {
+    "tableName": "articles",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "title": "title",
+      "blocks_content": "blocksContent",
+      "markdown_content": "markdownContent",
+      "cover": "cover",
+      "author_name": "authorName",
+      "slug": "slug",
+      "categories": "categories",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::category.category": {
+    "tableName": "categories",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "addresses": "addresses",
+      "temps": "temps",
+      "datetime": "datetime",
+      "date": "date",
+      "relation_locales": "relation_locales",
+      "relation": "relation",
+      "articles": "articles",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::condition.condition": {
+    "tableName": "conditions",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "is_active": "isActive",
+      "country": "country",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "configs_cmps": {
+    "tableName": "configs_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::config.config": {
+    "tableName": "configs",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "site_name": "siteName",
+      "siteLogo": "siteLogo",
+      "contact_email": "contactEmail",
+      "contact_phone": "contactPhone",
+      "socialLinks": "socialLinks",
+      "feature_toggles": "featureToggles",
+      "default_language": "defaultLanguage",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::country.country": {
+    "tableName": "countries",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "code": "code",
+      "visible": "visible",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "footers_cmps": {
+    "tableName": "footers_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::footer.footer": {
+    "tableName": "footers",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "logo": "logo",
+      "description": "description",
+      "socialLinks": "socialLinks",
+      "copyright_text": "copyrightText",
+      "footer_note": "footerNote",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::homepage.homepage": {
+    "tableName": "homepages",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "title": "title",
+      "slug": "slug",
+      "media_type": "mediaType",
+      "single": "single",
+      "multiple": "multiple",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "kitchensinks_cmps": {
+    "tableName": "kitchensinks_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::kitchensink.kitchensink": {
+    "tableName": "kitchensinks",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "short_text": "short_text",
+      "long_text": "long_text",
+      "rich_text": "rich_text",
+      "blocks": "blocks",
+      "integer": "integer",
+      "biginteger": "biginteger",
+      "decimal": "decimal",
+      "float": "float",
+      "date": "date",
+      "datetime": "datetime",
+      "time": "time",
+      "timestamp": "timestamp",
+      "boolean": "boolean",
+      "email": "email",
+      "password": "password",
+      "enumeration": "enumeration",
+      "single_media": "single_media",
+      "multiple_media": "multiple_media",
+      "json": "json",
+      "single_compo": "single_compo",
+      "repeatable_compo": "repeatable_compo",
+      "dynamiczone": "dynamiczone",
+      "one_way_tag": "one_way_tag",
+      "one_to_one_tag": "one_to_one_tag",
+      "one_to_many_tags": "one_to_many_tags",
+      "many_to_one_tag": "many_to_one_tag",
+      "many_to_many_tags": "many_to_many_tags",
+      "many_way_tags": "many_way_tags",
+      "morph_to_one": "morph_to_one",
+      "morph_to_many": "morph_to_many",
+      "morph_one": "morph_one",
+      "custom_field": "custom_field",
+      "custom_field_with_default_options": "custom_field_with_default_options",
+      "cats": "cats",
+      "slug": "slug",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::like.like": {
+    "tableName": "likes",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "author": "author",
+      "review": "review",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::menu.menu": {
+    "tableName": "menus",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "description": "description",
+      "menusections": "menusections",
+      "restaurant": "restaurant",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "menusections_cmps": {
+    "tableName": "menusections_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::menusection.menusection": {
+    "tableName": "menusections",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "dishes": "dishes",
+      "menu": "menu",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "relation_locales_cmps": {
+    "tableName": "relation_locales_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::relation-locale.relation-locale": {
+    "tableName": "relation_locales",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "categories": "categories",
+      "title": "title",
+      "repeatable_relations": "repeatable_relations",
+      "dynamic_relations": "dynamic_relations",
+      "single_relation": "single_relation",
+      "require_single_relation": "require_single_relation",
+      "category": "category",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "restaurants_cmps": {
+    "tableName": "restaurants_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "api::restaurant.restaurant": {
+    "tableName": "restaurants",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "slug": "slug",
+      "price_range": "priceRange",
+      "closingPeriod": "closingPeriod",
+      "contact_email": "contactEmail",
+      "stars": "stars",
+      "average_price": "averagePrice",
+      "address": "address",
+      "cover": "cover",
+      "timestamp": "timestamp",
+      "images": "images",
+      "short_description": "shortDescription",
+      "since": "since",
+      "categories": "categories",
+      "description": "description",
+      "services": "services",
+      "menu": "menu",
+      "openingTimes": "openingTimes",
+      "dz": "dz",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::review.review": {
+    "tableName": "reviews",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "comment": "comment",
+      "rating": "rating",
+      "likes": "likes",
+      "author": "author",
+      "restaurant": "restaurant",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::tag.tag": {
+    "tableName": "tags",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "many_to_one_kitchensink": "many_to_one_kitchensink",
+      "one_to_many_kitchensinks": "one_to_many_kitchensinks",
+      "many_to_many_kitchensinks": "many_to_many_kitchensinks",
+      "one_to_one_kitchensink": "one_to_one_kitchensink",
+      "taggable": "taggable",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "api::temp.temp": {
+    "tableName": "temps",
+    "columnToAttribute": {
+      "id": "id",
+      "document_id": "documentId",
+      "name": "name",
+      "category": "category",
+      "categories": "categories",
+      "created_at": "createdAt",
+      "updated_at": "updatedAt",
+      "published_at": "publishedAt",
+      "createdBy": "createdBy",
+      "updatedBy": "updatedBy",
+      "locale": "locale",
+      "localizations": "localizations"
+    }
+  },
+  "basic.relation": {
+    "tableName": "components_basic_relations",
+    "columnToAttribute": {
+      "id": "id",
+      "categories": "categories"
+    }
+  },
+  "basic.simple": {
+    "tableName": "components_basic_simples",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "test": "test"
+    }
+  },
+  "components_basic_team_members_cmps": {
+    "tableName": "components_basic_team_members_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "basic.team-members": {
+    "tableName": "components_basic_team_members",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "role": "role",
+      "photo": "photo",
+      "bio": "bio",
+      "organization": "organization"
+    }
+  },
+  "blog.test-como": {
+    "tableName": "components_blog_test_comos",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  "default.apple": {
+    "tableName": "components_default_apples",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  "default.car": {
+    "tableName": "components_default_cars",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  "components_closingperiods_cmps": {
+    "tableName": "components_closingperiods_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "default.closingperiod": {
+    "tableName": "components_closingperiods",
+    "columnToAttribute": {
+      "id": "id",
+      "label": "label",
+      "start_date": "start_date",
+      "end_date": "end_date",
+      "media": "media",
+      "dish": "dish"
+    }
+  },
+  "default.dish": {
+    "tableName": "components_dishes",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "description": "description",
+      "price": "price",
+      "picture": "picture",
+      "very_long_description": "very_long_description",
+      "categories": "categories"
+    }
+  },
+  "default.links": {
+    "tableName": "components_default_links",
+    "columnToAttribute": {
+      "id": "id",
+      "platform": "platform",
+      "url": "url"
+    }
+  },
+  "components_openingtimes_cmps": {
+    "tableName": "components_openingtimes_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "default.openingtimes": {
+    "tableName": "components_openingtimes",
+    "columnToAttribute": {
+      "id": "id",
+      "label": "label",
+      "time": "time",
+      "dishrep": "dishrep"
+    }
+  },
+  "components_default_orgs_cmps": {
+    "tableName": "components_default_orgs_cmps",
+    "columnToAttribute": {
+      "id": "id",
+      "entity_id": "entity_id",
+      "cmp_id": "cmp_id",
+      "component_type": "component_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "default.org": {
+    "tableName": "components_default_orgs",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "address": "address",
+      "coverOrgImage": "coverOrgImage",
+      "testComponent": "testComponent"
+    }
+  },
+  "default.organization": {
+    "tableName": "components_default_organizations",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "address": "address",
+      "coverPhotoOrganization": "coverPhotoOrganization"
+    }
+  },
+  "default.restaurantservice": {
+    "tableName": "components_restaurantservices",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "media": "media",
+      "is_available": "is_available"
+    }
+  },
+  "default.social-links": {
+    "tableName": "components_default_social_links",
+    "columnToAttribute": {
+      "id": "id"
+    }
+  },
+  "default.temp": {
+    "tableName": "components_default_temps",
+    "columnToAttribute": {
+      "id": "id",
+      "name": "name",
+      "url": "url"
+    }
+  },
+  "default.test-component": {
+    "tableName": "components_default_test_components",
+    "columnToAttribute": {
+      "id": "id",
+      "test_name": "testName",
+      "test_another_text": "testAnotherText",
+      "TestMedia": "TestMedia"
+    }
+  },
+  "strapi::core-store": {
+    "tableName": "strapi_core_store_settings",
+    "columnToAttribute": {
+      "id": "id",
+      "key": "key",
+      "value": "value",
+      "type": "type",
+      "environment": "environment",
+      "tag": "tag"
+    }
+  },
+  "upload_folders_parent_lnk": {
+    "tableName": "upload_folders_parent_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "folder_id": "folder_id",
+      "inv_folder_id": "inv_folder_id",
+      "folder_ord": "folder_ord"
+    }
+  },
+  "files_related_mph": {
+    "tableName": "files_related_mph",
+    "columnToAttribute": {
+      "id": "id",
+      "file_id": "file_id",
+      "related_id": "related_id",
+      "related_type": "related_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "files_folder_lnk": {
+    "tableName": "files_folder_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "file_id": "file_id",
+      "folder_id": "folder_id",
+      "file_ord": "file_ord"
+    }
+  },
+  "up_users_role_lnk": {
+    "tableName": "up_users_role_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "user_id": "user_id",
+      "role_id": "role_id",
+      "user_ord": "user_ord"
+    }
+  },
+  "up_permissions_role_lnk": {
+    "tableName": "up_permissions_role_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "permission_id": "permission_id",
+      "role_id": "role_id",
+      "permission_ord": "permission_ord"
+    }
+  },
+  "addresses_categories_lnk": {
+    "tableName": "addresses_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "address_id": "address_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord",
+      "address_ord": "address_ord"
+    }
+  },
+  "articles_categories_lnk": {
+    "tableName": "articles_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "article_id": "article_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord",
+      "article_ord": "article_ord"
+    }
+  },
+  "conditions_country_lnk": {
+    "tableName": "conditions_country_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "condition_id": "condition_id",
+      "country_id": "country_id"
+    }
+  },
+  "kitchensinks_one_way_tag_lnk": {
+    "tableName": "kitchensinks_one_way_tag_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_id": "tag_id"
+    }
+  },
+  "kitchensinks_one_to_one_tag_lnk": {
+    "tableName": "kitchensinks_one_to_one_tag_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_id": "tag_id"
+    }
+  },
+  "kitchensinks_many_to_one_tag_lnk": {
+    "tableName": "kitchensinks_many_to_one_tag_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_id": "tag_id",
+      "kitchensink_ord": "kitchensink_ord"
+    }
+  },
+  "kitchensinks_many_to_many_tags_lnk": {
+    "tableName": "kitchensinks_many_to_many_tags_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_id": "tag_id",
+      "tag_ord": "tag_ord",
+      "kitchensink_ord": "kitchensink_ord"
+    }
+  },
+  "kitchensinks_many_way_tags_lnk": {
+    "tableName": "kitchensinks_many_way_tags_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_id": "tag_id",
+      "tag_ord": "tag_ord"
+    }
+  },
+  "kitchensinks_morph_to_many_mph": {
+    "tableName": "kitchensinks_morph_to_many_mph",
+    "columnToAttribute": {
+      "id": "id",
+      "kitchensink_id": "kitchensink_id",
+      "morph_to_many_id": "morph_to_many_id",
+      "morph_to_many_type": "morph_to_many_type",
+      "field": "field",
+      "order": "order"
+    }
+  },
+  "likes_author_lnk": {
+    "tableName": "likes_author_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "like_id": "like_id",
+      "user_id": "user_id"
+    }
+  },
+  "likes_review_lnk": {
+    "tableName": "likes_review_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "like_id": "like_id",
+      "review_id": "review_id",
+      "like_ord": "like_ord"
+    }
+  },
+  "menusections_menu_lnk": {
+    "tableName": "menusections_menu_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "menusection_id": "menusection_id",
+      "menu_id": "menu_id",
+      "menusection_ord": "menusection_ord"
+    }
+  },
+  "relation_locales_categories_lnk": {
+    "tableName": "relation_locales_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "relation_locale_id": "relation_locale_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord",
+      "relation_locale_ord": "relation_locale_ord"
+    }
+  },
+  "relation_locales_category_lnk": {
+    "tableName": "relation_locales_category_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "relation_locale_id": "relation_locale_id",
+      "category_id": "category_id"
+    }
+  },
+  "restaurants_address_lnk": {
+    "tableName": "restaurants_address_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "restaurant_id": "restaurant_id",
+      "address_id": "address_id"
+    }
+  },
+  "restaurants_categories_lnk": {
+    "tableName": "restaurants_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "restaurant_id": "restaurant_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord"
+    }
+  },
+  "restaurants_menu_lnk": {
+    "tableName": "restaurants_menu_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "restaurant_id": "restaurant_id",
+      "menu_id": "menu_id"
+    }
+  },
+  "reviews_author_lnk": {
+    "tableName": "reviews_author_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "review_id": "review_id",
+      "user_id": "user_id"
+    }
+  },
+  "reviews_restaurant_lnk": {
+    "tableName": "reviews_restaurant_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "review_id": "review_id",
+      "restaurant_id": "restaurant_id"
+    }
+  },
+  "tags_many_to_one_kitchensink_lnk": {
+    "tableName": "tags_many_to_one_kitchensink_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "tag_id": "tag_id",
+      "kitchensink_id": "kitchensink_id",
+      "tag_ord": "tag_ord"
+    }
+  },
+  "temps_category_lnk": {
+    "tableName": "temps_category_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "temp_id": "temp_id",
+      "category_id": "category_id"
+    }
+  },
+  "temps_categories_lnk": {
+    "tableName": "temps_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "temp_id": "temp_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord",
+      "temp_ord": "temp_ord"
+    }
+  },
+  "components_basic_relations_categories_lnk": {
+    "tableName": "components_basic_relations_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "relation_id": "relation_id",
+      "category_id": "category_id",
+      "category_ord": "category_ord"
+    }
+  },
+  "components_dishes_categories_lnk": {
+    "tableName": "components_dishes_categories_lnk",
+    "columnToAttribute": {
+      "id": "id",
+      "dish_id": "dish_id",
+      "category_id": "category_id"
+    }
+  }
+}

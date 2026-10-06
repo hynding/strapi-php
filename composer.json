@@ -66,7 +66,8 @@
             "Strapi\\Tests\\": "tests/php/",
             "Strapi\\Utils\\Tests\\": "packages/core/utils/tests/",
             "Strapi\\Permissions\\Tests\\": "packages/core/permissions/tests/",
-            "Strapi\\Logger\\Tests\\": "packages/utils/logger/tests/"
+            "Strapi\\Logger\\Tests\\": "packages/utils/logger/tests/",
+            "Strapi\\Database\\Tests\\": "packages/core/database/tests/"
         }
     },
     "scripts": {

@@ -1,0 +1,7130 @@
+{
+  "admin_users": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "firstname",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "lastname",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "username",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "email",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "password",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "reset_password_token",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "registration_token",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "is_active",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "blocked",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "prefered_language",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "admin_users_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "admin_users_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "admin_users_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `admin_users` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `firstname` varchar(255) null, `lastname` varchar(255) null, `username` varchar(255) null, `email` varchar(255) null, `password` varchar(255) null, `reset_password_token` varchar(255) null, `registration_token` varchar(255) null, `is_active` boolean null, `blocked` boolean null, `prefered_language` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `admin_users_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `admin_users_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "upload_folders": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "path_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "path",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "upload_folders_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "upload_folders_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "upload_folders_documents_idx",
+        "unique": false
+      },
+      {
+        "name": "upload_folders_path_index",
+        "unique": true
+      },
+      {
+        "name": "upload_folders_path_id_index",
+        "unique": true
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `upload_folders` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `path_id` integer null, `path` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `upload_folders_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `upload_folders_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "files": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "alternative_text",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "caption",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "focal_point",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "width",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "height",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "formats",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "hash",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "ext",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "mime",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "size",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "url",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "preview_url",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "provider",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "provider_metadata",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "folder_path",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 18,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 19,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 20,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 21,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 22,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 23,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "files_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "files_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "files_documents_idx",
+        "unique": false
+      },
+      {
+        "name": "upload_files_ext_index",
+        "unique": false
+      },
+      {
+        "name": "upload_files_size_index",
+        "unique": false
+      },
+      {
+        "name": "upload_files_name_index",
+        "unique": false
+      },
+      {
+        "name": "upload_files_updated_at_index",
+        "unique": false
+      },
+      {
+        "name": "upload_files_created_at_index",
+        "unique": false
+      },
+      {
+        "name": "upload_files_folder_path_index",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `files` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `alternative_text` text null, `caption` text null, `focal_point` json null, `width` integer null, `height` integer null, `formats` json null, `hash` varchar(255) null, `ext` varchar(255) null, `mime` varchar(255) null, `size` float null, `url` text null, `preview_url` text null, `provider` varchar(255) null, `provider_metadata` json null, `folder_path` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `files_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `files_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "up_users": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "username",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "email",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "provider",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "password",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "reset_password_token",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "confirmation_token",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "confirmed",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "blocked",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "up_users_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_users_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_users_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `up_users` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `username` varchar(255) null, `email` varchar(255) null, `provider` varchar(255) null, `password` varchar(255) null, `reset_password_token` varchar(255) null, `confirmation_token` varchar(255) null, `confirmed` boolean null, `blocked` boolean null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `up_users_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `up_users_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "up_roles": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "description",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "up_roles_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_roles_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_roles_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `up_roles` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `description` varchar(255) null, `type` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `up_roles_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `up_roles_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "up_permissions": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "action",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "up_permissions_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_permissions_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "up_permissions_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `up_permissions` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `action` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `up_permissions_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `up_permissions_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "abouts_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "abouts_uq",
+        "unique": true
+      },
+      {
+        "name": "abouts_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "abouts_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "abouts_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "abouts",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `abouts_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `abouts_entity_fk` foreign key(`entity_id`) references `abouts`(`id`) on delete CASCADE)"
+  },
+  "abouts": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "title",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "content",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "abouts_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "abouts_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "abouts_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `abouts` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `title` varchar(255) null, `content` json null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `abouts_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `abouts_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "addresses_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "addresses_uq",
+        "unique": true
+      },
+      {
+        "name": "addresses_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "addresses_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "addresses_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "addresses",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `addresses_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `addresses_entity_fk` foreign key(`entity_id`) references `addresses`(`id`) on delete CASCADE)"
+  },
+  "addresses": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "postal_code",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "city",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "json",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "slug",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "addresses_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "addresses_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "addresses_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `addresses` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `postal_code` varchar(255) null, `city` varchar(255) null, `json` json null, `slug` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `addresses_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `addresses_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "articles": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "title",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "blocks_content",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "markdown_content",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "author_name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "slug",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "articles_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "articles_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "articles_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `articles` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `title` varchar(255) null, `blocks_content` json null, `markdown_content` text null, `author_name` varchar(255) null, `slug` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `articles_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `articles_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "categories": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "datetime",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "date",
+        "type": "date",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "categories_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "categories_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "categories_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `categories` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `datetime` datetime null, `date` date null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `categories_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `categories_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "conditions": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "is_active",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "conditions_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "conditions_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "conditions_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `conditions` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `is_active` boolean null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `conditions_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `conditions_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "configs_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "configs_uq",
+        "unique": true
+      },
+      {
+        "name": "configs_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "configs_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "configs_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "configs",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `configs_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `configs_entity_fk` foreign key(`entity_id`) references `configs`(`id`) on delete CASCADE)"
+  },
+  "configs": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "site_name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "contact_email",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "contact_phone",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "feature_toggles",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "default_language",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "configs_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "configs_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "configs_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `configs` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `site_name` varchar(255) null, `contact_email` varchar(255) null, `contact_phone` varchar(255) null, `feature_toggles` json null, `default_language` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `configs_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `configs_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "countries": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "code",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "visible",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "countries_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "countries_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "countries_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `countries` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `code` varchar(255) null, `visible` boolean null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `countries_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `countries_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "footers_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "footers_uq",
+        "unique": true
+      },
+      {
+        "name": "footers_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "footers_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "footers_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "footers",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `footers_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `footers_entity_fk` foreign key(`entity_id`) references `footers`(`id`) on delete CASCADE)"
+  },
+  "footers": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "copyright_text",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "footer_note",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "footers_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "footers_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "footers_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `footers` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `description` text null, `copyright_text` text null, `footer_note` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `footers_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `footers_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "homepages": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "title",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "slug",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "media_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "homepages_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "homepages_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "homepages_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `homepages` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `title` varchar(255) null, `slug` varchar(255) null, `media_type` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `homepages_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `homepages_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "kitchensinks_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `kitchensinks_entity_fk` foreign key(`entity_id`) references `kitchensinks`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "short_text",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "long_text",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "rich_text",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "blocks",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "integer",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "biginteger",
+        "type": "bigint",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "decimal",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "float",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "date",
+        "type": "date",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "datetime",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "time",
+        "type": "time",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "timestamp",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "boolean",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "email",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "password",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "enumeration",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 18,
+        "name": "json",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 19,
+        "name": "target_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 20,
+        "name": "target_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 21,
+        "name": "custom_field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 22,
+        "name": "custom_field_with_default_options",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 23,
+        "name": "slug",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 24,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 25,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 26,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 27,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 28,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 29,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `short_text` varchar(255) null, `long_text` text null, `rich_text` text null, `blocks` json null, `integer` integer null, `biginteger` bigint null, `decimal` float null, `float` float null, `date` date null, `datetime` datetime null, `time` time null, `timestamp` datetime null, `boolean` boolean null, `email` varchar(255) null, `password` varchar(255) null, `enumeration` varchar(255) null, `json` json null, `target_id` integer null, `target_type` varchar(255) null, `custom_field` varchar(255) null, `custom_field_with_default_options` varchar(255) null, `slug` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `kitchensinks_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `kitchensinks_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "likes": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "likes_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "likes_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "likes_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `likes` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `likes_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `likes_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "menus": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "menus_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "menus_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "menus_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `menus` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `description` text null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `menus_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `menus_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "menusections_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "menusections_uq",
+        "unique": true
+      },
+      {
+        "name": "menusections_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "menusections_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "menusections_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "menusections",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `menusections_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `menusections_entity_fk` foreign key(`entity_id`) references `menusections`(`id`) on delete CASCADE)"
+  },
+  "menusections": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "menusections_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "menusections_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "menusections_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `menusections` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `menusections_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `menusections_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "relation_locales_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "relation_locales_uq",
+        "unique": true
+      },
+      {
+        "name": "relation_locales_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "relation_locales",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `relation_locales_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `relation_locales_entity_fk` foreign key(`entity_id`) references `relation_locales`(`id`) on delete CASCADE)"
+  },
+  "relation_locales": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "title",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "relation_locales_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `relation_locales` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `title` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `relation_locales_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `relation_locales_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "restaurants_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "restaurants_uq",
+        "unique": true
+      },
+      {
+        "name": "restaurants_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "restaurants_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "restaurants",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `restaurants_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `restaurants_entity_fk` foreign key(`entity_id`) references `restaurants`(`id`) on delete CASCADE)"
+  },
+  "restaurants": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "slug",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "price_range",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "contact_email",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "stars",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "average_price",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "timestamp",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "short_description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "since",
+        "type": "date",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "restaurants_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `restaurants` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `slug` varchar(255) null, `price_range` varchar(255) null, `contact_email` varchar(255) null, `stars` integer null, `average_price` float null, `timestamp` datetime null, `short_description` text null, `since` date null, `description` text null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `restaurants_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `restaurants_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "reviews": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "comment",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "rating",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "reviews_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "reviews_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "reviews_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `reviews` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `comment` text null, `rating` integer null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `reviews_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `reviews_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "tags": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "taggable_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "taggable_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "tags_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "tags_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "tags_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `tags` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `taggable_id` integer null, `taggable_type` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `tags_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `tags_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "temps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "document_id",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "updated_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "published_at",
+        "type": "datetime",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "updated_by_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "locale",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "temps_updated_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "temps_created_by_id_fk",
+        "unique": false
+      },
+      {
+        "name": "temps_documents_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "updated_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "admin_users",
+        "from": "created_by_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `temps` (`id` integer not null primary key autoincrement, `document_id` varchar(255) null, `name` varchar(255) null, `created_at` datetime null, `updated_at` datetime null, `published_at` datetime null, `created_by_id` integer null, `updated_by_id` integer null, `locale` varchar(255) null, constraint `temps_created_by_id_fk` foreign key(`created_by_id`) references `admin_users`(`id`) on delete SET NULL, constraint `temps_updated_by_id_fk` foreign key(`updated_by_id`) references `admin_users`(`id`) on delete SET NULL)"
+  },
+  "components_basic_relations": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_basic_relations` (`id` integer not null primary key autoincrement)"
+  },
+  "components_basic_simples": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "test",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_basic_simples` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `test` varchar(255) null)"
+  },
+  "components_basic_team_members_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_basic_team_members_uq",
+        "unique": true
+      },
+      {
+        "name": "components_basic_team_members_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "components_basic_team_members_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "components_basic_team_members_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "components_basic_team_members",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_basic_team_members_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `components_basic_team_members_entity_fk` foreign key(`entity_id`) references `components_basic_team_members`(`id`) on delete CASCADE)"
+  },
+  "components_basic_team_members": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "role",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "bio",
+        "type": "json",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_basic_team_members` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `role` varchar(255) null, `bio` json null)"
+  },
+  "components_blog_test_comos": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_blog_test_comos` (`id` integer not null primary key autoincrement, `name` varchar(255) null)"
+  },
+  "components_default_apples": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_apples` (`id` integer not null primary key autoincrement, `name` varchar(255) null)"
+  },
+  "components_default_cars": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_cars` (`id` integer not null primary key autoincrement, `name` varchar(255) null)"
+  },
+  "components_closingperiods_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_closingperiods_uq",
+        "unique": true
+      },
+      {
+        "name": "components_closingperiods_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "components_closingperiods_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "components_closingperiods_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "components_closingperiods",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_closingperiods_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `components_closingperiods_entity_fk` foreign key(`entity_id`) references `components_closingperiods`(`id`) on delete CASCADE)"
+  },
+  "components_closingperiods": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "label",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "start_date",
+        "type": "date",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "end_date",
+        "type": "date",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_closingperiods` (`id` integer not null primary key autoincrement, `label` varchar(255) null, `start_date` date null, `end_date` date null)"
+  },
+  "components_dishes": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "price",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "very_long_description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_dishes` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `description` text null, `price` float null, `very_long_description` text null)"
+  },
+  "components_default_links": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "platform",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "url",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_links` (`id` integer not null primary key autoincrement, `platform` varchar(255) null, `url` varchar(255) null)"
+  },
+  "components_openingtimes_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_openingtimes_uq",
+        "unique": true
+      },
+      {
+        "name": "components_openingtimes_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "components_openingtimes_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "components_openingtimes_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "components_openingtimes",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_openingtimes_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `components_openingtimes_entity_fk` foreign key(`entity_id`) references `components_openingtimes`(`id`) on delete CASCADE)"
+  },
+  "components_openingtimes": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "label",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "time",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_openingtimes` (`id` integer not null primary key autoincrement, `label` varchar(255) null, `time` varchar(255) null)"
+  },
+  "components_default_orgs_cmps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "entity_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "cmp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "component_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_default_orgs_uq",
+        "unique": true
+      },
+      {
+        "name": "components_default_orgs_entity_fk",
+        "unique": false
+      },
+      {
+        "name": "components_default_orgs_component_type_idx",
+        "unique": false
+      },
+      {
+        "name": "components_default_orgs_field_idx",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "components_default_orgs",
+        "from": "entity_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_default_orgs_cmps` (`id` integer not null primary key autoincrement, `entity_id` integer null, `cmp_id` integer null, `component_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `components_default_orgs_entity_fk` foreign key(`entity_id`) references `components_default_orgs`(`id`) on delete CASCADE)"
+  },
+  "components_default_orgs": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "address",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_orgs` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `address` varchar(255) null)"
+  },
+  "components_default_organizations": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "address",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_organizations` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `address` varchar(255) null)"
+  },
+  "components_restaurantservices": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "is_available",
+        "type": "boolean",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_restaurantservices` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `is_available` boolean null)"
+  },
+  "components_default_social_links": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_social_links` (`id` integer not null primary key autoincrement)"
+  },
+  "components_default_temps": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "url",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_temps` (`id` integer not null primary key autoincrement, `name` varchar(255) null, `url` varchar(255) null)"
+  },
+  "components_default_test_components": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "test_name",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "test_another_text",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `components_default_test_components` (`id` integer not null primary key autoincrement, `test_name` varchar(255) null, `test_another_text` varchar(255) null)"
+  },
+  "strapi_core_store_settings": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "key",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "value",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "environment",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "tag",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [],
+    "fks": [],
+    "sql": "CREATE TABLE `strapi_core_store_settings` (`id` integer not null primary key autoincrement, `key` varchar(255) null, `value` text null, `type` varchar(255) null, `environment` varchar(255) null, `tag` varchar(255) null)"
+  },
+  "upload_folders_parent_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "folder_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "inv_folder_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "folder_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "upload_folders_parent_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "upload_folders_parent_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "upload_folders_parent_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "upload_folders_parent_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "upload_folders",
+        "from": "inv_folder_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "upload_folders",
+        "from": "folder_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `upload_folders_parent_lnk` (`id` integer not null primary key autoincrement, `folder_id` integer null, `inv_folder_id` integer null, `folder_ord` float null, constraint `upload_folders_parent_lnk_fk` foreign key(`folder_id`) references `upload_folders`(`id`) on delete CASCADE, constraint `upload_folders_parent_lnk_ifk` foreign key(`inv_folder_id`) references `upload_folders`(`id`) on delete CASCADE)"
+  },
+  "files_related_mph": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "file_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "related_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "related_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "files_related_mph_idix",
+        "unique": false
+      },
+      {
+        "name": "files_related_mph_oidx",
+        "unique": false
+      },
+      {
+        "name": "files_related_mph_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "files",
+        "from": "file_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `files_related_mph` (`id` integer not null primary key autoincrement, `file_id` integer null, `related_id` integer null, `related_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `files_related_mph_fk` foreign key(`file_id`) references `files`(`id`) on delete CASCADE)"
+  },
+  "files_folder_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "file_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "folder_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "file_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "files_folder_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "files_folder_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "files_folder_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "files_folder_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "upload_folders",
+        "from": "folder_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "files",
+        "from": "file_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `files_folder_lnk` (`id` integer not null primary key autoincrement, `file_id` integer null, `folder_id` integer null, `file_ord` float null, constraint `files_folder_lnk_fk` foreign key(`file_id`) references `files`(`id`) on delete CASCADE, constraint `files_folder_lnk_ifk` foreign key(`folder_id`) references `upload_folders`(`id`) on delete CASCADE)"
+  },
+  "up_users_role_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "user_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "role_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "user_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "up_users_role_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "up_users_role_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "up_users_role_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "up_users_role_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "up_roles",
+        "from": "role_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "up_users",
+        "from": "user_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `up_users_role_lnk` (`id` integer not null primary key autoincrement, `user_id` integer null, `role_id` integer null, `user_ord` float null, constraint `up_users_role_lnk_fk` foreign key(`user_id`) references `up_users`(`id`) on delete CASCADE, constraint `up_users_role_lnk_ifk` foreign key(`role_id`) references `up_roles`(`id`) on delete CASCADE)"
+  },
+  "up_permissions_role_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "permission_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "role_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "permission_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "up_permissions_role_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "up_permissions_role_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "up_permissions_role_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "up_permissions_role_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "up_roles",
+        "from": "role_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "up_permissions",
+        "from": "permission_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `up_permissions_role_lnk` (`id` integer not null primary key autoincrement, `permission_id` integer null, `role_id` integer null, `permission_ord` float null, constraint `up_permissions_role_lnk_fk` foreign key(`permission_id`) references `up_permissions`(`id`) on delete CASCADE, constraint `up_permissions_role_lnk_ifk` foreign key(`role_id`) references `up_roles`(`id`) on delete CASCADE)"
+  },
+  "addresses_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "address_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "address_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "addresses_categories_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "addresses_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "addresses_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "addresses_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "addresses_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "addresses",
+        "from": "address_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `addresses_categories_lnk` (`id` integer not null primary key autoincrement, `address_id` integer null, `category_id` integer null, `category_ord` float null, `address_ord` float null, constraint `addresses_categories_lnk_fk` foreign key(`address_id`) references `addresses`(`id`) on delete CASCADE, constraint `addresses_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "articles_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "article_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "article_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "articles_categories_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "articles_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "articles_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "articles_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "articles_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "articles",
+        "from": "article_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `articles_categories_lnk` (`id` integer not null primary key autoincrement, `article_id` integer null, `category_id` integer null, `category_ord` float null, `article_ord` float null, constraint `articles_categories_lnk_fk` foreign key(`article_id`) references `articles`(`id`) on delete CASCADE, constraint `articles_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "conditions_country_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "condition_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "country_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "conditions_country_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "conditions_country_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "conditions_country_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "countries",
+        "from": "country_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "conditions",
+        "from": "condition_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `conditions_country_lnk` (`id` integer not null primary key autoincrement, `condition_id` integer null, `country_id` integer null, constraint `conditions_country_lnk_fk` foreign key(`condition_id`) references `conditions`(`id`) on delete CASCADE, constraint `conditions_country_lnk_ifk` foreign key(`country_id`) references `countries`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_one_way_tag_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_one_way_tag_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_one_way_tag_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_one_way_tag_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_one_way_tag_lnk` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `tag_id` integer null, constraint `kitchensinks_one_way_tag_lnk_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE, constraint `kitchensinks_one_way_tag_lnk_ifk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_one_to_one_tag_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_one_to_one_tag_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_one_to_one_tag_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_one_to_one_tag_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_one_to_one_tag_lnk` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `tag_id` integer null, constraint `kitchensinks_one_to_one_tag_lnk_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE, constraint `kitchensinks_one_to_one_tag_lnk_ifk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_many_to_one_tag_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "kitchensink_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_many_to_one_tag_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_to_one_tag_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_many_to_one_tag_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_to_one_tag_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_many_to_one_tag_lnk` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `tag_id` integer null, `kitchensink_ord` float null, constraint `kitchensinks_many_to_one_tag_lnk_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE, constraint `kitchensinks_many_to_one_tag_lnk_ifk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_many_to_many_tags_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "tag_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "kitchensink_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_many_to_many_tags_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_to_many_tags_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_to_many_tags_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_many_to_many_tags_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_to_many_tags_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_many_to_many_tags_lnk` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `tag_id` integer null, `tag_ord` float null, `kitchensink_ord` float null, constraint `kitchensinks_many_to_many_tags_lnk_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE, constraint `kitchensinks_many_to_many_tags_lnk_ifk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_many_way_tags_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "tag_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_many_way_tags_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_way_tags_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "kitchensinks_many_way_tags_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_many_way_tags_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_many_way_tags_lnk` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `tag_id` integer null, `tag_ord` float null, constraint `kitchensinks_many_way_tags_lnk_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE, constraint `kitchensinks_many_way_tags_lnk_ifk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE)"
+  },
+  "kitchensinks_morph_to_many_mph": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "morph_to_many_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "morph_to_many_type",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "field",
+        "type": "varchar(255)",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "order",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "kitchensinks_morph_to_many_mph_idix",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_morph_to_many_mph_oidx",
+        "unique": false
+      },
+      {
+        "name": "kitchensinks_morph_to_many_mph_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `kitchensinks_morph_to_many_mph` (`id` integer not null primary key autoincrement, `kitchensink_id` integer null, `morph_to_many_id` integer null, `morph_to_many_type` varchar(255) null, `field` varchar(255) null, `order` float null, constraint `kitchensinks_morph_to_many_mph_fk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE)"
+  },
+  "likes_author_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "like_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "user_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "likes_author_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "likes_author_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "likes_author_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "up_users",
+        "from": "user_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "likes",
+        "from": "like_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `likes_author_lnk` (`id` integer not null primary key autoincrement, `like_id` integer null, `user_id` integer null, constraint `likes_author_lnk_fk` foreign key(`like_id`) references `likes`(`id`) on delete CASCADE, constraint `likes_author_lnk_ifk` foreign key(`user_id`) references `up_users`(`id`) on delete CASCADE)"
+  },
+  "likes_review_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "like_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "review_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "like_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "likes_review_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "likes_review_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "likes_review_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "likes_review_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "reviews",
+        "from": "review_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "likes",
+        "from": "like_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `likes_review_lnk` (`id` integer not null primary key autoincrement, `like_id` integer null, `review_id` integer null, `like_ord` float null, constraint `likes_review_lnk_fk` foreign key(`like_id`) references `likes`(`id`) on delete CASCADE, constraint `likes_review_lnk_ifk` foreign key(`review_id`) references `reviews`(`id`) on delete CASCADE)"
+  },
+  "menusections_menu_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "menusection_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "menu_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "menusection_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "menusections_menu_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "menusections_menu_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "menusections_menu_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "menusections_menu_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "menus",
+        "from": "menu_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "menusections",
+        "from": "menusection_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `menusections_menu_lnk` (`id` integer not null primary key autoincrement, `menusection_id` integer null, `menu_id` integer null, `menusection_ord` float null, constraint `menusections_menu_lnk_fk` foreign key(`menusection_id`) references `menusections`(`id`) on delete CASCADE, constraint `menusections_menu_lnk_ifk` foreign key(`menu_id`) references `menus`(`id`) on delete CASCADE)"
+  },
+  "relation_locales_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "relation_locale_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "relation_locale_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "relation_locales_categories_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "relation_locales_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "relation_locales",
+        "from": "relation_locale_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `relation_locales_categories_lnk` (`id` integer not null primary key autoincrement, `relation_locale_id` integer null, `category_id` integer null, `category_ord` float null, `relation_locale_ord` float null, constraint `relation_locales_categories_lnk_fk` foreign key(`relation_locale_id`) references `relation_locales`(`id`) on delete CASCADE, constraint `relation_locales_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "relation_locales_category_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "relation_locale_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "relation_locales_category_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "relation_locales_category_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "relation_locales_category_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "relation_locales",
+        "from": "relation_locale_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `relation_locales_category_lnk` (`id` integer not null primary key autoincrement, `relation_locale_id` integer null, `category_id` integer null, constraint `relation_locales_category_lnk_fk` foreign key(`relation_locale_id`) references `relation_locales`(`id`) on delete CASCADE, constraint `relation_locales_category_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "restaurants_address_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "restaurant_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "address_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "restaurants_address_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "restaurants_address_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_address_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "addresses",
+        "from": "address_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "restaurants",
+        "from": "restaurant_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `restaurants_address_lnk` (`id` integer not null primary key autoincrement, `restaurant_id` integer null, `address_id` integer null, constraint `restaurants_address_lnk_fk` foreign key(`restaurant_id`) references `restaurants`(`id`) on delete CASCADE, constraint `restaurants_address_lnk_ifk` foreign key(`address_id`) references `addresses`(`id`) on delete CASCADE)"
+  },
+  "restaurants_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "restaurant_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "restaurants_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "restaurants_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "restaurants",
+        "from": "restaurant_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `restaurants_categories_lnk` (`id` integer not null primary key autoincrement, `restaurant_id` integer null, `category_id` integer null, `category_ord` float null, constraint `restaurants_categories_lnk_fk` foreign key(`restaurant_id`) references `restaurants`(`id`) on delete CASCADE, constraint `restaurants_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "restaurants_menu_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "restaurant_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "menu_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "restaurants_menu_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "restaurants_menu_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "restaurants_menu_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "menus",
+        "from": "menu_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "restaurants",
+        "from": "restaurant_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `restaurants_menu_lnk` (`id` integer not null primary key autoincrement, `restaurant_id` integer null, `menu_id` integer null, constraint `restaurants_menu_lnk_fk` foreign key(`restaurant_id`) references `restaurants`(`id`) on delete CASCADE, constraint `restaurants_menu_lnk_ifk` foreign key(`menu_id`) references `menus`(`id`) on delete CASCADE)"
+  },
+  "reviews_author_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "review_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "user_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "reviews_author_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "reviews_author_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "reviews_author_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "up_users",
+        "from": "user_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "reviews",
+        "from": "review_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `reviews_author_lnk` (`id` integer not null primary key autoincrement, `review_id` integer null, `user_id` integer null, constraint `reviews_author_lnk_fk` foreign key(`review_id`) references `reviews`(`id`) on delete CASCADE, constraint `reviews_author_lnk_ifk` foreign key(`user_id`) references `up_users`(`id`) on delete CASCADE)"
+  },
+  "reviews_restaurant_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "review_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "restaurant_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "reviews_restaurant_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "reviews_restaurant_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "reviews_restaurant_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "restaurants",
+        "from": "restaurant_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "reviews",
+        "from": "review_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `reviews_restaurant_lnk` (`id` integer not null primary key autoincrement, `review_id` integer null, `restaurant_id` integer null, constraint `reviews_restaurant_lnk_fk` foreign key(`review_id`) references `reviews`(`id`) on delete CASCADE, constraint `reviews_restaurant_lnk_ifk` foreign key(`restaurant_id`) references `restaurants`(`id`) on delete CASCADE)"
+  },
+  "tags_many_to_one_kitchensink_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "tag_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "kitchensink_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "tag_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "tags_many_to_one_kitchensink_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "tags_many_to_one_kitchensink_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "tags_many_to_one_kitchensink_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "tags_many_to_one_kitchensink_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "kitchensinks",
+        "from": "kitchensink_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "tags",
+        "from": "tag_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `tags_many_to_one_kitchensink_lnk` (`id` integer not null primary key autoincrement, `tag_id` integer null, `kitchensink_id` integer null, `tag_ord` float null, constraint `tags_many_to_one_kitchensink_lnk_fk` foreign key(`tag_id`) references `tags`(`id`) on delete CASCADE, constraint `tags_many_to_one_kitchensink_lnk_ifk` foreign key(`kitchensink_id`) references `kitchensinks`(`id`) on delete CASCADE)"
+  },
+  "temps_category_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "temp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "temps_category_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "temps_category_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "temps_category_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "temps",
+        "from": "temp_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `temps_category_lnk` (`id` integer not null primary key autoincrement, `temp_id` integer null, `category_id` integer null, constraint `temps_category_lnk_fk` foreign key(`temp_id`) references `temps`(`id`) on delete CASCADE, constraint `temps_category_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "temps_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "temp_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "temp_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "temps_categories_lnk_oifk",
+        "unique": false
+      },
+      {
+        "name": "temps_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "temps_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "temps_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "temps_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "temps",
+        "from": "temp_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `temps_categories_lnk` (`id` integer not null primary key autoincrement, `temp_id` integer null, `category_id` integer null, `category_ord` float null, `temp_ord` float null, constraint `temps_categories_lnk_fk` foreign key(`temp_id`) references `temps`(`id`) on delete CASCADE, constraint `temps_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "components_basic_relations_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "relation_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "category_ord",
+        "type": "float",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_basic_relations_categories_lnk_ofk",
+        "unique": false
+      },
+      {
+        "name": "components_basic_relations_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "components_basic_relations_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "components_basic_relations_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "components_basic_relations",
+        "from": "relation_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_basic_relations_categories_lnk` (`id` integer not null primary key autoincrement, `relation_id` integer null, `category_id` integer null, `category_ord` float null, constraint `components_basic_relations_categories_lnk_fk` foreign key(`relation_id`) references `components_basic_relations`(`id`) on delete CASCADE, constraint `components_basic_relations_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  },
+  "components_dishes_categories_lnk": {
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "dish_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "category_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "indexes": [
+      {
+        "name": "components_dishes_categories_lnk_uq",
+        "unique": true
+      },
+      {
+        "name": "components_dishes_categories_lnk_ifk",
+        "unique": false
+      },
+      {
+        "name": "components_dishes_categories_lnk_fk",
+        "unique": false
+      }
+    ],
+    "fks": [
+      {
+        "id": 0,
+        "seq": 0,
+        "table": "categories",
+        "from": "category_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      },
+      {
+        "id": 1,
+        "seq": 0,
+        "table": "components_dishes",
+        "from": "dish_id",
+        "to": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE",
+        "match": "NONE"
+      }
+    ],
+    "sql": "CREATE TABLE `components_dishes_categories_lnk` (`id` integer not null primary key autoincrement, `dish_id` integer null, `category_id` integer null, constraint `components_dishes_categories_lnk_fk` foreign key(`dish_id`) references `components_dishes`(`id`) on delete CASCADE, constraint `components_dishes_categories_lnk_ifk` foreign key(`category_id`) references `categories`(`id`) on delete CASCADE)"
+  }
+}
