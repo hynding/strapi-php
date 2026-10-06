@@ -1,0 +1,88 @@
+{
+    "name": "strapi/strapi-monorepo",
+    "description": "PHP 8.3 port of Strapi \u2014 monorepo root",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "strapi/strapi": "*",
+        "strapi/core": "*",
+        "strapi/database": "*",
+        "strapi/utils": "*",
+        "strapi/types": "*",
+        "strapi/permissions": "*",
+        "strapi/logger": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/core/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/plugins/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/providers/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/utils/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/generators/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/cli/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Tests\\": "tests/php/",
+            "Strapi\\Utils\\Tests\\": "packages/core/utils/tests/",
+            "Strapi\\Permissions\\Tests\\": "packages/core/permissions/tests/",
+            "Strapi\\Logger\\Tests\\": "packages/utils/logger/tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "lint": "php-cs-fixer fix --dry-run --diff",
+        "lint:fix": "php-cs-fixer fix",
+        "version:check": "php scripts/check-package-versions.php",
+        "version:fix": "php scripts/check-package-versions.php --fix",
+        "parity": "php scripts/parity-map.php"
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": false
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

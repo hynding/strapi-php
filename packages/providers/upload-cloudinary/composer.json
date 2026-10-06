@@ -1,0 +1,32 @@
+{
+    "name": "strapi/provider-upload-cloudinary",
+    "description": "Cloudinary upload provider (port of @strapi/provider-upload-cloudinary)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/upload": "self.version",
+        "cloudinary/cloudinary_php": "^3.1"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/provider-upload-cloudinary",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Provider\\UploadCloudinary\\Tests\\": "tests/"
+        }
+    }
+}

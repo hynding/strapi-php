@@ -1,0 +1,31 @@
+{
+    "name": "strapi/utils",
+    "description": "Shared utilities: errors, query-param conversion, sanitize/validate, pagination (port of @strapi/utils)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/types": "self.version"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/utils",
+            "status": "foundation",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Utils\\Tests\\": "tests/"
+        }
+    }
+}

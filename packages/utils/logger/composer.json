@@ -1,0 +1,31 @@
+{
+    "name": "strapi/logger",
+    "description": "Monolog-based logger (port of @strapi/logger)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "monolog/monolog": "^3.8"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/logger",
+            "status": "foundation",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Logger\\Tests\\": "tests/"
+        }
+    }
+}

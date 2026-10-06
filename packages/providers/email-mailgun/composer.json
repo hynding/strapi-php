@@ -1,0 +1,32 @@
+{
+    "name": "strapi/provider-email-mailgun",
+    "description": "Mailgun email provider (port of @strapi/provider-email-mailgun)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/email": "self.version",
+        "symfony/mailgun-mailer": "^7.2"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/provider-email-mailgun",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Provider\\EmailMailgun\\Tests\\": "tests/"
+        }
+    }
+}

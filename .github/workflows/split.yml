@@ -1,0 +1,39 @@
+name: Split packages
+
+# Pushes each packages/*/* directory to its own read-only repository so Packagist can
+# serve strapi/<name> independently. Requires a SPLIT_TOKEN secret with repo scope and one
+# repository per package under the target organization.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - { path: packages/core/types, repo: types }
+          - { path: packages/core/utils, repo: utils }
+          - { path: packages/utils/logger, repo: logger }
+          - { path: packages/core/permissions, repo: permissions }
+          - { path: packages/core/database, repo: database }
+          - { path: packages/core/core, repo: core }
+          - { path: packages/core/strapi, repo: strapi }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: symplify/monorepo-split-github-action@v2.3.0
+        with:
+          tag: ${{ github.ref_name }}
+          package_directory: ${{ matrix.package.path }}
+          repository_organization: ${{ github.repository_owner }}
+          repository_name: strapi-php-${{ matrix.package.repo }}
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}

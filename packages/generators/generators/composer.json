@@ -1,0 +1,33 @@
+{
+    "name": "strapi/generators",
+    "description": "Code generators for APIs, controllers, services, policies (port of @strapi/generators)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/utils": "self.version",
+        "symfony/console": "^7.2",
+        "symfony/filesystem": "^7.2"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/generators",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Generators\\Tests\\": "tests/"
+        }
+    }
+}

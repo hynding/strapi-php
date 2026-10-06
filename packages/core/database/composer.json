@@ -1,0 +1,33 @@
+{
+    "name": "strapi/database",
+    "description": "Database layer on Doctrine DBAL: metadata, schema sync, query builder, entity manager, migrations (port of @strapi/database)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "doctrine/dbal": "^4.2",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/database",
+            "status": "foundation",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Database\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "name": "strapi/content-releases",
+    "description": "Scheduled content releases (port of @strapi/content-releases server)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/core": "self.version"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/content-releases",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "server/src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\ContentReleases\\Tests\\": "tests/"
+        }
+    }
+}

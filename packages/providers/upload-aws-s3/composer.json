@@ -1,0 +1,32 @@
+{
+    "name": "strapi/provider-upload-aws-s3",
+    "description": "Amazon S3 upload provider (port of @strapi/provider-upload-aws-s3)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/upload": "self.version",
+        "league/flysystem-aws-s3-v3": "^3.29"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/provider-upload-aws-s3",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Provider\\UploadAwsS3\\Tests\\": "tests/"
+        }
+    }
+}

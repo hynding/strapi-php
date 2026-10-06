@@ -1,0 +1,49 @@
+name: Upstream release watch
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - id: watch
+        run: php scripts/strapi-release-watch.php || true
+      - name: Open tracking issue
+        if: steps.watch.outputs.behind == 'true'
+        uses: actions/github-script@v7
+        env:
+          UPSTREAM: ${{ steps.watch.outputs.upstream }}
+          TRACKED: ${{ steps.watch.outputs.tracked }}
+          DIFF: ${{ steps.watch.outputs.diffUrl }}
+          RELEASE: ${{ steps.watch.outputs.releaseUrl }}
+        with:
+          script: |
+            const title = `Parity: ${process.env.UPSTREAM}`;
+            const { data: open } = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'parity' });
+            if (open.some(i => i.title === title)) { core.info('Tracking issue already exists'); return; }
+            const body = [
+              `Upstream released **${process.env.UPSTREAM}**; this repo tracks **${process.env.TRACKED}**.`,
+              '',
+              `- Release notes: ${process.env.RELEASE}`,
+              `- Server-side diff: ${process.env.DIFF}`,
+              '',
+              '### Checklist',
+              '- [ ] Clone upstream at the new tag and run `php scripts/parity-map.php --upstream=../strapi --tag=v' + process.env.UPSTREAM + ' --diff=parity.json --out=parity.json`',
+              '- [ ] Port every file listed as `changed-upstream` / `added-upstream`',
+              '- [ ] `php scripts/check-package-versions.php --set ' + process.env.UPSTREAM + '-beta.1`',
+              '- [ ] Bump `@strapi/admin` and plugin admin packages in `examples/*/package.json`',
+              '- [ ] Run `tests/api` against the PHP server',
+              '- [ ] Tag `v' + process.env.UPSTREAM + '` (or a `-beta.N` pre-release if parity is incomplete)',
+            ].join('\n');
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['parity'] });

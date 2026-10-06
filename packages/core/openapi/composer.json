@@ -1,0 +1,32 @@
+{
+    "name": "strapi/openapi",
+    "description": "OpenAPI document generation from route schemas (port of @strapi/openapi)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/core": "self.version",
+        "cebe/php-openapi": "^1.7"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/openapi",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\OpenApi\\Tests\\": "tests/"
+        }
+    }
+}

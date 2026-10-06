@@ -1,0 +1,18 @@
+parameters:
+    level: 8
+    phpVersion: 80300
+    paths:
+        - packages/core/types/src
+        - packages/core/utils/src
+        - packages/core/permissions/src
+        - packages/utils/logger/src
+        - packages/core/database/src
+        - packages/core/core/src
+        - packages/core/strapi/src
+        - scripts
+    scanDirectories:
+        - packages
+    excludePaths:
+        - packages/*/*/admin
+        - packages/*/*/vendor
+    treatPhpDocTypesAsCertain: false

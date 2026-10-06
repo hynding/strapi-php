@@ -2,6 +2,12 @@ MIT License
 
 Copyright (c) 2026 Steve Hynding
 
+This repository is a port of Strapi (https://github.com/strapi/strapi),
+Copyright (c) 2015-present Strapi Solutions SAS, licensed under the MIT Expat
+License for its Community Edition. Files that mirror upstream code carry the same
+licence. Nothing under an upstream "ee/" directory is ported; those parts of Strapi
+are licensed separately by Strapi Solutions SAS.
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

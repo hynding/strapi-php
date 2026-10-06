@@ -1,0 +1,33 @@
+{
+    "name": "strapi/types",
+    "description": "Shared interfaces, enums and PHPStan types (port of @strapi/types)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "psr/http-message": "^1.1 || ^2.0",
+        "psr/log": "^3.0",
+        "psr/http-server-middleware": "^1.0"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/types",
+            "status": "foundation",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Types\\Tests\\": "tests/"
+        }
+    }
+}

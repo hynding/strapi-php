@@ -1,0 +1,32 @@
+{
+    "name": "strapi/provider-email-nodemailer",
+    "description": "SMTP email provider via symfony/mailer (port of @strapi/provider-email-nodemailer)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/email": "self.version",
+        "symfony/mailer": "^7.2"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/provider-email-nodemailer",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Provider\\EmailNodemailer\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "strapi-php",
+  "private": true,
+  "description": "Admin-side (JavaScript) workspaces of the Strapi PHP port. The admin panel is upstream's unchanged React bundle.",
+  "workspaces": [
+    "packages/*/*/admin",
+    "examples/*"
+  ],
+  "scripts": {
+    "test:api": "cd tests/api && yarn test",
+    "verify:versions": "php scripts/check-package-versions.php"
+  },
+  "engines": {
+    "node": ">=20.0.0 <=26.x.x"
+  }
+}

@@ -1,0 +1,32 @@
+{
+    "name": "strapi/data-transfer",
+    "description": "Export/import/transfer engine (port of @strapi/data-transfer)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/core": "self.version",
+        "splitbrain/php-archive": "^1.4"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/data-transfer",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\DataTransfer\\Tests\\": "tests/"
+        }
+    }
+}

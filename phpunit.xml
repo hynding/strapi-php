@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="utils"><directory>packages/core/utils/tests</directory></testsuite>
+        <testsuite name="permissions"><directory>packages/core/permissions/tests</directory></testsuite>
+        <testsuite name="logger"><directory>packages/utils/logger/tests</directory></testsuite>
+        <testsuite name="database"><directory>packages/core/database/tests</directory></testsuite>
+        <testsuite name="core"><directory>packages/core/core/tests</directory></testsuite>
+        <testsuite name="strapi"><directory>packages/core/strapi/tests</directory></testsuite>
+        <testsuite name="integration"><directory>tests/php</directory></testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">packages/core/*/src</directory>
+            <directory suffix=".php">packages/utils/*/src</directory>
+        </include>
+    </source>
+</phpunit>

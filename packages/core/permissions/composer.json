@@ -1,0 +1,32 @@
+{
+    "name": "strapi/permissions",
+    "description": "Permission engine: CASL-style abilities with Mongo-style conditions (port of @strapi/permissions)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/permissions",
+            "status": "foundation",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Permissions\\Tests\\": "tests/"
+        }
+    }
+}

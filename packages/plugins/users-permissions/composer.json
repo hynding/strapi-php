@@ -1,0 +1,33 @@
+{
+    "name": "strapi/plugin-users-permissions",
+    "description": "Public users, roles and OAuth providers (port of @strapi/plugin-users-permissions server)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/core": "self.version",
+        "firebase/php-jwt": "^6.11",
+        "symfony/rate-limiter": "^7.2"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/plugin-users-permissions",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "server/src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Plugin\\UsersPermissions\\Tests\\": "tests/"
+        }
+    }
+}

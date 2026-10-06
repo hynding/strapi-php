@@ -1,0 +1,32 @@
+{
+    "name": "strapi/upgrade",
+    "description": "Upgrade tool and codemods on rector (port of @strapi/upgrade)",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "symfony/console": "^7.2",
+        "rector/rector": "^2.0"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "@strapi/upgrade",
+            "status": "planned",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strapi\\Upgrade\\Tests\\": "tests/"
+        }
+    }
+}
