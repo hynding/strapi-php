@@ -36,7 +36,8 @@ exec($cmd, $lines, $code);
 if ($code !== 0 || $lines === []) {
     // Shallow clones may not have the tag; fall back to HEAD and say so.
     exec(sprintf('git -C %s ls-tree -r HEAD -- packages', escapeshellarg($upstream)), $lines, $code);
-    $tag = 'HEAD';
+    $sha = trim((string) shell_exec(sprintf('git -C %s rev-parse --short HEAD', escapeshellarg($upstream))));
+    $tag = 'HEAD@' . $sha;
 }
 
 $isServerFile = static function (string $path): bool {
