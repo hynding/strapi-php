@@ -42,6 +42,30 @@ To serve the admin panel, install the pinned upstream bundle and build it:
 cd examples/getstarted && npm install && php bin/strapi build   # needs Node 20+
 ```
 
+## Docker
+
+`docker-compose.dev.yml` runs `examples/getstarted` on [FrankenPHP](https://frankenphp.dev)
+in worker mode (Strapi boots once per worker, PHP files are watched and workers restart on
+change) with the repository bind-mounted, plus optional database services:
+
+```sh
+docker compose -f docker-compose.dev.yml up                                         # SQLite, http://localhost:1337
+DATABASE_CLIENT=postgres docker compose -f docker-compose.dev.yml --profile postgres up
+DATABASE_CLIENT=mysql    docker compose -f docker-compose.dev.yml --profile mysql up
+DATABASE_CLIENT=mariadb  docker compose -f docker-compose.dev.yml --profile mariadb up
+
+docker compose -f docker-compose.dev.yml exec app composer test
+docker compose -f docker-compose.dev.yml exec app php examples/getstarted/bin/strapi routes:list
+docker compose -f docker-compose.dev.yml exec app sh -c 'cd examples/getstarted && npm install && php bin/strapi build'
+```
+
+The container runs `composer install` on first start, creates the example's `.env` from
+`.env.example` when missing, points `DATABASE_HOST`/`DATABASE_PORT` at the chosen service
+and waits for it. The image (`docker/Dockerfile`) is PHP 8.3 with `pdo_mysql`, `pdo_pgsql`,
+`intl`, `gd`, `zip`, Composer, and Node 20 for the admin build (`--build-arg WITH_NODE=0`
+to skip). `docker-compose.test.yml` mirrors upstream's and only starts Postgres and MySQL
+for running the test suites against a real server.
+
 ## Layout
 
 ```

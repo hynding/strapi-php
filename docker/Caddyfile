@@ -1,0 +1,20 @@
+# FrankenPHP worker mode for the mounted example project. The worker boots Strapi once and
+# reuses it across requests; `watch` restarts the workers when PHP files change.
+{
+	frankenphp {
+		worker {
+			file {$APP_ROOT}/public/index.php
+			num {$WORKERS:2}
+			env MAX_REQUESTS {$MAX_REQUESTS:0}
+			watch /app/packages/**/*.php
+			watch {$APP_ROOT}/config/**/*.php
+			watch {$APP_ROOT}/src/**/*
+		}
+	}
+}
+
+{$SERVER_NAME::1337} {
+	root * {$APP_ROOT}/public
+	encode zstd gzip
+	php_server
+}

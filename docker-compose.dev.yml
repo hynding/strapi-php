@@ -1,0 +1,96 @@
+# Local development. Mirrors upstream docker-compose.dev.yml (postgres + mysql services) and adds
+# the PHP application itself, running examples/getstarted on FrankenPHP in worker mode.
+#
+#   docker compose -f docker-compose.dev.yml up                               # SQLite
+#   DATABASE_CLIENT=postgres docker compose -f docker-compose.dev.yml --profile postgres up
+#   DATABASE_CLIENT=mysql    docker compose -f docker-compose.dev.yml --profile mysql up
+#   DATABASE_CLIENT=mariadb  docker compose -f docker-compose.dev.yml --profile mariadb up
+#
+#   docker compose -f docker-compose.dev.yml exec app composer test
+#   docker compose -f docker-compose.dev.yml exec app php examples/getstarted/bin/strapi routes:list
+#   docker compose -f docker-compose.dev.yml exec app sh -c 'cd examples/getstarted && npm install && php bin/strapi build'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: strapi-php-dev
+    volumes:
+      - .:/app
+      - composer-cache:/root/.composer/cache
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT:-sqlite}
+      DATABASE_NAME: ${DATABASE_NAME:-strapi}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-strapi}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-strapi}
+      DATABASE_HOST: ${DATABASE_HOST:-}
+      DATABASE_PORT: ${DATABASE_PORT:-}
+      WORKERS: ${WORKERS:-2}
+      STRAPI_ENV: development
+    ports:
+      - '${PORT:-1337}:1337'
+    tty: true
+
+  postgres:
+    image: postgres:16
+    profiles: [postgres]
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi
+      POSTGRES_DB: strapi
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U strapi']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '5432:5432'
+
+  mysql:
+    image: mysql:8
+    profiles: [mysql]
+    restart: always
+    environment:
+      MYSQL_DATABASE: strapi
+      MYSQL_USER: strapi
+      MYSQL_PASSWORD: strapi
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: strapi
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -pstrapi']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '3306:3306'
+
+  mariadb:
+    image: mariadb:11
+    profiles: [mariadb]
+    restart: always
+    environment:
+      MARIADB_DATABASE: strapi
+      MARIADB_USER: strapi
+      MARIADB_PASSWORD: strapi
+      MARIADB_ROOT_PASSWORD: strapi
+    volumes:
+      - mariadbdata:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '3307:3306'
+
+volumes:
+  pgdata:
+  mysqldata:
+  mariadbdata:
+  composer-cache:
