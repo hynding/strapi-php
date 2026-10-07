@@ -1,0 +1,10 @@
+{
+    "name": "strapi-plugin/announcements-conformance-app",
+    "description": "Throwaway app the PHP conformance test boots with only the announcements plugin",
+    "type": "project",
+    "extra": {
+        "strapi": {
+            "uuid": "conformance"
+        }
+    }
+}

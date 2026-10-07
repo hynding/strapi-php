@@ -10,6 +10,8 @@ parameters:
         - packages/core/core/src
         - packages/core/strapi/src
         - scripts
+        - examples/plugins/announcements/server/src
+        - examples/plugins/announcements/tests/php
     scanDirectories:
         - packages
     excludePaths:

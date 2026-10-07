@@ -13,6 +13,7 @@
         <testsuite name="core"><directory>packages/core/core/tests</directory></testsuite>
         <testsuite name="strapi"><directory>packages/core/strapi/tests</directory></testsuite>
         <testsuite name="integration"><directory>tests/php</directory></testsuite>
+        <testsuite name="example-plugins"><directory>examples/plugins/announcements/tests/php</directory></testsuite>
     </testsuites>
     <source>
         <include>

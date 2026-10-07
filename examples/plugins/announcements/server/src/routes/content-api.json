@@ -1,0 +1,14 @@
+{
+  "type": "content-api",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/active",
+      "handler": "announcement.active",
+      "config": {
+        "auth": false,
+        "policies": []
+      }
+    }
+  ]
+}

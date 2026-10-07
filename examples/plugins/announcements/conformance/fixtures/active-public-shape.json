@@ -1,0 +1,27 @@
+{
+  "description": "The content API exposes exactly the public fields of an announcement",
+  "seed": {
+    "plugin::announcements.announcement": [
+      { "title": "Maintenance tonight", "body": "From 22:00 UTC.", "level": "warning" }
+    ]
+  },
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active" },
+      "expect": {
+        "status": 200,
+        "body": {
+          "data": [
+            {
+              "$keys": ["body", "createdAt", "documentId", "level", "title"],
+              "title": "Maintenance tonight",
+              "body": "From 22:00 UTC.",
+              "level": "warning"
+            }
+          ],
+          "meta": { "limit": 3 }
+        }
+      }
+    }
+  ]
+}
