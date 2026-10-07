@@ -13,9 +13,11 @@ use Strapi\Utils\Errors\UnauthorizedError;
  * A strategy is an array `['name' => string, 'authenticate' => callable(Context): array, 'verify' => ?callable(array $auth, mixed $config): void]`
  * where `authenticate` returns `['authenticated' => bool, 'credentials' => mixed, 'ability' => mixed, 'error' => ?string]`.
  *
- * PHP-port note: when a route type has NO registered strategy at all (the users-permissions and
- * admin packages are not ported yet), requests are treated as public instead of being rejected
- * with 401, so the content API is usable; registering any strategy restores upstream's behaviour.
+ * PHP-port note: when the content API has NO registered strategy at all (users-permissions is not
+ * ported yet), its requests are treated as public instead of being rejected with 401, so the
+ * content API is usable; registering any strategy restores upstream's behaviour. Admin routes get
+ * no such fallback: without the admin package nobody can authenticate, so they answer 401 like
+ * upstream does for an anonymous request (plugin admin routes rely on this).
  *
  * @phpstan-type Strategy array{name: string, authenticate: callable, verify?: callable}
  * @phpstan-type AuthenticationInfo array{strategy: Strategy, credentials: mixed, ability: mixed}
@@ -94,8 +96,8 @@ final class Auth
             }
         }
 
-        // PHP port: no strategy registered for this route type → public access (see class doc)
-        if ($strategiesToUse === [] && $routeStrategies === []) {
+        // PHP port: no strategy registered for the content API → public access (see class doc)
+        if ($strategiesToUse === [] && $routeStrategies === [] && $routeType === 'content-api') {
             $next();
 
             return;
@@ -140,8 +142,8 @@ final class Auth
         }
 
         if ($auth === null || $auth === []) {
-            // PHP port: no strategy registered for this route type → public access (see class doc)
-            if ($routeType !== null && ($this->strategies[$routeType] ?? []) === []) {
+            // PHP port: no strategy registered for the content API → public access (see class doc)
+            if ($routeType === 'content-api' && ($this->strategies[$routeType] ?? []) === []) {
                 return null;
             }
 
