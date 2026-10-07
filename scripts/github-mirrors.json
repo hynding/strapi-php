@@ -26,7 +26,6 @@
   "vlucas/phpdotenv",
   "GrahamCampbell/Result-Type",
   "schmittjoh/php-option",
-  "firebase/php-jwt",
   "sebastianbergmann/phpunit",
   "sebastianbergmann/php-code-coverage",
   "sebastianbergmann/php-file-iterator",

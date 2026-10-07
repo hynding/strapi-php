@@ -7,8 +7,7 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/core": "self.version",
-        "firebase/php-jwt": "^6.11"
+        "strapi/core": "self.version"
     },
     "extra": {
         "strapi": {

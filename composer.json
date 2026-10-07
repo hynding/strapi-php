@@ -5,13 +5,13 @@
     "license": "MIT",
     "require": {
         "php": ">=8.3",
-        "strapi/strapi": "*",
-        "strapi/core": "*",
-        "strapi/database": "*",
-        "strapi/utils": "*",
-        "strapi/types": "*",
-        "strapi/permissions": "*",
-        "strapi/logger": "*"
+        "strapi/strapi": "self.version",
+        "strapi/core": "self.version",
+        "strapi/database": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/permissions": "self.version",
+        "strapi/logger": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",
@@ -87,5 +87,6 @@
         "allow-plugins": false
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "version": "5.56.0"
 }

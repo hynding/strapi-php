@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Services;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+use Strapi\Core\Utils\Jwt;
 use Strapi\Core\Constants;
 use Strapi\Core\Services\SessionManager\DatabaseSessionProvider;
 use Strapi\Core\Services\SessionManager\OriginSessionManager;
@@ -159,15 +158,13 @@ final class SessionManager
     {
         unset($jwtOptions['expiresIn'], $jwtOptions['privateKey'], $jwtOptions['publicKey']);
 
-        return JWT::encode([...self::optionClaims($jwtOptions), ...$payload], $key, $algorithm);
+        return Jwt::encode([...self::optionClaims($jwtOptions), ...$payload], $key, $algorithm);
     }
 
     /** @return array<string, mixed> */
     private function verify(string $token, string $key, string $algorithm): array
     {
-        $decoded = JWT::decode($token, new Key($key, $algorithm));
-
-        return json_decode((string) json_encode($decoded), true) ?: [];
+        return Jwt::decode($token, $key, $algorithm);
     }
 
     private static function toTimestamp(mixed $value): int
@@ -266,7 +263,7 @@ final class SessionManager
             $config = $this->getConfigForOrigin($origin);
             $algorithm = $config['algorithm'] ?? Constants::DEFAULT_ALGORITHM;
             $payload = $this->verify($token, $this->getJwtKey($config, $algorithm, 'verify'), $algorithm);
-        } catch (\Firebase\JWT\ExpiredException | \Firebase\JWT\SignatureInvalidException | \Firebase\JWT\BeforeValidException | \UnexpectedValueException | \DomainException) {
+        } catch (\UnexpectedValueException | \DomainException) {
             return ['isValid' => false];
         }
 
