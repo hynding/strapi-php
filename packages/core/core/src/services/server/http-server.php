@@ -149,12 +149,20 @@ PHP;
     {
         if (!headers_sent()) {
             http_response_code($response->getStatusCode());
-            foreach ($response->getHeaders() as $name => $values) {
-                $first = true;
-                foreach ($values as $value) {
-                    header("{$name}: {$value}", $first);
-                    $first = false;
+            // the response's Content-Type is final: PHP must not append `;charset=` (default_charset)
+            // to `text/*` types as Koa never does (`text/event-stream` stays as set)
+            $defaultCharset = ini_get('default_charset');
+            ini_set('default_charset', '');
+            try {
+                foreach ($response->getHeaders() as $name => $values) {
+                    $first = true;
+                    foreach ($values as $value) {
+                        header("{$name}: {$value}", $first);
+                        $first = false;
+                    }
                 }
+            } finally {
+                ini_set('default_charset', $defaultCharset === false ? 'UTF-8' : $defaultCharset);
             }
         }
 

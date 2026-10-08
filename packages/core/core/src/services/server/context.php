@@ -35,7 +35,7 @@ final class Context implements ContextContract
 
     private bool $bodyParsed = false;
 
-    /** @var array<string, UploadedFileInterface> */
+    /** @var array<string, UploadedFileInterface|list<UploadedFileInterface>> */
     private array $files = [];
 
     private mixed $body = null;
@@ -138,7 +138,7 @@ final class Context implements ContextContract
         return $this->files;
     }
 
-    /** @param array<string, UploadedFileInterface> $files */
+    /** @param array<string, UploadedFileInterface|list<UploadedFileInterface>> $files a list when the field is repeated (koa-body) */
     public function setFiles(array $files): void
     {
         $this->files = $files;

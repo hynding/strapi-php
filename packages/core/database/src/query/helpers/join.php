@@ -135,7 +135,7 @@ final class Join
             $inner->on("{$rootTable}.{$join['rootColumn']}", "{$alias}.{$join['referencedColumn']}");
 
             foreach ($join['on'] ?? [] as $key => $value) {
-                if (is_callable($value)) {
+                if (!is_string($value) && is_callable($value)) {
                     continue;
                 }
                 $inner->onVal("{$alias}.{$key}", $value);

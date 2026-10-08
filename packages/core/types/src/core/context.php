@@ -41,7 +41,7 @@ interface Context
     /** @return mixed parsed request body (JSON object as array, multipart as ['data' => ..., 'files' => ...]) */
     public function requestBody(): mixed;
 
-    /** @return array<string, \Psr\Http\Message\UploadedFileInterface> */
+    /** @return array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>> a list when the multipart field is repeated (koa-body) */
     public function files(): array;
 
     public function method(): string;

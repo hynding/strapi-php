@@ -9,7 +9,7 @@ use Strapi\Core\Strapi;
 /**
  * Port of packages/core/core/src/services/ai.ts.
  *
- * STUB (TODO): upstream builds the `strapi.ai` namespace (with `mcp`). Only `mcp` is exposed here.
+ * The `strapi.ai` namespace: `admin` (registered by the admin package as `ai.admin`) and `mcp`.
  */
 final class Ai
 {
@@ -20,6 +20,12 @@ final class Ai
     public static function createAiNamespace(Strapi $strapi): self
     {
         return new self($strapi);
+    }
+
+    /** `strapi.ai.admin`: the admin AI service (`ai.admin`, registered by the admin package). */
+    public function admin(): object
+    {
+        return $this->strapi->get('ai.admin');
     }
 
     public function mcp(): Mcp\Mcp

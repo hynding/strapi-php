@@ -390,7 +390,8 @@ final class EntityManager
 
         $dataToInsert = $this->processData($metadata, $data, true);
 
-        $res = $this->createQueryBuilder($uid)->insert($dataToInsert)->execute();
+        // a row without any column (e.g. a component made of relations only) is still one row: knex inserts its defaults
+        $res = $this->createQueryBuilder($uid)->insert($dataToInsert === [] ? [[]] : $dataToInsert)->execute();
         $id = is_array($res[0] ?? null) ? $res[0]['id'] : ($res[0] ?? null);
 
         $trx = $this->db->transaction();

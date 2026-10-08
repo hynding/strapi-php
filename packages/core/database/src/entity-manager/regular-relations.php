@@ -19,17 +19,18 @@ final class RegularRelations
      *
      * @return list<int|string>|SqlBuilder
      */
-    private static function getDocumentSiblingIdsQuery(Database $db, string $tableName, int|string $id): array|SqlBuilder
+    private static function getDocumentSiblingIdsQuery(Database $db, ?string $tableName, int|string $id): array|SqlBuilder
     {
         $isContentType = false;
-        foreach ($db->metadata as $model) {
+        // component join tables have no referencedTable on the inverse column (upstream: `undefined`)
+        foreach ($tableName === null ? [] : $db->metadata as $model) {
             if ($model['tableName'] === $tableName && isset($model['attributes']['documentId'])) {
                 $isContentType = true;
                 break;
             }
         }
 
-        if (!$isContentType) {
+        if (!$isContentType || $tableName === null) {
             return [$id];
         }
 
@@ -61,7 +62,7 @@ final class RegularRelations
 
         $sql = $db->sql()->from($joinTable['name'])->delete()
             // Exclude the ids of the current document
-            ->whereNotIn($joinColumn['name'], self::getDocumentSiblingIdsQuery($db, $joinColumn['referencedTable'], $id))
+            ->whereNotIn($joinColumn['name'], self::getDocumentSiblingIdsQuery($db, $joinColumn['referencedTable'] ?? null, $id))
             // Include all the ids that are being connected
             ->whereIn($inverseJoinColumn['name'], $relIdsToadd)
             ->where($joinTable['on'] ?? []);
@@ -94,7 +95,7 @@ final class RegularRelations
         if (Relations::isManyToAny($attribute)) {
             $relsToDelete = $db->sql()->select($inverseJoinColumn['name'])->from($joinTable['name'])
                 ->where($joinColumn['name'], $id)
-                ->whereNotIn($inverseJoinColumn['name'], self::getDocumentSiblingIdsQuery($db, $inverseJoinColumn['referencedTable'], $relIdToadd))
+                ->whereNotIn($inverseJoinColumn['name'], self::getDocumentSiblingIdsQuery($db, $inverseJoinColumn['referencedTable'] ?? null, $relIdToadd))
                 ->where($joinTable['on'] ?? [])
                 ->run();
 
@@ -116,7 +117,7 @@ final class RegularRelations
             // handling oneToOne
             $db->sql()->from($joinTable['name'])->delete()
                 ->where($joinColumn['name'], $id)
-                ->whereNotIn($inverseJoinColumn['name'], self::getDocumentSiblingIdsQuery($db, $inverseJoinColumn['referencedTable'], $relIdToadd))
+                ->whereNotIn($inverseJoinColumn['name'], self::getDocumentSiblingIdsQuery($db, $inverseJoinColumn['referencedTable'] ?? null, $relIdToadd))
                 ->where($joinTable['on'] ?? [])
                 ->run();
         }

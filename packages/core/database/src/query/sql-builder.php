@@ -265,7 +265,8 @@ final class SqlBuilder
 
     private function addWhere(string $bool, callable|string|array $column, mixed ...$args): self
     {
-        if (is_callable($column)) {
+        // a string column is never a callback, even when it names a PHP function (`key`, `count`...)
+        if (!is_string($column) && is_callable($column)) {
             $sub = $this->sub();
             $column($sub);
             $compiled = $sub->compileWheres();
@@ -786,7 +787,12 @@ final class SqlBuilder
         if ($this->onConflict !== null && $this->ignore && $client === 'mysql') {
             $sql = 'INSERT IGNORE ';
         }
-        $sql .= "INTO {$table} ({$quotedColumns}) VALUES " . implode(', ', $valueGroups);
+        if ($columns === []) {
+            // rows without columns: insert the column defaults, as knex does for `insert({})`
+            $sql .= $client === 'mysql' ? "INTO {$table} () VALUES ()" : "INTO {$table} DEFAULT VALUES";
+        } else {
+            $sql .= "INTO {$table} ({$quotedColumns}) VALUES " . implode(', ', $valueGroups);
+        }
 
         if ($this->onConflict !== null) {
             if ($client === 'mysql') {
