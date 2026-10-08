@@ -67,6 +67,27 @@ $phpPathFor = static function (string $upstreamPath): string {
     return $p;
 };
 
+// folders (below a package root) whose own LICENSE is the Enterprise licence
+$enterpriseDirs = [];
+foreach ($lines as $line) {
+    if (preg_match('/^\d+ blob ([0-9a-f]+)\t(packages\/[^\/]+\/[^\/]+\/.+)\/LICENSE$/', $line, $m) !== 1) {
+        continue;
+    }
+    $licence = (string) shell_exec(sprintf('git -C %s cat-file -p %s 2>/dev/null', escapeshellarg($upstream), escapeshellarg($m[1])));
+    if (str_contains($licence, 'Enterprise License')) {
+        $enterpriseDirs[] = $m[2] . '/';
+    }
+}
+$isUnderEnterpriseLicence = static function (string $path) use ($enterpriseDirs): bool {
+    foreach ($enterpriseDirs as $dir) {
+        if (str_starts_with($path, $dir)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 $entries = [];
 foreach ($lines as $line) {
     // <mode> blob <hash>\t<path>
@@ -83,9 +104,10 @@ foreach ($lines as $line) {
         'php' => $php,
         'ported' => file_exists($root . '/' . $php),
     ];
-    // Enterprise Edition code (packages/*/*/ee/...) is under Strapi's EE licence, not MIT: tracked,
-    // but blocked until the licence is confirmed (see VERSIONING.md / the package READMEs).
-    if (preg_match('#^packages/[^/]+/[^/]+/(.*/)?ee/#', $path) === 1) {
+    // Enterprise Edition code is under Strapi's EE licence, not MIT: tracked, but blocked until the
+    // licence is confirmed. That is everything under an ee/ folder, and every folder below a package
+    // root that carries its own Enterprise LICENSE (content-manager's history/ and preview/).
+    if (preg_match('#^packages/[^/]+/[^/]+/(.*/)?ee/#', $path) === 1 || $isUnderEnterpriseLicence($path)) {
         $entries[$path]['ee'] = true;
     }
 }

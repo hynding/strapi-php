@@ -1,563 +1,12 @@
 {
     "upstreamTag": "v5.56.0",
-    "generatedAt": "2026-10-08T00:05:15+00:00",
+    "generatedAt": "2026-10-08T03:00:53+00:00",
     "totals": {
         "files": 1921,
-        "ported": 360,
-        "ee": 45
+        "ported": 672,
+        "ee": 69
     },
-    "changed": {
-        "packages/core/admin/_internal/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/content-types/audit-log.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/controllers/audit-logs.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/routes/audit-logs.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/services/audit-logs.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/services/lifecycles.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/utils.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/utils/csv.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/utils/export-token.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/audit-logs/validation/audit-logs.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/bootstrap.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/config/admin-actions.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/content-types/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/admin.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/authentication-utils/constants.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/authentication-utils/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/authentication-utils/middlewares.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/authentication-utils/utils.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/authentication.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/role.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/controllers/user.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/destroy.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/register.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/routes/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/routes/license-limit.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/routes/sso.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/routes/utils.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/auth.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/metrics.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/passport.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/passport/provider-registry.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/passport/sso.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/persist-tables.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/role.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/seat-enforcement.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/services/user.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/utils/index.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/utils/sso-lock.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/validation/authentication.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/validation/role.ts": "added-upstream",
-        "packages/core/admin/ee/server/src/validation/user.ts": "added-upstream",
-        "packages/core/admin/server/src/ai/controllers/ai.ts": "added-upstream",
-        "packages/core/admin/server/src/ai/routes/ai.ts": "added-upstream",
-        "packages/core/admin/server/src/ai/services/ai.ts": "added-upstream",
-        "packages/core/admin/server/src/audit-logs/admin-users.ts": "added-upstream",
-        "packages/core/admin/server/src/audit-logs/tokens.ts": "added-upstream",
-        "packages/core/admin/server/src/audit-logs/webhooks.ts": "added-upstream",
-        "packages/core/admin/server/src/bootstrap.ts": "added-upstream",
-        "packages/core/admin/server/src/config/admin-actions.ts": "added-upstream",
-        "packages/core/admin/server/src/config/admin-conditions.ts": "added-upstream",
-        "packages/core/admin/server/src/config/email-templates/forgot-password.ts": "added-upstream",
-        "packages/core/admin/server/src/config/index.ts": "added-upstream",
-        "packages/core/admin/server/src/config/settings.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/Permission.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/Role.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/User.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/api-token-permission.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/api-token.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/index.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/session.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/transfer-token-permission.ts": "added-upstream",
-        "packages/core/admin/server/src/content-types/transfer-token.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/admin-token.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/admin.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/api-token.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/authenticated-session.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/authenticated-user.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/authentication.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/content-api.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/formatters/conditions.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/formatters/format-actions-by-sections.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/formatters/index.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/homepage.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/index.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/permission.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/role.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/transfer/index.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/transfer/runner.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/transfer/token.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/user.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/validation/schema.ts": "added-upstream",
-        "packages/core/admin/server/src/controllers/webhooks.ts": "added-upstream",
-        "packages/core/admin/server/src/destroy.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/action/index.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/action/provider.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/condition/index.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/condition/provider.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/permission/index.ts": "added-upstream",
-        "packages/core/admin/server/src/domain/user.ts": "added-upstream",
-        "packages/core/admin/server/src/index.ts": "added-upstream",
-        "packages/core/admin/server/src/middlewares/data-transfer.ts": "added-upstream",
-        "packages/core/admin/server/src/middlewares/index.ts": "added-upstream",
-        "packages/core/admin/server/src/middlewares/rateLimit.ts": "added-upstream",
-        "packages/core/admin/server/src/migrations/database/migrate-prefered-language-dk-to-da.ts": "added-upstream",
-        "packages/core/admin/server/src/policies/hasPermissions.ts": "added-upstream",
-        "packages/core/admin/server/src/policies/index.ts": "added-upstream",
-        "packages/core/admin/server/src/policies/isAuthenticatedAdmin.ts": "added-upstream",
-        "packages/core/admin/server/src/policies/isTelemetryEnabled.ts": "added-upstream",
-        "packages/core/admin/server/src/register.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/admin-tokens.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/admin.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/api-tokens.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/authentication.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/content-api.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/homepage.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/index.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/permissions.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/roles.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/serve-admin-panel.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/transfer.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/users.ts": "added-upstream",
-        "packages/core/admin/server/src/routes/webhooks.ts": "added-upstream",
-        "packages/core/admin/server/src/services/action.ts": "added-upstream",
-        "packages/core/admin/server/src/services/api-token.ts": "added-upstream",
-        "packages/core/admin/server/src/services/auth.ts": "added-upstream",
-        "packages/core/admin/server/src/services/condition.ts": "added-upstream",
-        "packages/core/admin/server/src/services/constants.ts": "added-upstream",
-        "packages/core/admin/server/src/services/content-type.ts": "added-upstream",
-        "packages/core/admin/server/src/services/encryption.ts": "added-upstream",
-        "packages/core/admin/server/src/services/homepage.ts": "added-upstream",
-        "packages/core/admin/server/src/services/index.ts": "added-upstream",
-        "packages/core/admin/server/src/services/metrics.ts": "added-upstream",
-        "packages/core/admin/server/src/services/passport.ts": "added-upstream",
-        "packages/core/admin/server/src/services/passport/local-strategy.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/engine.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/permissions-manager/index.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/permissions-manager/permission-fields.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/permissions-manager/query-builders.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/permissions-manager/sanitize.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/permissions-manager/validate.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/queries.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/sections-builder/builder.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/sections-builder/handlers.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/sections-builder/index.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/sections-builder/section.ts": "added-upstream",
-        "packages/core/admin/server/src/services/permission/sections-builder/utils.ts": "added-upstream",
-        "packages/core/admin/server/src/services/project-settings.ts": "added-upstream",
-        "packages/core/admin/server/src/services/role.ts": "added-upstream",
-        "packages/core/admin/server/src/services/token.ts": "added-upstream",
-        "packages/core/admin/server/src/services/transfer/index.ts": "added-upstream",
-        "packages/core/admin/server/src/services/transfer/permission.ts": "added-upstream",
-        "packages/core/admin/server/src/services/transfer/token.ts": "added-upstream",
-        "packages/core/admin/server/src/services/transfer/utils.ts": "added-upstream",
-        "packages/core/admin/server/src/services/user.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/admin-token.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/admin.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/api-token-utils.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/content-api-token.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/data-transfer.ts": "added-upstream",
-        "packages/core/admin/server/src/strategies/index.ts": "added-upstream",
-        "packages/core/admin/server/src/utils/index.js": "added-upstream",
-        "packages/core/admin/server/src/utils/normalize-email.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/action-provider.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/admin-tokens.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/api-tokens.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/authentication/forgot-password.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/authentication/index.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/authentication/login.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/authentication/register.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/authentication/reset-password.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/common-functions/check-fields-are-correctly-nested.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/common-functions/check-fields-dont-have-duplicates.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/common-functions/index.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/common-validators.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/permission.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/policies/hasPermissions.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/project-settings.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/role.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/transfer/index.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/transfer/token.ts": "added-upstream",
-        "packages/core/admin/server/src/validation/user.ts": "added-upstream",
-        "packages/core/admin/server/test-utils/create-context.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/admin-token.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/admin.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/ai.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/api-token.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/audit-logs.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/authentication.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/content-api-token.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/content-api.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/content-api/permissions.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/content-api/routes.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/content-types.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/homepage.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/permissions.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/providers.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/roles.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/sessions.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/shared.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/transfer.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/user.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/users.ts": "added-upstream",
-        "packages/core/admin/shared/contracts/webhooks.ts": "added-upstream",
-        "packages/core/admin/shared/utils/audit-log-export.ts": "added-upstream",
-        "packages/core/admin/shared/utils/auth-cookie-domain.ts": "added-upstream",
-        "packages/core/admin/shared/utils/auth-cookie-name.ts": "added-upstream",
-        "packages/core/admin/shared/utils/auth-cookie-path.ts": "added-upstream",
-        "packages/core/admin/shared/utils/session-auth.ts": "added-upstream",
-        "packages/core/content-manager/server/src/controllers/collection-types.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/controllers/content-types.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/controllers/relations.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/controllers/utils/clone.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/history/controllers/history-version.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/history/services/history.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/history/services/lifecycles.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/history/services/utils.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/mcp/permissions.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/mcp/register-content-manager-mcp-tools.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/mcp/types.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/preview/controllers/previewScript.js": "changed-upstream",
-        "packages/core/content-manager/server/src/preview/controllers/validation/preview.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/components.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/content-structure.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/content-types.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/data-mapper.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/document-manager.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/document-metadata.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/metrics.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/permission-checker.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/permission.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/populate-builder.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/utils/configuration/attributes.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/utils/configuration/settings.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/utils/draft.ts": "changed-upstream",
-        "packages/core/content-manager/server/src/services/utils/populate.ts": "changed-upstream",
-        "packages/core/content-releases/server/src/migrations/index.ts": "changed-upstream",
-        "packages/core/content-releases/server/src/services/release-action.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/config.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/controllers/schema.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/controllers/validation/content-type.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/controllers/validation/model-schema.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/controllers/validation/relations.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/controllers/validation/schema.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/services/content-types.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/services/schema-builder/content-type-builder.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/services/schema-mutation.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/services/schema.ts": "changed-upstream",
-        "packages/core/core/src/Strapi.ts": "changed-upstream",
-        "packages/core/core/src/configuration/get-dirs.ts": "changed-upstream",
-        "packages/core/core/src/configuration/index.ts": "changed-upstream",
-        "packages/core/core/src/core-api/controller/collection-type.ts": "changed-upstream",
-        "packages/core/core/src/core-api/controller/index.ts": "changed-upstream",
-        "packages/core/core/src/core-api/controller/single-type.ts": "changed-upstream",
-        "packages/core/core/src/core-api/controller/transform.ts": "changed-upstream",
-        "packages/core/core/src/core-api/routes/index.ts": "changed-upstream",
-        "packages/core/core/src/core-api/service/pagination.ts": "changed-upstream",
-        "packages/core/core/src/domain/content-type/index.ts": "changed-upstream",
-        "packages/core/core/src/ee/index.ts": "changed-upstream",
-        "packages/core/core/src/factories.ts": "changed-upstream",
-        "packages/core/core/src/loaders/apis.ts": "changed-upstream",
-        "packages/core/core/src/loaders/plugins/get-enabled-plugins.ts": "changed-upstream",
-        "packages/core/core/src/loaders/plugins/get-user-plugins-config.ts": "changed-upstream",
-        "packages/core/core/src/loaders/plugins/index.ts": "changed-upstream",
-        "packages/core/core/src/middlewares/body.ts": "changed-upstream",
-        "packages/core/core/src/middlewares/public.ts": "changed-upstream",
-        "packages/core/core/src/middlewares/responses.ts": "changed-upstream",
-        "packages/core/core/src/middlewares/security.ts": "changed-upstream",
-        "packages/core/core/src/middlewares/session.ts": "changed-upstream",
-        "packages/core/core/src/migrations/database/5.0.0-discard-drafts.ts": "changed-upstream",
-        "packages/core/core/src/migrations/i18n.ts": "changed-upstream",
-        "packages/core/core/src/registries/apis.ts": "changed-upstream",
-        "packages/core/core/src/registries/components.ts": "changed-upstream",
-        "packages/core/core/src/registries/content-types.ts": "changed-upstream",
-        "packages/core/core/src/registries/controllers.ts": "changed-upstream",
-        "packages/core/core/src/registries/custom-fields.ts": "changed-upstream",
-        "packages/core/core/src/registries/hooks.ts": "changed-upstream",
-        "packages/core/core/src/registries/middlewares.ts": "changed-upstream",
-        "packages/core/core/src/registries/modules.ts": "changed-upstream",
-        "packages/core/core/src/registries/plugins.ts": "changed-upstream",
-        "packages/core/core/src/registries/policies.ts": "changed-upstream",
-        "packages/core/core/src/registries/services.ts": "changed-upstream",
-        "packages/core/core/src/services/auth/index.ts": "changed-upstream",
-        "packages/core/core/src/services/core-store.ts": "changed-upstream",
-        "packages/core/core/src/services/cron.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/attributes/index.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/attributes/transforms.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/components.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/draft-and-publish.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/entries.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/first-published-at.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/internationalization.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/params.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/repository.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/id-map.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/id-transform.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/query.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/extract/data-ids.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/transform/data-ids.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/transform/default-locale.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/utils/data.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/utils/dp.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/utils/i18n.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/utils/map-relation.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/transform/relations/utils/xto-one.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/utils/bidirectional-relations.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/utils/clone-relations.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/utils/self-referential-relations.ts": "changed-upstream",
-        "packages/core/core/src/services/document-service/utils/unidirectional-relations.ts": "changed-upstream",
-        "packages/core/core/src/services/entity-validator/index.ts": "changed-upstream",
-        "packages/core/core/src/services/server/compose-endpoint.ts": "changed-upstream",
-        "packages/core/core/src/services/server/koa-methods.ts": "changed-upstream",
-        "packages/core/core/src/services/server/koa.ts": "changed-upstream",
-        "packages/core/core/src/services/server/middleware.ts": "changed-upstream",
-        "packages/core/core/src/services/server/routing.ts": "changed-upstream",
-        "packages/core/core/src/services/utils/conditional-fields.ts": "changed-upstream",
-        "packages/core/core/src/services/utils/dynamic-zones.ts": "changed-upstream",
-        "packages/core/core/src/utils/cron.ts": "changed-upstream",
-        "packages/core/core/src/utils/filepath-to-prop-path.ts": "changed-upstream",
-        "packages/core/core/src/utils/is-initialized.ts": "changed-upstream",
-        "packages/core/core/src/utils/startup-logger.ts": "changed-upstream",
-        "packages/core/core/src/utils/transform-content-types-to-models.ts": "changed-upstream",
-        "packages/core/data-transfer/src/directory/providers/source/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/engine/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/engine/validation/provider.ts": "changed-upstream",
-        "packages/core/data-transfer/src/engine/validation/schemas/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/file/providers/source/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/configuration.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/providers/local-source/configuration.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/providers/remote-destination/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/providers/remote-source/index.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/queries/entity.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/queries/link.ts": "changed-upstream",
-        "packages/core/data-transfer/src/strapi/utils/project-settings-logos.ts": "changed-upstream",
-        "packages/core/data-transfer/src/utils/components.ts": "changed-upstream",
-        "packages/core/data-transfer/src/utils/json.ts": "changed-upstream",
-        "packages/core/data-transfer/src/utils/schema.ts": "changed-upstream",
-        "packages/core/database/src/dialects/dialect.ts": "changed-upstream",
-        "packages/core/database/src/dialects/mysql/index.ts": "changed-upstream",
-        "packages/core/database/src/dialects/postgresql/index.ts": "changed-upstream",
-        "packages/core/database/src/dialects/sqlite/index.ts": "changed-upstream",
-        "packages/core/database/src/entity-manager/entity-repository.ts": "changed-upstream",
-        "packages/core/database/src/entity-manager/index.ts": "changed-upstream",
-        "packages/core/database/src/entity-manager/morph-relations.ts": "changed-upstream",
-        "packages/core/database/src/entity-manager/regular-relations.ts": "changed-upstream",
-        "packages/core/database/src/entity-manager/relations-orderer.ts": "changed-upstream",
-        "packages/core/database/src/fields/biginteger.ts": "changed-upstream",
-        "packages/core/database/src/fields/boolean.ts": "changed-upstream",
-        "packages/core/database/src/fields/number.ts": "changed-upstream",
-        "packages/core/database/src/fields/shared/parsers.ts": "changed-upstream",
-        "packages/core/database/src/fields/string.ts": "changed-upstream",
-        "packages/core/database/src/index.ts": "changed-upstream",
-        "packages/core/database/src/metadata/index.ts": "changed-upstream",
-        "packages/core/database/src/metadata/metadata.ts": "changed-upstream",
-        "packages/core/database/src/metadata/relations.ts": "changed-upstream",
-        "packages/core/database/src/migrations/common.ts": "changed-upstream",
-        "packages/core/database/src/migrations/index.ts": "changed-upstream",
-        "packages/core/database/src/migrations/internal-migrations/5.0.0-02-document-id.ts": "changed-upstream",
-        "packages/core/database/src/migrations/resolver.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/order-by.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/populate/apply.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/populate/process.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/search.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/streams/readable.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/transform.ts": "changed-upstream",
-        "packages/core/database/src/query/helpers/where.ts": "changed-upstream",
-        "packages/core/database/src/query/query-builder.ts": "changed-upstream",
-        "packages/core/database/src/schema/builder.ts": "changed-upstream",
-        "packages/core/database/src/schema/diff.ts": "changed-upstream",
-        "packages/core/database/src/schema/index.ts": "changed-upstream",
-        "packages/core/database/src/utils/async-curry.ts": "changed-upstream",
-        "packages/core/database/src/utils/identifiers/hash.ts": "changed-upstream",
-        "packages/core/database/src/utils/identifiers/index.ts": "changed-upstream",
-        "packages/core/database/src/validations/relations/bidirectional.ts": "changed-upstream",
-        "packages/core/email/server/src/controllers/email.ts": "changed-upstream",
-        "packages/core/email/server/src/middlewares/rateLimit.ts": "changed-upstream",
-        "packages/core/permissions/src/domain/permission/index.ts": "changed-upstream",
-        "packages/core/permissions/src/engine/abilities/casl-ability.ts": "changed-upstream",
-        "packages/core/permissions/src/engine/hooks.ts": "changed-upstream",
-        "packages/core/permissions/src/engine/index.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/bootstrap.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/controllers/workflows.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/middlewares/review-workflows.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/migrations/handle-deleted-ct-in-workflows.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/migrations/multiple-workflows.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/register.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/assignees.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/document-service-middleware.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/metrics/weekly-metrics.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/stage-permissions.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/stages.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/validation.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/workflow-content-types.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/services/workflows.ts": "changed-upstream",
-        "packages/core/review-workflows/server/src/utils/review-workflows.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/build.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/develop.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/export/action.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/import/action.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/index.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/routes/list.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/commands/transfer/action.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/utils/commander.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/utils/data-transfer.ts": "changed-upstream",
-        "packages/core/strapi/src/cli/utils/helpers.ts": "changed-upstream",
-        "packages/core/strapi/src/node/vite/config.ts": "changed-upstream",
-        "packages/core/types/src/core/strapi.ts": "changed-upstream",
-        "packages/core/types/src/modules/index.ts": "changed-upstream",
-        "packages/core/upload/server/src/controllers/admin-file.ts": "changed-upstream",
-        "packages/core/upload/server/src/controllers/admin-folder.ts": "changed-upstream",
-        "packages/core/upload/server/src/controllers/content-api.ts": "changed-upstream",
-        "packages/core/upload/server/src/migrations/unsign-richtext-and-blocks-urls.ts": "changed-upstream",
-        "packages/core/upload/server/src/routes/content-api.ts": "changed-upstream",
-        "packages/core/upload/server/src/routes/validation/upload.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/api-upload-folder.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/extensions/utils.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/file.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/folder.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/provider.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/upload.ts": "changed-upstream",
-        "packages/core/upload/server/src/services/weekly-metrics.ts": "changed-upstream",
-        "packages/core/utils/src/async.ts": "changed-upstream",
-        "packages/core/utils/src/content-types.ts": "changed-upstream",
-        "packages/core/utils/src/convert-query-params.ts": "changed-upstream",
-        "packages/core/utils/src/format-yup-error.ts": "changed-upstream",
-        "packages/core/utils/src/hooks.ts": "changed-upstream",
-        "packages/core/utils/src/pagination.ts": "changed-upstream",
-        "packages/core/utils/src/policy.ts": "changed-upstream",
-        "packages/core/utils/src/primitives/objects.ts": "changed-upstream",
-        "packages/core/utils/src/primitives/strings.ts": "changed-upstream",
-        "packages/core/utils/src/provider-factory.ts": "changed-upstream",
-        "packages/core/utils/src/relations.ts": "changed-upstream",
-        "packages/core/utils/src/sanitize/index.ts": "changed-upstream",
-        "packages/core/utils/src/sanitize/sanitizers.ts": "changed-upstream",
-        "packages/core/utils/src/sanitize/visitors/remove-disallowed-fields.ts": "changed-upstream",
-        "packages/core/utils/src/sanitize/visitors/remove-restricted-fields.ts": "changed-upstream",
-        "packages/core/utils/src/sanitize/visitors/remove-restricted-relations.ts": "changed-upstream",
-        "packages/core/utils/src/security.ts": "changed-upstream",
-        "packages/core/utils/src/set-creator-fields.ts": "changed-upstream",
-        "packages/core/utils/src/traverse-entity.ts": "changed-upstream",
-        "packages/core/utils/src/traverse/factory.ts": "changed-upstream",
-        "packages/core/utils/src/traverse/query-fields.ts": "changed-upstream",
-        "packages/core/utils/src/traverse/query-filters.ts": "changed-upstream",
-        "packages/core/utils/src/traverse/query-populate.ts": "changed-upstream",
-        "packages/core/utils/src/traverse/query-sort.ts": "changed-upstream",
-        "packages/core/utils/src/validate/index.ts": "changed-upstream",
-        "packages/core/utils/src/validate/utils.ts": "changed-upstream",
-        "packages/core/utils/src/validate/validators.ts": "changed-upstream",
-        "packages/core/utils/src/validate/visitors/throw-disallowed-fields.ts": "changed-upstream",
-        "packages/core/utils/src/validate/visitors/throw-restricted-fields.ts": "changed-upstream",
-        "packages/core/utils/src/validate/visitors/throw-restricted-relations.ts": "changed-upstream",
-        "packages/core/utils/src/validators.ts": "changed-upstream",
-        "packages/core/utils/src/yup.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/services/documentation.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/services/helpers/build-component-schema.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/services/helpers/index.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/services/helpers/utils/clean-schema-attributes.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/services/helpers/utils/loop-content-type-names.ts": "changed-upstream",
-        "packages/plugins/documentation/server/src/types.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/bootstrap.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/format-graphql-error.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/dynamic-zones.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/entity.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/enums.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/filters/operators/index.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/generic-morph.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/index.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/relation-response-collection.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/resolvers/association.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/resolvers/query.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/response-collection.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/response.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/type.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/builders/utils.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/content-api/index.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/content-api/policy.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/content-api/wrap-resolvers.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/extension/extension.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/internals/helpers/get-enabled-scalars.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/internals/types/error.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/type-registry.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/attributes.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/mappers/entity-to-response-entity.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/mappers/graphql-filters-to-strapi-query.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/mappers/graphql-scalar-to-operators.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/mappers/strapi-scalar-to-graphql-scalar.ts": "changed-upstream",
-        "packages/plugins/graphql/server/src/services/utils/naming.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/bootstrap.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/controllers/content-types.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/controllers/locales.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/controllers/validate-locale-creation.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/graphql.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/index.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/register.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/content-types.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/fill-from-locale.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/locales.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/localizations.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/metrics.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/permissions/actions.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/permissions/sections-builder.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/services/sanitize/index.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/validation/content-types.ts": "changed-upstream",
-        "packages/plugins/i18n/server/src/validation/locales.ts": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/controllers/auth.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/controllers/validation/email-template.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/change-password.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/email-confirmation.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/forgot-password.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/login.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/register.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/auth/reset-password.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/create-role.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/create-user.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/update-user.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/graphql/utils.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/middlewares/rateLimit.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/services/user.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/services/users-permissions.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/strategies/users-permissions.js": "changed-upstream",
-        "packages/plugins/users-permissions/server/src/utils/sanitize/sanitizers.js": "changed-upstream",
-        "packages/providers/upload-aws-s3/src/index.ts": "changed-upstream",
-        "packages/utils/api-tests/agent.js": "changed-upstream",
-        "packages/utils/api-tests/builder/action-registry.js": "changed-upstream",
-        "packages/utils/api-tests/builder/context.js": "changed-upstream",
-        "packages/utils/api-tests/builder/index.js": "changed-upstream",
-        "packages/utils/api-tests/models.js": "changed-upstream",
-        "packages/utils/upgrade/src/modules/codemod-runner/codemod-runner.ts": "changed-upstream",
-        "packages/utils/upgrade/src/modules/json/transform-api.ts": "changed-upstream",
-        "packages/utils/upgrade/src/modules/runner/json/transform.ts": "changed-upstream",
-        "packages/core/content-type-builder/server/src/services/migration-builder/index.ts": "removed-upstream",
-        "packages/core/core/src/services/localization.ts": "removed-upstream",
-        "packages/core/database/src/metadata/attribute-naming.ts": "removed-upstream",
-        "packages/core/database/src/migrations/file-builder.ts": "removed-upstream",
-        "packages/core/database/src/schema/rename-helpers.ts": "removed-upstream",
-        "packages/core/email/vitest.config.ts": "removed-upstream",
-        "packages/core/review-workflows/server/src/audit-logs.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/content-types/rename-field.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/index.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/action.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/checklist-prompt.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/constants.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/directories.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/discovery.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/errors.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/install-packages.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/license.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/package-manager.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/plugin-status.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/registry-access.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/registry.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/selection.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/setup-links.ts": "removed-upstream",
-        "packages/core/strapi/src/cli/commands/enterprise/install/versions.ts": "removed-upstream",
-        "packages/core/types/src/modules/localization.ts": "removed-upstream",
-        "packages/plugins/graphql/vitest.config.ts": "removed-upstream",
-        "packages/plugins/i18n/server/src/localization.ts": "removed-upstream"
-    },
+    "changed": [],
     "files": {
         "packages/cli/create-strapi-app/bin/index.js": {
             "upstream": "6ea4a7a7b43eb123f47928a6bfc493ca992a64d0",
@@ -1360,152 +809,152 @@
         "packages/core/admin/server/src/ai/controllers/ai.ts": {
             "upstream": "0ed172bac05b85958112997425990daa3a24162b",
             "php": "packages/core/admin/server/src/ai/controllers/ai.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/ai/routes/ai.ts": {
             "upstream": "8e70dc437079b325513fdb2f4ecf352d35892cea",
             "php": "packages/core/admin/server/src/ai/routes/ai.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/ai/services/ai.ts": {
             "upstream": "87d625f9e58005bf4a458f535578129321a5e23b",
             "php": "packages/core/admin/server/src/ai/services/ai.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/audit-logs/admin-users.ts": {
             "upstream": "dd7b6048e13c1a3047b9833206293c3bc71661ac",
             "php": "packages/core/admin/server/src/audit-logs/admin-users.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/audit-logs/tokens.ts": {
             "upstream": "12940cf09c539851731fcea136a7cc161949475e",
             "php": "packages/core/admin/server/src/audit-logs/tokens.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/audit-logs/webhooks.ts": {
             "upstream": "375140410ea06f51742cd8fd0bdc538c3e7c7fcf",
             "php": "packages/core/admin/server/src/audit-logs/webhooks.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/bootstrap.ts": {
             "upstream": "dbd64f23b3829ec75859941e2a085bacc441a1b6",
             "php": "packages/core/admin/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/config/admin-actions.ts": {
             "upstream": "e2eb5beaf4d4c8819d15f149cb4f55abdf256f92",
             "php": "packages/core/admin/server/src/config/admin-actions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/config/admin-conditions.ts": {
             "upstream": "1ab749537fbb74fa2cb9496261874202c4661692",
             "php": "packages/core/admin/server/src/config/admin-conditions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/config/email-templates/forgot-password.ts": {
             "upstream": "68264fec4121f4b29b5753e962285a28eca2973b",
             "php": "packages/core/admin/server/src/config/email-templates/forgot-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/config/index.ts": {
             "upstream": "a87bea8357f290dde2e07040042b429f362421ba",
             "php": "packages/core/admin/server/src/config/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/config/settings.ts": {
             "upstream": "14297fc61f6e71734df4bc3856953a8cb3f4eb2f",
             "php": "packages/core/admin/server/src/config/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/Permission.ts": {
             "upstream": "2fd18e6c80be2a314a65f3e18406bd9ddadba54d",
             "php": "packages/core/admin/server/src/content-types/Permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/Role.ts": {
             "upstream": "9fc02bc60019cf068cb781f85346133b3eab2e96",
             "php": "packages/core/admin/server/src/content-types/Role.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/User.ts": {
             "upstream": "33b3ba7db3d8aea3c7e387d82ba8b92cfa68d688",
             "php": "packages/core/admin/server/src/content-types/User.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/api-token-permission.ts": {
             "upstream": "c64bb37970bd214926274433c8f433a217359420",
             "php": "packages/core/admin/server/src/content-types/api-token-permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/api-token.ts": {
             "upstream": "865ad9947775ee38dce02d49bac6b743228d5a9d",
             "php": "packages/core/admin/server/src/content-types/api-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/index.ts": {
             "upstream": "d1e8d353337ff178444da347675ba9efc219e1e4",
             "php": "packages/core/admin/server/src/content-types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/session.ts": {
             "upstream": "87e893b1211f8d76aebcd2697e50fd3d761f6a9d",
             "php": "packages/core/admin/server/src/content-types/session.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/transfer-token-permission.ts": {
             "upstream": "f28bcab903b8e11b8a746c9be6be7b742cfe5bf8",
             "php": "packages/core/admin/server/src/content-types/transfer-token-permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/content-types/transfer-token.ts": {
             "upstream": "a5f2af7e6b89c4d4e9fd43df48511f411c9f09ae",
             "php": "packages/core/admin/server/src/content-types/transfer-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/admin-token.ts": {
             "upstream": "8e69f50b486b41c9880f83b1d43327491901bdb3",
             "php": "packages/core/admin/server/src/controllers/admin-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/admin.ts": {
             "upstream": "4f3817979e3d24f7182244d9e70ce4daabb970a0",
             "php": "packages/core/admin/server/src/controllers/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/api-token.ts": {
             "upstream": "bf67774f2e14a92817b46f2dbaac8fca02c62549",
             "php": "packages/core/admin/server/src/controllers/api-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/authenticated-session.ts": {
             "upstream": "e07e59f369854b806fa256e9ac51d793e72b64b4",
             "php": "packages/core/admin/server/src/controllers/authenticated-session.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/authenticated-user.ts": {
             "upstream": "7767631f05082369f665b14b535fdb45c6e77786",
             "php": "packages/core/admin/server/src/controllers/authenticated-user.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/authentication.ts": {
             "upstream": "d47a73855c3607ea1f776a79362750fc6b7671cd",
             "php": "packages/core/admin/server/src/controllers/authentication.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/content-api.ts": {
             "upstream": "84ac152906598c9aad1c6a23564d3419d6702a15",
             "php": "packages/core/admin/server/src/controllers/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/formatters/conditions.ts": {
             "upstream": "8485bf79b46623c5ce229b4749ec0483dba3b497",
             "php": "packages/core/admin/server/src/controllers/formatters/conditions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/formatters/format-actions-by-sections.ts": {
             "upstream": "c8c4eeb4b286091f67bd1751335b7838ef963ac0",
             "php": "packages/core/admin/server/src/controllers/formatters/format-actions-by-sections.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/formatters/index.ts": {
             "upstream": "41825c28d39e16072f04abca69c8d1a754d42793",
@@ -1515,392 +964,392 @@
         "packages/core/admin/server/src/controllers/homepage.ts": {
             "upstream": "9f753e8c1349f61f56d4495389044bc75c2e2f19",
             "php": "packages/core/admin/server/src/controllers/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/index.ts": {
             "upstream": "fd2c062e7ffd73024328c17a73a81af2d4eada03",
             "php": "packages/core/admin/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/permission.ts": {
             "upstream": "f445e27d353c9367b3ae906ffd92a2b08cdeaa93",
             "php": "packages/core/admin/server/src/controllers/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/role.ts": {
             "upstream": "0a49990ba90c0ee64b4b08c7861557594b48b139",
             "php": "packages/core/admin/server/src/controllers/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/transfer/index.ts": {
             "upstream": "9de3cf3241ef985830352bae896e9d9491b2919f",
             "php": "packages/core/admin/server/src/controllers/transfer/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/transfer/runner.ts": {
             "upstream": "ff7d0e728d47353b529980a64b36e2cda73507ad",
             "php": "packages/core/admin/server/src/controllers/transfer/runner.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/transfer/token.ts": {
             "upstream": "9fe9b71fe417bc83ddf57c070d8fdaee43d0809f",
             "php": "packages/core/admin/server/src/controllers/transfer/token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/user.ts": {
             "upstream": "ab2d3b1a77509041039421836f4aab1a8087f902",
             "php": "packages/core/admin/server/src/controllers/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/validation/schema.ts": {
             "upstream": "9bb7433c9b80f17eaf382873cc3682e4c83cefa6",
             "php": "packages/core/admin/server/src/controllers/validation/schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/controllers/webhooks.ts": {
             "upstream": "43888a1dfa68ff72c0f892f2a1ca9c097750ddb3",
             "php": "packages/core/admin/server/src/controllers/webhooks.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/destroy.ts": {
             "upstream": "5253c4dd90144e7cc58fad9f9a69c768bb016b1e",
             "php": "packages/core/admin/server/src/destroy.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/action/index.ts": {
             "upstream": "afd0d01163d5a10014259c4ce552f4695e77a333",
             "php": "packages/core/admin/server/src/domain/action/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/action/provider.ts": {
             "upstream": "0dd713811823bbeffb3e29296a121e83e9d0d15b",
             "php": "packages/core/admin/server/src/domain/action/provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/condition/index.ts": {
             "upstream": "e432cf064185c7a67fd5c833ca7dd03096e0477d",
             "php": "packages/core/admin/server/src/domain/condition/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/condition/provider.ts": {
             "upstream": "880510a01b32289271ec2636a2072463cb8ff9a6",
             "php": "packages/core/admin/server/src/domain/condition/provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/permission/index.ts": {
             "upstream": "37e74482ada8fb037c86ba25d06dc232b3b12602",
             "php": "packages/core/admin/server/src/domain/permission/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/domain/user.ts": {
             "upstream": "d540edf16dccda23f881b543e9927585379b9b69",
             "php": "packages/core/admin/server/src/domain/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/index.ts": {
             "upstream": "cc5addf987f038ea65572e8f8f746f8b3e47867c",
             "php": "packages/core/admin/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/middlewares/data-transfer.ts": {
             "upstream": "9c4d8b9a90e9873d4c132a09dbc23c0874eac561",
             "php": "packages/core/admin/server/src/middlewares/data-transfer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/middlewares/index.ts": {
             "upstream": "ad8a87aee9fbd0d47b8c1ba20af7a23be72caa46",
             "php": "packages/core/admin/server/src/middlewares/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/middlewares/rateLimit.ts": {
             "upstream": "0cdcfa32e2032999f16df5fa1fbdc8438e290611",
             "php": "packages/core/admin/server/src/middlewares/rateLimit.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/migrations/database/migrate-prefered-language-dk-to-da.ts": {
             "upstream": "bc0e895782fa24e28e3890f5214e47a5f1d14832",
             "php": "packages/core/admin/server/src/migrations/database/migrate-prefered-language-dk-to-da.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/policies/hasPermissions.ts": {
             "upstream": "11607c183de2db2407d801e0b22b7a813b82ea73",
             "php": "packages/core/admin/server/src/policies/hasPermissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/policies/index.ts": {
             "upstream": "e2e9519f8a740c2ce9a190ece85451f2d781665a",
             "php": "packages/core/admin/server/src/policies/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/policies/isAuthenticatedAdmin.ts": {
             "upstream": "495f8293b9d0521d66f5a69b90cfb81df411848d",
             "php": "packages/core/admin/server/src/policies/isAuthenticatedAdmin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/policies/isTelemetryEnabled.ts": {
             "upstream": "696f84a0e49c30fb0cd4b8cf41b140116c2dab49",
             "php": "packages/core/admin/server/src/policies/isTelemetryEnabled.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/register.ts": {
             "upstream": "490adedeccd7709a7c364d70ef3ff87a272444ef",
             "php": "packages/core/admin/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/admin-tokens.ts": {
             "upstream": "8cc268f0ff833284e3b03d277613b2fc0ffc289e",
             "php": "packages/core/admin/server/src/routes/admin-tokens.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/admin.ts": {
             "upstream": "b03cf72c246942369adc202ca40b7ff7c62c0836",
             "php": "packages/core/admin/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/api-tokens.ts": {
             "upstream": "d790fbe5e66f6d2f3ec1d79b0d858fab3cee8841",
             "php": "packages/core/admin/server/src/routes/api-tokens.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/authentication.ts": {
             "upstream": "b8d2ae127a0eb20bb1404bec3942722e51344d47",
             "php": "packages/core/admin/server/src/routes/authentication.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/content-api.ts": {
             "upstream": "7bc527c902f4d3f3e8e31c7a91fa9cb2374ac3a1",
             "php": "packages/core/admin/server/src/routes/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/homepage.ts": {
             "upstream": "592c84d7d4343a15785ed19df13f4dbb62afd1c1",
             "php": "packages/core/admin/server/src/routes/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/index.ts": {
             "upstream": "fae5a0fe1cce286dbc56899e404a3038437aacda",
             "php": "packages/core/admin/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/permissions.ts": {
             "upstream": "8357ed439fb122ff568d1baf9d6ffb76ac7b8e49",
             "php": "packages/core/admin/server/src/routes/permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/roles.ts": {
             "upstream": "657f3ed958fa62d49b4bc5b51b62f94d2a16b838",
             "php": "packages/core/admin/server/src/routes/roles.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/serve-admin-panel.ts": {
             "upstream": "19c2f658c672da8b6f61a3c81aeb86f22ae9466e",
             "php": "packages/core/admin/server/src/routes/serve-admin-panel.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/transfer.ts": {
             "upstream": "6ca5cdeba7b572448cf405235957c1778b488a2d",
             "php": "packages/core/admin/server/src/routes/transfer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/users.ts": {
             "upstream": "6f30eaa3a0f8b7469d529ec6508dcd9e7d9308f3",
             "php": "packages/core/admin/server/src/routes/users.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/routes/webhooks.ts": {
             "upstream": "d72a089fedfaa122b238a31d8f67b07c786a93b0",
             "php": "packages/core/admin/server/src/routes/webhooks.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/action.ts": {
             "upstream": "66d45c6b4c4d296e0981abf348d7a55618c121db",
             "php": "packages/core/admin/server/src/services/action.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/api-token.ts": {
             "upstream": "d1d8fc74f93e225d3286e5aa61f80d7e69cb7f31",
             "php": "packages/core/admin/server/src/services/api-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/auth.ts": {
             "upstream": "75694ed55bf883cc1ace21815fd9eed65291dc44",
             "php": "packages/core/admin/server/src/services/auth.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/condition.ts": {
             "upstream": "a68130f13ddace5d37ab0d2af5799cf0e0e1af7a",
             "php": "packages/core/admin/server/src/services/condition.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/constants.ts": {
             "upstream": "d2b8022ecfa602a59f7916d92ec694b7ff5ca753",
             "php": "packages/core/admin/server/src/services/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/content-type.ts": {
             "upstream": "cc33a9e0aed52fbfad94a23d12833bd90d0e009d",
             "php": "packages/core/admin/server/src/services/content-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/encryption.ts": {
             "upstream": "b1f7a500899dddac50c0b09ed3a8098d95c72c63",
             "php": "packages/core/admin/server/src/services/encryption.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/homepage.ts": {
             "upstream": "4bbf95071aeb1023e0ebea5761d64c21d2e54af5",
             "php": "packages/core/admin/server/src/services/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/index.ts": {
             "upstream": "4acfac1765488a3ce0b3fdda34aa3eb623def656",
             "php": "packages/core/admin/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/metrics.ts": {
             "upstream": "b5818ed7a660e276c5b879ec9c3885630dd5b257",
             "php": "packages/core/admin/server/src/services/metrics.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/passport.ts": {
             "upstream": "71610c0476191b9d0e97082aee3ab267250e412c",
             "php": "packages/core/admin/server/src/services/passport.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/passport/local-strategy.ts": {
             "upstream": "fee1e87e99afff74c3ee30b0e4ea495f401daf28",
             "php": "packages/core/admin/server/src/services/passport/local-strategy.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission.ts": {
             "upstream": "2706cea95eb60634094e30179869c34a25402b74",
             "php": "packages/core/admin/server/src/services/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/engine.ts": {
             "upstream": "d75a0a5970e79d062825dc71f4aba179f673c079",
             "php": "packages/core/admin/server/src/services/permission/engine.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/permissions-manager/index.ts": {
             "upstream": "49071021722b6cfc2c9c986026d6f0d33977e5c4",
             "php": "packages/core/admin/server/src/services/permission/permissions-manager/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/permissions-manager/permission-fields.ts": {
             "upstream": "2089648da3490ca29e0bac52831ea99bd91a5df1",
             "php": "packages/core/admin/server/src/services/permission/permissions-manager/permission-fields.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/permissions-manager/query-builders.ts": {
             "upstream": "d1fe12180b9fc74d71a307b98fcc7fbf131c827e",
             "php": "packages/core/admin/server/src/services/permission/permissions-manager/query-builders.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/permissions-manager/sanitize.ts": {
             "upstream": "e56afa1f0b7d3a464b06905a51375474ef92a0e4",
             "php": "packages/core/admin/server/src/services/permission/permissions-manager/sanitize.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/permissions-manager/validate.ts": {
             "upstream": "46c3aaff649d2ab7d03c27bb57f4d59d635d5cc9",
             "php": "packages/core/admin/server/src/services/permission/permissions-manager/validate.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/queries.ts": {
             "upstream": "23bfbc765c4dff1eaa68c08ee22b4fa5d07d3721",
             "php": "packages/core/admin/server/src/services/permission/queries.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/sections-builder/builder.ts": {
             "upstream": "9eb5fa55e4febc1bb1ab3096fd48aac133e753d9",
             "php": "packages/core/admin/server/src/services/permission/sections-builder/builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/sections-builder/handlers.ts": {
             "upstream": "53bdd8db72c47b78abd84a1a652d4492d1953ee8",
             "php": "packages/core/admin/server/src/services/permission/sections-builder/handlers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/sections-builder/index.ts": {
             "upstream": "ade12f4fbc15ce2975ebabb549dabc9461ea6894",
             "php": "packages/core/admin/server/src/services/permission/sections-builder/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/sections-builder/section.ts": {
             "upstream": "20239f3e968c3ca841083c1d91410ff6c8bfb1ae",
             "php": "packages/core/admin/server/src/services/permission/sections-builder/section.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/permission/sections-builder/utils.ts": {
             "upstream": "2eca127de3bd711ae3c4ccc43adade50d28c66fb",
             "php": "packages/core/admin/server/src/services/permission/sections-builder/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/project-settings.ts": {
             "upstream": "0d1b5017155faf53b4515f067526ce62e991cc3e",
             "php": "packages/core/admin/server/src/services/project-settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/role.ts": {
             "upstream": "13bc6058c696205435b01f25b66d4aeb67ec70e9",
             "php": "packages/core/admin/server/src/services/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/token.ts": {
             "upstream": "c445de8384c1f9ba47050911ab66a76f43206baf",
             "php": "packages/core/admin/server/src/services/token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/transfer/index.ts": {
             "upstream": "1515335beabffa7d5a41fb2397aac21e35b0514f",
             "php": "packages/core/admin/server/src/services/transfer/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/transfer/permission.ts": {
             "upstream": "2bfd2fb6f85d5f1c85522a30be8168969ee107b8",
             "php": "packages/core/admin/server/src/services/transfer/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/transfer/token.ts": {
             "upstream": "6933b613195e561d90a282a60f4a0481a50befa3",
             "php": "packages/core/admin/server/src/services/transfer/token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/transfer/utils.ts": {
             "upstream": "9aa93bc908bce250000b79f17b6cc62e1c4630a7",
             "php": "packages/core/admin/server/src/services/transfer/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/services/user.ts": {
             "upstream": "d749663491e1e3f0fdec8f012b926c860c2a6d73",
             "php": "packages/core/admin/server/src/services/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/admin-token.ts": {
             "upstream": "5acc2ae466dfe677d92f4f9f673061245ae3022c",
             "php": "packages/core/admin/server/src/strategies/admin-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/admin.ts": {
             "upstream": "665897a1dde9b0a60652d614d5e52b418f239fbc",
             "php": "packages/core/admin/server/src/strategies/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/api-token-utils.ts": {
             "upstream": "a242be2eaa08ded6ee793d3b56901c810abd7f7a",
             "php": "packages/core/admin/server/src/strategies/api-token-utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/content-api-token.ts": {
             "upstream": "128713a7460d70945e66bea90365af9c83581dec",
             "php": "packages/core/admin/server/src/strategies/content-api-token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/data-transfer.ts": {
             "upstream": "db703bea2c080ab5a8221d1fae07d25a4da252bb",
             "php": "packages/core/admin/server/src/strategies/data-transfer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/strategies/index.ts": {
             "upstream": "77c030a9c2078246cf230260337c92b43aaf343d",
@@ -1910,32 +1359,32 @@
         "packages/core/admin/server/src/utils/index.js": {
             "upstream": "c224f1c7744880a346e8617ce3abbd473b9af27b",
             "php": "packages/core/admin/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/utils/normalize-email.ts": {
             "upstream": "6455892bf1c24725808f79f1c33bbe8ce48e4bb6",
             "php": "packages/core/admin/server/src/utils/normalize-email.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/action-provider.ts": {
             "upstream": "3560c98669eb98b4de8bbc7a167ee9d1fafa8332",
             "php": "packages/core/admin/server/src/validation/action-provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/admin-tokens.ts": {
             "upstream": "3bc6f951a4acec2e04e662b99e3e21e65f69a750",
             "php": "packages/core/admin/server/src/validation/admin-tokens.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/api-tokens.ts": {
             "upstream": "afcd7fef5235f032e045bf8454041a8f5247355a",
             "php": "packages/core/admin/server/src/validation/api-tokens.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/authentication/forgot-password.ts": {
             "upstream": "cafe29883cb33ae424c35fb567fafed9fc855d08",
             "php": "packages/core/admin/server/src/validation/authentication/forgot-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/authentication/index.ts": {
             "upstream": "8ea8c5b5b07153a39684b75abea3ae38e50e4410",
@@ -1945,27 +1394,27 @@
         "packages/core/admin/server/src/validation/authentication/login.ts": {
             "upstream": "c28da3c286a9c8f012d151dd799f093ac7a5985b",
             "php": "packages/core/admin/server/src/validation/authentication/login.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/authentication/register.ts": {
             "upstream": "acdb20c4c81ebb4a71aac32650c6d5eeb596240d",
             "php": "packages/core/admin/server/src/validation/authentication/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/authentication/reset-password.ts": {
             "upstream": "2bf2b0f856e374f61c5786dd0715b9c2c0de41a7",
             "php": "packages/core/admin/server/src/validation/authentication/reset-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/common-functions/check-fields-are-correctly-nested.ts": {
             "upstream": "b6e323c7c90ce6c45ee67a7cbef8c78836e345c2",
             "php": "packages/core/admin/server/src/validation/common-functions/check-fields-are-correctly-nested.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/common-functions/check-fields-dont-have-duplicates.ts": {
             "upstream": "be9c5277690bd5c2f8b17ddd7216edb623056e05",
             "php": "packages/core/admin/server/src/validation/common-functions/check-fields-dont-have-duplicates.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/common-functions/index.ts": {
             "upstream": "edc6e223084f3db86bd0f61f525975ea9e46ddc2",
@@ -1975,27 +1424,27 @@
         "packages/core/admin/server/src/validation/common-validators.ts": {
             "upstream": "a0aba5bca8b4222bb625cff5c45f5fb6472aa2f5",
             "php": "packages/core/admin/server/src/validation/common-validators.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/permission.ts": {
             "upstream": "652c9e2c301f607d187080f8dbe7de992e482b7e",
             "php": "packages/core/admin/server/src/validation/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/policies/hasPermissions.ts": {
             "upstream": "b064e9bf14a9dafe7aed945cf22b1fa5896ac2f7",
             "php": "packages/core/admin/server/src/validation/policies/hasPermissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/project-settings.ts": {
             "upstream": "6e3868ed383694ec302896b7f904a236cae0b152",
             "php": "packages/core/admin/server/src/validation/project-settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/role.ts": {
             "upstream": "c2854b8a16f5d557c9932ec443cb19f61af93edb",
             "php": "packages/core/admin/server/src/validation/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/transfer/index.ts": {
             "upstream": "912d1b8691ed93111a75af45b7779a72e850f0db",
@@ -2005,12 +1454,12 @@
         "packages/core/admin/server/src/validation/transfer/token.ts": {
             "upstream": "33daef21215b1d2c484294d69c3066c82b8fde10",
             "php": "packages/core/admin/server/src/validation/transfer/token.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/src/validation/user.ts": {
             "upstream": "5e0e5dab689bd1464f67722d729705f87eb1cb67",
             "php": "packages/core/admin/server/src/validation/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/server/test-utils/create-context.ts": {
             "upstream": "8737814998ec94cc817fcc8238ef0fa20307d0d1",
@@ -2130,227 +1579,240 @@
         "packages/core/admin/shared/utils/auth-cookie-domain.ts": {
             "upstream": "767515fc69bbd58cb7a222d0cfc59ffed8cdebb0",
             "php": "packages/core/admin/shared/utils/auth-cookie-domain.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/shared/utils/auth-cookie-name.ts": {
             "upstream": "a56cc011c691c39306f84a1b883a7e654cf42e34",
             "php": "packages/core/admin/shared/utils/auth-cookie-name.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/shared/utils/auth-cookie-path.ts": {
             "upstream": "c13d9cffcf44c188fdd909f52f21d031a115ff29",
             "php": "packages/core/admin/shared/utils/auth-cookie-path.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/admin/shared/utils/session-auth.ts": {
             "upstream": "16c7835b9f54ac03f5d4336fd3e298d6c334d075",
             "php": "packages/core/admin/shared/utils/session-auth.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/bootstrap.ts": {
             "upstream": "6da1b437e7b2149f0366d22e7ccd4a1a5c8a9d2d",
             "php": "packages/core/content-manager/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/config.ts": {
             "upstream": "d51850754c2d840ebf15ffb06b3773aab29262ba",
             "php": "packages/core/content-manager/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/constants/index.ts": {
             "upstream": "b903f34ceffd2bb4135f20ad1995257c7b4206af",
             "php": "packages/core/content-manager/server/src/constants/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/collection-types.ts": {
             "upstream": "5acb6e6fc2468eb855ed72ce904f046afbcc0ff7",
             "php": "packages/core/content-manager/server/src/controllers/collection-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/components.ts": {
             "upstream": "1036ed3a1f8d353970fc15bf399834504e10bbde",
             "php": "packages/core/content-manager/server/src/controllers/components.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/content-types.ts": {
             "upstream": "22520479050d7390b5307f67ce1d007a1b937156",
             "php": "packages/core/content-manager/server/src/controllers/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/index.ts": {
             "upstream": "a6fd68d76ab00ace477b544e7049f36eebb35981",
             "php": "packages/core/content-manager/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/init.ts": {
             "upstream": "ae771631b5303b0f57d0dd722baad912d8fa3055",
             "php": "packages/core/content-manager/server/src/controllers/init.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/relations.ts": {
             "upstream": "b5cdb04b62599832b7314fe8ced1f1d864ac92f8",
             "php": "packages/core/content-manager/server/src/controllers/relations.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/single-types.ts": {
             "upstream": "ec150e884934cc9fd4c8c1316ae8aa1b619f7b7b",
             "php": "packages/core/content-manager/server/src/controllers/single-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/uid.ts": {
             "upstream": "d77db0206796c2fb164f7f4c7c9442c02b531910",
             "php": "packages/core/content-manager/server/src/controllers/uid.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/utils/clone.ts": {
             "upstream": "a34713515f095e4657c388bc65d2874b65d5634f",
             "php": "packages/core/content-manager/server/src/controllers/utils/clone.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/utils/document-status.ts": {
             "upstream": "503419b988221c5b644baa4abfcef21032b4e126",
             "php": "packages/core/content-manager/server/src/controllers/utils/document-status.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/utils/metadata.ts": {
             "upstream": "b96b02d442ad3b3be09050de58ae1ae1f7379759",
             "php": "packages/core/content-manager/server/src/controllers/utils/metadata.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/validation/dimensions.ts": {
             "upstream": "f79a958dcb042cb47e9327b27342f62e6f874e57",
             "php": "packages/core/content-manager/server/src/controllers/validation/dimensions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/validation/index.ts": {
             "upstream": "940a07881a0c9d1d1d77f44aa57ca2d798866293",
             "php": "packages/core/content-manager/server/src/controllers/validation/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/validation/model-configuration.ts": {
             "upstream": "c988f4d602101ad16bc5362c63ffc3cd650c9aae",
             "php": "packages/core/content-manager/server/src/controllers/validation/model-configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/controllers/validation/relations.ts": {
             "upstream": "ac125477e3f8c9287931d542f146c3b88f8390a3",
             "php": "packages/core/content-manager/server/src/controllers/validation/relations.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/destroy.ts": {
             "upstream": "e386dd8084c8a0c6f95488830d6de5a6b4f63a60",
             "php": "packages/core/content-manager/server/src/destroy.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/history/constants.ts": {
             "upstream": "bcac0e2139f0f96dbf431700d3c91e2992da8a4e",
             "php": "packages/core/content-manager/server/src/history/constants.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/controllers/history-version.ts": {
             "upstream": "41c5078a0127c8fbf0e337dbf58aecc65bd661b4",
             "php": "packages/core/content-manager/server/src/history/controllers/history-version.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/controllers/index.ts": {
             "upstream": "822102744a3933a1d9173f15296bf1391b298309",
             "php": "packages/core/content-manager/server/src/history/controllers/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/controllers/validation/history-version.ts": {
             "upstream": "78cae81737fbee53788b5cc423cf2339b39171fe",
             "php": "packages/core/content-manager/server/src/history/controllers/validation/history-version.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/index.ts": {
             "upstream": "f99cbb398c1e38c0f7523203b828eb92f17dc7f4",
             "php": "packages/core/content-manager/server/src/history/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/models/history-version.ts": {
             "upstream": "d695081cd7419b002d0e3a42fb2e5d0e0488f3b0",
             "php": "packages/core/content-manager/server/src/history/models/history-version.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/routes/history-version.ts": {
             "upstream": "86bd7f8dc949285d7988e9b1ce4b68aa566960f1",
             "php": "packages/core/content-manager/server/src/history/routes/history-version.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/routes/index.ts": {
             "upstream": "9519580f4033b2cf933de4ebc5a099eda4bd570f",
             "php": "packages/core/content-manager/server/src/history/routes/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/services/history.ts": {
             "upstream": "b5d140fdd96e4b7f0aca81050f853f1d5dc750dc",
             "php": "packages/core/content-manager/server/src/history/services/history.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/services/index.ts": {
             "upstream": "947aacdc0942e7eb27e935c71474be0b1f741cc4",
             "php": "packages/core/content-manager/server/src/history/services/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/services/lifecycles.ts": {
             "upstream": "4872237eda34c741feaa410984241d66d5a310eb",
             "php": "packages/core/content-manager/server/src/history/services/lifecycles.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/services/utils.ts": {
             "upstream": "e085525e382b95425bcff1221db826e64c50f767",
             "php": "packages/core/content-manager/server/src/history/services/utils.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/history/utils.ts": {
             "upstream": "c9996499c1aedfbafba3de751c4b8c45dc4f2e0e",
             "php": "packages/core/content-manager/server/src/history/utils.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/homepage/controllers/homepage.ts": {
             "upstream": "5e849b52d1c7dc7bccb739bdbbe8a85c87673000",
             "php": "packages/core/content-manager/server/src/homepage/controllers/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/controllers/index.ts": {
             "upstream": "c65d8499781cc1f0c9957e512e977aa2c278f439",
             "php": "packages/core/content-manager/server/src/homepage/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/index.ts": {
             "upstream": "f3c8c10a39ca7234307a50c9205f5073785e45cf",
             "php": "packages/core/content-manager/server/src/homepage/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/routes/homepage.ts": {
             "upstream": "d5a710edadd51612b2b902b4686011c1445c4f79",
             "php": "packages/core/content-manager/server/src/homepage/routes/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/routes/index.ts": {
             "upstream": "e369d541fa4122f9d5e9446b7c36ae4211e72d3c",
             "php": "packages/core/content-manager/server/src/homepage/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/services/homepage-query-utils.ts": {
             "upstream": "793bec8d3cecbcb6cf080b59abb873f0d279c7fc",
             "php": "packages/core/content-manager/server/src/homepage/services/homepage-query-utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/services/homepage.ts": {
             "upstream": "50af2dcaed7ad1aeb7000dbb5b709c9d3c0826cf",
             "php": "packages/core/content-manager/server/src/homepage/services/homepage.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/homepage/services/index.ts": {
             "upstream": "4901193b60f251ceef1206ed20d0ba3c47fd08e8",
             "php": "packages/core/content-manager/server/src/homepage/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/index.ts": {
             "upstream": "8c11d8a32f25499ce7a69a54102615a386d2755d",
             "php": "packages/core/content-manager/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/mcp/derive-content-type-mcp-tools.ts": {
             "upstream": "a6eb5b53f51f134eacd34ef3361b3e6ba2bf98a5",
@@ -2385,7 +1847,7 @@
         "packages/core/content-manager/server/src/mcp/register-content-manager-mcp-tools.ts": {
             "upstream": "a762cb00fc4f608062d8daff22da9e557086e7c6",
             "php": "packages/core/content-manager/server/src/mcp/register-content-manager-mcp-tools.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/mcp/sanitizers/shape-relations.ts": {
             "upstream": "5c5e719afc82a69cfb25263a0d13c2cde2878bc0",
@@ -2440,227 +1902,238 @@
         "packages/core/content-manager/server/src/middlewares/index.ts": {
             "upstream": "aa51671aee2c4a51fe7d4446da3490ddad38a35b",
             "php": "packages/core/content-manager/server/src/middlewares/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/middlewares/routing.ts": {
             "upstream": "40364763eb6a25669e3e19f9f6d5b6ba24d1bb03",
             "php": "packages/core/content-manager/server/src/middlewares/routing.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/policies/hasPermissions.ts": {
             "upstream": "2dc80521882243dd9dcb27b763c30cff03c60725",
             "php": "packages/core/content-manager/server/src/policies/hasPermissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/policies/index.ts": {
             "upstream": "497dcbb03d1cf621d86d127427ea95c7cda631f8",
             "php": "packages/core/content-manager/server/src/policies/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/preview/controllers/index.ts": {
             "upstream": "146198fe0d7e20b88a2e3e6c2dfd4618cc9db67f",
             "php": "packages/core/content-manager/server/src/preview/controllers/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/controllers/preview.ts": {
             "upstream": "cfa9295d4b13124116d419e48200ba1e77132cb4",
             "php": "packages/core/content-manager/server/src/preview/controllers/preview.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/controllers/previewScript.js": {
             "upstream": "d9c8b82c008ef569e95c3f0fe9798cdd33eb297e",
             "php": "packages/core/content-manager/server/src/preview/controllers/previewScript.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/controllers/validation/preview.ts": {
             "upstream": "75ee94f9b523878b86d3f17fcb95e40f7a58d8cd",
             "php": "packages/core/content-manager/server/src/preview/controllers/validation/preview.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/index.ts": {
             "upstream": "8e64bd12ea6a2dcb16de3c96f45cd53bf86e1b8d",
             "php": "packages/core/content-manager/server/src/preview/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/routes/index.ts": {
             "upstream": "b6a769bbc99980cd00b7749453f441ca388d2999",
             "php": "packages/core/content-manager/server/src/preview/routes/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/routes/preview.ts": {
             "upstream": "e2b2fecef2a9fe4f6f7f003c72098504e6347b4d",
             "php": "packages/core/content-manager/server/src/preview/routes/preview.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/services/index.ts": {
             "upstream": "f542aceffa77ba06493c917e834cbf47cb99fa41",
             "php": "packages/core/content-manager/server/src/preview/services/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/services/preview-config.ts": {
             "upstream": "ea7753da9ff1acb1d18b9cd81ab3c6ee29e96332",
             "php": "packages/core/content-manager/server/src/preview/services/preview-config.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/services/preview.ts": {
             "upstream": "94a1cb391cd12a8fd3d61f903196fee5c7ca4514",
             "php": "packages/core/content-manager/server/src/preview/services/preview.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/preview/utils.ts": {
             "upstream": "b228641489b52f7ccbd76eecd6dbda62c2b002ab",
             "php": "packages/core/content-manager/server/src/preview/utils.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-manager/server/src/register.ts": {
             "upstream": "02511f4fc1c7ba1a1e276b03d28abf11fb6b8df1",
             "php": "packages/core/content-manager/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/routes/admin.ts": {
             "upstream": "989354b7a133e6a7091836f6881f767cc826862a",
             "php": "packages/core/content-manager/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/routes/index.ts": {
             "upstream": "349bc7e2244a867a577ca24aa34fb15cab5d3994",
             "php": "packages/core/content-manager/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/components.ts": {
             "upstream": "dc33cc19eecd04c7a095e54577a1b3d2f4613e1a",
             "php": "packages/core/content-manager/server/src/services/components.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/configuration.ts": {
             "upstream": "62086b3cf23a894564d9f656ec0199fb9407c380",
             "php": "packages/core/content-manager/server/src/services/configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/content-structure.ts": {
             "upstream": "912760f84a1ac501a3565c88e72c7a6e66c2d180",
             "php": "packages/core/content-manager/server/src/services/content-structure.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/content-types.ts": {
             "upstream": "9417b29dd4bd7edbdc19e96f2c15d20d171b8068",
             "php": "packages/core/content-manager/server/src/services/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/data-mapper.ts": {
             "upstream": "a8bdaac30dba4d0a0844404b04bcdb4ded9d130a",
             "php": "packages/core/content-manager/server/src/services/data-mapper.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/document-manager.ts": {
             "upstream": "420f3b1510d2f221eb59455051efb361e6aa2079",
             "php": "packages/core/content-manager/server/src/services/document-manager.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/document-metadata.ts": {
             "upstream": "fc178cb4bf57901789115ba60c7a6fde4ceae93e",
             "php": "packages/core/content-manager/server/src/services/document-metadata.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/field-sizes.ts": {
             "upstream": "2d76b86e2e8cacd4f2fc2f2348534c9850abff65",
             "php": "packages/core/content-manager/server/src/services/field-sizes.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/index.ts": {
             "upstream": "4789c380d88981dd315bf74cd0c6e70643da0b7c",
             "php": "packages/core/content-manager/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/metrics.ts": {
             "upstream": "7c479991ee2a69fe60d4490fe91f586af0c71621",
             "php": "packages/core/content-manager/server/src/services/metrics.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/permission-checker.ts": {
             "upstream": "5b1ba01d628a32e87fe25cd78dab5d2d7af96a2e",
             "php": "packages/core/content-manager/server/src/services/permission-checker.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/permission.ts": {
             "upstream": "e0d4d8f0ffd744e6bf52fa6c061d4c147dd433ce",
             "php": "packages/core/content-manager/server/src/services/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/populate-builder.ts": {
             "upstream": "f0c61bd74564d18ea3deabf852c9a107613a4900",
             "php": "packages/core/content-manager/server/src/services/populate-builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/uid.ts": {
             "upstream": "e7771fa26f7a4909f43aed596e1d5104afa334d8",
             "php": "packages/core/content-manager/server/src/services/uid.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/configuration/attributes.ts": {
             "upstream": "b61f61986f778f25cb63c44895670fd5f7eb4f73",
             "php": "packages/core/content-manager/server/src/services/utils/configuration/attributes.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/configuration/index.ts": {
             "upstream": "0a38353255cda7a7058b781966b1e79b763419be",
             "php": "packages/core/content-manager/server/src/services/utils/configuration/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/configuration/layouts.ts": {
             "upstream": "e6381b52de8aab65462219269102fcf9fe80f518",
             "php": "packages/core/content-manager/server/src/services/utils/configuration/layouts.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/configuration/metadatas.ts": {
             "upstream": "9bca8c4c5570a69e7149319c03c5beb1efe3e521",
             "php": "packages/core/content-manager/server/src/services/utils/configuration/metadatas.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/configuration/settings.ts": {
             "upstream": "fe4c6ad2e6a9a77b7d7cb644c581e191f0ec36cf",
             "php": "packages/core/content-manager/server/src/services/utils/configuration/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/count.ts": {
             "upstream": "934a345ea776493dee387b49ec424ed4f697736b",
             "php": "packages/core/content-manager/server/src/services/utils/count.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/draft-relations.ts": {
             "upstream": "1b22fd3237b2ec40d1d64c565d63de351d9ce646",
             "php": "packages/core/content-manager/server/src/services/utils/draft-relations.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/draft.ts": {
             "upstream": "680f52f5ed564b42c81070d61e48bac1532e20b4",
             "php": "packages/core/content-manager/server/src/services/utils/draft.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/populate.ts": {
             "upstream": "c06db02b3abaa7ee7a490ea4b652520e1a91bf26",
             "php": "packages/core/content-manager/server/src/services/utils/populate.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/services/utils/store.ts": {
             "upstream": "9bbdcd82c479e5cae677c463b8640fa39e3014ea",
             "php": "packages/core/content-manager/server/src/services/utils/store.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/utils/index.ts": {
             "upstream": "5c1a949b28c0a3821f3c717d5076e9991266c0c7",
             "php": "packages/core/content-manager/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/validation/policies/hasPermissions.ts": {
             "upstream": "502c152213f3507e0ddec7c95d744406e5807a8d",
             "php": "packages/core/content-manager/server/src/validation/policies/hasPermissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/server/src/validation/zod.ts": {
             "upstream": "ec3cc85a76d47b5f7273ccf8233b5a532f2c1013",
             "php": "packages/core/content-manager/server/src/validation/zod.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-manager/shared/contracts/collection-types.ts": {
             "upstream": "c716b506aa280258c988e32537241f8b53b8d22c",
@@ -2930,187 +2403,187 @@
         "packages/core/content-type-builder/server/src/bootstrap.ts": {
             "upstream": "ea967bc17a77c15a2492db276194985350a91896",
             "php": "packages/core/content-type-builder/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/config.ts": {
             "upstream": "d51850754c2d840ebf15ffb06b3773aab29262ba",
             "php": "packages/core/content-type-builder/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/builder.ts": {
             "upstream": "85daabb2c8aa40cbd76bdd65802a8f056fd698ab",
             "php": "packages/core/content-type-builder/server/src/controllers/builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/component-categories.ts": {
             "upstream": "a21edb9577aa62cff39ab7e660314ea007687991",
             "php": "packages/core/content-type-builder/server/src/controllers/component-categories.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/components.ts": {
             "upstream": "fcb5875ba1fd3f8dada0a75f5e609ef709c41a4f",
             "php": "packages/core/content-type-builder/server/src/controllers/components.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/content-types.ts": {
             "upstream": "3c1ca4ec1344927b7e00c8da5fce288878e790b4",
             "php": "packages/core/content-type-builder/server/src/controllers/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/index.ts": {
             "upstream": "1309499f395133ffe658c351a3a563d6444f88de",
             "php": "packages/core/content-type-builder/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/schema.ts": {
             "upstream": "821808443108f5152d37f6b5ac127edee5827754",
             "php": "packages/core/content-type-builder/server/src/controllers/schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/common.ts": {
             "upstream": "59c03f8cf4d75495b6e39814c52b4af240d5a1b4",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/common.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/component-category.ts": {
             "upstream": "d5dea684d72840bb44134a7e9c1740884861c35d",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/component-category.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/component.ts": {
             "upstream": "351f6d8b8a82bf2d5048521a528b0190b55b8a9d",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/component.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/content-structure.ts": {
             "upstream": "1a2c478a57a602bc32ce9bc42a14735fb77d01c2",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/content-structure.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/content-type.ts": {
             "upstream": "57e5f15a1b961e52710577a077e359d91a86a454",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/content-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/data-transform.ts": {
             "upstream": "605f5d29ab52e7579123501e2f10a2b0714a8618",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/data-transform.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/model-schema.ts": {
             "upstream": "3053ede9cda26a1e79db0bb9bca9bb3af4899196",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/model-schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/relations.ts": {
             "upstream": "5aa145623bbd1bc1fc50b84e811e2e1d76e24216",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/relations.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/schema.ts": {
             "upstream": "87c0fd69a8ee999d6cfa738009e5000ed5f15d57",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/controllers/validation/types.ts": {
             "upstream": "bbb84cb34cd5b6616923bc2603696d93451ded75",
             "php": "packages/core/content-type-builder/server/src/controllers/validation/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/index.ts": {
             "upstream": "008ca05d50ad4da6c449bf978e232cf4ff2ebbfe",
             "php": "packages/core/content-type-builder/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/middlewares/index.ts": {
             "upstream": "8c509bab954f6ea7fcd39e9d9df466cf7d7802be",
             "php": "packages/core/content-type-builder/server/src/middlewares/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/middlewares/is-development-mode.ts": {
             "upstream": "098c364eabc390c34643da8dd7aeb625bf3c7e36",
             "php": "packages/core/content-type-builder/server/src/middlewares/is-development-mode.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/register.ts": {
             "upstream": "d9e9cbf9671c3638c88841628fff16a917980154",
             "php": "packages/core/content-type-builder/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/routes/admin.ts": {
             "upstream": "9ee05ce7e913a416e811eb684ed438e9a22e3f86",
             "php": "packages/core/content-type-builder/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/routes/content-api.ts": {
             "upstream": "be8c49b091dbba5feb28a368710e0ca1c230fa9f",
             "php": "packages/core/content-type-builder/server/src/routes/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/routes/index.ts": {
             "upstream": "79b873972f378a7b70583bfec6241e0fdd825978",
             "php": "packages/core/content-type-builder/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/api-handler.ts": {
             "upstream": "42988e4b98f2291a10f5212dd803f111464f5e51",
             "php": "packages/core/content-type-builder/server/src/services/api-handler.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/builder.ts": {
             "upstream": "52dd6929d058a8bf19f8e3d3b047972e873a20bd",
             "php": "packages/core/content-type-builder/server/src/services/builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/component-categories.ts": {
             "upstream": "fde632e0afb63b7e88d422257c4548d1f8986f03",
             "php": "packages/core/content-type-builder/server/src/services/component-categories.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/components.ts": {
             "upstream": "0fe96fa35d38881edef43828a8cd8923ef42e8e5",
             "php": "packages/core/content-type-builder/server/src/services/components.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/constants.ts": {
             "upstream": "6b05716b1e734c1e66faa6af1c93cef6ee62c918",
             "php": "packages/core/content-type-builder/server/src/services/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/content-structure.ts": {
             "upstream": "89878411ac6347ff8730b1a9020d764d252037f8",
             "php": "packages/core/content-type-builder/server/src/services/content-structure.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/content-types.ts": {
             "upstream": "db1f43ff4b96e87b3baffa644b7549e024a4d98f",
             "php": "packages/core/content-type-builder/server/src/services/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/index.ts": {
             "upstream": "88d2ab0b656b767a8a884f45814d02ff5a65a620",
             "php": "packages/core/content-type-builder/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema-builder/component-builder.ts": {
             "upstream": "ae27caff6c89da53dbd94b111eda9f136c95da9d",
             "php": "packages/core/content-type-builder/server/src/services/schema-builder/component-builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema-builder/content-type-builder.ts": {
             "upstream": "f5793f6c8a7d7bc8422c1b66d496069f96bd1201",
             "php": "packages/core/content-type-builder/server/src/services/schema-builder/content-type-builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema-builder/index.ts": {
             "upstream": "467dc539e809d02224f44c09fe29fa474e87c569",
             "php": "packages/core/content-type-builder/server/src/services/schema-builder/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema-builder/schema-handler.ts": {
             "upstream": "344b12484dbabdffde7a37e781cbd6820532d652",
             "php": "packages/core/content-type-builder/server/src/services/schema-builder/schema-handler.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema-builder/types.ts": {
             "upstream": "0b315d6538b709a781bcafab884188c4f486fd1b",
@@ -3120,32 +2593,32 @@
         "packages/core/content-type-builder/server/src/services/schema-mutation.ts": {
             "upstream": "31e7e4c9b5b97187e5320a96197f23b02db506a2",
             "php": "packages/core/content-type-builder/server/src/services/schema-mutation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/services/schema.ts": {
             "upstream": "91100ff657339bb8bcede0a777f56f32112b073d",
             "php": "packages/core/content-type-builder/server/src/services/schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/utils/attributes.ts": {
             "upstream": "10ab3d7e5808e5bfe5a4763cb8f5aba0685c72e7",
             "php": "packages/core/content-type-builder/server/src/utils/attributes.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/utils/helpers.ts": {
             "upstream": "667e6415c0e2ca41556177c8834a2dd2f15c6e24",
             "php": "packages/core/content-type-builder/server/src/utils/helpers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/utils/index.ts": {
             "upstream": "3800611cb3c3691566bc7f8f23d984b16c462aa9",
             "php": "packages/core/content-type-builder/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/server/src/utils/typeguards.ts": {
             "upstream": "8179c2ea041a5e3e4cc5e6562c25fa32cabea485",
             "php": "packages/core/content-type-builder/server/src/utils/typeguards.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/content-type-builder/vitest.config.ts": {
             "upstream": "dfabab4aa2559b8d67f6c8645e689fc40d103604",
@@ -3707,12 +3180,12 @@
         "packages/core/core/src/services/content-structure/utils/isGroupExpressionValid.ts": {
             "upstream": "97e11c4793b5f663fe37b85b680ebf9f5cefa257",
             "php": "packages/core/core/src/services/content-structure/utils/isGroupExpressionValid.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/services/content-structure/validation.ts": {
             "upstream": "d89fc60e2e8a45916adf32987548efd99af6336d",
             "php": "packages/core/core/src/services/content-structure/validation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/services/core-store.ts": {
             "upstream": "5cd0f0bc27c898fe8ddd8339d1df3588b54257ec",
@@ -7162,122 +6635,122 @@
         "packages/core/upload/documentation/content-api.json": {
             "upstream": "4f724932756c47364bc901683b9615d4c1c059b7",
             "php": "packages/core/upload/documentation/content-api.json",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/bootstrap.ts": {
             "upstream": "58c5314e53d8b2b7d789479b30923f13f10ac56b",
             "php": "packages/core/upload/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/config.ts": {
             "upstream": "6ef8cbe0490af29e9dff8da77b768b9fd978a515",
             "php": "packages/core/upload/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/constants.ts": {
             "upstream": "0ffc64d89ef8591981a6ad366d69c47cdd2375e7",
             "php": "packages/core/upload/server/src/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/content-types/file.ts": {
             "upstream": "937e699a170fc5d0365576a4406be5a4f3ff65d4",
             "php": "packages/core/upload/server/src/content-types/file.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/content-types/folder.ts": {
             "upstream": "7a798bfa918dd7ef093efe88e60cce3ca34eb0ab",
             "php": "packages/core/upload/server/src/content-types/folder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/content-types/index.ts": {
             "upstream": "826de045fcec5f12f0cd37c79dbf94879867087d",
             "php": "packages/core/upload/server/src/content-types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/admin-file.ts": {
             "upstream": "e63a65a2a089003374037c0cd8adae71185f3201",
             "php": "packages/core/upload/server/src/controllers/admin-file.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/admin-folder-file.ts": {
             "upstream": "bb82f471f5c77f4285a9e691bb9079535c07897e",
             "php": "packages/core/upload/server/src/controllers/admin-folder-file.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/admin-folder.ts": {
             "upstream": "fc328e56ba63f9858c1f12ae2d21d445b56963ce",
             "php": "packages/core/upload/server/src/controllers/admin-folder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/admin-settings.ts": {
             "upstream": "6173ebff13197acea71ab0883693832424664df6",
             "php": "packages/core/upload/server/src/controllers/admin-settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/admin-upload.ts": {
             "upstream": "d6526f2cf95c1640c15783b926734b75dc2783e7",
             "php": "packages/core/upload/server/src/controllers/admin-upload.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/content-api.ts": {
             "upstream": "e0dcd1f9ffa4fb2326005b7784d08a0f84c6903c",
             "php": "packages/core/upload/server/src/controllers/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/index.ts": {
             "upstream": "63c17b84b85bc3db3407b43d703f5c2ed6a02f21",
             "php": "packages/core/upload/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/utils/find-entity-and-check-permissions.ts": {
             "upstream": "8307e1cd4fc958211dd530c786103c2bec7d17c7",
             "php": "packages/core/upload/server/src/controllers/utils/find-entity-and-check-permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/utils/folders.ts": {
             "upstream": "eda2a5d1cf57cde8e13b6a9da99d57fe5db8ceca",
             "php": "packages/core/upload/server/src/controllers/utils/folders.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/validation/content-api/upload.ts": {
             "upstream": "24e9f10a8d7b52f8588b4d70a0db22c8cadf85f5",
             "php": "packages/core/upload/server/src/controllers/validation/content-api/upload.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/controllers/view-configuration.ts": {
             "upstream": "949b3ab016f05f9aacf07f62573550d409297754",
             "php": "packages/core/upload/server/src/controllers/view-configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/errors.ts": {
             "upstream": "2bb2753d918ee4e18309b0ca6facae3436287166",
             "php": "packages/core/upload/server/src/errors.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/graphql.ts": {
             "upstream": "98da551b2075ceed9490a1610a0e05a1ff82d33a",
             "php": "packages/core/upload/server/src/graphql.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/index.ts": {
             "upstream": "ef5f34917e255a18e2bd4b33f1cc1d3e8c7c66d3",
             "php": "packages/core/upload/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/ambient-instance.ts": {
             "upstream": "6ef64b19c3e71e95670795c19d07eca93bcea452",
             "php": "packages/core/upload/server/src/mcp/ambient-instance.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/handlers/constants.ts": {
             "upstream": "d8558716396de836160e87d58e6d38a7926bcdc8",
             "php": "packages/core/upload/server/src/mcp/handlers/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/handlers/folder-handlers.ts": {
             "upstream": "71563638a813f4fd5e08c3e8527bdfcd051aaadd",
             "php": "packages/core/upload/server/src/mcp/handlers/folder-handlers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/handlers/index.ts": {
             "upstream": "b0e6764361d16d0b5e283cdc6190faf604f1b30d",
@@ -7287,12 +6760,12 @@
         "packages/core/upload/server/src/mcp/handlers/read-handlers.ts": {
             "upstream": "52e00a9157d3e7761e2bb8ddbd25f1ba22cb67e6",
             "php": "packages/core/upload/server/src/mcp/handlers/read-handlers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/handlers/write-handlers.ts": {
             "upstream": "558e2c431390fa080325c3c2d927a049440f4526",
             "php": "packages/core/upload/server/src/mcp/handlers/write-handlers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/index.ts": {
             "upstream": "e92b1e2169eae1c48792b15ea624b41c9c9efe63",
@@ -7302,17 +6775,17 @@
         "packages/core/upload/server/src/mcp/permissions.ts": {
             "upstream": "27fa2fcee892b7e2a3d9afd675e1a340809dc42d",
             "php": "packages/core/upload/server/src/mcp/permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/register-upload-mcp-tools.ts": {
             "upstream": "527710a6dad381bd7a2057a96678672ca66e5f2d",
             "php": "packages/core/upload/server/src/mcp/register-upload-mcp-tools.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/sanitizers/sanitize-media.ts": {
             "upstream": "c125923c136becdd1ac1c389b8a3cf35831630f5",
             "php": "packages/core/upload/server/src/mcp/sanitizers/sanitize-media.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/schemas/index.ts": {
             "upstream": "532b638b44f966174fb2885a3b1ffc2f04e2cb10",
@@ -7322,42 +6795,42 @@
         "packages/core/upload/server/src/mcp/schemas/input-schemas.ts": {
             "upstream": "c69b1fafb6d41287c376b7fb6ad822e696561712",
             "php": "packages/core/upload/server/src/mcp/schemas/input-schemas.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/schemas/output-schemas.ts": {
             "upstream": "b1c06f8acb5c82b5b772afcd213750d05dcf8809",
             "php": "packages/core/upload/server/src/mcp/schemas/output-schemas.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/types.ts": {
             "upstream": "effe1e96813b1797aacad2bb058102cdfc252e44",
             "php": "packages/core/upload/server/src/mcp/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/mcp/utils.ts": {
             "upstream": "8bb761063bab3ec2c4d7494a768972a069e36c1f",
             "php": "packages/core/upload/server/src/mcp/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/media-library-default-notice.ts": {
             "upstream": "073de9bacb959b2e8279696643a365355241bc41",
             "php": "packages/core/upload/server/src/media-library-default-notice.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/middlewares/upload.ts": {
             "upstream": "f3e8f367c376a04be722ab5a67412073c7c71634",
             "php": "packages/core/upload/server/src/middlewares/upload.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/migrations/unsign-richtext-and-blocks-urls.ts": {
             "upstream": "de68bdc41502670c87c9e96443b33bb5e0f7fef1",
             "php": "packages/core/upload/server/src/migrations/unsign-richtext-and-blocks-urls.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/models/ai-metadata-job.ts": {
             "upstream": "2787cf00f49dee9f7382bb72b6264869c7169e01",
             "php": "packages/core/upload/server/src/models/ai-metadata-job.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/models/index.ts": {
             "upstream": "c8610c1ba66e954c13dddfec0c4fac4817badf02",
@@ -7367,22 +6840,22 @@
         "packages/core/upload/server/src/register.ts": {
             "upstream": "6e6db35bc20f20eaee2a9fd16ff017a5e82ea7d1",
             "php": "packages/core/upload/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/routes/admin.ts": {
             "upstream": "4d58b574dcd564517a1a4104e56189791ab64189",
             "php": "packages/core/upload/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/routes/content-api.ts": {
             "upstream": "e18dce92eb4810822d6120a61c4817afdd7db300",
             "php": "packages/core/upload/server/src/routes/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/routes/index.ts": {
             "upstream": "be772c8278e135e2fdae8f7b98886129a71df98e",
             "php": "packages/core/upload/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/routes/validation/index.ts": {
             "upstream": "31e04a4a0aebc1647047d436913b0eb72b21dc0f",
@@ -7392,117 +6865,117 @@
         "packages/core/upload/server/src/routes/validation/upload.ts": {
             "upstream": "641f987d0d50c39510453f0adf674fb8e4d1ba62",
             "php": "packages/core/upload/server/src/routes/validation/upload.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/routes/view-configuration.ts": {
             "upstream": "2bb5c1780d58eaccd9829a2a50791f02dcec747c",
             "php": "packages/core/upload/server/src/routes/view-configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/ai-metadata-jobs.ts": {
             "upstream": "6b36c8eae221ccc7baa35acbee321de799d1c73d",
             "php": "packages/core/upload/server/src/services/ai-metadata-jobs.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/ai-metadata-provider.ts": {
             "upstream": "ad12465de012e3c7fd1243dede4b27821e061c42",
             "php": "packages/core/upload/server/src/services/ai-metadata-provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/ai-metadata-strapi-managed.ts": {
             "upstream": "ed30eeccb3000c197cdc0e384b0ce1e71eabb5aa",
             "php": "packages/core/upload/server/src/services/ai-metadata-strapi-managed.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/ai-metadata.ts": {
             "upstream": "479bac097c54d3f097153b8b1779f564bbe8c49c",
             "php": "packages/core/upload/server/src/services/ai-metadata.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/api-upload-folder.ts": {
             "upstream": "c340e0e072b34a71886095ce7e00ec41753fc148",
             "php": "packages/core/upload/server/src/services/api-upload-folder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/extensions/index.ts": {
             "upstream": "0ae0ba02d98e9ec80a7028c5b7afcd4b375e740a",
             "php": "packages/core/upload/server/src/services/extensions/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/extensions/utils.ts": {
             "upstream": "0dddda5a111ae23f91d0ad8d80d4e15aef67e561",
             "php": "packages/core/upload/server/src/services/extensions/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/file.ts": {
             "upstream": "20e6104cb9b09fed44dab0e1f0cf6b08236d618c",
             "php": "packages/core/upload/server/src/services/file.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/folder.ts": {
             "upstream": "f17ad13d05dfda3d3f1e81bcebddf6cc98133535",
             "php": "packages/core/upload/server/src/services/folder.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/image-manipulation.ts": {
             "upstream": "29af8fe217fd38f959a3e2a243def6a0d17293d0",
             "php": "packages/core/upload/server/src/services/image-manipulation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/index.ts": {
             "upstream": "e03b1736b6dd225fed8908b1c820694a50495f44",
             "php": "packages/core/upload/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/metrics.ts": {
             "upstream": "e0926222a5fb9bcc4f48db97ecbd3c97ca88e99d",
             "php": "packages/core/upload/server/src/services/metrics.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/provider.ts": {
             "upstream": "b347e4c04c0f7caae82bccc214b30d8f565714ce",
             "php": "packages/core/upload/server/src/services/provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/upload.ts": {
             "upstream": "00f2c49aa3804d141fa0f0de6652a558ed931a17",
             "php": "packages/core/upload/server/src/services/upload.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/services/weekly-metrics.ts": {
             "upstream": "4547cce154455c7f98a8aa4ef74153a6ac56182a",
             "php": "packages/core/upload/server/src/services/weekly-metrics.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/types.ts": {
             "upstream": "e6bbc64c7f812ed048a6cb9fc86e97119b8068a2",
             "php": "packages/core/upload/server/src/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/utils/cron.ts": {
             "upstream": "b30348b19feb7d1ba2ee1ebc28e1b70809ada052",
             "php": "packages/core/upload/server/src/utils/cron.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/utils/images.ts": {
             "upstream": "43c698f472747ee7302cb8e22f10e0d939373359",
             "php": "packages/core/upload/server/src/utils/images.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/utils/index.ts": {
             "upstream": "dd47a2fe22f98c6b278422d68f5a2e256e232574",
             "php": "packages/core/upload/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/server/src/utils/mime-validation.ts": {
             "upstream": "f9cc75ef0b923f09f9f3e771a83796af96f1ffe4",
             "php": "packages/core/upload/server/src/utils/mime-validation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/shared/constants.ts": {
             "upstream": "0813379bb5f0281f7e5efab751483d16de7bca0f",
             "php": "packages/core/upload/shared/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/upload/shared/contracts/ai-metadata-jobs.ts": {
             "upstream": "d9dd15d5816813e72fbee657e3687b03d41b6577",
@@ -7542,7 +7015,7 @@
         "packages/core/utils/src/audit-logs.ts": {
             "upstream": "5628aa98e39fd75838379f7883f159fbc307de65",
             "php": "packages/core/utils/src/audit-logs.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/content-api-constants.ts": {
             "upstream": "1b5ff79883e437943e762b930fd3d83ead414f3e",
@@ -7582,12 +7055,12 @@
         "packages/core/utils/src/file.ts": {
             "upstream": "09af49943260f32abf43c7aa3b371031766f31b5",
             "php": "packages/core/utils/src/file.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/format-yup-error.ts": {
             "upstream": "5c5ac484c97e53fbaa4ecbd8b3f38904a3cb708e",
             "php": "packages/core/utils/src/format-yup-error.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/get-preferred-pm.ts": {
             "upstream": "193ef0c8353c9a1c47bd703e593f5b424eb0663e",
@@ -7762,12 +7235,12 @@
         "packages/core/utils/src/security.ts": {
             "upstream": "b7dd1074b868561feb8d98fcd637504e80dec7a0",
             "php": "packages/core/utils/src/security.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/sessions.ts": {
             "upstream": "a80e50534034e92196e57ffc6928f01aee824a75",
             "php": "packages/core/utils/src/sessions.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/set-creator-fields.ts": {
             "upstream": "c5a96c4740e19306f39739cc6f02f191f4882e15",
@@ -7827,7 +7300,7 @@
         "packages/core/utils/src/user-agent.ts": {
             "upstream": "7877f40d285f70b4eb5406a5ad6c5e3f98d904a6",
             "php": "packages/core/utils/src/user-agent.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/validate/index.ts": {
             "upstream": "fd77255dba02e37b4ae44bde31e9d02591002d7d",
@@ -7917,17 +7390,17 @@
         "packages/core/utils/src/validators.ts": {
             "upstream": "8752c3fdfb716772603e459869d05c8bae6ea528",
             "php": "packages/core/utils/src/validators.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/yup.ts": {
             "upstream": "ce19774eefa3be5bf825bc92ee33721e04895305",
             "php": "packages/core/utils/src/yup.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/zod.ts": {
             "upstream": "8f2d613c78211e4c6d285105519a15a0599f7c7d",
             "php": "packages/core/utils/src/zod.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -9552,7 +9025,7 @@
         "packages/providers/upload-local/src/index.ts": {
             "upstream": "ecf83d5224658bfcbcbffd21da7888d638204934",
             "php": "packages/providers/upload-local/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/upload-local/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
