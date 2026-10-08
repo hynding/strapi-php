@@ -29,32 +29,30 @@ use Strapi\Core\CoreApi\Service\Service;
 final class Factories
 {
     /**
-     * @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg
+     * @param array<string, callable>|\Closure(Strapi): array<string, callable>|null $cfg
      * @return \Closure(Strapi): Extendable
      */
-    public static function createCoreController(string $uid, array|callable|null $cfg = null): \Closure
+    public static function createCoreController(string $uid, array|\Closure|null $cfg = null): \Closure
     {
         return static function (Strapi $strapi) use ($uid, $cfg): Extendable {
             $baseController = Controller::createController($strapi, $strapi->contentType($uid));
 
-            $userCtrl = is_callable($cfg) && !is_array($cfg) ? $cfg($strapi) : ($cfg ?? []);
-            $userCtrl = is_array($userCtrl) ? $userCtrl : [];
+            $userCtrl = $cfg instanceof \Closure ? $cfg($strapi) : ($cfg ?? []);
 
             return new Extendable($baseController, $userCtrl, $strapi, $cfg !== null);
         };
     }
 
     /**
-     * @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg
+     * @param array<string, callable>|\Closure(Strapi): array<string, callable>|null $cfg
      * @return \Closure(Strapi): Extendable
      */
-    public static function createCoreService(string $uid, array|callable|null $cfg = null): \Closure
+    public static function createCoreService(string $uid, array|\Closure|null $cfg = null): \Closure
     {
         return static function (Strapi $strapi) use ($uid, $cfg): Extendable {
             $baseService = Service::createService($strapi, $strapi->contentType($uid));
 
-            $userService = is_callable($cfg) && !is_array($cfg) ? $cfg($strapi) : ($cfg ?? []);
-            $userService = is_array($userService) ? $userService : [];
+            $userService = $cfg instanceof \Closure ? $cfg($strapi) : ($cfg ?? []);
 
             return new Extendable($baseService, $userService, $strapi, $cfg !== null);
         };

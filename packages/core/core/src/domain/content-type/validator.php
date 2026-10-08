@@ -102,9 +102,8 @@ final class Validator
                 }
             }
 
-            if (in_array('', $regressedValues, true)) {
-                return "At least one value of the enumeration '{$attrName}' appears to be empty. Only alphanumerical characters are taken into account.";
-            }
+            // An empty regressed value never matches GRAPHQL_ENUM_REGEX, so the loop above already
+            // reports it (same message upstream's yup test ends up producing).
 
             $counts = array_count_values($regressedValues);
             $duplicates = array_keys(array_filter($counts, static fn (int $c): bool => $c > 1));

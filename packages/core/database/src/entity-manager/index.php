@@ -963,7 +963,8 @@ final class EntityManager
                     $typeColumn = $joinTable['morphColumn']['typeColumn'];
 
                     $hasSet = !empty($cleanRelationData['set']);
-                    $hasConnect = !empty($cleanRelationData['connect']);
+                    $connect = $cleanRelationData['connect'] ?? [];
+                    $hasConnect = $connect !== [];
                     $hasDisconnect = !empty($cleanRelationData['disconnect']);
 
                     // for connect/disconnect without a set, only modify those relations
@@ -995,7 +996,7 @@ final class EntityManager
                             $startOrder = (float) ($start['max'] ?? 0);
 
                             $rows = [];
-                            foreach ($cleanRelationData['connect'] ?? [] as $idx => $datum) {
+                            foreach ($connect as $idx => $datum) {
                                 $rows[] = [
                                     $joinColumn['name'] => $datum['id'],
                                     $idColumn['name'] => $id,
@@ -1098,7 +1099,8 @@ final class EntityManager
         $typeField = $morphColumn['typeField'] ?? '__type';
 
         $hasSet = !empty($cleanRelationData['set']);
-        $hasConnect = !empty($cleanRelationData['connect']);
+        $connect = $cleanRelationData['connect'] ?? [];
+        $hasConnect = $connect !== [];
         $hasDisconnect = !empty($cleanRelationData['disconnect']);
 
         // for connect/disconnect without a set, only modify those relations
@@ -1153,7 +1155,7 @@ final class EntityManager
             }
 
             if ($hasConnect) {
-                $dataset = $cleanRelationData['connect'] ?? [];
+                $dataset = $connect;
 
                 $rows = [];
                 foreach ($dataset as $datum) {
