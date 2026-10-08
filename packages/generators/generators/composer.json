@@ -7,15 +7,17 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
+        "strapi/core": "self.version",
         "strapi/utils": "self.version",
-        "symfony/console": "^7.2",
-        "symfony/filesystem": "^7.2"
+        "strapi/types": "self.version",
+        "symfony/console": "^7.2"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/generators",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "namespace": "Strapi\\Generators"
         }
     },
     "minimum-stability": "stable",

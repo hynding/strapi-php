@@ -33,7 +33,7 @@ component collection names (`components_<category>_<pluralize(displayName)>`).
 
 | Upstream | State |
 | --- | --- |
-| `services/content-types.generateAPI` → `@strapi/generators` `content-type` | `@strapi/generators` is not ported: the files its generator writes for a new API (`content-types/<name>/schema.json`, then `controllers/`, `services/`, `routes/<name>.php` with `Factories::createCoreController/Service/Router('api::<name>.<name>')`, the PHP edition of the TypeScript templates) are written by `ContentTypes::generateAPI()`. Like plop's `add` action it fails with `File already exists` rather than overwrite. |
+| `services/content-types.generateAPI` → `@strapi/generators` `content-type` | Calls `Strapi\Generators\Generators::generate('content-type', [... 'destination' => 'new', 'bootstrapApi' => true], ['dir' => <project root>])` (strapi/generators), which writes `content-types/<name>/schema.json`, then `controllers/`, `services/`, `routes/<name>.php` with `Factories::createCoreController/Service/Router('api::<name>.<name>')`. Like plop's `add` action it fails with `File already exists` rather than overwrite (upstream's `generate()` overwrites). |
 | `strapi.reload()` after a write | see "Reload" below |
 | `scheduleReloadAfterOutboundTelemetry` | telemetry is synchronous here; the reload is requested once the files are written |
 
