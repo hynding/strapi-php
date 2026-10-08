@@ -8,7 +8,7 @@ mirrors**. Upstream uses Lerna fixed versioning (one number for every `@strapi/*
 | Situation | Tag | Users write |
 | --- | --- | --- |
 | Strapi 5.56.0 fully ported | `v5.56.0` | `"strapi/strapi": "^5.56"` |
-| Strapi 5.57.0 released, port in progress | `v5.57.0-beta.1`, `-beta.2`, … | `"strapi/strapi": "5.57.0@beta"` |
+| Strapi 5.57.0 released, port in progress | `v5.57.0-beta.1`, `-beta.2`, … | `"strapi/strapi": "5.57.0-beta.1"` plus `"minimum-stability": "beta", "prefer-stable": true` |
 | PHP-only fix, no upstream counterpart | `v5.56.0.1`, `v5.56.0.2` | still `^5.56` — Composer sorts four-part versions after `5.56.0` |
 | Strapi 6.0.0 | `v6.0.0-alpha.1` → `v6.0.0` | `^6.0` |
 
@@ -18,9 +18,13 @@ Rules:
    publish `5.57.0-beta.N` with a parity note and move on; `parity.json` records what is
    missing.
 2. A project pins `@strapi/admin` and every plugin's admin package in `package.json` to the
-   exact version of its `strapi/*` Composer packages. `bin/strapi build` refuses to run when
-   the two manifests disagree.
-3. A given PHP `5.x.y` serves the admin bundle `@strapi/admin@5.x.y`, exposes the same REST
+   upstream release its `strapi/*` Composer packages mirror: the version without PHP's
+   pre-release or fourth number (`5.56.0-beta.1` and `5.56.0.1` both pin `5.56.0`).
+   `bin/strapi build` refuses to run when the two manifests disagree.
+3. During a beta, the project needs `"minimum-stability": "beta"` (with `"prefer-stable": true`):
+   the `strapi/*` packages require each other at `self.version`, and Composer's `@beta` flag on
+   the root requirement does not reach those transitive requirements.
+4. A given PHP `5.x.y` serves the admin bundle `@strapi/admin@5.x.y`, exposes the same REST
    and admin API routes, reads and writes the same database schema, and accepts the same
    `schema.json`, `config/*` options and data-transfer archives as Strapi `5.x.y`.
 

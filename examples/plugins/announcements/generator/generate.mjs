@@ -268,7 +268,10 @@ for (const stem of phpStems) if (!tsStems.has(stem)) problems.push(`parity: ${st
 if (composer.extra.strapi.name !== pluginName) {
   problems.push(`manifest: composer.json extra.strapi.name "${composer.extra.strapi.name}" != package.json strapi.name "${pluginName}"`);
 }
-if (composer.version !== pkg.version) {
+// lockstep on the upstream release: the PHP side may carry a pre-release or a fourth number
+// (5.56.0-beta.1, 5.56.0.1) while npm stays on 5.56.0 (VERSIONING.md)
+const upstreamOf = (v) => (String(v).match(/^v?(\d+\.\d+\.\d+)/) || [null, v])[1];
+if (upstreamOf(composer.version) !== upstreamOf(pkg.version)) {
   problems.push(`manifest: composer.json version ${composer.version} != package.json version ${pkg.version} (versions move in lockstep)`);
 }
 

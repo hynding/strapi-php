@@ -3,7 +3,7 @@
     "description": "Admin API: users, roles, permissions, API tokens, auth (port of @strapi/admin server). The React admin stays upstream's npm bundle.",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",

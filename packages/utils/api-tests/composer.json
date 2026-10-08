@@ -3,7 +3,7 @@
     "description": "Helpers for running the upstream Jest HTTP suite against a PHP instance (port of @strapi/api-tests)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
