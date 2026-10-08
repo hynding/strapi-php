@@ -1,9 +1,9 @@
 {
     "upstreamTag": "v5.56.0",
-    "generatedAt": "2026-10-08T08:53:16+00:00",
+    "generatedAt": "2026-10-08T12:42:21+00:00",
     "totals": {
         "files": 1921,
-        "ported": 794,
+        "ported": 1111,
         "ee": 157
     },
     "changed": [],
@@ -2743,27 +2743,27 @@
         "packages/core/core/src/core-api/routes/validation/attributes.ts": {
             "upstream": "ae08723242827d7820e34aaf7c5def40b3e6f28f",
             "php": "packages/core/core/src/core-api/routes/validation/attributes.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/common.ts": {
             "upstream": "47a38ffb8172870d583a03e7e795278a42599ee0",
             "php": "packages/core/core/src/core-api/routes/validation/common.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/component.ts": {
             "upstream": "a9eb26487b9855fb643afd4310ff07467c38a390",
             "php": "packages/core/core/src/core-api/routes/validation/component.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/constants.ts": {
             "upstream": "9d38e3ccd26c54189a27f019a324eead3fe1319d",
             "php": "packages/core/core/src/core-api/routes/validation/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/content-type.ts": {
             "upstream": "23d8b13bc88ece795f31e8dd8665a49874dd6b5f",
             "php": "packages/core/core/src/core-api/routes/validation/content-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/index.ts": {
             "upstream": "34cfe1018422802b2831da18452119828a91f254",
@@ -2773,17 +2773,17 @@
         "packages/core/core/src/core-api/routes/validation/mappers.ts": {
             "upstream": "33b74fa3f8db5be8c276754c754f48f4a72a6b77",
             "php": "packages/core/core/src/core-api/routes/validation/mappers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/schema-registry.ts": {
             "upstream": "0587bffd4efeea8e9dbaf1c01af950df0c1d2ed1",
             "php": "packages/core/core/src/core-api/routes/validation/schema-registry.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/routes/validation/utils.ts": {
             "upstream": "2cc0aa67dcf8e024e43ba4082100ea110cba7dc8",
             "php": "packages/core/core/src/core-api/routes/validation/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/core-api/service/collection-type.ts": {
             "upstream": "7bcf3d93eec914ee757c2b6eccb158b797190785",
@@ -3695,7 +3695,7 @@
         "packages/core/core/src/services/server/openapi.ts": {
             "upstream": "9ec60068bcf81cbfc5d7064d90f8eab7d4711bea",
             "php": "packages/core/core/src/services/server/openapi.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/src/services/server/policy.ts": {
             "upstream": "c850ae0b0478df44c600da0a41bae4d921191a43",
@@ -3830,7 +3830,7 @@
         "packages/core/core/src/utils/zod.ts": {
             "upstream": "f27989d48b832f45a382b197df6d01c0df5ae06d",
             "php": "packages/core/core/src/utils/zod.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/core/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -3845,12 +3845,12 @@
         "packages/core/data-transfer/src/directory/providers/destination/index.ts": {
             "upstream": "b973333a4f302f0a4bda8bb8607c90cc314667b1",
             "php": "packages/core/data-transfer/src/directory/providers/destination/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/directory/providers/destination/utils.ts": {
             "upstream": "2d7552af5c9d4e77e7a9b2d6a23bf3dcecdc516d",
             "php": "packages/core/data-transfer/src/directory/providers/destination/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/directory/providers/index.ts": {
             "upstream": "74400a0ff2b812124218b120994b504449ee8181",
@@ -3860,17 +3860,17 @@
         "packages/core/data-transfer/src/directory/providers/source/index.ts": {
             "upstream": "9d318a904753f1f37de14a12cf15086dcabfaede",
             "php": "packages/core/data-transfer/src/directory/providers/source/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/engine/errors.ts": {
             "upstream": "109438157d77a9e3e63ea464f1cb7b323cd546fd",
             "php": "packages/core/data-transfer/src/engine/errors.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/engine/index.ts": {
             "upstream": "610c145a520143d26a5b0ba34b1f956c7845aaf7",
             "php": "packages/core/data-transfer/src/engine/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/engine/validation/index.ts": {
             "upstream": "9fc174d4636ce97675ecb6e33fef38e067783ddf",
@@ -3880,22 +3880,22 @@
         "packages/core/data-transfer/src/engine/validation/provider.ts": {
             "upstream": "7d9798dcd5e005d0c10c6e278b53f2d3c0666e5c",
             "php": "packages/core/data-transfer/src/engine/validation/provider.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/engine/validation/schemas/index.ts": {
             "upstream": "96d05057273c1411acb40b5d1e7139f3abcbae69",
             "php": "packages/core/data-transfer/src/engine/validation/schemas/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/errors/base.ts": {
             "upstream": "1d3987a39fb33b5eb1cac701b603fd4408a5cd38",
             "php": "packages/core/data-transfer/src/errors/base.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/errors/constants.ts": {
             "upstream": "17a4fc7a39dbaab17e74948e7c0c68e6efd7d4c4",
             "php": "packages/core/data-transfer/src/errors/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/errors/index.ts": {
             "upstream": "41bf5eaffbfe4da8ce432015c0bcc297f81518ee",
@@ -3905,7 +3905,7 @@
         "packages/core/data-transfer/src/errors/providers.ts": {
             "upstream": "ce446ce72adbbef13da3ce8dc8af0fee79037874",
             "php": "packages/core/data-transfer/src/errors/providers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/file/index.ts": {
             "upstream": "15f74296f57f567dde83b7470ad536ec1d9fb328",
@@ -3915,12 +3915,12 @@
         "packages/core/data-transfer/src/file/providers/destination/index.ts": {
             "upstream": "1ee8c5231dab15ee0c2d93126096410171216ec7",
             "php": "packages/core/data-transfer/src/file/providers/destination/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/file/providers/destination/utils.ts": {
             "upstream": "90eef24750d13949a41b052a6b5e1910eca805eb",
             "php": "packages/core/data-transfer/src/file/providers/destination/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/file/providers/index.ts": {
             "upstream": "d3c54e88d0bf77db1a66bf7a4429e794573f1a19",
@@ -3930,12 +3930,12 @@
         "packages/core/data-transfer/src/file/providers/source/index.ts": {
             "upstream": "85127e948e037331d0f4e388318b31123a4c54a8",
             "php": "packages/core/data-transfer/src/file/providers/source/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/file/providers/source/utils.ts": {
             "upstream": "404a68bfaa0625c9cfe889db52c9824dd40ad2dd",
             "php": "packages/core/data-transfer/src/file/providers/source/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/index.ts": {
             "upstream": "010ceccdbb1fa09eaea4200c5310a38263dca1f6",
@@ -3955,12 +3955,12 @@
         "packages/core/data-transfer/src/strapi/providers/local-destination/assets-destination-writable.ts": {
             "upstream": "e6b3b35cdcd2b9a712f6f380b76720c4ffa60f39",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/assets-destination-writable.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/index.ts": {
             "upstream": "fbeb94efa88f741c76291b2c9a73423439e37490",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/index.ts": {
             "upstream": "99172a7a46e3328a03a80c04c416c9e2d6305321",
@@ -3970,77 +3970,77 @@
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/configuration.ts": {
             "upstream": "391e867d362f6b883de84cb72157d9837efee068",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/entities.ts": {
             "upstream": "1f4ea5c9b3f229e5d57c6ea513d7708c63d6ebf3",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/entities.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/index.ts": {
             "upstream": "da74f11721c04958913aaab36b7e2da1d275833b",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/links.ts": {
             "upstream": "6670cc63d3b29654a4d55646988d77ff2076a5f2",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/links.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/resolve-link-ref.ts": {
             "upstream": "49b0d9cce467d1be13c0baae1f9baa3eee7680df",
             "php": "packages/core/data-transfer/src/strapi/providers/local-destination/strategies/restore/resolve-link-ref.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/assets.ts": {
             "upstream": "16bfb5c9a59bc03f2cc8a8abd0c2791bf58122af",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/assets.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/configuration.ts": {
             "upstream": "c2ac1265717016da51973acfe3ce6c851e4cbb94",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/configuration.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/entities.ts": {
             "upstream": "c118ab29268203eb916c8122f199e132db908f58",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/entities.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/estimate-asset-totals.ts": {
             "upstream": "ec6a94ce2144a95a4822279234242cf300c4330a",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/estimate-asset-totals.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/index.ts": {
             "upstream": "601a3596b65c7d2567c948c6538885c00038f0ba",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/local-source/links.ts": {
             "upstream": "726b4d7e118edfa18f7be6a9a731665d12f7e1e8",
             "php": "packages/core/data-transfer/src/strapi/providers/local-source/links.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/remote-destination/index.ts": {
             "upstream": "17a8a542784c90983c0be655a21bfe4bd5f750e4",
             "php": "packages/core/data-transfer/src/strapi/providers/remote-destination/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/remote-source/index.ts": {
             "upstream": "79fbe7a17fec198831e32a1b480fab9b350fed8e",
             "php": "packages/core/data-transfer/src/strapi/providers/remote-source/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/providers/utils.ts": {
             "upstream": "e80295e4e2700c41ed8bc937e7fd9fed44b908ec",
             "php": "packages/core/data-transfer/src/strapi/providers/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/queries/entity.ts": {
             "upstream": "9a63d116c1142c71ca769804645093d0c64fd578",
             "php": "packages/core/data-transfer/src/strapi/queries/entity.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/queries/index.ts": {
             "upstream": "8267f2a25cd053ad74fb8f985a1b30c48278deea",
@@ -4050,32 +4050,32 @@
         "packages/core/data-transfer/src/strapi/queries/link.ts": {
             "upstream": "ac31dc825901d8cafb50f1ede39b8e2d52b2ee64",
             "php": "packages/core/data-transfer/src/strapi/queries/link.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/constants.ts": {
             "upstream": "1e8fe0fb76318d761f06145dec93df7f4af7b1f7",
             "php": "packages/core/data-transfer/src/strapi/remote/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/flows/default.ts": {
             "upstream": "6f1dbf41dc76823213b9e629cc5abc5b12517f11",
             "php": "packages/core/data-transfer/src/strapi/remote/flows/default.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/flows/index.ts": {
             "upstream": "f19429777ebe23fc82273f86cbe34ff6d3c6dddc",
             "php": "packages/core/data-transfer/src/strapi/remote/flows/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/handlers/abstract.ts": {
             "upstream": "655047e0fb2af13067d785d967efb90c4c1b89ca",
             "php": "packages/core/data-transfer/src/strapi/remote/handlers/abstract.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/handlers/constants.ts": {
             "upstream": "fbaefdbcbc48b1c32eab5599b553087dced391a9",
             "php": "packages/core/data-transfer/src/strapi/remote/handlers/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/handlers/index.ts": {
             "upstream": "1c193afe2d3a8a6aaf3066e2e547eee0179da601",
@@ -4085,17 +4085,17 @@
         "packages/core/data-transfer/src/strapi/remote/handlers/pull.ts": {
             "upstream": "37eb92b0015b43d972ba5aa44c194f7d64a4911d",
             "php": "packages/core/data-transfer/src/strapi/remote/handlers/pull.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/handlers/push.ts": {
             "upstream": "fec564b3ad140bb8f9a01d748b9f398c747310e4",
             "php": "packages/core/data-transfer/src/strapi/remote/handlers/push.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/handlers/utils.ts": {
             "upstream": "100897a8eaf645a1dc86494fe318c2c8657aa9f5",
             "php": "packages/core/data-transfer/src/strapi/remote/handlers/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/remote/index.ts": {
             "upstream": "05aef38592a328d8df57d1db6350efaca72c505d",
@@ -4105,12 +4105,12 @@
         "packages/core/data-transfer/src/strapi/transfer-policy.ts": {
             "upstream": "b787a7726f894cd447bbdd6043327a42d5eaa2a2",
             "php": "packages/core/data-transfer/src/strapi/transfer-policy.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/strapi/utils/project-settings-logos.ts": {
             "upstream": "6f0de2f786d892a7fff3df1f02a493787c3284c0",
             "php": "packages/core/data-transfer/src/strapi/utils/project-settings-logos.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/types/common-entities.ts": {
             "upstream": "5826efb9bd75f8a149102d8be4efb30f34f6d678",
@@ -4210,27 +4210,27 @@
         "packages/core/data-transfer/src/utils/capped-warnings.ts": {
             "upstream": "d794cf698eb58b3f96d74dd7a6d4ce531decbac5",
             "php": "packages/core/data-transfer/src/utils/capped-warnings.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/components.ts": {
             "upstream": "6daba5e421a697dce8fafda4f7ac48c6fa8f34f4",
             "php": "packages/core/data-transfer/src/utils/components.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/diagnostic.ts": {
             "upstream": "3c530023aa025d68721b26217d5581dd82df4839",
             "php": "packages/core/data-transfer/src/utils/diagnostic.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/encryption/decrypt.ts": {
             "upstream": "ff017bc6b264ecc8948e2a95efe3157c3ef0ea60",
             "php": "packages/core/data-transfer/src/utils/encryption/decrypt.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/encryption/encrypt.ts": {
             "upstream": "046f687077e4c60fea3955adaafa148f42ef83f2",
             "php": "packages/core/data-transfer/src/utils/encryption/encrypt.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/encryption/index.ts": {
             "upstream": "04a109a35c8d5e80b8cfa81370ce572e36f0cb47",
@@ -4245,47 +4245,47 @@
         "packages/core/data-transfer/src/utils/json.ts": {
             "upstream": "f057512de0cb079abe84a2bcc9938674bfbee1dd",
             "php": "packages/core/data-transfer/src/utils/json.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/middleware.ts": {
             "upstream": "3e7719474dbc13eac424a988694648c7d03a81e6",
             "php": "packages/core/data-transfer/src/utils/middleware.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/providers.ts": {
             "upstream": "85a5e831254f055f586a62efc1b39cbb6d5220eb",
             "php": "packages/core/data-transfer/src/utils/providers.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/schema.ts": {
             "upstream": "09532c7d0b1efc96672562212ac3affb38e9df24",
             "php": "packages/core/data-transfer/src/utils/schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/stream.ts": {
             "upstream": "a31cd755b157b59d76387a0b059396a82c855857",
             "php": "packages/core/data-transfer/src/utils/stream.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/transaction.ts": {
             "upstream": "0e4c6db5548cac64ba6541c4bbd344e3cbbb1a84",
             "php": "packages/core/data-transfer/src/utils/transaction.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/transfer-asset-chunk.ts": {
             "upstream": "3a4f0d882566e59d7999340555919d8ad1493cda",
             "php": "packages/core/data-transfer/src/utils/transfer-asset-chunk.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/transfer-websocket-json.ts": {
             "upstream": "b3c4fa7d460071328b10cac7131c7d1c21d59ca4",
             "php": "packages/core/data-transfer/src/utils/transfer-websocket-json.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/src/utils/writable-async-write.ts": {
             "upstream": "e5593332b71eb47240f11eea15c9ccf721435a5c",
             "php": "packages/core/data-transfer/src/utils/writable-async-write.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/data-transfer/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -4870,7 +4870,7 @@
         "packages/core/openapi/src/assemblers/document/factory.ts": {
             "upstream": "ee3fc5b7d1700a6f8c7192cc100b725c5ef1ed15",
             "php": "packages/core/openapi/src/assemblers/document/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/index.ts": {
             "upstream": "4167beb54809dd3a4de928b88f0ccc1db732775d",
@@ -4880,17 +4880,17 @@
         "packages/core/openapi/src/assemblers/document/info.ts": {
             "upstream": "341091861adf4c431b98f893c906fe6dfe9ab1eb",
             "php": "packages/core/openapi/src/assemblers/document/info.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/metadata.ts": {
             "upstream": "c35a90f713ab6c5fddc297629bd69badb17c3d63",
             "php": "packages/core/openapi/src/assemblers/document/metadata.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/factory.ts": {
             "upstream": "ef9bc09e0935a501031be15b12cf874028ff08f0",
             "php": "packages/core/openapi/src/assemblers/document/path/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/index.ts": {
             "upstream": "cf0e3929a70b3a88aa5c3654cfe3793ca29070cc",
@@ -4900,7 +4900,7 @@
         "packages/core/openapi/src/assemblers/document/path/path-item/factory.ts": {
             "upstream": "0b3059e806d95503d5731b2c6cff7ea41f29fe79",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/index.ts": {
             "upstream": "43b3e2b81dea8edd2a3c9a0599d16ed1e6e28884",
@@ -4910,12 +4910,12 @@
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/body.ts": {
             "upstream": "60022ce30eb9e1509378084416015a2a9baf1b35",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/body.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/factory.ts": {
             "upstream": "aabc08fd5f5ecc7f056969a3517fba1854ba6745",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/index.ts": {
             "upstream": "5a40e60094f5591b8ab3390c8c997828b9da7e00",
@@ -4925,52 +4925,52 @@
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/operation-id.ts": {
             "upstream": "666fc99607ca148d125ea47ec3536d8be645ca7d",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/operation-id.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/operation.ts": {
             "upstream": "e16dad311e59ef906ba3252c6a92567353ce0917",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/operation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/parameters.ts": {
             "upstream": "d01d8e31579d0bd5cadca952c2badb0045255cca",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/parameters.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/responses.ts": {
             "upstream": "789c2a23f925e195091b5a3ac053c9a5ff9f3cf0",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/responses.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/operation/tags.ts": {
             "upstream": "d5b664f80506f4620d33289e26376fdaf99e4a44",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/operation/tags.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path-item/path-item.ts": {
             "upstream": "490aacab0c70c768b18bf07a0facab3f833953db",
             "php": "packages/core/openapi/src/assemblers/document/path/path-item/path-item.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/path/path.ts": {
             "upstream": "e64161daa07380c336d33631db564249b0623f70",
             "php": "packages/core/openapi/src/assemblers/document/path/path.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/query-param-styles.ts": {
             "upstream": "9b125f6e1a7b7238315840facc23cb0cc9c8177a",
             "php": "packages/core/openapi/src/assemblers/document/query-param-styles.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/security.ts": {
             "upstream": "bcda945f85c7a3fc5194b44a1c0538ed9a99bf4f",
             "php": "packages/core/openapi/src/assemblers/document/security.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/document/server.ts": {
             "upstream": "1bd8409cd30ca02c41ed08bd33a8b8ec57034e95",
             "php": "packages/core/openapi/src/assemblers/document/server.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/assemblers/index.ts": {
             "upstream": "da79d44b2fe2f7206c376b52ab13fc4139cfbc42",
@@ -4980,22 +4980,22 @@
         "packages/core/openapi/src/assemblers/types.ts": {
             "upstream": "37cb34a928df478b04716faef5539d1dfd3a51b9",
             "php": "packages/core/openapi/src/assemblers/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/constants.ts": {
             "upstream": "ebab7fed50e230b81486dc1b62ef7c88492ae51e",
             "php": "packages/core/openapi/src/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/factories/abstract.ts": {
             "upstream": "7a4bc1475e90d69da74cd8c3f533b3b3490562a9",
             "php": "packages/core/openapi/src/context/factories/abstract.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/factories/document.ts": {
             "upstream": "03b63b4d10ce23ae22c25b5a0eede0cea2a716a2",
             "php": "packages/core/openapi/src/context/factories/document.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/factories/index.ts": {
             "upstream": "ef28f1bb713acd5e1078737e39fccea08826e114",
@@ -5005,17 +5005,17 @@
         "packages/core/openapi/src/context/factories/operation.ts": {
             "upstream": "3cdc85746496ed8cad8e5b38c1589ba1dc5f9376",
             "php": "packages/core/openapi/src/context/factories/operation.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/factories/path-item.ts": {
             "upstream": "1234a535fb1b7776f2a014def05b0bf79bb57d8b",
             "php": "packages/core/openapi/src/context/factories/path-item.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/factories/path.ts": {
             "upstream": "b2923621ca5c945c6f86ea5ae4ea3df7bd876ef1",
             "php": "packages/core/openapi/src/context/factories/path.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/context/index.ts": {
             "upstream": "107ca13c5594800856512d0c25f74781c630abf5",
@@ -5025,17 +5025,17 @@
         "packages/core/openapi/src/context/types.ts": {
             "upstream": "69f4ca65821b0691399f00d84b58242d499b6f83",
             "php": "packages/core/openapi/src/context/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/exports.ts": {
             "upstream": "cdfc51b37a1e7ad9b8ed7033279814a651e7a964",
             "php": "packages/core/openapi/src/exports.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/generator/generator.ts": {
             "upstream": "276b9ac7face852fb5c266c593e42f7f5b328016",
             "php": "packages/core/openapi/src/generator/generator.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/generator/index.ts": {
             "upstream": "c2a15495d472b5e9f109fe8a8a921affd97b3a2c",
@@ -5045,7 +5045,7 @@
         "packages/core/openapi/src/generator/types.ts": {
             "upstream": "87a2d58a30fd07c26655f160296562e354df312c",
             "php": "packages/core/openapi/src/generator/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/index.ts": {
             "upstream": "8570a426a7e7f4e463afad927b72a7b14a29d5b1",
@@ -5055,12 +5055,12 @@
         "packages/core/openapi/src/post-processor/component-writer.ts": {
             "upstream": "542abab82ace87f9df7362107736eda4908fe35a",
             "php": "packages/core/openapi/src/post-processor/component-writer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/post-processor/factory.ts": {
             "upstream": "f74165befd55b625cead1df70abe7df5792d9bab",
             "php": "packages/core/openapi/src/post-processor/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/post-processor/index.ts": {
             "upstream": "6ad8a75b3baa840846193f40dd5d067c6c99c2c0",
@@ -5070,12 +5070,12 @@
         "packages/core/openapi/src/post-processor/types.ts": {
             "upstream": "08ff7643090de2c7fbc6db5a89857f6d91dda610",
             "php": "packages/core/openapi/src/post-processor/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/pre-processor/factory.ts": {
             "upstream": "9145561e5e87a74a05aa34170d7bbd752d9a92b0",
             "php": "packages/core/openapi/src/pre-processor/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/pre-processor/index.ts": {
             "upstream": "56647c8b321dc04472ba673104080b964aa14054",
@@ -5085,12 +5085,12 @@
         "packages/core/openapi/src/pre-processor/types.ts": {
             "upstream": "9dd053249f8cf531f4f0baa80c9ca2f50366be88",
             "php": "packages/core/openapi/src/pre-processor/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/registries/factory.ts": {
             "upstream": "441af3c21652f2ebdb6aa91803259748ece4dbbd",
             "php": "packages/core/openapi/src/registries/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/registries/index.ts": {
             "upstream": "606d87cc796db489efd22c0527a7171d3be0f6b1",
@@ -5100,12 +5100,12 @@
         "packages/core/openapi/src/registries/types.ts": {
             "upstream": "3ba0e31c5a5a08c5b40828b1beb95b4ec5bab3ab",
             "php": "packages/core/openapi/src/registries/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/collector.ts": {
             "upstream": "c17cc2692c76df90987e1cde362e340efb7bb274",
             "php": "packages/core/openapi/src/routes/collector.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/index.ts": {
             "upstream": "d4aadd2794efc39d31ce7b81a91036db135e5479",
@@ -5115,22 +5115,22 @@
         "packages/core/openapi/src/routes/matcher.ts": {
             "upstream": "ecb45e7bc1aa8456c8311e9bfaff41dd441cfbdb",
             "php": "packages/core/openapi/src/routes/matcher.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/providers/abstract.ts": {
             "upstream": "375f8783244fb456915bd96fe81c7db8d634f607",
             "php": "packages/core/openapi/src/routes/providers/abstract.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/providers/admin.ts": {
             "upstream": "7821049faa24a5a4d462119bfbe10d3c69e78efd",
             "php": "packages/core/openapi/src/routes/providers/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/providers/api.ts": {
             "upstream": "27f14835ea56e6c37f301a208aef5d1c757b9171",
             "php": "packages/core/openapi/src/routes/providers/api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/providers/index.ts": {
             "upstream": "1311121e8efd3e706ae2bacd0cef3ac1a4c4655b",
@@ -5140,12 +5140,12 @@
         "packages/core/openapi/src/routes/providers/plugin.ts": {
             "upstream": "6cbdea313fbe09dd285d85dba73d5d64e279ce10",
             "php": "packages/core/openapi/src/routes/providers/plugin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/providers/types.ts": {
             "upstream": "da9a7ac75c6823f4ecb83507bc63c84d73adcf23",
             "php": "packages/core/openapi/src/routes/providers/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/rules/index.ts": {
             "upstream": "c63e4c5d21ac4246ba49f01bedfbf786d5e5d463",
@@ -5155,22 +5155,22 @@
         "packages/core/openapi/src/routes/rules/is-of-type.ts": {
             "upstream": "d04d82012237db7f642b362ece1526632168143b",
             "php": "packages/core/openapi/src/routes/rules/is-of-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/routes/types.ts": {
             "upstream": "843eeddd336f0f27bf7bf09626551ef8ba777da5",
             "php": "packages/core/openapi/src/routes/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/types.ts": {
             "upstream": "c9ef5bcd8d8095274800542d57a8d84070c3ff44",
             "php": "packages/core/openapi/src/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/utils/debug.ts": {
             "upstream": "b6c65e2a0b4bd0dc1b39faf9fbb014c8e465d0bb",
             "php": "packages/core/openapi/src/utils/debug.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/utils/index.ts": {
             "upstream": "80c6ffaee23a1c955878e94a834ea194ac63117b",
@@ -5180,7 +5180,7 @@
         "packages/core/openapi/src/utils/timer/factory.ts": {
             "upstream": "9fb8ad225cf80562dbd654df7b54069170d4ff3c",
             "php": "packages/core/openapi/src/utils/timer/factory.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/utils/timer/index.ts": {
             "upstream": "7b8c71896039619c57f52b2cd40485e9895bca92",
@@ -5190,12 +5190,12 @@
         "packages/core/openapi/src/utils/timer/timer.ts": {
             "upstream": "37b19516e4aea09f67ee9e2bc929c7eb3de0cfe6",
             "php": "packages/core/openapi/src/utils/timer/timer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/openapi/src/utils/zod.ts": {
             "upstream": "1cfc9c99471f855bb71fda8a3065944df58ed303",
             "php": "packages/core/openapi/src/utils/zod.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/permissions/src/domain/index.ts": {
             "upstream": "e603c25886143c3f1e02374a54546dfb8c2b1b09",
@@ -5588,22 +5588,22 @@
         "packages/core/strapi/src/cli/commands/export/action.ts": {
             "upstream": "1893265fe103a949ba98c3acc04074bf3cc5e047",
             "php": "packages/core/strapi/src/cli/commands/export/action.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/export/command.ts": {
             "upstream": "3e7b74866a1d8451860e7e511421225c69be7285",
             "php": "packages/core/strapi/src/cli/commands/export/command.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/export/validate-dir-format.ts": {
             "upstream": "3ddfc1a7cd3112a7b09c2598b72bf949177552d0",
             "php": "packages/core/strapi/src/cli/commands/export/validate-dir-format.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/generate.ts": {
             "upstream": "5ab7911d7baf3f07ea94abe7d5ecfad9301f8bf2",
             "php": "packages/core/strapi/src/cli/commands/generate.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/hooks/list.ts": {
             "upstream": "ba3cbd39a4dca89a58e8c268f3ac421b7cce299b",
@@ -5613,12 +5613,12 @@
         "packages/core/strapi/src/cli/commands/import/action.ts": {
             "upstream": "a503023ee1904e22f06dd073698628ab0b0899c4",
             "php": "packages/core/strapi/src/cli/commands/import/action.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/import/command.ts": {
             "upstream": "d4ba27cb9076bde798503f3326419b02e6e7ff1a",
             "php": "packages/core/strapi/src/cli/commands/import/command.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/index.ts": {
             "upstream": "2bf51608cefaac507beac81ab8ed04d7dec42421",
@@ -5633,7 +5633,7 @@
         "packages/core/strapi/src/cli/commands/openapi/generate.ts": {
             "upstream": "b788240d74dbfa26624f5a5c9a661e54000a1af7",
             "php": "packages/core/strapi/src/cli/commands/openapi/generate.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/openapi/index.ts": {
             "upstream": "101596d1a236b5514e8686ea4fc191989879beeb",
@@ -5683,12 +5683,12 @@
         "packages/core/strapi/src/cli/commands/transfer/action.ts": {
             "upstream": "7aec8db69de25c43a15b8c26096dc6dfcb023798",
             "php": "packages/core/strapi/src/cli/commands/transfer/action.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/transfer/command.ts": {
             "upstream": "ede712c263ad20b67f1f39828e2af1120525cd0c",
             "php": "packages/core/strapi/src/cli/commands/transfer/command.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/commands/ts/generate-types.ts": {
             "upstream": "2e2533a21d487ca2cad0989e4e7fa171136883fe",
@@ -5713,12 +5713,12 @@
         "packages/core/strapi/src/cli/utils/commander.ts": {
             "upstream": "6d2f371005878a24a64749be3a49f324dab9e3e1",
             "php": "packages/core/strapi/src/cli/utils/commander.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/utils/data-transfer.ts": {
             "upstream": "bda4da231e08545e0afd2ea4aa8202e95108c4f0",
             "php": "packages/core/strapi/src/cli/utils/data-transfer.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/strapi/src/cli/utils/get-inquirer.ts": {
             "upstream": "b07e311e609a8cb099419418bdc402a7702c5b40",
@@ -7458,7 +7458,7 @@
         "packages/core/utils/src/validation/route-validators/base.ts": {
             "upstream": "a2c46ecd598b55ea26cd9074cb5ef020c39c800a",
             "php": "packages/core/utils/src/validation/route-validators/base.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/validation/route-validators/index.ts": {
             "upstream": "f5b586a0813baee43aac7cd2c6709f2007362eb1",
@@ -7468,12 +7468,12 @@
         "packages/core/utils/src/validation/route-validators/query-params.ts": {
             "upstream": "a55017ce1318610d5eb6a704dc85d61f4bff7810",
             "php": "packages/core/utils/src/validation/route-validators/query-params.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/validation/utilities.ts": {
             "upstream": "7087fa6a5a2ef61e7e9d245b5bb8c2174150c868",
             "php": "packages/core/utils/src/validation/utilities.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/utils/src/validators.ts": {
             "upstream": "8752c3fdfb716772603e459869d05c8bae6ea528",
@@ -7498,97 +7498,97 @@
         "packages/generators/generators/src/index.ts": {
             "upstream": "50c202128fa4dbd6f135e4bb6213cbdd3ac3ba8c",
             "php": "packages/generators/generators/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plopfile.ts": {
             "upstream": "0063124b491fa9ba6bfcdae7a5424d4b8d255a8a",
             "php": "packages/generators/generators/src/plopfile.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/api.ts": {
             "upstream": "cda2a2cebf3b0916eaa9d9d43fe69daa8d7eec24",
             "php": "packages/generators/generators/src/plops/api.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/content-type.ts": {
             "upstream": "3bbfe5f938ff9d270dd965a393084b311c882d46",
             "php": "packages/generators/generators/src/plops/content-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/controller.ts": {
             "upstream": "4498a16c2d41a9e1d780a2a79a316528536bff56",
             "php": "packages/generators/generators/src/plops/controller.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/middleware.ts": {
             "upstream": "cd17e3a5bbff3a2ac9478d281535861f864b09fc",
             "php": "packages/generators/generators/src/plops/middleware.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/migration.ts": {
             "upstream": "f51f7070c07496b0a3433d5d73ff518638720efa",
             "php": "packages/generators/generators/src/plops/migration.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/policy.ts": {
             "upstream": "a803391f24a7f51416da5eb3081ea0b1af902db8",
             "php": "packages/generators/generators/src/plops/policy.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/bootstrap-api-prompts.ts": {
             "upstream": "ad8a5e3839af11df11e1a10d131c6d83a56602e3",
             "php": "packages/generators/generators/src/plops/prompts/bootstrap-api-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/ct-names-prompts.ts": {
             "upstream": "b7a097fe61099d702128419309d6c6a0cda9c6f8",
             "php": "packages/generators/generators/src/plops/prompts/ct-names-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/get-attributes-prompts.ts": {
             "upstream": "7f9746d91a955452a36d921647658ea0a5bb3de1",
             "php": "packages/generators/generators/src/plops/prompts/get-attributes-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/get-destination-prompts.ts": {
             "upstream": "f38bcbffffb07fea5180dc8c75c598409ebc7ffd",
             "php": "packages/generators/generators/src/plops/prompts/get-destination-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/get-folder-prompts.ts": {
             "upstream": "b91ddb8be6bc908b81593a8fa63c00ba9413bf1b",
             "php": "packages/generators/generators/src/plops/prompts/get-folder-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/prompts/kind-prompts.ts": {
             "upstream": "dd1c27c7055658692936f9ef236c93d2c90cc6eb",
             "php": "packages/generators/generators/src/plops/prompts/kind-prompts.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/service.ts": {
             "upstream": "3d702f6989ef8d56f2faf389891ba4976b069541",
             "php": "packages/generators/generators/src/plops/service.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/content-structure.ts": {
             "upstream": "e2055d494c46235418ec80d56cb1b5a24d3839c9",
             "php": "packages/generators/generators/src/plops/utils/content-structure.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/extend-plugin-index-files.ts": {
             "upstream": "ae568bcf82669567ba10c9aadd62399c78bb0b20",
             "php": "packages/generators/generators/src/plops/utils/extend-plugin-index-files.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/get-file-path.ts": {
             "upstream": "7809170f015dbacd9089f0438c4a6aeb96309991",
             "php": "packages/generators/generators/src/plops/utils/get-file-path.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/get-formatted-date.ts": {
             "upstream": "fffcc0b777cf5ec64d37e271f80460627a88ce20",
             "php": "packages/generators/generators/src/plops/utils/get-formatted-date.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/get-generator-language.ts": {
             "upstream": "cc1ed51482f610de8617974a641d8ccd2c7c61f8",
@@ -7598,27 +7598,27 @@
         "packages/generators/generators/src/plops/utils/validate-attribute-input.ts": {
             "upstream": "5f2d3cdc6c89528e8f82832b3fedd27ca92159dc",
             "php": "packages/generators/generators/src/plops/utils/validate-attribute-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/validate-file-name-input.ts": {
             "upstream": "5722c20504915196957291b4b1eaa7b9f17af384",
             "php": "packages/generators/generators/src/plops/utils/validate-file-name-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/generators/generators/src/plops/utils/validate-input.ts": {
             "upstream": "da68e4ef4c17f329e553c781768ad9c879e217cf",
             "php": "packages/generators/generators/src/plops/utils/validate-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/color-picker/server/src/index.ts": {
             "upstream": "b7ffca92db6bf0b7c84d2c543303135fdfce37f0",
             "php": "packages/plugins/color-picker/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/color-picker/server/src/register.ts": {
             "upstream": "ad29f26c90c0f2e95cc2ecc904beacffef287223",
             "php": "packages/plugins/color-picker/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/color-picker/vitest.config.ts": {
             "upstream": "dfabab4aa2559b8d67f6c8645e689fc40d103604",
@@ -7628,67 +7628,67 @@
         "packages/plugins/documentation/server/src/bootstrap.ts": {
             "upstream": "aa5451261f1faf0023a742405bada6bb1c4080de",
             "php": "packages/plugins/documentation/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/config/default-plugin-config.ts": {
             "upstream": "19046f279477afc71a14a9a6712607d139a22f67",
             "php": "packages/plugins/documentation/server/src/config/default-plugin-config.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/config/index.ts": {
             "upstream": "14a647128778a0992221b44917c963c16299f58f",
             "php": "packages/plugins/documentation/server/src/config/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/controllers/documentation.ts": {
             "upstream": "e418d84da984d73e743493c50b9ab69c984364b8",
             "php": "packages/plugins/documentation/server/src/controllers/documentation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/controllers/index.ts": {
             "upstream": "0be82393aeffc853d1aaf41a4e2bfc946f950233",
             "php": "packages/plugins/documentation/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/index.ts": {
             "upstream": "e5cdd2118bdf47c72662a2dae85f0eb478d28741",
             "php": "packages/plugins/documentation/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/middlewares/documentation.ts": {
             "upstream": "b070aa0313e1a91452c4f5036288d442107778ad",
             "php": "packages/plugins/documentation/server/src/middlewares/documentation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/middlewares/restrict-access.ts": {
             "upstream": "f0c30626e04ba3daba4537eb702974747d7aa6d0",
             "php": "packages/plugins/documentation/server/src/middlewares/restrict-access.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/register.ts": {
             "upstream": "9cf2fdabac547985e30c079da8e8a11a6ef22b0e",
             "php": "packages/plugins/documentation/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/routes/index.ts": {
             "upstream": "77fc267672ff1b9d257428931f79f454da64cd4b",
             "php": "packages/plugins/documentation/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/documentation.ts": {
             "upstream": "914268c9b8327c07f7c9fc109a11cec4a7b65d1b",
             "php": "packages/plugins/documentation/server/src/services/documentation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/build-api-endpoint-path.ts": {
             "upstream": "5edd81ff7f3698245b9b34e7e902707837b3de97",
             "php": "packages/plugins/documentation/server/src/services/helpers/build-api-endpoint-path.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/build-component-schema.ts": {
             "upstream": "4f400a57a59f272a5cbfaa62fc6723420672b273",
             "php": "packages/plugins/documentation/server/src/services/helpers/build-component-schema.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/index.ts": {
             "upstream": "0dd5044fa1a2d0c345d96dbfdf17329009dfcfad",
@@ -7698,62 +7698,62 @@
         "packages/plugins/documentation/server/src/services/helpers/utils/clean-schema-attributes.ts": {
             "upstream": "3b7c298638ecac90b0eff72395ba7a449bc6be91",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/clean-schema-attributes.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/get-api-responses.ts": {
             "upstream": "1b6ecbbf95c4add916c94f4bfc1311c7325b2608",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/get-api-responses.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/get-schema-data.ts": {
             "upstream": "2c85151db5ae08bfcdca88bc08b73b5885fb1e58",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/get-schema-data.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/loop-content-type-names.ts": {
             "upstream": "caaba426be92d536d6b6927ffe712db2e43c298f",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/loop-content-type-names.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/pascal-case.ts": {
             "upstream": "0f99f72df96aa2db147a1258c61fb049338c5b9a",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/pascal-case.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/query-params.ts": {
             "upstream": "6b11c32de15a5b19c96a0e1edaac7a9da2375c27",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/query-params.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/helpers/utils/routes.ts": {
             "upstream": "4d2a3d2e828b807942cbc6ddf683d4da423be622",
             "php": "packages/plugins/documentation/server/src/services/helpers/utils/routes.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/index.ts": {
             "upstream": "a5a67fc5109b00f04265e095f4341b9e92b62213",
             "php": "packages/plugins/documentation/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/override.ts": {
             "upstream": "d20899b92fbce2562113e740bcf1b3b4795ac3e0",
             "php": "packages/plugins/documentation/server/src/services/override.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/services/utils/get-plugins-that-need-documentation.ts": {
             "upstream": "49f1f23f85c9642ed4ade105ccd1e40249aaeda8",
             "php": "packages/plugins/documentation/server/src/services/utils/get-plugins-that-need-documentation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/types.ts": {
             "upstream": "c395af8b6a8227daa71ecd5d8aad5fdff647a8dd",
             "php": "packages/plugins/documentation/server/src/types.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/server/src/utils.ts": {
             "upstream": "1083587cd8fd0df651a26047dedba042167435b8",
             "php": "packages/plugins/documentation/server/src/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/documentation/tests/server.ts": {
             "upstream": "f707c951b749bd796766532779078047dac31b1e",
@@ -7768,312 +7768,312 @@
         "packages/plugins/graphql/server/src/bootstrap.ts": {
             "upstream": "61677fe4d85e77809d94b4d59df536a86c5d6f90",
             "php": "packages/plugins/graphql/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/config/default-config.ts": {
             "upstream": "cee3d542e6889c1035b2cf3b839dd04f96068b44",
             "php": "packages/plugins/graphql/server/src/config/default-config.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/config/index.ts": {
             "upstream": "e6d8c1fa1c95a3c12ba90e32f2afb314e4c9f150",
             "php": "packages/plugins/graphql/server/src/config/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/format-graphql-error.ts": {
             "upstream": "9a1052f9613a8c38140d3e1fb0531b74c8eb4ca1",
             "php": "packages/plugins/graphql/server/src/format-graphql-error.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/index.ts": {
             "upstream": "7a392f9f5cf0fdca6fd5cba0acfe21dc815322ce",
             "php": "packages/plugins/graphql/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/dynamic-zones.ts": {
             "upstream": "4e988e00c25cc43dcdf5f7ebd4cd64cb0aa29d5b",
             "php": "packages/plugins/graphql/server/src/services/builders/dynamic-zones.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/entity.ts": {
             "upstream": "defc6d12cc40b0d970d65cd1fbb072fdbb43299b",
             "php": "packages/plugins/graphql/server/src/services/builders/entity.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/enums.ts": {
             "upstream": "121531b7c11d5cb9a5729b0210a31d8b9070ec31",
             "php": "packages/plugins/graphql/server/src/services/builders/enums.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/content-type.ts": {
             "upstream": "ca99ae75f3a955ab9f2642682507160bfd453d51",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/content-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/index.ts": {
             "upstream": "56bd27c1741206c8f8114048e85d53bd5eec2de3",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/and.ts": {
             "upstream": "42bbf0a81abac14f0169dcc31a1b5664f74a7f9a",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/and.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/between.ts": {
             "upstream": "f5d9de3b4820a858a5bc22d99b1c25ae813d7f75",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/between.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/contains.ts": {
             "upstream": "237f3f29723c958b39ca42c8729c26a6fdea88a1",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/contains.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/containsi.ts": {
             "upstream": "2ae6b7d39395c04dda8068c329eded8bba19bba0",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/containsi.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/ends-with.ts": {
             "upstream": "74b066269adaacfcbb5cc80171a345b06df64ac5",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/ends-with.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/eq.ts": {
             "upstream": "d40f49e714e523a9a76a01ace8a8c2bdf15a7657",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/eq.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/eqi.ts": {
             "upstream": "8491e9c4af23f7935b045f359d9beed9f96dbea4",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/eqi.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/gt.ts": {
             "upstream": "ebf3553bb09301343a9e4001adb47d9613cea4db",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/gt.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/gte.ts": {
             "upstream": "4d33ef7d663b1dc135a535554c6803b3f3d3f037",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/gte.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/in.ts": {
             "upstream": "66637eadfff41e1a8c4a4f744c7f09f8eb79a0f9",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/in.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/index.ts": {
             "upstream": "3222ef96abd4265b132e3bb31a94dafdbefc502d",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/lt.ts": {
             "upstream": "ca76cdca9b1f112065f26da9a7590e57306456d1",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/lt.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/lte.ts": {
             "upstream": "a326a1b3088bc96025505d6975b8ec7e22075a70",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/lte.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/ne.ts": {
             "upstream": "19f28f980c1448bdff16baf163711ac5d0ca3025",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/ne.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/nei.ts": {
             "upstream": "4657224750b9c408174a6b3964a4aa088b9ceeec",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/nei.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/not-contains.ts": {
             "upstream": "fc1e7e10b022243b82cee271ba8c2c8314955aad",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/not-contains.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/not-containsi.ts": {
             "upstream": "7baf1dd7eceb7b410b57f8c43e1ab626b066649b",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/not-containsi.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/not-in.ts": {
             "upstream": "ed1e64773c5208a15ada6d16e035508b77c54650",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/not-in.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/not-null.ts": {
             "upstream": "f66ab3bed475d34bc5811242dd0e91733a065bf6",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/not-null.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/not.ts": {
             "upstream": "36c1e7ce1fb74ade15e253da5623c50cee60baa5",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/not.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/null.ts": {
             "upstream": "1ecccb2519cb18eeb6e2ac35632ebf68535de249",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/null.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/or.ts": {
             "upstream": "3e371cc7a4d15d3e849a415e2615681bf382d5bf",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/or.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/filters/operators/starts-with.ts": {
             "upstream": "e8491d0339f7be4d29f72a799f636d31ac81041b",
             "php": "packages/plugins/graphql/server/src/services/builders/filters/operators/starts-with.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/generic-morph.ts": {
             "upstream": "dad8da639589a9810a77f5d6f094bb32157949a4",
             "php": "packages/plugins/graphql/server/src/services/builders/generic-morph.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/index.ts": {
             "upstream": "4259261136180569ff7852455e2af40c3504b721",
             "php": "packages/plugins/graphql/server/src/services/builders/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/input.ts": {
             "upstream": "ee913f59b682c958906d3ef4e5462e64a1f7463b",
             "php": "packages/plugins/graphql/server/src/services/builders/input.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/mutations/collection-type.ts": {
             "upstream": "7f7aa8a0f449f7e9713983cdde2f762f9441b33e",
             "php": "packages/plugins/graphql/server/src/services/builders/mutations/collection-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/mutations/index.ts": {
             "upstream": "ca6fac6fbd6d81e17293e4f769d4bd904236f567",
             "php": "packages/plugins/graphql/server/src/services/builders/mutations/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/mutations/single-type.ts": {
             "upstream": "59e294bfa11da4de2b683a55a29537925e33cd35",
             "php": "packages/plugins/graphql/server/src/services/builders/mutations/single-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/queries/collection-type.ts": {
             "upstream": "3742dd4ca74607b383ecdda0294a5e8ca420f95c",
             "php": "packages/plugins/graphql/server/src/services/builders/queries/collection-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/queries/index.ts": {
             "upstream": "4fcbee5ce0c31ebf6560122eb6261e036e91bfbe",
             "php": "packages/plugins/graphql/server/src/services/builders/queries/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/queries/single-type.ts": {
             "upstream": "881f934f3a612b95babea4cdb6ea53e29c8599ca",
             "php": "packages/plugins/graphql/server/src/services/builders/queries/single-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/relation-response-collection.ts": {
             "upstream": "ba110cd161c4daf958ec5d7ee1c6742086857186",
             "php": "packages/plugins/graphql/server/src/services/builders/relation-response-collection.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/association.ts": {
             "upstream": "20e6793d37b3ac87dd95b3a16f53f0163cbe734a",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/association.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/component.ts": {
             "upstream": "5cd9405cbb6a794f6d32ed3ef36f7d06f6f59d10",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/component.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/dynamic-zone.ts": {
             "upstream": "04cc4c1af0c504b1c25d729c517da03605ea9de4",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/dynamic-zone.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/index.ts": {
             "upstream": "0eb29071cede76d7c4c015eed6428251389b556b",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/merge-publication-args.ts": {
             "upstream": "00e144d8c7a9af66cea0201e5dc138382ee8b318",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/merge-publication-args.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/pagination.ts": {
             "upstream": "2f072d7326bd34dbb3f6732743e3a8004a3fd61d",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/pagination.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/resolvers/query.ts": {
             "upstream": "ea3d819b3808c85dd9432260bae8f081bced8922",
             "php": "packages/plugins/graphql/server/src/services/builders/resolvers/query.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/response-collection.ts": {
             "upstream": "bb5d3dc27b81466b0c2c4cafee7489b9ea037c16",
             "php": "packages/plugins/graphql/server/src/services/builders/response-collection.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/response.ts": {
             "upstream": "6d2635a993106839de8b1e2d006d765c6dbc34d2",
             "php": "packages/plugins/graphql/server/src/services/builders/response.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/type.ts": {
             "upstream": "14f8c6e5e17d1d18da2c83cb81898711c6b3d697",
             "php": "packages/plugins/graphql/server/src/services/builders/type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/builders/utils.ts": {
             "upstream": "1a5ad06084b6d3c6d8ea460b1e113b89755fa172",
             "php": "packages/plugins/graphql/server/src/services/builders/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/constants.ts": {
             "upstream": "16a3499c7ae4bd7c89c6bca4ce93b5b8e6e7f82c",
             "php": "packages/plugins/graphql/server/src/services/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/index.ts": {
             "upstream": "728ada7a72b2b4b7371ce37583bb6b233999080b",
             "php": "packages/plugins/graphql/server/src/services/content-api/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/policy.ts": {
             "upstream": "d608353fe2e62617ea49bf953b56da71b01418e3",
             "php": "packages/plugins/graphql/server/src/services/content-api/policy.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/collection-type.ts": {
             "upstream": "eef4e7fb3050ac8accb40c7ec46996aef09fae56",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/collection-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/component.ts": {
             "upstream": "68f98657b55365b2407628ced84f82863315ce17",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/component.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/dynamic-zones.ts": {
             "upstream": "07b116c90706e74bbbba35deb6cbd59621de0813",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/dynamic-zones.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/enums.ts": {
             "upstream": "f7557d738e5e53088c2fb4e7983753d0286a3cbf",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/enums.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/filters.ts": {
             "upstream": "397c3c9aedb26b997df7d3d0f4952e311d065ddf",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/filters.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/index.ts": {
             "upstream": "985c44b0ddcca58a793030f4279b40e28c4ac676",
@@ -8083,37 +8083,37 @@
         "packages/plugins/graphql/server/src/services/content-api/register-functions/inputs.ts": {
             "upstream": "9c69a4f72a50c42b1d7a04018a27b39e5f6a4fe4",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/inputs.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/internals.ts": {
             "upstream": "ae7849ff95629973e7936d4dab6951a50ef0412a",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/internals.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/polymorphic.ts": {
             "upstream": "c2d2d6b118e70c424cda2c6cf7f8fc4a6aa73210",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/polymorphic.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/scalars.ts": {
             "upstream": "a9d9cd19de58eccb0cb5fb46b6ce7937f6d1adb3",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/scalars.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/register-functions/single-type.ts": {
             "upstream": "ed1dc5d4eed87af38156e9c4e23502d8fb0f61d1",
             "php": "packages/plugins/graphql/server/src/services/content-api/register-functions/single-type.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/content-api/wrap-resolvers.ts": {
             "upstream": "6362f306a80d8718161d04ff12a3b89dd88ff935",
             "php": "packages/plugins/graphql/server/src/services/content-api/wrap-resolvers.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/extension/extension.ts": {
             "upstream": "5fda63a691f9c4d624f507db5f23a9d95bb8ecf6",
             "php": "packages/plugins/graphql/server/src/services/extension/extension.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/extension/index.ts": {
             "upstream": "f8c14260acd72b2fa1efa6f520c77d284768ed7b",
@@ -8123,127 +8123,127 @@
         "packages/plugins/graphql/server/src/services/extension/shadow-crud-manager.ts": {
             "upstream": "867eaf3d152eba36c856ce6abe29aa3ad2f15775",
             "php": "packages/plugins/graphql/server/src/services/extension/shadow-crud-manager.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/format/index.ts": {
             "upstream": "feb04e103c2fd126a7dca585967396d37137f761",
             "php": "packages/plugins/graphql/server/src/services/format/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/format/return-types.ts": {
             "upstream": "f25e303653a419b901d9439558718583ca71754c",
             "php": "packages/plugins/graphql/server/src/services/format/return-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/index.ts": {
             "upstream": "ffe781b5fba575cb6b87db91b10e97bb87d56aae",
             "php": "packages/plugins/graphql/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/has-published-version.ts": {
             "upstream": "d77a29354198307d39505a7259f4d692fa243e77",
             "php": "packages/plugins/graphql/server/src/services/internals/args/has-published-version.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/index.ts": {
             "upstream": "fa903a837f46bd41b13f068b9b84e2410da1208b",
             "php": "packages/plugins/graphql/server/src/services/internals/args/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/pagination.ts": {
             "upstream": "9c0c616a6fa4d6bb25ffedb2e72ed1583674127e",
             "php": "packages/plugins/graphql/server/src/services/internals/args/pagination.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/publication-filter.ts": {
             "upstream": "3105ba2b33584283045bf3f9ca2151c71d88b883",
             "php": "packages/plugins/graphql/server/src/services/internals/args/publication-filter.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/publication-status.ts": {
             "upstream": "f3f68d6d2ca74a5575bf46fda90c003832a60611",
             "php": "packages/plugins/graphql/server/src/services/internals/args/publication-status.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/args/sort.ts": {
             "upstream": "faf5ef2a806d8035baefe256fe79db9c94c5ef98",
             "php": "packages/plugins/graphql/server/src/services/internals/args/sort.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/helpers/get-enabled-scalars.ts": {
             "upstream": "46ed5e0ce0ea8788f9bf9612bbf7407ff8d968a8",
             "php": "packages/plugins/graphql/server/src/services/internals/helpers/get-enabled-scalars.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/helpers/index.ts": {
             "upstream": "ea58ef869df9111e92e4983ff4deb433762c8351",
             "php": "packages/plugins/graphql/server/src/services/internals/helpers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/index.ts": {
             "upstream": "9e7c26bbb2e1ea8b9701bb2f43e67f800e67fd61",
             "php": "packages/plugins/graphql/server/src/services/internals/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/scalars/date.ts": {
             "upstream": "a1c6ca12721d0998ac639347eefad74fb1cc79af",
             "php": "packages/plugins/graphql/server/src/services/internals/scalars/date.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/scalars/index.ts": {
             "upstream": "8e7517a44e67560db4c4a63e0f40bdecf87cfe32",
             "php": "packages/plugins/graphql/server/src/services/internals/scalars/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/scalars/time.ts": {
             "upstream": "6fd6e28c87bd1670242c5feb0205ec8f09a8e2af",
             "php": "packages/plugins/graphql/server/src/services/internals/scalars/time.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/delete-mutation-response.ts": {
             "upstream": "96fead810e3c553fd3e50a049c55ba22ed272fdb",
             "php": "packages/plugins/graphql/server/src/services/internals/types/delete-mutation-response.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/error.ts": {
             "upstream": "55f90c528944f6180b8b88779a807438405901f7",
             "php": "packages/plugins/graphql/server/src/services/internals/types/error.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/filters.ts": {
             "upstream": "445aab52ceb87c624b5a29ffa06b960837d14d1a",
             "php": "packages/plugins/graphql/server/src/services/internals/types/filters.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/index.ts": {
             "upstream": "d4ff2092980a0fc12e28da2d5d206823672c8228",
             "php": "packages/plugins/graphql/server/src/services/internals/types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/pagination.ts": {
             "upstream": "0a45f6dd8ec477eaeaaca73a18422fea502178b8",
             "php": "packages/plugins/graphql/server/src/services/internals/types/pagination.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/publication-filter.ts": {
             "upstream": "a970f4cb9c350734568009382a66cb72db37069e",
             "php": "packages/plugins/graphql/server/src/services/internals/types/publication-filter.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/publication-status.ts": {
             "upstream": "2a8acc73ad768a442b135a952c7edc472369c8cd",
             "php": "packages/plugins/graphql/server/src/services/internals/types/publication-status.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/internals/types/response-collection-meta.ts": {
             "upstream": "100c014e133f0364d1ba4e0720a0d7ddeab20d4b",
             "php": "packages/plugins/graphql/server/src/services/internals/types/response-collection-meta.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/type-registry.ts": {
             "upstream": "ecb76a26a3294e7360c8c35cd39eb84bc7e14eae",
             "php": "packages/plugins/graphql/server/src/services/type-registry.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/types.ts": {
             "upstream": "d4c053d55b0eb022435314fcaa759219f407b938",
@@ -8253,47 +8253,47 @@
         "packages/plugins/graphql/server/src/services/utils/attributes.ts": {
             "upstream": "2a3f4b3ff0c955d6d03004e520ee0da5aa1f56e9",
             "php": "packages/plugins/graphql/server/src/services/utils/attributes.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/index.ts": {
             "upstream": "31bb24b4321c2b677e76360e4f9e351a7e2930d8",
             "php": "packages/plugins/graphql/server/src/services/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/mappers/entity-to-response-entity.ts": {
             "upstream": "5082656e1212cfd6cf11ab6d00b1fcc9676aa3f6",
             "php": "packages/plugins/graphql/server/src/services/utils/mappers/entity-to-response-entity.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/mappers/graphql-filters-to-strapi-query.ts": {
             "upstream": "296c4ee719f91bdad67919d27b597ba974ff84f8",
             "php": "packages/plugins/graphql/server/src/services/utils/mappers/graphql-filters-to-strapi-query.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/mappers/graphql-scalar-to-operators.ts": {
             "upstream": "f5087dc8cde94aae40a0971ad1f807b24fb11db7",
             "php": "packages/plugins/graphql/server/src/services/utils/mappers/graphql-scalar-to-operators.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/mappers/index.ts": {
             "upstream": "2f99a855dc5c881f15c53ad03a8f2e02b7bc9461",
             "php": "packages/plugins/graphql/server/src/services/utils/mappers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/mappers/strapi-scalar-to-graphql-scalar.ts": {
             "upstream": "d7dbd0f49983d67c642a777ec76823d2d8de1a46",
             "php": "packages/plugins/graphql/server/src/services/utils/mappers/strapi-scalar-to-graphql-scalar.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/naming.ts": {
             "upstream": "58ec29f528c0aa01b50b14af115af4c894674926",
             "php": "packages/plugins/graphql/server/src/services/utils/naming.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/graphql/server/src/services/utils/playground.ts": {
             "upstream": "b32c48cde9347291d1daa22da8831f27ca54e8c1",
             "php": "packages/plugins/graphql/server/src/services/utils/playground.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/audit-logs.ts": {
             "upstream": "3fa2fad81261bbcd61fa1b07f0a047511da6f6a7",
@@ -8563,32 +8563,32 @@
         "packages/plugins/sentry/server/src/bootstrap.ts": {
             "upstream": "d4af58cf4f5b6f5005613a72fcce8207285a18b2",
             "php": "packages/plugins/sentry/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/server/src/config.ts": {
             "upstream": "7c1f4bc67032660aecb6199b268406d3a62a692d",
             "php": "packages/plugins/sentry/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/server/src/index.ts": {
             "upstream": "e7ae1aa5dffa55b416562215589ba29f9500abf6",
             "php": "packages/plugins/sentry/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/server/src/middlewares/sentry.ts": {
             "upstream": "f5641ab219b6e049b0d7ec61d8cb003c6e258488",
             "php": "packages/plugins/sentry/server/src/middlewares/sentry.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/server/src/services/index.ts": {
             "upstream": "fc58b3679352f1f51cb33f356ea51f74357b297c",
             "php": "packages/plugins/sentry/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/server/src/services/sentry.ts": {
             "upstream": "24fb265b8f75a919fab07b32f85a72921a713cb6",
             "php": "packages/plugins/sentry/server/src/services/sentry.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/sentry/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -8693,152 +8693,152 @@
         "packages/plugins/users-permissions/server/src/graphql/index.js": {
             "upstream": "4780f3241a463027e2e9df784914110c53ed4847",
             "php": "packages/plugins/users-permissions/server/src/graphql/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/change-password.js": {
             "upstream": "21f597b685ac535b4c6e9ee4d7405020b6d27826",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/change-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/email-confirmation.js": {
             "upstream": "1e97f9af994a2d1fbb601d39359b4a81fbe8a25c",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/email-confirmation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/forgot-password.js": {
             "upstream": "f15f5ba610b587f3f7d398b96419055303489f13",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/forgot-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/login.js": {
             "upstream": "0922d28ceb8ef3bd36df7732a3ec7dd932f7409f",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/login.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/rate-limit.js": {
             "upstream": "484f260c7387ebfa76034fb8f796262e5b7f8d0e",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/rate-limit.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/register.js": {
             "upstream": "36f6ff1ad3ef114225f20d632c29ee4af00e2b97",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/auth/reset-password.js": {
             "upstream": "ac4e3bfc370783f88622ca186ec3a63361c87451",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/auth/reset-password.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/create-role.js": {
             "upstream": "3dd0fede0ade76936b02114e6950fdd103017e74",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/create-role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/delete-role.js": {
             "upstream": "154bbd8871a1c4448320fc7929a736894150c9de",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/delete-role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/update-role.js": {
             "upstream": "4d22a01c52a7ecc757b81860721d72849e310dde",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/role/update-role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/create-user.js": {
             "upstream": "7c1526e3292863ce9877d18a56b4ca19c21902d4",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/create-user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/delete-user.js": {
             "upstream": "500834ec6e86c58f78c86b2103220acde8e6bae3",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/delete-user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/update-user.js": {
             "upstream": "a89cb3e4f0e6ce70070cfcf888550a851fed7dc2",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/crud/user/update-user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/mutations/index.js": {
             "upstream": "801d1f3a4c409fcf031632fafd1e95bfde4ae23a",
             "php": "packages/plugins/users-permissions/server/src/graphql/mutations/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/queries/index.js": {
             "upstream": "d45d0f278c2aadf4b533c02a74fa3663facdaa2c",
             "php": "packages/plugins/users-permissions/server/src/graphql/queries/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/queries/me.js": {
             "upstream": "0835ad65868006cfac7b03758661fa21bb674ae5",
             "php": "packages/plugins/users-permissions/server/src/graphql/queries/me.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/resolvers-configs.js": {
             "upstream": "f149df2b1a48189164f22ec3ad9b715b8086f9ef",
             "php": "packages/plugins/users-permissions/server/src/graphql/resolvers-configs.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/create-role-payload.js": {
             "upstream": "33b5c476329dc117ebba2c02ee3d6d51a92b580b",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/create-role-payload.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/delete-role-payload.js": {
             "upstream": "7e060055cba1cb0d136a2e49b6ab8601f2804d7c",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/delete-role-payload.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/index.js": {
             "upstream": "55f90682f6a9eccb02283865fb1a91b2be2a83d0",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/login-input.js": {
             "upstream": "b8d7f414f3b11de222d0cbe5577a3016ed03939b",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/login-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/login-payload.js": {
             "upstream": "65f8ec49ee221de58d125ed272b6b2f4e9968cd5",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/login-payload.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/me-role.js": {
             "upstream": "485fedb1500bcb26cfb97a875ba6c56116743e01",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/me-role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/me.js": {
             "upstream": "4cf7438dc6347ca1f35e785eb8b8bf35936135d9",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/me.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/password-payload.js": {
             "upstream": "5d68c8ea0bbc25d096fe3f258cebeec0bb3868f0",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/password-payload.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/register-input.js": {
             "upstream": "1585761a13ba53e8a004ca2c4d0b86ac186b466c",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/register-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/update-role-payload.js": {
             "upstream": "cea281dcd790fc80747b4ad8f966506b87c7eaba",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/update-role-payload.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/types/user-input.js": {
             "upstream": "b8b375a0d53f58ccfdbc96b1f61e520c3ade86f5",
             "php": "packages/plugins/users-permissions/server/src/graphql/types/user-input.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/utils.js": {
             "upstream": "8439021245b10112ab91360972ea862dd077dbc1",
             "php": "packages/plugins/users-permissions/server/src/graphql/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/index.js": {
             "upstream": "14629aa6ad2c9518ce6734b4f828625f8bc80bd6",

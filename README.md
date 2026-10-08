@@ -17,26 +17,29 @@ serves it.
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (admin/MCP/AI providers stubbed), 72 tests |
 | CLI: `strapi start / develop / build / console / routes:list / cron:run / migrations:run` | `strapi/strapi` | ported |
-| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 306/335 |
-| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 743/781 |
-| Content-Type Builder | `strapi/content-type-builder` | ported; 61/63 |
+| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 313/333 |
+| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 749/781 |
+| Content-Type Builder | `strapi/content-type-builder` | ported; 62/63 |
 | Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 182/193 |
 | Email + sendmail, nodemailer, Amazon SES, Mailgun, SendGrid providers | `strapi/email`, `strapi/provider-email-*` | ported |
 | Internationalization | `strapi/i18n` | ported; 56/64 |
-| Users & Permissions: end users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported; 120/125 |
-| GraphQL (webonyx/graphql-php; nexus, Apollo Server 4 behaviour ported) | `strapi/plugin-graphql` | ported; 119/123 |
-| Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers to and from Node apps through `strapi transfer:serve`) | `strapi/data-transfer` | ported; `core/data-transfer` 3/3, `admin/data-transfer-push-security` 3/3 |
-| documentation + openapi, content-releases, generators, CLI tooling, sentry, color-picker | the rest | scaffolded, not ported |
+| Users & Permissions: end users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported; 125/125 |
+| GraphQL (webonyx/graphql-php; nexus, Apollo Server 4 behaviour ported) | `strapi/plugin-graphql` | ported; 119/122 |
+| Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers through `strapi transfer:serve`) | `strapi/data-transfer` | ported; 3/3 (+ admin push security 3/3) |
+| OpenAPI generator and the documentation plugin (Swagger UI) | `strapi/openapi`, `strapi/plugin-documentation` | ported; documents identical to Node's for the same app |
+| `strapi generate`, sentry, color-picker | `strapi/generators`, `strapi/plugin-sentry`, `strapi/plugin-color-picker` | ported |
+| create-strapi-app, upgrade | | not ported yet |
+| content-releases, review-workflows | | not ported: the whole packages are Enterprise-licensed |
 
-`parity.json` lists every upstream server file and whether it is ported (794 of 1,921 at the
-time of writing; 69 are Enterprise-licensed and blocked). `php scripts/parity-map.php`
-regenerates it.
+`parity.json` lists every upstream server file and whether it is ported. `php
+scripts/parity-map.php` regenerates it.
 
 The numbers are upstream's own Jest API suite (`tests/api`, see its README) run unmodified
-against the PHP app, one package directory at a time; `tests/api/core/strapi` (core's REST,
-document service, relations, validation) is at 1193/1497. What still fails is mostly
-Enterprise features, and tests that replace functions inside the server from
-the Jest process, which can't cross into PHP.
+against the PHP app, one package directory at a time, each test file on a fresh database:
+2,969 of 3,181 across all directories, `tests/api/core/strapi` (core's REST, document
+service, relations, validation) at 1360/1497. What still fails is mostly Enterprise
+features and tests that replace functions inside the server from the Jest process, which
+can't cross into PHP.
 
 ## Try it
 
