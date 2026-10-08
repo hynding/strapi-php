@@ -463,7 +463,8 @@ class QueryBuilder
         }
 
         $aliasedId = $this->aliasColumn(Transform::toColumnName($this->meta, 'id'));
-        $lastOrder = $this->state['orderBy'][array_key_last($this->state['orderBy'])] ?? null;
+        $orderBy = $this->state['orderBy'];
+        $lastOrder = $orderBy === [] ? null : $orderBy[array_key_last($orderBy)];
 
         if ($lastOrder !== null && ($lastOrder['column'] ?? null) === $aliasedId) {
             return;
