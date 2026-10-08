@@ -14,7 +14,7 @@ use Strapi\Database\Fields\Shared\Parsers;
  * Port of packages/core/database/src/schema/storage.ts: persists the last synced schema and its
  * hash in `strapi_database_schema`.
  *
- * @phpstan-import-type Schema as SchemaArray from Types
+ * @phpstan-import-type SchemaArray from Types
  */
 final class Storage
 {

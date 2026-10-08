@@ -221,7 +221,8 @@ final class Qs
      */
     private static function splitWithLimit(string $str, string $delimiter, int $limit): array
     {
-        $parts = explode($delimiter, $str);
+        // JS `split('')` splits into characters; PHP's explode() refuses an empty separator.
+        $parts = $delimiter === '' ? mb_str_split($str) : explode($delimiter, $str);
 
         return array_slice($parts, 0, $limit);
     }

@@ -16,7 +16,11 @@ final class Arrays
         return in_array($cast($val), array_map($cast, $arr), true);
     }
 
-    /** True when the stringified value is in the stringified array. */
+    /**
+     * True when the stringified value is in the stringified array.
+     *
+     * @param array<array-key, mixed> $arr
+     */
     public static function includesString(array $arr, mixed $val): bool
     {
         return self::castIncludes(array_values($arr), $val, Strings::stringify(...));

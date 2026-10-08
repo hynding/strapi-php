@@ -106,8 +106,8 @@ final class ParseType
         if ($hour > 24 || $minute > 59 || $second > 59 || ($hour === 24 && ($minute > 0 || $second > 0))) {
             return null;
         }
-        $millis = isset($m[7]) && $m[7] !== '' ? str_pad($m[7], 3, '0') : '000';
-        $tz = isset($m[8]) && $m[8] !== '' ? strtoupper($m[8]) : null;
+        $millis = ($m[7] ?? '') !== '' ? str_pad($m[7], 3, '0') : '000';
+        $tz = ($m[8] ?? '') !== '' ? strtoupper($m[8]) : null;
 
         $zone = $tz === null ? new \DateTimeZone(date_default_timezone_get()) : new \DateTimeZone($tz === 'Z' ? 'UTC' : $tz);
 

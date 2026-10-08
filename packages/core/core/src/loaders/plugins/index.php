@@ -82,7 +82,7 @@ final class Plugins
         }
 
         self::applyUserConfig($strapi, $plugins);
-        self::applyUserExtension($strapi, $plugins);
+        $plugins = self::applyUserExtension($strapi, $plugins);
 
         foreach ($plugins as $pluginName => $plugin) {
             $strapi->get('plugins')->add((string) $pluginName, $plugin);
@@ -118,12 +118,15 @@ final class Plugins
         }
     }
 
-    /** @param array<string, array<string, mixed>> $plugins */
-    private static function applyUserExtension(Strapi $strapi, array &$plugins): void
+    /**
+     * @param array<string, array<string, mixed>> $plugins
+     * @return array<string, array<string, mixed>>
+     */
+    private static function applyUserExtension(Strapi $strapi, array $plugins): array
     {
         $extensionsDir = $strapi->dirs()->extensions;
         if (!is_dir($extensionsDir)) {
-            return;
+            return $plugins;
         }
 
         $extendedSchemas = LoadFiles::loadFiles($extensionsDir, '**/content-types/**/schema.json');
@@ -153,11 +156,17 @@ final class Plugins
             // second: execute strapi-server extension
             $strapiServer = $strapiServers[$pluginName]['strapi-server'] ?? null;
             if (is_callable($strapiServer)) {
-                $plugin = $strapiServer($plugin, $strapi);
+                $extended = $strapiServer($plugin, $strapi);
+                if (!is_array($extended)) {
+                    throw new \RuntimeException("The strapi-server.php extension of plugin {$pluginName} must return the plugin array");
+                }
+                $plugin = $extended;
             }
 
             $plugins[$pluginName] = $plugin;
         }
+
+        return $plugins;
     }
 
     /**

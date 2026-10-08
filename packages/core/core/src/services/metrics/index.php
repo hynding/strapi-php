@@ -12,7 +12,7 @@ use Strapi\Core\Strapi;
  */
 final class Metrics
 {
-    public function __construct(private readonly Strapi $strapi)
+    public function __construct(public readonly Strapi $strapi)
     {
     }
 

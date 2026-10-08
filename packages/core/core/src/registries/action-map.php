@@ -61,7 +61,11 @@ final class ActionMap
         return $this->has($name);
     }
 
-    /** Names of the callable actions of any controller-like object (ActionMap or class instance). */
+    /**
+     * Names of the callable actions of any controller-like object (ActionMap or class instance).
+     *
+     * @return list<string>
+     */
     public static function actionNames(object $controller): array
     {
         if ($controller instanceof self) {
@@ -103,7 +107,7 @@ final class ActionMap
             return static fn (mixed ...$args): mixed => $controller->{$name}(...$args);
         }
         if (method_exists($controller, $name)) {
-            return [$controller, $name];
+            return $controller->{$name}(...);
         }
 
         /** @var callable $cb */

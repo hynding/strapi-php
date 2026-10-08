@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strapi\Core\CoreApi\Controller;
 
+use Strapi\Core\Registries\ActionMap;
 use Strapi\Core\Strapi;
 use Strapi\Types\Core\Context;
 use Strapi\Types\Schema\Schema;
@@ -19,6 +20,21 @@ abstract class Base
     public function __construct(protected readonly Strapi $strapi, public readonly Schema $contentType)
     {
         $this->uid = $contentType->uid;
+    }
+
+    /**
+     * `strapi.service(uid)[action](...args)`. Services are duck-typed like upstream's plain objects
+     * (an Extendable from `Factories::createCoreService`, an ActionMap or any class instance), so
+     * the action is resolved by name.
+     */
+    protected function callService(string $action, mixed ...$args): mixed
+    {
+        $service = $this->strapi->service($this->uid);
+        if (!ActionMap::hasAction($service, $action)) {
+            throw new \BadMethodCallException("Service {$this->uid} has no \"{$action}\" action");
+        }
+
+        return ActionMap::action($service, $action)(...$args);
     }
 
     /** @return array<string, mixed> `ctx.state.auth ?? {}` */

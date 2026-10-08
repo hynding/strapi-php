@@ -19,7 +19,7 @@ use Strapi\Utils\ContentTypes;
  * @phpstan-type GetModel callable(string): (Schema|array<string, mixed>|null)
  * @phpstan-type TraverseOptions array{schema: Schema|array<string, mixed>|null, getModel: callable(string): (Schema|array<string, mixed>|null), path?: Path|null, parent?: ParentNode|null}
  * @phpstan-type Visitor callable(VisitorOptions, VisitorUtils): void
- * @phpstan-type Recurse \Closure(callable, array, mixed): mixed
+ * @phpstan-type Recurse \Closure(callable(VisitorOptions, VisitorUtils): void, TraverseOptions, mixed): mixed
  * @phpstan-type ParseUtils array{transform: callable(mixed): mixed, remove: callable(string, mixed): mixed, set: callable(string, mixed, mixed): mixed, keys: callable(mixed): list<string>, get: callable(string, mixed): mixed}
  */
 final class Factory
@@ -27,7 +27,7 @@ final class Factory
     /** @var list<array{predicate: callable(mixed): bool, handler: callable}> */
     private array $interceptors = [];
 
-    /** @var list<array{predicate: callable(mixed): bool, parser: callable(mixed): array}> */
+    /** @var list<array{predicate: callable(mixed): bool, parser: callable(mixed): ParseUtils}> */
     private array $parsers = [];
 
     /** @var list<callable(Context): bool> */

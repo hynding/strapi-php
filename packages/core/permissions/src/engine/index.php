@@ -27,6 +27,7 @@ use Strapi\Utils\Qs;
  * @phpstan-type Permission array{action: string, actionParameters?: array<string, mixed>, subject?: string|null, properties?: array<string, mixed>, conditions?: list<string>}
  * @phpstan-type Condition array{name?: string, handler: callable}|object
  * @phpstan-type Providers array{action: object, condition: object}
+ * @phpstan-import-type PermissionRule from CaslAbility
  */
 final class Engine
 {
@@ -87,9 +88,9 @@ final class Engine
      * Create a register function that wraps a `can` function used to register a permission in the
      * ability builder. The rule is passed by reference so the before-register hook can add conditions.
      *
-     * @param callable(array<string, mixed>): mixed $can
+     * @param callable(PermissionRule): mixed $can
      * @param array<string, mixed> $options
-     * @return \Closure(array<string, mixed>): mixed
+     * @return \Closure(PermissionRule): mixed
      */
     public function createRegisterFunction(callable $can, array $options): \Closure
     {
@@ -101,9 +102,9 @@ final class Engine
     }
 
     /**
-     * @param callable(array<string, mixed>): mixed $can
+     * @param callable(PermissionRule): mixed $can
      * @param array<string, mixed> $options
-     * @return \Closure(array<string, mixed>): mixed
+     * @return \Closure(PermissionRule): mixed
      */
     public function defaultRegisterFunction(callable $can, array $options): \Closure
     {
@@ -112,8 +113,29 @@ final class Engine
 
             $this->hooks['before-register.permission']->call($hookContext);
 
+            // the hook received the rule by reference and may have rewritten it
+            self::assertPermissionRule($permission);
+
             return $can($permission);
         };
+    }
+
+    /**
+     * @param array<array-key, mixed> $rule
+     * @phpstan-assert PermissionRule $rule
+     */
+    private static function assertPermissionRule(array $rule): void
+    {
+        $action = $rule['action'] ?? null;
+        $validAction = is_string($action)
+            || (is_array($action) && is_string($action['name'] ?? null) && is_array($action['params'] ?? null));
+        $validSubject = ($rule['subject'] ?? null) === null || is_string($rule['subject']);
+        $validProperties = ($rule['properties'] ?? null) === null || is_array($rule['properties']);
+        $validCondition = ($rule['condition'] ?? null) === null || is_array($rule['condition']);
+
+        if (!$validAction || !$validSubject || !$validProperties || !$validCondition) {
+            throw new \InvalidArgumentException('Invalid permission rule: expected { action, subject?, properties?, condition? }');
+        }
     }
 
     /**
@@ -152,7 +174,7 @@ final class Engine
      *
      * @param Permission $permission
      * @param array<string, mixed> $options
-     * @param callable(array<string, mixed>): mixed $register
+     * @param callable(PermissionRule): mixed $register
      */
     private function evaluate(array $permission, array $options, callable $register): mixed
     {
@@ -193,7 +215,8 @@ final class Engine
 
         $resolved = [];
         foreach ($conditions as $id) {
-            $condition = $this->providers['condition']->get($id);
+            $provider = $this->providers['condition'];
+            $condition = method_exists($provider, 'get') ? $provider->get($id) : null;
             $handler = self::handlerOf($condition);
             // remove invalid conditions (unregistered, or without a callable handler)
             if ($handler !== null) {

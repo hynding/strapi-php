@@ -48,7 +48,7 @@ final class Constants
             return $level;
         }
         if (is_int($level)) {
-            return Level::fromValue($level);
+            return Level::from($level);
         }
 
         $lower = strtolower($level);
@@ -56,7 +56,13 @@ final class Constants
             return self::MONOLOG_LEVELS[$lower];
         }
 
-        return Level::fromName(ucfirst($lower));
+        foreach (Level::cases() as $case) {
+            if (strtolower($case->name) === $lower) {
+                return $case;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unknown log level "%s"', $level));
     }
 
     /** The winston label for a Monolog level (what `level` shows in log lines, lowercased like winston). */

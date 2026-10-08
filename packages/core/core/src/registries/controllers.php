@@ -42,7 +42,7 @@ final class Controllers
         }
 
         $controller = $this->controllers[$uid];
-        $instance = $controller instanceof \Closure || (is_object($controller) && is_callable($controller) && !$controller instanceof ActionMap)
+        $instance = $controller instanceof \Closure || (is_object($controller) && is_callable($controller))
             ? $controller($this->strapi)
             : $controller;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Services;
 
+use Strapi\Core\Services\Localization\LocalizationProvider;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\ContentTypes;
 
@@ -16,34 +17,21 @@ use Strapi\Utils\ContentTypes;
  * value, {@see self::isLocalizedContentType()} reads the schema flag and the default locale falls
  * back to `'en'` (the i18n plugin's own default) when no provider is registered.
  *
- * A provider is any object with `isLocalizedContentType`, `getDefaultLocale`, `getLocales`,
- * `getNestedPopulateOfNonLocalizedAttributes`, `getNonLocalizedAttributes`, `fillNonLocalizedAttributes`.
+ * A provider implements {@see LocalizationProvider}.
  */
 final class Localization
 {
-    private const PROVIDER_METHODS = [
-        'isLocalizedContentType', 'getDefaultLocale', 'getLocales',
-        'getNestedPopulateOfNonLocalizedAttributes', 'getNonLocalizedAttributes', 'fillNonLocalizedAttributes',
-    ];
-
-    private ?object $provider = null;
+    private ?LocalizationProvider $provider = null;
 
     public static function createLocalizationService(): self
     {
         return new self();
     }
 
-    public function register(object $localizationProvider): void
+    public function register(LocalizationProvider $localizationProvider): void
     {
         if ($this->provider !== null) {
             throw new \RuntimeException('A localization provider is already registered for this application.');
-        }
-
-        // Fail at registration rather than on first use
-        foreach (self::PROVIDER_METHODS as $name) {
-            if (!method_exists($localizationProvider, $name)) {
-                throw new \RuntimeException("Localization provider is missing \"{$name}\"");
-            }
         }
 
         $this->provider = $localizationProvider;
@@ -61,7 +49,7 @@ final class Localization
             return false;
         }
         if ($this->provider !== null) {
-            return (bool) $this->provider->isLocalizedContentType($model);
+            return $this->provider->isLocalizedContentType($model);
         }
 
         return ContentTypes::getDoesPluginOptionHaveValue($model, 'i18n', 'localized', true);
@@ -70,9 +58,7 @@ final class Localization
     public function getDefaultLocale(): ?string
     {
         if ($this->provider !== null) {
-            $locale = $this->provider->getDefaultLocale();
-
-            return is_string($locale) ? $locale : null;
+            return $this->provider->getDefaultLocale();
         }
 
         return 'en';
@@ -82,7 +68,7 @@ final class Localization
     public function getLocales(): array
     {
         if ($this->provider !== null) {
-            return (array) $this->provider->getLocales();
+            return $this->provider->getLocales();
         }
 
         return [];
@@ -91,7 +77,7 @@ final class Localization
     /** @return list<string> */
     public function getNestedPopulateOfNonLocalizedAttributes(string $modelUID): array
     {
-        return $this->provider !== null ? (array) $this->provider->getNestedPopulateOfNonLocalizedAttributes($modelUID) : [];
+        return $this->provider !== null ? $this->provider->getNestedPopulateOfNonLocalizedAttributes($modelUID) : [];
     }
 
     /**
@@ -100,7 +86,7 @@ final class Localization
      */
     public function getNonLocalizedAttributes(Schema|array $model): array
     {
-        return $this->provider !== null ? (array) $this->provider->getNonLocalizedAttributes($model) : [];
+        return $this->provider !== null ? $this->provider->getNonLocalizedAttributes($model) : [];
     }
 
     /**

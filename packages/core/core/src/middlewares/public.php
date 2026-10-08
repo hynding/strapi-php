@@ -18,7 +18,7 @@ final class PublicStatic
     private const DEFAULTS = ['maxAge' => 60000, 'defaultIndex' => true];
 
     /** @param array<string, mixed> $config */
-    public function __invoke(array $config, Strapi $strapi): ?callable
+    public function __invoke(array $config, Strapi $strapi): null
     {
         $options = [...self::DEFAULTS, ...$config];
         $maxAge = (int) $options['maxAge'];

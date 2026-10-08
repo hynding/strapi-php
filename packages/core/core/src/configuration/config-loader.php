@@ -36,10 +36,14 @@ final class ConfigLoader
     // Existing Strapi configuration files
     private const STRAPI_CONFIG_FILENAMES = ['admin', 'server', 'api', 'database', 'middlewares', 'plugins', 'features'];
 
-    /** @var callable(string): void */
+    /** @var (callable(string): void)|null */
     private static $warn = null;
 
-    /** Override where warnings go (upstream uses console.warn: the logger does not exist yet). */
+    /**
+     * Override where warnings go (upstream uses console.warn: the logger does not exist yet).
+     *
+     * @param (callable(string): void)|null $handler
+     */
     public static function setWarningHandler(?callable $handler): void
     {
         self::$warn = $handler;

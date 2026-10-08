@@ -64,6 +64,9 @@ final class Hash
 
         for ($offset = 0, $total = strlen($padded); $offset < $total; $offset += self::RATE_BYTES) {
             $block = unpack('P17', substr($padded, $offset, self::RATE_BYTES));
+            if ($block === false) {
+                throw new \RuntimeException('unpack failed');
+            }
             for ($i = 0; $i < 17; $i++) {
                 $state[$i] ^= $block[$i + 1];
             }
@@ -87,7 +90,14 @@ final class Hash
     private static function roundConstants(): array
     {
         if (self::$rc === null) {
-            self::$rc = array_map(static fn (string $hex): int => unpack('J', hex2bin($hex))[1], self::ROUND_CONSTANTS);
+            self::$rc = array_map(static function (string $hex): int {
+                $unpacked = unpack('J', (string) hex2bin($hex));
+                if ($unpacked === false) {
+                    throw new \RuntimeException('unpack failed');
+                }
+
+                return (int) $unpacked[1];
+            }, self::ROUND_CONSTANTS);
         }
 
         return self::$rc;

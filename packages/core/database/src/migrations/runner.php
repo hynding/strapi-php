@@ -55,7 +55,11 @@ final class Runner
         return array_map(self::meta(...), $toBeApplied);
     }
 
-    /** Reverts the last executed migration. @return list<array{name: string, path?: string}> */
+    /**
+     * Reverts the last executed migration.
+     *
+     * @return list<array{name: string, path?: string}>
+     */
     public function down(): array
     {
         $executedReversed = array_reverse($this->getExecutedMigrations());
@@ -94,7 +98,11 @@ final class Runner
         return array_values(array_filter(($this->getMigrations)(), static fn (array $m): bool => isset($executed[$m['name']])));
     }
 
-    /** @param RunnableMigration $migration  @return array{name: string, path?: string} */
+    /**
+     * @param RunnableMigration $migration
+     *
+     * @return array{name: string, path?: string}
+     */
     private static function meta(array $migration): array
     {
         $meta = ['name' => $migration['name']];

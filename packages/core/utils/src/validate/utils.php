@@ -11,6 +11,8 @@ final class Utils
 {
     /**
      * @param array{key: string, path?: string|null, reason?: string|null} $params
+     *
+     * @throws ValidationError
      */
     public static function throwInvalidKey(array $params): never
     {

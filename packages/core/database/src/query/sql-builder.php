@@ -6,6 +6,7 @@ namespace Strapi\Database\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Strapi\Database\Dialects\Dialect;
 
 /**
@@ -73,7 +74,7 @@ final class SqlBuilder
 
     private bool $forUpdate = false;
 
-    /** @var array{column: string|Raw, alias: string, distinct: bool}|null */
+    /** @var array{fn: string, column: string|Raw, alias: string, distinct: bool}|null */
     private ?array $aggregate = null;
 
     public function __construct(private readonly Dialect $dialect, private readonly Connection $connection)
@@ -100,6 +101,7 @@ final class SqlBuilder
         return new self($this->dialect, $this->connection);
     }
 
+    /** @param list<mixed> $bindings */
     public function raw(string $sql, array $bindings = []): Raw
     {
         return new Raw($sql, $bindings);
@@ -227,7 +229,11 @@ final class SqlBuilder
         return $this->onVal($column, $value, $operator);
     }
 
-    /** Raw join condition (already quoted). @param list<mixed> $bindings */
+    /**
+     * Raw join condition (already quoted).
+     *
+     * @param list<mixed> $bindings
+     */
     public function onRaw(string $sql, array $bindings = []): self
     {
         $this->wheres[] = ['bool' => 'AND', 'sql' => $sql, 'bindings' => $bindings];
@@ -240,12 +246,15 @@ final class SqlBuilder
     /**
      * `where(callable)` opens a nested group, `where(column, value)` is equality,
      * `where(column, operator, value)` a comparison, `where(array)` a map of column => value.
+     *
+     * @param (callable(SqlBuilder): void)|string|array<string, mixed> $column
      */
     public function where(callable|string|array $column, mixed ...$args): self
     {
         return $this->addWhere('AND', $column, ...$args);
     }
 
+    /** @param (callable(SqlBuilder): void)|string|array<string, mixed> $column */
     public function orWhere(callable|string|array $column, mixed ...$args): self
     {
         return $this->addWhere('OR', $column, ...$args);
@@ -263,6 +272,7 @@ final class SqlBuilder
         return $this;
     }
 
+    /** @param (callable(SqlBuilder): void)|string|array<string, mixed> $column */
     private function addWhere(string $bool, callable|string|array $column, mixed ...$args): self
     {
         if (is_callable($column)) {
@@ -283,7 +293,7 @@ final class SqlBuilder
             $sub = $this->sub();
             foreach ($column as $col => $value) {
                 if (is_array($value)) {
-                    $sub->whereIn((string) $col, $value);
+                    $sub->whereIn((string) $col, array_values($value));
                 } elseif ($value === null) {
                     $sub->whereNull((string) $col);
                 } else {
@@ -388,7 +398,11 @@ final class SqlBuilder
         return $this;
     }
 
-    /** `??` placeholders are identifiers, `?` placeholders are bindings (Knex semantics). */
+    /**
+     * `??` placeholders are identifiers, `?` placeholders are bindings (Knex semantics).
+     *
+     * @param list<mixed> $bindings
+     */
     public function whereRaw(string $sql, array $bindings = [], string $bool = 'AND'): self
     {
         [$sql, $bindings] = $this->interpolateIdentifiers($sql, $bindings);
@@ -397,12 +411,17 @@ final class SqlBuilder
         return $this;
     }
 
+    /** @param list<mixed> $bindings */
     public function orWhereRaw(string $sql, array $bindings = []): self
     {
         return $this->whereRaw($sql, $bindings, 'OR');
     }
 
-    /** @return array{0: string, 1: list<mixed>} */
+    /**
+     * @param list<mixed> $bindings
+     *
+     * @return array{0: string, 1: list<mixed>}
+     */
     private function interpolateIdentifiers(string $sql, array $bindings): array
     {
         $out = '';
@@ -737,8 +756,9 @@ final class SqlBuilder
             $sql = $this->platform()->modifyLimitQuery($sql, $this->limit, $this->offset ?? 0);
         }
 
-        if ($this->forUpdate) {
-            $sql .= ' ' . $this->platform()->getForUpdateSQL();
+        // DBAL 4 has no `getForUpdateSQL()`; SQLite is the only supported platform without row locks
+        if ($this->forUpdate && !$this->platform() instanceof SQLitePlatform) {
+            $sql .= ' FOR UPDATE';
         }
 
         return ['sql' => $sql, 'bindings' => $bindings];
@@ -865,7 +885,11 @@ final class SqlBuilder
 
     // --- EXECUTION ---------------------------------------------------------------------
 
-    /** @return list<mixed> */
+    /**
+     * @param list<mixed> $bindings
+     *
+     * @return list<mixed>
+     */
     private function bindValues(array $bindings): array
     {
         return array_map(fn (mixed $v): mixed => $this->dialect->toDatabaseValue($v), $bindings);
@@ -904,6 +928,22 @@ final class SqlBuilder
             default:
                 return (int) $this->connection->executeStatement($sql, $bindings);
         }
+    }
+
+    /**
+     * Runs a select and returns its rows (`run()` narrowed for the common case).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function rows(): array
+    {
+        if ($this->method !== 'select') {
+            throw new \LogicException('rows() can only be used with a select query');
+        }
+
+        ['sql' => $sql, 'bindings' => $bindings] = $this->toSql();
+
+        return $this->connection->fetchAllAssociative($sql, $this->bindValues($bindings));
     }
 
     public function __clone()

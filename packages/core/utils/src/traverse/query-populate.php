@@ -108,7 +108,7 @@ final class QueryPopulate
             })
             // Array of strings ['foo', 'bar.baz'] => traverse as one object, then serialize when possible
             ->intercept(Factory::isStringArray(...), static function (callable $visitor, array $options, array $populate, \Closure $recurse): mixed {
-                $populateObject = self::pathsToObjectPopulate($populate);
+                $populateObject = self::pathsToObjectPopulate(array_values(array_filter($populate, 'is_string')));
                 $traversedPopulate = $recurse($visitor, $options, $populateObject);
                 $paths = is_array($traversedPopulate) ? self::objectPopulateToPaths($traversedPopulate) : null;
 

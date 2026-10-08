@@ -28,6 +28,10 @@ class Metadata implements \IteratorAggregate, \Countable
     /** @var array<string, Meta> */
     private array $metas = [];
 
+    final public function __construct()
+    {
+    }
+
     /** @param list<Model> $models */
     public static function create(array $models = []): static
     {

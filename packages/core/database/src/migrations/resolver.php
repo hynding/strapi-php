@@ -54,7 +54,11 @@ final class Resolver
         ];
     }
 
-    /** @param list<string> $filepaths  @return list<RunnableMigration> */
+    /**
+     * @param list<string> $filepaths
+     *
+     * @return list<RunnableMigration>
+     */
     public static function resolveMigrationFiles(array $filepaths, Database $db): array
     {
         return array_map(static fn (string $path): array => self::migrationResolver(basename($path), $path, $db), $filepaths);

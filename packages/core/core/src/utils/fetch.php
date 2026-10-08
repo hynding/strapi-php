@@ -56,7 +56,7 @@ final class Fetch
             'ignore_errors' => true,
             'follow_location' => 1,
         ];
-        if (isset($options['body']) && $options['body'] !== null) {
+        if (isset($options['body'])) {
             $http['content'] = (string) $options['body'];
         }
         if ($this->proxy !== null) {
@@ -73,8 +73,9 @@ final class Fetch
             throw new \RuntimeException('fetch failed: ' . ($error['message'] ?? 'unknown error'));
         }
 
+        // populated by the http wrapper on every completed request
         /** @var list<string> $responseHeaders */
-        $responseHeaders = $http_response_header ?? [];
+        $responseHeaders = $http_response_header;
         $status = 0;
         $headers = [];
         foreach ($responseHeaders as $line) {

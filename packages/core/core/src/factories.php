@@ -28,7 +28,10 @@ use Strapi\Core\CoreApi\Service\Service;
  */
 final class Factories
 {
-    /** @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg @return \Closure(Strapi): Extendable */
+    /**
+     * @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg
+     * @return \Closure(Strapi): Extendable
+     */
     public static function createCoreController(string $uid, array|callable|null $cfg = null): \Closure
     {
         return static function (Strapi $strapi) use ($uid, $cfg): Extendable {
@@ -41,7 +44,10 @@ final class Factories
         };
     }
 
-    /** @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg @return \Closure(Strapi): Extendable */
+    /**
+     * @param array<string, callable>|callable(Strapi): array<string, callable>|null $cfg
+     * @return \Closure(Strapi): Extendable
+     */
     public static function createCoreService(string $uid, array|callable|null $cfg = null): \Closure
     {
         return static function (Strapi $strapi) use ($uid, $cfg): Extendable {

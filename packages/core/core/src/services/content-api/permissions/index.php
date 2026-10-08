@@ -9,6 +9,7 @@ use Strapi\Core\Services\ContentApi\Permissions\Providers\Action;
 use Strapi\Core\Services\ContentApi\Permissions\Providers\Condition;
 use Strapi\Core\Strapi;
 use Strapi\Permissions\Engine\Engine as PermissionsEngine;
+use Strapi\Permissions\Engine\Hooks\BeforeEvaluateContext;
 
 /**
  * Port of packages/core/core/src/services/content-api/permissions/index.ts: the content-API
@@ -45,10 +46,10 @@ final class Permissions
         return new self($strapi);
     }
 
-    /** @param array{permission: array{action: string}} $params */
-    private function createValidatePermissionHandler(array|object $params): bool
+    /** @param array{permission: array<string, mixed>}|BeforeEvaluateContext $params */
+    private function createValidatePermissionHandler(array|BeforeEvaluateContext $params): bool
     {
-        $permission = is_array($params) ? $params['permission'] : $params->permission;
+        $permission = $params instanceof BeforeEvaluateContext ? $params->permission() : $params['permission'];
         $action = $this->providers['action']->get((string) ($permission['action'] ?? ''));
 
         // If the action isn't registered into the action provider, then ignore the permission and warn the user

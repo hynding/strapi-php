@@ -24,7 +24,11 @@ abstract class Dialect
     {
     }
 
-    /** Normalises the Strapi connection config before the DBAL params are built. @param array<string, mixed> $connection */
+    /**
+     * Normalises the Strapi connection config before the DBAL params are built.
+     *
+     * @param array<string, mixed> $connection
+     */
     public function configure(array &$connection): void
     {
     }
@@ -88,7 +92,11 @@ abstract class Dialect
         return false;
     }
 
-    /** Max rows per batch for bulk inserts. */
+    /**
+     * Max rows per batch for bulk inserts.
+     *
+     * @return int<1, max>
+     */
     public function getBatchInsertSize(): int
     {
         return 1000;

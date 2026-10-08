@@ -38,7 +38,7 @@ final class Services
         }
 
         $service = $this->services[$uid];
-        $instance = $service instanceof \Closure || (is_object($service) && is_callable($service) && !$service instanceof ActionMap)
+        $instance = $service instanceof \Closure || (is_object($service) && is_callable($service))
             ? $service($this->strapi)
             : $service;
 

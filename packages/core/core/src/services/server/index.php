@@ -151,18 +151,18 @@ final class Server
     private function dispatchMiddleware(): \Closure
     {
         return function (Context $ctx, callable $next): void {
-            $match = $this->mountedRouter()->match($ctx->method(), $ctx->path());
+            ['found' => $match, 'allowed' => $allowed] = $this->mountedRouter()->resolve($ctx->method(), $ctx->path());
 
             if ($match === null) {
-                $next();
+                if ($allowed === []) {
+                    $next();
 
-                return;
-            }
+                    return;
+                }
 
-            if (array_is_list($match)) {
                 // allowedMethods(): 405 for known paths, 501 for unknown methods
                 $ctx->setStatus(405);
-                $ctx->setHeader('Allow', implode(', ', $match));
+                $ctx->setHeader('Allow', implode(', ', $allowed));
                 if ($ctx->method() === 'OPTIONS') {
                     $ctx->setStatus(200);
                     $ctx->setBody('');

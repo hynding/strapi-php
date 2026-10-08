@@ -16,7 +16,9 @@ final class CollectionType extends Base
         $this->validateQuery($ctx);
         $sanitizedQuery = $this->sanitizeQuery($ctx);
 
-        ['results' => $results, 'pagination' => $pagination] = $this->strapi->service($this->uid)->find($sanitizedQuery);
+        $page = $this->callService('find', $sanitizedQuery);
+        \assert(is_array($page));
+        ['results' => $results, 'pagination' => $pagination] = $page;
         $sanitizedResults = $this->sanitizeOutput($results, $ctx);
 
         return $this->transformResponse($sanitizedResults, ['pagination' => $pagination]);
@@ -29,7 +31,7 @@ final class CollectionType extends Base
         $this->validateQuery($ctx);
         $sanitizedQuery = $this->sanitizeQuery($ctx);
 
-        $entity = $this->strapi->service($this->uid)->findOne($id, $sanitizedQuery);
+        $entity = $this->callService('findOne', $id, $sanitizedQuery);
         $sanitizedEntity = $this->sanitizeOutput($entity, $ctx);
 
         return $this->transformResponse($sanitizedEntity);
@@ -52,7 +54,7 @@ final class CollectionType extends Base
 
         $sanitizedInputData = $this->sanitizeInput($body['data'], $ctx);
 
-        $entity = $this->strapi->service($this->uid)->create([...$sanitizedQuery, 'data' => $sanitizedInputData]);
+        $entity = $this->callService('create', [...$sanitizedQuery, 'data' => $sanitizedInputData]);
 
         $sanitizedEntity = $this->sanitizeOutput($entity, $ctx);
 
@@ -79,7 +81,7 @@ final class CollectionType extends Base
 
         $sanitizedInputData = $this->sanitizeInput($body['data'], $ctx);
 
-        $entity = $this->strapi->service($this->uid)->update($id, [...$sanitizedQuery, 'data' => $sanitizedInputData]);
+        $entity = $this->callService('update', $id, [...$sanitizedQuery, 'data' => $sanitizedInputData]);
 
         $sanitizedEntity = $this->sanitizeOutput($entity, $ctx);
 
@@ -93,7 +95,7 @@ final class CollectionType extends Base
         $this->validateQuery($ctx);
         $sanitizedQuery = $this->sanitizeQuery($ctx);
 
-        $this->strapi->service($this->uid)->delete($id, $sanitizedQuery);
+        $this->callService('delete', $id, $sanitizedQuery);
 
         $ctx->setStatus(204);
 

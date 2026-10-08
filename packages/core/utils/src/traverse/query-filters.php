@@ -37,7 +37,12 @@ final class QueryFilters
         return static fn (mixed $filters): mixed => self::traverse($visitor, $options, $filters);
     }
 
-    /** True if this object should be walked as a filter subtree (operators / attributes), not an opaque operand. */
+    /**
+     * True if this object should be walked as a filter subtree (operators / attributes), not an opaque operand.
+     *
+     * @param array<array-key, mixed> $value
+     * @param Schema|array<string, mixed>|null $schema
+     */
     private static function isFilterLikeObject(array $value, Schema|array|null $schema): bool
     {
         foreach (array_keys($value) as $k) {

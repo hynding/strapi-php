@@ -44,7 +44,10 @@ final class EntityService
         return $this->strapi->documents($uid)->findMany($params);
     }
 
-    /** @param array<string, mixed> $params */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
     public function findOne(string $uid, int|string $id, array $params = []): ?array
     {
         $this->warn();
@@ -64,7 +67,10 @@ final class EntityService
         return $this->strapi->documents($uid)->count($params);
     }
 
-    /** @param array<string, mixed> $params */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     public function create(string $uid, array $params = []): array
     {
         $this->warn();
@@ -72,7 +78,10 @@ final class EntityService
         return $this->strapi->documents($uid)->create($params);
     }
 
-    /** @param array<string, mixed> $params */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
     public function update(string $uid, int|string $id, array $params = []): ?array
     {
         $this->warn();
@@ -84,7 +93,10 @@ final class EntityService
         return $this->strapi->documents($uid)->update([...$params, 'documentId' => $entry['documentId'], 'locale' => $entry['locale'] ?? null]);
     }
 
-    /** @param array<string, mixed> $params */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
     public function delete(string $uid, int|string $id, array $params = []): ?array
     {
         $this->warn();

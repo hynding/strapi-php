@@ -27,8 +27,9 @@ final class Files
     /** `path.relative(from, to)` */
     public static function relative(string $from, string $to): string
     {
-        $from = array_values(array_filter(explode('/', str_replace('\\', '/', rtrim($from, '/'))), 'strlen'));
-        $to = array_values(array_filter(explode('/', str_replace('\\', '/', rtrim($to, '/'))), 'strlen'));
+        $notEmpty = static fn (string $segment): bool => $segment !== '';
+        $from = array_values(array_filter(explode('/', str_replace('\\', '/', rtrim($from, '/'))), $notEmpty));
+        $to = array_values(array_filter(explode('/', str_replace('\\', '/', rtrim($to, '/'))), $notEmpty));
 
         while ($from !== [] && $to !== [] && $from[0] === $to[0]) {
             array_shift($from);

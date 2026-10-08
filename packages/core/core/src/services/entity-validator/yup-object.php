@@ -12,8 +12,6 @@ class YupObject extends Yup
     /** @var array<string, Yup> */
     public array $fields = [];
 
-    private bool $noUnknown = false;
-
     /** @param array<string, Yup> $shape */
     public function shape(array $shape): static
     {
@@ -26,7 +24,6 @@ class YupObject extends Yup
     public function noUnknown(bool $noUnknown = true, string $message = '${path} field has unspecified keys: ${unknown}'): static
     {
         $clone = clone $this;
-        $clone->noUnknown = $noUnknown;
         if ($noUnknown) {
             $clone = $clone->test('noUnknown', $message, function (mixed $v, TestContext $ctx) use ($message): bool|YupError {
                 if (!is_array($v)) {

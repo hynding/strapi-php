@@ -91,7 +91,7 @@ final class Cuid2
     /** Converts a hex string to base36 using repeated division on a digit array. */
     private static function hexToBase36(string $hex): string
     {
-        $digits = array_map('hexdec', str_split(strtolower($hex)));
+        $digits = array_map(static fn (string $c): int => (int) hexdec($c), str_split(strtolower($hex)));
 
         return self::digitsToBase36($digits, 16);
     }

@@ -53,7 +53,7 @@ final class Components
     {
         $model = $this->strapi->getModel($uid);
 
-        return $model?->attributes ?? [];
+        return $model === null ? [] : $model->attributes;
     }
 
     /**

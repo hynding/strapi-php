@@ -44,11 +44,11 @@ final class OrderBy
      */
     public static function toSqlOrderByDescriptor(SqlBuilder $sql, string $tableName, string $rootTableAlias, array $entry): array
     {
-        if (isset($entry['rawExpression'])) {
-            return ['column' => self::buildStatusSortExpression($sql, $tableName, $rootTableAlias, $entry['isI18n'] ?? false), 'order' => $entry['order'] ?? null];
+        if (isset($entry['column'])) {
+            return ['column' => $entry['column'], 'order' => $entry['order'] ?? null];
         }
 
-        return ['column' => $entry['column'], 'order' => $entry['order'] ?? null];
+        return ['column' => self::buildStatusSortExpression($sql, $tableName, $rootTableAlias, $entry['isI18n'] ?? false), 'order' => $entry['order'] ?? null];
     }
 
     /**

@@ -60,11 +60,17 @@ final class Transform
             return null;
         }
 
-        if (array_is_list($row)) {
-            return array_map(static fn (?array $r): ?array => self::fromSingleRow($meta, $r), $row);
+        if (!array_is_list($row)) {
+            /** @var array<string, mixed> $row a single row keyed by column */
+            return self::fromSingleRow($meta, $row);
         }
 
-        return self::fromSingleRow($meta, $row);
+        $rows = [];
+        foreach ($row as $r) {
+            $rows[] = self::fromSingleRow($meta, $r);
+        }
+
+        return $rows;
     }
 
     /**
@@ -106,11 +112,17 @@ final class Transform
             return null;
         }
 
-        if (array_is_list($data) && $data !== []) {
-            return array_map(static fn (?array $d): ?array => self::toSingleRow($meta, $d), $data);
+        if (!array_is_list($data) || $data === []) {
+            /** @var array<string, mixed> $data a single row keyed by attribute */
+            return self::toSingleRow($meta, $data);
         }
 
-        return self::toSingleRow($meta, $data);
+        $rows = [];
+        foreach ($data as $d) {
+            $rows[] = self::toSingleRow($meta, $d);
+        }
+
+        return $rows;
     }
 
     /** @param Meta $meta */

@@ -11,13 +11,16 @@ use Strapi\Utils\ProviderFactory;
  * Port of packages/core/core/src/services/content-api/permissions/providers/action.ts: a
  * {@see ProviderFactory} that refuses registrations once Strapi is loaded.
  */
+/** @extends ProviderFactory<mixed> */
 final class Action extends ProviderFactory
 {
+    /** @param array{throwOnDuplicates?: bool} $options */
     public function __construct(private readonly Strapi $strapi, array $options = [])
     {
         parent::__construct($options);
     }
 
+    /** @param array{throwOnDuplicates?: bool} $options */
     public static function createActionProvider(Strapi $strapi, array $options = []): self
     {
         return new self($strapi, $options);

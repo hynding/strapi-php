@@ -11,7 +11,7 @@ use Strapi\Database\Utils\Types as AttributeTypes;
 /**
  * Port of packages/core/database/src/schema/schema.ts: `metadataToSchema`.
  *
- * @phpstan-import-type Schema as SchemaArray from Types
+ * @phpstan-import-type SchemaArray from Types
  * @phpstan-import-type Table from Types
  * @phpstan-import-type Column from Types
  * @phpstan-import-type Meta from Metadata
@@ -30,7 +30,11 @@ final class Schema
         return $schema;
     }
 
-    /** @param Meta $meta  @return Table */
+    /**
+     * @param Meta $meta
+     *
+     * @return Table
+     */
     public static function createTable(array $meta): array
     {
         $identifiers = Identifiers::global();
@@ -95,7 +99,11 @@ final class Schema
         return $table;
     }
 
-    /** @param array<string, mixed> $attribute  @return Column */
+    /**
+     * @param array<string, mixed> $attribute
+     *
+     * @return Column
+     */
     public static function createColumn(string $name, array $attribute): array
     {
         $columnType = self::getColumnType($attribute);
@@ -103,7 +111,9 @@ final class Schema
         $args = $columnType['args'] ?? [];
         unset($columnType['type'], $columnType['args']);
 
-        return [
+        // `columnType` / `attribute.column` may override the defaults (and carry extra options)
+        /** @var Column $column */
+        $column = [
             'name' => Identifiers::global()->getName($name),
             'type' => $type,
             'args' => $args,
@@ -113,9 +123,15 @@ final class Schema
             ...$columnType,
             ...($attribute['column'] ?? []),
         ];
+
+        return $column;
     }
 
-    /** @param array<string, mixed> $attribute  @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $attribute
+     *
+     * @return array<string, mixed>
+     */
     public static function getColumnType(array $attribute): array
     {
         if (!empty($attribute['columnType'])) {

@@ -11,13 +11,19 @@ namespace Strapi\Core\Services\SessionManager;
  */
 interface SessionProvider
 {
-    /** @param SessionData $session @return SessionData */
+    /**
+     * @param SessionData $session
+     * @return SessionData
+     */
     public function create(array $session): array;
 
     /** @return SessionData|null */
     public function findBySessionId(string $sessionId): ?array;
 
-    /** @param array{userId: string, origin: string, status?: string} $criteria @return list<SessionData> */
+    /**
+     * @param array{userId: string, origin: string, status?: string} $criteria
+     * @return list<SessionData>
+     */
     public function findByUser(array $criteria): array;
 
     /** @param array<string, mixed> $data */

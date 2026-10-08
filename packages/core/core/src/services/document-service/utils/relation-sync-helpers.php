@@ -20,6 +20,7 @@ final class RelationSyncHelpers
 
     /**
      * @param list<mixed> $ids
+     * @param list<mixed> $notInIds
      * @return list<array<string, mixed>>
      */
     public static function selectWhereIn(Strapi $strapi, string $table, string $column, array $ids, ?string $notInColumn = null, array $notInIds = []): array
@@ -48,7 +49,10 @@ final class RelationSyncHelpers
         }
     }
 
-    /** @param array<string, mixed> $row */
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
     public static function omitId(array $row, string $idColumn = 'id'): array
     {
         unset($row[$idColumn]);

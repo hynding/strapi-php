@@ -112,7 +112,9 @@ final class Apis
         return null;
     }
 
-    /** @return array<string, array{schema: array<string, mixed>, actions: array<string, mixed>, lifecycles: array<string, mixed>}>|null */
+    /**
+     * @return array<string, array<string, mixed>>|null `{ schema, actions, lifecycles, ...other files }` per content type
+     */
     private static function loadContentTypes(string $apiName, string $dir): ?array
     {
         if (!is_dir($dir)) {
@@ -132,12 +134,18 @@ final class Apis
             $contentTypeName = self::normalizeName($entry);
             $loadedContentType = self::loadDir($dir . '/' . $entry);
 
-            if (empty($loadedContentType) || empty($loadedContentType['schema'])) {
+            $schema = $loadedContentType['schema'] ?? null;
+            if (empty($loadedContentType) || !is_array($schema) || $schema === []) {
                 throw new \RuntimeException("Could not load content type found at {$dir}");
             }
 
-            $contentType = [...self::DEFAULT_CONTENT_TYPE, ...$loadedContentType];
-            $schema = $contentType['schema'];
+            $actions = $loadedContentType['actions'] ?? self::DEFAULT_CONTENT_TYPE['actions'];
+            $lifecycles = $loadedContentType['lifecycles'] ?? self::DEFAULT_CONTENT_TYPE['lifecycles'];
+            $contentType = [
+                ...$loadedContentType,
+                'actions' => is_array($actions) ? $actions : [],
+                'lifecycles' => is_array($lifecycles) ? $lifecycles : [],
+            ];
 
             $schema['apiName'] = $apiName;
             $schema['collectionName'] = $schema['collectionName'] ?? ($schema['info']['singularName'] ?? null);

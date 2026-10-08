@@ -120,7 +120,9 @@ final class Entries
 
         $entryData = Attributes::applyTransforms($this->contentType, $dataWithComponents);
 
-        return $this->strapi->db()->query($this->uid)->create([...$query, 'data' => $entryData]);
+        $query['data'] = $entryData;
+
+        return $this->strapi->db()->query($this->uid)->create($query);
     }
 
     /**
@@ -131,7 +133,8 @@ final class Entries
     {
         $componentsToDelete = $this->components->getComponents($this->uid, ['id' => $id]);
 
-        $deletedEntry = $this->strapi->db()->query($this->uid)->delete([...$query, 'where' => ['id' => $id]]);
+        $query['where'] = ['id' => $id];
+        $deletedEntry = $this->strapi->db()->query($this->uid)->delete($query);
 
         $this->components->deleteComponents($this->uid, [...$componentsToDelete, 'id' => $id], ['loadComponents' => false]);
 
@@ -167,7 +170,10 @@ final class Entries
 
         $entryData = Attributes::applyTransforms($this->contentType, $dataWithComponents);
 
-        return $this->strapi->db()->query($this->uid)->update([...$query, 'where' => ['id' => $entryToUpdate['id']], 'data' => $entryData]);
+        $query['where'] = ['id' => $entryToUpdate['id']];
+        $query['data'] = $entryData;
+
+        return $this->strapi->db()->query($this->uid)->update($query);
     }
 
     /**

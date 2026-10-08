@@ -18,7 +18,10 @@ final class Route
 {
     public const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
-    /** @param RouteArray $route */
+    /**
+     * @param RouteArray $route
+     * @return RouteArray
+     */
     public static function normalize(array $route, string $prefix = ''): array
     {
         $route['method'] = strtoupper($route['method']);

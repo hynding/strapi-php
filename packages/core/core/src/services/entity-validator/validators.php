@@ -98,7 +98,10 @@ final class Validators
         };
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     private static function addMinLengthValidator(YupString $validator, array $metas, array $options): YupString
     {
         $attr = $metas['attr'];
@@ -124,7 +127,10 @@ final class Validators
         return isset($attr['maxLength']) && is_int($attr['maxLength']) && $attr['maxLength'] ? $validator->max($attr['maxLength']) : $validator;
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     private static function addMinIntegerValidator(YupNumber $validator, array $metas, array $options): YupNumber
     {
         $min = self::toNumberSafe($metas['attr']['min'] ?? null);
@@ -140,7 +146,10 @@ final class Validators
         return $max !== null ? $validator->max((int) $max) : $validator;
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     private static function addMinFloatValidator(YupNumber $validator, array $metas, array $options): YupNumber
     {
         $min = self::toNumberSafe($metas['attr']['min'] ?? null);
@@ -156,7 +165,10 @@ final class Validators
         return $max !== null ? $validator->max($max) : $validator;
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     private static function addStringRegexValidator(YupString $validator, array $metas, array $options): YupString
     {
         $attr = $metas['attr'];
@@ -349,7 +361,10 @@ final class Validators
 
     /* Type validators */
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function string(array $metas, array $options): YupString
     {
         $schema = Yup::string()->transform(static fn (mixed $val, mixed $originalVal): mixed => $originalVal);
@@ -361,7 +376,10 @@ final class Validators
         return $this->addUniqueValidator($schema, $metas, $options);
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function email(array $metas, array $options): YupString
     {
         $schema = $this->string($metas, $options);
@@ -373,7 +391,10 @@ final class Validators
         return $schema->email()->min(1, '${path} cannot be empty');
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function uid(array $metas, array $options): YupString
     {
         $schema = $this->string($metas, $options);
@@ -398,7 +419,10 @@ final class Validators
         return Yup::string()->oneOf([...$values, null]);
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function integer(array $metas, array $options): YupNumber
     {
         $schema = Yup::number()->integer();
@@ -409,7 +433,10 @@ final class Validators
         return $this->addUniqueValidator($schema, $metas, $options);
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function float(array $metas, array $options): YupNumber
     {
         $schema = Yup::number()->test('is-finite-number', '${path} must be a finite number', static fn (mixed $value): bool => $value === null || $value instanceof Undefined || self::isValidFiniteNumber($value));
@@ -420,7 +447,10 @@ final class Validators
         return $this->addUniqueValidator($schema, $metas, $options);
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function biginteger(array $metas, array $options): Yup
     {
         $schema = Yup::mixed()
@@ -430,7 +460,10 @@ final class Validators
         return $this->addUniqueValidator($schema, $metas, $options);
     }
 
-    /** @param ValidatorMetas $metas @param ValidatorOptions $options */
+    /**
+     * @param ValidatorMetas $metas
+     * @param ValidatorOptions $options
+     */
     public function dates(array $metas, array $options): Yup
     {
         return $this->addUniqueValidator(Yup::mixed(), $metas, $options);

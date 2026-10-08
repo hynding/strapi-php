@@ -16,7 +16,7 @@ final class SingleType extends Base
         $this->validateQuery($ctx);
         $sanitizedQuery = $this->sanitizeQuery($ctx);
 
-        $entity = $this->strapi->service($this->uid)->find($sanitizedQuery);
+        $entity = $this->callService('find', $sanitizedQuery);
 
         $sanitizedEntity = $this->sanitizeOutput($entity, $ctx);
 
@@ -40,7 +40,7 @@ final class SingleType extends Base
 
         $sanitizedInputData = $this->sanitizeInput($body['data'], $ctx);
 
-        $entity = $this->strapi->service($this->uid)->createOrUpdate([...$sanitizedQuery, 'data' => $sanitizedInputData]);
+        $entity = $this->callService('createOrUpdate', [...$sanitizedQuery, 'data' => $sanitizedInputData]);
 
         $sanitizedEntity = $this->sanitizeOutput($entity, $ctx);
 
@@ -52,7 +52,7 @@ final class SingleType extends Base
         $this->validateQuery($ctx);
         $sanitizedQuery = $this->sanitizeQuery($ctx);
 
-        $this->strapi->service($this->uid)->delete($sanitizedQuery);
+        $this->callService('delete', $sanitizedQuery);
 
         $ctx->setStatus(204);
 

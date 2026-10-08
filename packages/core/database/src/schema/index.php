@@ -10,7 +10,7 @@ use Strapi\Database\Database;
  * Port of packages/core/database/src/schema/index.ts (`createSchemaProvider`): the `db.schema`
  * object with `sync()`, `syncSchema()`, `create()`, `drop()`, `reset()`.
  *
- * @phpstan-import-type Schema as SchemaArray from Types
+ * @phpstan-import-type SchemaArray from Types
  */
 final class SchemaProvider
 {
@@ -30,7 +30,11 @@ final class SchemaProvider
         $this->schemaStorage = new Storage($db);
     }
 
-    /** The target schema, built from metadata on first access. @return SchemaArray */
+    /**
+     * The target schema, built from metadata on first access.
+     *
+     * @return SchemaArray
+     */
     public function getSchema(): array
     {
         return $this->schema ??= Schema::metadataToSchema($this->db->metadata);

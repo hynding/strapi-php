@@ -13,7 +13,7 @@ namespace Strapi\Permissions\Engine\Abilities;
  * and whose `build()` returns an {@see Ability} matching conditions with {@see Sift}.
  *
  * @phpstan-type ParametrizedAction array{name: string, params: array<string, mixed>}
- * @phpstan-type PermissionRule array{action: string|ParametrizedAction, subject?: string|null, properties?: array{fields?: list<string>|null}, condition?: array<string, mixed>|null}
+ * @phpstan-type PermissionRule array{action: string|ParametrizedAction, subject?: string|null, properties?: array<string, mixed>|null, condition?: array<string, mixed>|null}
  */
 final class CaslAbility
 {

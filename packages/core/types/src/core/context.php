@@ -22,7 +22,7 @@ interface Context
     /** @return array<string, mixed> parsed with qs semantics (filters[a][$eq]=1 → nested arrays) */
     public function query(): array;
 
-    /** @param array<string, mixed> $query */
+    /** @param array<array-key, mixed> $query */
     public function setQuery(array $query): void;
 
     /** @return mixed parsed request body (JSON object as array, multipart as ['data' => ..., 'files' => ...]) */
@@ -69,4 +69,63 @@ interface Context
     public function is(string ...$types): bool;
 
     public function redirect(string $url, int $status = 302): void;
+
+    // --- koa.ts custom response methods: `ctx.<name>(message|details, details)` writes the error envelope ---
+
+    /** @param string|array<string, mixed>|null $response */
+    public function badRequest(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function unauthorized(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function paymentRequired(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function forbidden(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function notFound(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function methodNotAllowed(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function notAcceptable(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function requestTimeout(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function conflict(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function gone(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function payloadTooLarge(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function unsupportedMediaType(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function unprocessableEntity(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function tooManyRequests(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function internalServerError(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function notImplemented(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function badGateway(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function serviceUnavailable(string|array|null $response = null, mixed $details = []): void;
+
+    /** @param string|array<string, mixed>|null $response */
+    public function gatewayTimeout(string|array|null $response = null, mixed $details = []): void;
 }

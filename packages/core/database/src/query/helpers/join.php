@@ -10,7 +10,7 @@ use Strapi\Database\Query\SqlBuilder;
 /**
  * Port of packages/core/database/src/query/helpers/join.ts.
  *
- * @phpstan-type Join array{method?: 'leftJoin'|'innerJoin', alias: string, referencedTable: string, referencedColumn: string, rootColumn: string, rootTable?: string, on?: array<string, mixed>|null, orderBy?: array<string, string>|null}
+ * @phpstan-type JoinArray array{method?: 'leftJoin'|'innerJoin', alias: string, referencedTable: string, referencedColumn: string, rootColumn: string, rootTable?: string, on?: array<string, mixed>|null, orderBy?: array<string, string>|null}
  */
 final class Join
 {
@@ -124,7 +124,7 @@ final class Join
         return $alias;
     }
 
-    /** @param Join $join */
+    /** @param JoinArray $join */
     public static function applyJoin(SqlBuilder $sql, array $join): void
     {
         $method = $join['method'] ?? 'leftJoin';
@@ -147,7 +147,7 @@ final class Join
         }
     }
 
-    /** @param list<Join> $joins */
+    /** @param list<JoinArray> $joins */
     public static function applyJoins(SqlBuilder $sql, array $joins): void
     {
         foreach ($joins as $join) {

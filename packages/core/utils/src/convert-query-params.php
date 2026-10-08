@@ -71,7 +71,7 @@ final class ConvertQueryParams
         return $sortMap;
     }
 
-    /** @param array<string, mixed> $sortMap */
+    /** @param array<array-key, mixed> $sortMap */
     public static function isEmptySortMap(array $sortMap): bool
     {
         if ($sortMap === []) {
@@ -104,7 +104,11 @@ final class ConvertQueryParams
      */
     public static function normalizeOrderBy(array $orderBy): ?array
     {
-        if (array_is_list($orderBy) && $orderBy !== []) {
+        if (array_is_list($orderBy)) {
+            if ($orderBy === []) {
+                return null;
+            }
+
             $filtered = array_values(array_filter($orderBy, static fn (array $sortMap): bool => !self::isEmptySortMap($sortMap)));
 
             return $filtered !== [] ? $filtered : null;

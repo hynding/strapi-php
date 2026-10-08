@@ -25,6 +25,7 @@ final class Sqlite extends Dialect
         $this->schemaInspector = new SchemaInspector($db);
     }
 
+    /** @return int<1, max> */
     public function getBatchInsertSize(): int
     {
         return self::SQLITE_BATCH_INSERT_SIZE;

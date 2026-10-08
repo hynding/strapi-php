@@ -61,7 +61,12 @@ final class Permission
     public static function addCondition(string $condition, ?array $permission = null): array|\Closure
     {
         if ($permission === null) {
-            return static fn (array $p): array => self::addCondition($condition, $p);
+            return static function (array $p) use ($condition): array {
+                $result = self::addCondition($condition, $p);
+                \assert(is_array($result));
+
+                return $result;
+            };
         }
 
         $conditions = $permission['conditions'] ?? null;

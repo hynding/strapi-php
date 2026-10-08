@@ -10,7 +10,7 @@ use Strapi\Database\Dialects\SchemaInspector as SchemaInspectorInterface;
 /**
  * Port of packages/core/database/src/dialects/sqlite/schema-inspector.ts.
  *
- * @phpstan-import-type Schema from \Strapi\Database\Schema\Types
+ * @phpstan-import-type SchemaArray from \Strapi\Database\Schema\Types
  * @phpstan-import-type Column from \Strapi\Database\Schema\Types
  * @phpstan-import-type Index from \Strapi\Database\Schema\Types
  * @phpstan-import-type ForeignKey from \Strapi\Database\Schema\Types

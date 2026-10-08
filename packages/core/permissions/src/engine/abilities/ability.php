@@ -37,7 +37,11 @@ final class Ability
         return $this->rules;
     }
 
-    /** `ability.rules` as plain arrays (`{ action, subject, fields?, conditions?, inverted }`). */
+    /**
+     * `ability.rules` as plain arrays (`{ action, subject, fields?, conditions?, inverted }`).
+     *
+     * @return list<array{action: string, subject: string, fields?: list<string>, conditions?: array<string, mixed>, inverted: bool}>
+     */
     public function rulesAsArrays(): array
     {
         return array_map(static fn (Rule $rule): array => $rule->toArray(), $this->rules);

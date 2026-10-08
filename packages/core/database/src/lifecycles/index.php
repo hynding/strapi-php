@@ -50,10 +50,6 @@ final class Lifecycles
      */
     public function subscribe(callable|array $subscriber): callable
     {
-        if (!is_callable($subscriber) && !is_array($subscriber)) {
-            throw new \InvalidArgumentException('Invalid subscriber. Expected function or object');
-        }
-
         $id = $this->counter++;
         $this->subscribers[$id] = $subscriber;
 
@@ -99,7 +95,7 @@ final class Lifecycles
      * Runs every subscriber for the action. `$properties['params']` is passed by reference so that
      * subscribers (the timestamps one) can mutate the params the caller continues with.
      *
-     * @param array{params?: array<string, mixed>, result?: mixed} $properties
+     * @param array{params: array<string, mixed>, result?: mixed} $properties
      * @param array<int, array<string, mixed>> $states
      *
      * @return array<int, array<string, mixed>>

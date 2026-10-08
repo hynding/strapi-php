@@ -96,9 +96,9 @@ final class RegularRelations
                 ->where($joinColumn['name'], $id)
                 ->whereNotIn($inverseJoinColumn['name'], self::getDocumentSiblingIdsQuery($db, $inverseJoinColumn['referencedTable'], $relIdToadd))
                 ->where($joinTable['on'] ?? [])
-                ->run();
+                ->rows();
 
-            $relIdsToDelete = array_map(static fn (array $r): mixed => $r[$inverseJoinColumn['name']], $relsToDelete);
+            $relIdsToDelete = array_map(static fn (array $r): int|string => self::toId($r[$inverseJoinColumn['name']]), $relsToDelete);
 
             if ($relIdsToDelete === []) {
                 return;
@@ -156,12 +156,13 @@ final class RegularRelations
                     ->limit($batchSize)
                     ->transacting($trx)
                     ->execute();
+                /** @var list<array<string, mixed>> $batchToDelete */
 
                 $done = count($batchToDelete) < $batchSize;
                 $last = $batchToDelete[array_key_last($batchToDelete)] ?? null;
                 $lastId = $last['id'] ?? 0;
 
-                $batchIds = array_map(static fn (array $r): mixed => $r[$inverseJoinColumn['name']], $batchToDelete);
+                $batchIds = array_map(static fn (array $r): int|string => self::toId($r[$inverseJoinColumn['name']]), $batchToDelete);
 
                 if ($batchIds === []) {
                     break;
@@ -189,6 +190,16 @@ final class RegularRelations
                 ->transacting($trx)
                 ->execute();
         }
+    }
+
+    /** Join-column values read back from the database are ids. */
+    private static function toId(mixed $value): int|string
+    {
+        if (!is_int($value) && !is_string($value)) {
+            throw new \UnexpectedValueException('Expected an id, got ' . get_debug_type($value));
+        }
+
+        return $value;
     }
 
     /**

@@ -84,6 +84,7 @@ final class Where
         return self::processWhere($where, $qb, $uid, $alias);
     }
 
+    /** @return array<string, mixed>|list<array<string, mixed>> */
     private static function processRelationWhere(mixed $where, QueryBuilder $qb, string $uid, ?string $alias): array
     {
         $idAlias = $qb->aliasColumn('id', $alias);

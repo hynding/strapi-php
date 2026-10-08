@@ -13,7 +13,7 @@ use Strapi\Database\Utils\LodashWords as Strings;
  * them to `maxLength` with a hash suffix exactly the way Node Strapi does so both backends can
  * share one database.
  *
- * @phpstan-type NameToken array{name: string, compressible: bool, shortName?: string, allocatedLength?: int}
+ * @phpstan-type NameToken array{name: string, compressible: bool, shortName?: string|null}
  * @phpstan-type NameOptions array{suffix?: string, prefix?: string}
  */
 class Identifiers
@@ -186,55 +186,82 @@ class Identifiers
      * INDEXES
      */
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'index', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getFkIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'fk', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getUniqueIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'unique', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getPrimaryIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'primary', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getInverseFkIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'inv_fk', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getOrderFkIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'order_fk', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getOrderInverseFkIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'order_inv_fk', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getIdColumnIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'id_column_index', ...$options]);
     }
 
-    /** @param string|list<string> $names  @param NameOptions $options */
+    /**
+     * @param string|list<string> $names
+     * @param NameOptions $options
+     */
     public function getOrderIndexName(string|array $names, array $options = []): string
     {
         return $this->getName($names, ['suffix' => 'order_index', ...$options]);
@@ -351,14 +378,16 @@ class Identifiers
         }
 
         // Calculate total surplus length from shorter strings and total deficit length from longer strings
+        /** @var array<int, int> $allocatedLengths length allocated to each compressible token, by index */
+        $allocatedLengths = [];
         $deficits = [];
         foreach ($compressibleIdx as $i) {
             $actualLength = strlen($nameTokens[$i]['name']);
             if ($actualLength < $availablePerToken) {
                 $surplus += $availablePerToken - $actualLength;
-                $nameTokens[$i]['allocatedLength'] = $actualLength;
+                $allocatedLengths[$i] = $actualLength;
             } else {
-                $nameTokens[$i]['allocatedLength'] = $availablePerToken;
+                $allocatedLengths[$i] = $availablePerToken;
                 $deficits[] = $i;
             }
         }
@@ -368,10 +397,10 @@ class Identifiers
         while ($surplus > 0 && count($deficits) > 0) {
             $remaining = [];
             foreach ($deficits as $i) {
-                if ($nameTokens[$i]['allocatedLength'] < strlen($nameTokens[$i]['name']) && $surplus > 0) {
-                    $nameTokens[$i]['allocatedLength']++;
+                if ($allocatedLengths[$i] < strlen($nameTokens[$i]['name']) && $surplus > 0) {
+                    $allocatedLengths[$i]++;
                     $surplus--;
-                    if ($nameTokens[$i]['allocatedLength'] < strlen($nameTokens[$i]['name'])) {
+                    if ($allocatedLengths[$i] < strlen($nameTokens[$i]['name'])) {
                         $remaining[] = $i;
                     }
                 }
@@ -386,9 +415,9 @@ class Identifiers
 
         // Build final string
         $parts = [];
-        foreach ($nameTokens as $token) {
-            if ($token['compressible'] && isset($token['allocatedLength'])) {
-                $parts[] = $this->getShortenedName($token['name'], $token['allocatedLength']);
+        foreach ($nameTokens as $i => $token) {
+            if ($token['compressible'] && isset($allocatedLengths[$i])) {
+                $parts[] = $this->getShortenedName($token['name'], $allocatedLengths[$i]);
             } elseif (!$token['compressible'] && !empty($token['shortName'])) {
                 $parts[] = $token['shortName'];
             } else {

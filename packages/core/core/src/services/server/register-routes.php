@@ -71,11 +71,12 @@ final class RegisterRoutes
             $routes = $plugin->routes();
 
             if (array_is_list($routes)) {
-                foreach ($routes as &$route) {
+                $routes = array_map(static function (array $route) use ($generateRouteScope, $pluginName): array {
                     $generateRouteScope($route);
                     $route['info'] = ['pluginName' => $pluginName];
-                }
-                unset($route);
+
+                    return $route;
+                }, $routes);
                 $strapi->contentAPI()->applyExtraParamsToRoutes($routes);
                 $plugin->setRoutes($routes);
 

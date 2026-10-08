@@ -52,7 +52,7 @@ final class Objects
         foreach ($matches as $m) {
             if (isset($m[3])) {
                 $out[] = stripslashes($m[3]);
-            } elseif (isset($m[1]) && $m[1] !== '') {
+            } elseif (isset($m[1])) {
                 $out[] = $m[1];
             } else {
                 $out[] = $m[0];
@@ -71,10 +71,9 @@ final class Objects
      * other value (including the assigned one) keeps its identity. A literal key matching the
      * whole path wins over splitting it.
      *
-     * @template T of array<string|int, mixed>
-     * @param T $object
+     * @param array<string|int, mixed> $object
      * @param string|list<string|int> $path
-     * @return T
+     * @return ($object is array<string, mixed> ? array<string, mixed> : array<string|int, mixed>)
      */
     public static function set(array $object, string|array $path, mixed $value): array
     {
@@ -146,7 +145,11 @@ final class Objects
         return $current;
     }
 
-    /** `_.has` with a dot/bracket path. */
+    /**
+     * `_.has` with a dot/bracket path.
+     *
+     * @param string|list<string|int> $path
+     */
     public static function has(mixed $object, string|array $path): bool
     {
         $sentinel = new \stdClass();
@@ -196,7 +199,7 @@ final class Objects
      *
      * @param array<string|int, mixed> $object
      * @param list<string|int> $keys
-     * @return array<string|int, mixed>
+     * @return ($object is array<string, mixed> ? array<string, mixed> : array<string|int, mixed>)
      */
     public static function pick(array $object, array $keys): array
     {
@@ -215,7 +218,7 @@ final class Objects
      *
      * @param array<string|int, mixed> $object
      * @param list<string|int> $keys
-     * @return array<string|int, mixed>
+     * @return ($object is array<string, mixed> ? array<string, mixed> : array<string|int, mixed>)
      */
     public static function omit(array $object, array $keys): array
     {
@@ -227,7 +230,7 @@ final class Objects
      *
      * @param array<string|int, mixed> $target
      * @param array<string|int, mixed> ...$sources
-     * @return array<string|int, mixed>
+     * @return ($target is array<string, mixed> ? array<string, mixed> : array<string|int, mixed>)
      */
     public static function merge(array $target, array ...$sources): array
     {

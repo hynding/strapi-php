@@ -11,7 +11,7 @@ final class Logger
     public static function log(\Psr\Log\LoggerInterface $logger, string $level, mixed $message): void
     {
         $formatted = self::transformLogMessage($level, $message);
-        if ($formatted === '') {
+        if (!is_array($formatted)) {
             return;
         }
 

@@ -250,7 +250,10 @@ final class ContentApi
         return $out;
     }
 
-    /** @param array<string, mixed> $route @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $route
+     * @return array<string, mixed>
+     */
     private static function sanitizeRoute(array $route): array
     {
         unset($route['request'], $route['response']);

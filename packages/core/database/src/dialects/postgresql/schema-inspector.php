@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace Strapi\Database\Dialects\Postgresql;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Strapi\Database\Database;
 use Strapi\Database\Dialects\SchemaInspector as SchemaInspectorInterface;
 
-/** Port of packages/core/database/src/dialects/postgresql/schema-inspector.ts. */
+/**
+ * Port of packages/core/database/src/dialects/postgresql/schema-inspector.ts.
+ *
+ * @phpstan-import-type Column from \Strapi\Database\Schema\Types
+ * @phpstan-import-type Index from \Strapi\Database\Schema\Types
+ * @phpstan-import-type ForeignKey from \Strapi\Database\Schema\Types
+ */
 final class SchemaInspector implements SchemaInspectorInterface
 {
     private const TABLE_LIST = <<<'SQL'
@@ -98,10 +105,14 @@ final class SchemaInspector implements SchemaInspectorInterface
         return $this->getBulkForeignKeys([$tableName])[$tableName] ?? [];
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<Column>>
+     */
     private function getBulkColumns(array $tables): array
     {
-        $rows = $this->db->connection->fetchAllAssociative(self::BULK_COLUMNS, [$this->getDatabaseSchema(), $tables], [null, ArrayParameterType::STRING]);
+        $rows = $this->db->connection->fetchAllAssociative(self::BULK_COLUMNS, [$this->getDatabaseSchema(), $tables], [ParameterType::STRING, ArrayParameterType::STRING]);
         $result = [];
         foreach ($rows as $row) {
             $strapiType = self::toStrapiType($row);
@@ -119,10 +130,14 @@ final class SchemaInspector implements SchemaInspectorInterface
         return $result;
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<Index>>
+     */
     private function getBulkIndexes(array $tables): array
     {
-        $rows = $this->db->connection->fetchAllAssociative(self::BULK_INDEXES, [$this->getDatabaseSchema(), $tables], [null, ArrayParameterType::STRING]);
+        $rows = $this->db->connection->fetchAllAssociative(self::BULK_INDEXES, [$this->getDatabaseSchema(), $tables], [ParameterType::STRING, ArrayParameterType::STRING]);
         $byTable = [];
         foreach ($rows as $row) {
             if ($row['column_name'] === 'id') {
@@ -145,10 +160,14 @@ final class SchemaInspector implements SchemaInspectorInterface
         return array_map('array_values', $byTable);
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<ForeignKey>>
+     */
     private function getBulkForeignKeys(array $tables): array
     {
-        $rows = $this->db->connection->fetchAllAssociative(self::BULK_FOREIGN_KEYS, [$this->getDatabaseSchema(), $tables], [null, ArrayParameterType::STRING]);
+        $rows = $this->db->connection->fetchAllAssociative(self::BULK_FOREIGN_KEYS, [$this->getDatabaseSchema(), $tables], [ParameterType::STRING, ArrayParameterType::STRING]);
         $byTable = [];
         foreach ($rows as $row) {
             $table = (string) $row['table_name'];
@@ -175,7 +194,11 @@ final class SchemaInspector implements SchemaInspectorInterface
         return array_map('array_values', $byTable);
     }
 
-    /** @param array<string, mixed> $column  @return array{type: string, args?: list<mixed>} */
+    /**
+     * @param array<string, mixed> $column
+     *
+     * @return array{type: string, args?: list<mixed>}
+     */
     public static function toStrapiType(array $column): array
     {
         preg_match('/[^(), ]+/', strtolower((string) $column['data_type']), $m);

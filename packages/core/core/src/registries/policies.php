@@ -145,13 +145,15 @@ final class Policies
                 $out[] = ['handler' => $policyConfig, 'config' => []];
                 continue;
             }
-            if (!is_string($policyConfig) && !is_array($policyConfig)) {
+            if (is_array($policyConfig) && is_string($policyConfig['name'] ?? null)) {
+                $policyConfig = ['name' => $policyConfig['name'], 'config' => $policyConfig['config'] ?? []];
+            } elseif (!is_string($policyConfig)) {
                 throw new \RuntimeException('Invalid policy configuration: expected a string, a function or {name, config}');
             }
 
             $out[] = [
                 'handler' => $this->resolveHandler($policyConfig, $info),
-                'config' => is_array($policyConfig) ? ($policyConfig['config'] ?? []) : [],
+                'config' => is_array($policyConfig) ? $policyConfig['config'] : [],
             ];
         }
 

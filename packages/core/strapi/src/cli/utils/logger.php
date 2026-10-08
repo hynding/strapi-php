@@ -31,8 +31,19 @@ final class Logger
         $out = null,
         $err = null,
     ) {
-        $this->out = $out ?? (defined('STDOUT') ? STDOUT : fopen('php://output', 'wb'));
-        $this->err = $err ?? (defined('STDERR') ? STDERR : fopen('php://output', 'wb'));
+        $this->out = $out ?? (defined('STDOUT') ? STDOUT : self::openOutput());
+        $this->err = $err ?? (defined('STDERR') ? STDERR : self::openOutput());
+    }
+
+    /** @return resource */
+    private static function openOutput()
+    {
+        $stream = fopen('php://output', 'wb');
+        if ($stream === false) {
+            throw new \RuntimeException('Unable to open php://output');
+        }
+
+        return $stream;
     }
 
     /** @param array{silent?: bool, debug?: bool, timestamp?: bool} $options */

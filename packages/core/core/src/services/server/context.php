@@ -51,7 +51,7 @@ final class Context implements ContextContract
 
     private readonly State $state;
 
-    private ?ServerRequestInterface $request;
+    private ServerRequestInterface $request;
 
     public function __construct(ServerRequestInterface $request)
     {
@@ -92,8 +92,7 @@ final class Context implements ContextContract
         if (!$this->queryParsed) {
             // default parser when the strapi::query middleware is not mounted
             parse_str($this->request->getUri()->getQuery(), $parsed);
-            $this->query = $parsed;
-            $this->queryParsed = true;
+            $this->setQuery($parsed);
         }
 
         return $this->query;
@@ -101,7 +100,11 @@ final class Context implements ContextContract
 
     public function setQuery(array $query): void
     {
-        $this->query = $query;
+        // query keys are parameter names: `?0=a` keeps working, the key is just stored as given
+        $this->query = [];
+        foreach ($query as $key => $value) {
+            $this->query[(string) $key] = $value;
+        }
         $this->queryParsed = true;
     }
 
@@ -344,102 +347,125 @@ final class Context implements ContextContract
         $this->body = $body;
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function badRequest(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(400, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function unauthorized(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(401, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function paymentRequired(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(402, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function forbidden(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(403, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function notFound(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(404, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function methodNotAllowed(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(405, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function notAcceptable(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(406, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function requestTimeout(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(408, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function conflict(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(409, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function gone(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(410, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function payloadTooLarge(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(413, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function unsupportedMediaType(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(415, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function unprocessableEntity(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(422, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function tooManyRequests(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(429, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function internalServerError(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(500, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function notImplemented(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(501, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function badGateway(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(502, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function serviceUnavailable(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(503, $response, $details);
     }
 
+    /** @param string|array<string, mixed>|null $response */
     public function gatewayTimeout(string|array|null $response = null, mixed $details = []): void
     {
         $this->httpError(504, $response, $details);
     }
 
-    /** Any other 4xx/5xx `ctx.<camelCasedStatus>()` helper. @param list<mixed> $args */
+    /**
+     * Any other 4xx/5xx `ctx.<camelCasedStatus>()` helper.
+     *
+     * @param list<mixed> $args
+     */
     public function __call(string $name, array $args): void
     {
         $code = KoaMethods::codeForMethodName($name);

@@ -49,8 +49,11 @@ final class State implements StateContract
     public function auth(): ?array
     {
         $auth = $this->data['auth'] ?? null;
+        if (!is_array($auth) || !is_array($auth['strategy'] ?? null) || !array_key_exists('credentials', $auth)) {
+            return null;
+        }
 
-        return is_array($auth) ? $auth : null;
+        return $auth;
     }
 
     public function isAuthenticated(): bool

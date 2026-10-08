@@ -58,7 +58,11 @@ use Strapi\Utils\Hooks\Hook;
  */
 final class Strapi extends Container implements StrapiContract
 {
-    /** `src/index.php` contents: `['register' => fn, 'bootstrap' => fn, 'destroy' => fn]`. @var array<string, callable|null> */
+    /**
+     * `src/index.php` contents: `['register' => fn, 'bootstrap' => fn, 'destroy' => fn]`.
+     *
+     * @var array<string, callable|null>
+     */
     public array $app = [];
 
     private bool $loaded = false;
@@ -469,6 +473,7 @@ final class Strapi extends Container implements StrapiContract
             ->add('localization', static fn (): Localization => Localization::createLocalizationService())
             ->add('db', function () use ($logger): Database {
                 $databaseConfig = $this->config()->get('database');
+                /** @var array<string, mixed> $databaseConfig */
                 $databaseConfig = is_array($databaseConfig) ? $databaseConfig : [];
                 $databaseConfig = self::resolveSqliteFilename($databaseConfig, $this->dirs()->root);
 

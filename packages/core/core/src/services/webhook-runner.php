@@ -42,10 +42,8 @@ final class WebhookRunner
         array $configuration,
         callable $fetch,
     ) {
-        $this->config = ['defaultHeaders' => [], ...$configuration];
-        if (!is_array($this->config['defaultHeaders'])) {
-            $this->config['defaultHeaders'] = [];
-        }
+        $defaultHeaders = $configuration['defaultHeaders'] ?? [];
+        $this->config = ['defaultHeaders' => is_array($defaultHeaders) ? $defaultHeaders : []];
         $this->fetch = $fetch(...);
 
         $this->queue = new WorkerQueue($logger, 5);

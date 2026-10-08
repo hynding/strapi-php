@@ -90,7 +90,7 @@ final class Router
         return $path;
     }
 
-    private function compile(): void
+    private function compile(): Dispatcher
     {
         $collector = new RouteCollector(new RouteParser(), new DataGenerator());
         $this->regexRoutes = [];
@@ -121,20 +121,35 @@ final class Router
         }
 
         $this->dispatcher = new GroupDispatcher($collector->getData());
+
+        return $this->dispatcher;
     }
 
     /**
+     * The matched route, or the list of methods the path accepts (405 material), or null (404).
+     *
      * @return array{handler: callable, params: array<string, string>, route: array<string, mixed>}|list<string>|null
      */
     public function match(string $method, string $path): array|null
     {
-        if ($this->dispatcher === null) {
-            $this->compile();
-        }
+        ['found' => $found, 'allowed' => $allowed] = $this->resolve($method, $path);
+
+        return $found ?? ($allowed !== [] ? $allowed : null);
+    }
+
+    /**
+     * `match()` with the two outcomes kept apart: `found` is the matched route (null when none),
+     * `allowed` the methods the path accepts when it is known under other methods only.
+     *
+     * @return array{found: array{handler: callable, params: array<string, string>, route: array<string, mixed>}|null, allowed: list<string>}
+     */
+    public function resolve(string $method, string $path): array
+    {
+        $dispatcher = $this->dispatcher ?? $this->compile();
         $method = strtoupper($method);
         $lookup = $method === 'HEAD' ? 'GET' : $method;
 
-        $result = $this->dispatcher->dispatch($lookup, rawurldecode($path));
+        $result = $dispatcher->dispatch($lookup, rawurldecode($path));
 
         if ($result[0] === Dispatcher::FOUND) {
             $entry = $this->stack[$result[1]];
@@ -143,7 +158,7 @@ final class Router
                 $params[(string) $name] = (string) $value;
             }
 
-            return ['handler' => $entry['handler'], 'params' => $params, 'route' => $entry['route']];
+            return ['found' => ['handler' => $entry['handler'], 'params' => $params, 'route' => $entry['route']], 'allowed' => []];
         }
 
         // regex routes (koa-static catch-all etc.) are checked after the declarative ones
@@ -153,15 +168,11 @@ final class Router
                 continue;
             }
             if ($regexRoute['method'] === $lookup) {
-                return ['handler' => $regexRoute['handler'], 'params' => [], 'route' => $regexRoute['route']];
+                return ['found' => ['handler' => $regexRoute['handler'], 'params' => [], 'route' => $regexRoute['route']], 'allowed' => []];
             }
             $allowed[] = $regexRoute['method'];
         }
 
-        if ($allowed !== []) {
-            return array_values(array_unique($allowed));
-        }
-
-        return null;
+        return ['found' => null, 'allowed' => array_values(array_unique($allowed))];
     }
 }

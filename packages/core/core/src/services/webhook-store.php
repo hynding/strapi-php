@@ -51,7 +51,10 @@ final class WebhookStore
         ];
     }
 
-    /** @param Webhook $data @return array<string, mixed> */
+    /**
+     * @param Webhook $data
+     * @return array<string, mixed>
+     */
     private static function toDBObject(array $data): array
     {
         return [
@@ -63,7 +66,10 @@ final class WebhookStore
         ];
     }
 
-    /** @param array<string, mixed> $row @return Webhook */
+    /**
+     * @param array<string, mixed> $row
+     * @return Webhook
+     */
     private static function fromDBObject(array $row): array
     {
         return [
@@ -123,7 +129,10 @@ final class WebhookStore
         return $result !== null ? self::fromDBObject($result) : null;
     }
 
-    /** @param Webhook $data @return Webhook */
+    /**
+     * @param Webhook $data
+     * @return Webhook
+     */
     public function createWebhook(array $data): array
     {
         $this->webhookEventValidator($data['events'] ?? []);
@@ -131,7 +140,10 @@ final class WebhookStore
         return self::fromDBObject($this->db->query('strapi::webhook')->create(['data' => self::toDBObject([...$data, 'isEnabled' => true])]));
     }
 
-    /** @param Webhook $data @return Webhook|null */
+    /**
+     * @param Webhook $data
+     * @return Webhook|null
+     */
     public function updateWebhook(string $id, array $data): ?array
     {
         $this->webhookEventValidator($data['events'] ?? []);

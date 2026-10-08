@@ -37,9 +37,6 @@ class Yup
 
     protected bool $strict = false;
 
-    /** @var list<array{path: string, message: string, value: mixed}> */
-    private array $collected = [];
-
     // --- factories -----------------------------------------------------------------------------
 
     public static function mixed(): self
@@ -168,7 +165,7 @@ class Yup
         $clone = clone $this;
         $clone->tests[] = [
             'name' => 'oneOf',
-            'message' => self::interpolate($message, ['path' => '${path}', 'values' => implode(', ', array_map(static fn (mixed $v): string => is_null($v) ? 'null' : (is_scalar($v) ? (string) $v : json_encode($v)), $values))]),
+            'message' => self::interpolate($message, ['path' => '${path}', 'values' => implode(', ', array_map(static fn (mixed $v): string => is_null($v) ? 'null' : (is_scalar($v) ? (string) $v : (json_encode($v) ?: '')), $values))]),
             'test' => static function (mixed $v) use ($values): bool {
                 if ($v === null || $v instanceof Undefined) {
                     return true;
@@ -234,6 +231,10 @@ class Yup
         return $result;
     }
 
+    /**
+     * @param array{strict?: bool, abortEarly?: bool, path?: string} $options
+     * @throws YupValidationError
+     */
     public function validateSync(mixed $value, array $options = []): mixed
     {
         return $this->validate($value, $options);

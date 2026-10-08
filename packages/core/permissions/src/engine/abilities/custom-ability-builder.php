@@ -25,6 +25,7 @@ class CustomAbilityBuilder
         $action = $permission['action'];
         $subject = $permission['subject'] ?? null;
         $fields = $permission['properties']['fields'] ?? null;
+        $fields = is_array($fields) ? array_values(array_filter($fields, 'is_string')) : null;
         $condition = $permission['condition'] ?? null;
 
         $caslAction = is_string($action) ? $action : Ability::buildParametrizedAction($action);
