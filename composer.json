@@ -11,7 +11,8 @@
         "strapi/utils": "self.version",
         "strapi/types": "self.version",
         "strapi/permissions": "self.version",
-        "strapi/logger": "self.version"
+        "strapi/logger": "self.version",
+        "strapi/admin": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",
