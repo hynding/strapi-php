@@ -44,7 +44,11 @@ $isServerFile = static function (string $path): bool {
     if (!preg_match('/\.(ts|js|json)$/', $path)) {
         return false;
     }
-    if (preg_match('#/(admin|__tests__|dist|node_modules|__mocks__)/#', $path)) {
+    // An `admin/` UI folder sits right under a package root (packages/<group>/<name>/admin/...), and
+    // packages/core/admin keeps its UI in admin/ and its server in server/ and ee/server/. Match the
+    // folder after the package root only, so the admin package's server half is not dropped.
+    $rest = implode('/', array_slice(explode('/', $path), 3));
+    if (preg_match('#(^|/)(admin|ee/admin)/#', $rest) || preg_match('#/(__tests__|dist|node_modules|__mocks__)/#', $path)) {
         return false;
     }
     if (preg_match('/\.(test|spec)\.[tj]sx?$|\.d\.ts$|\.(config|setup)\.[mc]?js$|package\.json$|tsconfig.*\.json$|rollup\.config|lint-staged|jest\.config/', $path)) {
@@ -79,6 +83,11 @@ foreach ($lines as $line) {
         'php' => $php,
         'ported' => file_exists($root . '/' . $php),
     ];
+    // Enterprise Edition code (packages/*/*/ee/...) is under Strapi's EE licence, not MIT: tracked,
+    // but blocked until the licence is confirmed (see VERSIONING.md / the package READMEs).
+    if (preg_match('#^packages/[^/]+/[^/]+/(.*/)?ee/#', $path) === 1) {
+        $entries[$path]['ee'] = true;
+    }
 }
 ksort($entries);
 
@@ -101,10 +110,11 @@ if (isset($opts['diff']) && is_file((string) $opts['diff'])) {
 }
 
 $ported = count(array_filter($entries, static fn ($e) => $e['ported']));
+$ee = count(array_filter($entries, static fn ($e) => $e['ee'] ?? false));
 $result = [
     'upstreamTag' => $tag,
     'generatedAt' => gmdate('c'),
-    'totals' => ['files' => count($entries), 'ported' => $ported],
+    'totals' => ['files' => count($entries), 'ported' => $ported, 'ee' => $ee],
     'changed' => $changed,
     'files' => $entries,
 ];
@@ -117,7 +127,7 @@ foreach ($entries as $path => $e) {
     $byPackage[$pkg]['files'] = ($byPackage[$pkg]['files'] ?? 0) + 1;
     $byPackage[$pkg]['ported'] = ($byPackage[$pkg]['ported'] ?? 0) + ($e['ported'] ? 1 : 0);
 }
-printf("Upstream %s: %d server files, %d ported (%.1f%%). Written to %s\n", $tag, count($entries), $ported, $ported * 100 / max(1, count($entries)), $out);
+printf("Upstream %s: %d server files (%d EE, blocked), %d ported (%.1f%%). Written to %s\n", $tag, count($entries), $ee, $ported, $ported * 100 / max(1, count($entries)), $out);
 foreach ($byPackage as $pkg => $c) {
     printf("  %-48s %4d / %4d\n", $pkg, $c['ported'], $c['files']);
 }
