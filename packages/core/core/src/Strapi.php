@@ -130,6 +130,32 @@ final class Strapi extends Container implements StrapiContract
         return $this->get('reload');
     }
 
+    /**
+     * Upstream resolves a relative SQLite filename with `path.resolve()`, i.e. against the process
+     * working directory, which for Node Strapi is always the project root. Under PHP's web SAPIs
+     * (FPM, FrankenPHP, the built-in server) the working directory is `public/`, so the same
+     * relative path would put the database inside the web root, where it can be downloaded. Resolve
+     * it against the project root instead, which is what upstream gets.
+     *
+     * @param array<string, mixed> $databaseConfig
+     * @return array<string, mixed>
+     */
+    public static function resolveSqliteFilename(array $databaseConfig, string $root): array
+    {
+        $client = $databaseConfig['connection']['client'] ?? null;
+        $filename = $databaseConfig['connection']['connection']['filename'] ?? null;
+        if (!in_array($client, ['sqlite', 'sqlite3', 'better-sqlite3'], true) || !is_string($filename)) {
+            return $databaseConfig;
+        }
+        if ($filename === '' || $filename === ':memory:' || str_starts_with($filename, 'file:') || str_starts_with($filename, '/') || preg_match('#^[A-Za-z]:[\\\\/]#', $filename) === 1) {
+            return $databaseConfig;
+        }
+
+        $databaseConfig['connection']['connection']['filename'] = rtrim($root, '/') . '/' . $filename;
+
+        return $databaseConfig;
+    }
+
     public function db(): Database
     {
         return $this->get('db');
@@ -444,6 +470,7 @@ final class Strapi extends Container implements StrapiContract
             ->add('db', function () use ($logger): Database {
                 $databaseConfig = $this->config()->get('database');
                 $databaseConfig = is_array($databaseConfig) ? $databaseConfig : [];
+                $databaseConfig = self::resolveSqliteFilename($databaseConfig, $this->dirs()->root);
 
                 return new Database(\Strapi\Utils\Primitives\Objects::merge($databaseConfig, [
                     'logger' => $logger,
