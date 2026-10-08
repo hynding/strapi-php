@@ -565,6 +565,43 @@ final class Strapi extends Container implements StrapiContract
 
     public function bootstrap(): static
     {
+        // PHP port: upstream boots one process. FrankenPHP and FPM boot several at once on the same
+        // project, and bootstrap writes to the database (schema sync, migrations, the default
+        // roles and permissions plugins create), so concurrent first boots race. Serialize them.
+        $lock = $this->acquireBootstrapLock();
+
+        try {
+            return $this->doBootstrap();
+        } finally {
+            if ($lock !== null) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
+        }
+    }
+
+    /** @return resource|null */
+    private function acquireBootstrapLock()
+    {
+        $dir = $this->dirs()->root . '/.tmp';
+        if (!is_dir($dir) && !@mkdir($dir, 0o777, true) && !is_dir($dir)) {
+            return null;
+        }
+        $handle = @fopen($dir . '/bootstrap.lock', 'c');
+        if ($handle === false) {
+            return null;
+        }
+        if (!flock($handle, LOCK_EX)) {
+            fclose($handle);
+
+            return null;
+        }
+
+        return $handle;
+    }
+
+    private function doBootstrap(): static
+    {
         // content types + components (Schema objects) and the raw models (core store, webhooks)
         $models = [...array_values($this->contentTypes()), ...array_values($this->components()), ...$this->get('models')->get()];
         $db = $this->db();
