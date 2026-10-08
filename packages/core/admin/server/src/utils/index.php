@@ -16,7 +16,7 @@ use Strapi\Core\Strapi;
 final class Utils
 {
     /**
-     * @return ($name is 'user' ? Services\User : ($name is 'auth' ? Services\Auth : ($name is 'token' ? Services\Token : ($name is 'passport' ? Services\Passport : ($name is 'metrics' ? Services\Metrics : ($name is 'encryption' ? Services\Encryption : ($name is 'role' ? Services\Role : ($name is 'permission' ? Services\Permission : ($name is 'constants' ? Services\Constants : ($name is 'project-settings' ? Services\ProjectSettings : ($name is 'api-token'|'api-token-content-api'|'api-token-admin' ? Services\ApiToken : ($name is 'transfer' ? Services\Transfer\Transfer : object))))))))))))
+     * @return ($name is 'user' ? Services\User : ($name is 'auth' ? Services\Auth : ($name is 'token' ? Services\Token : ($name is 'passport' ? Services\Passport : ($name is 'metrics' ? Services\Metrics : ($name is 'encryption' ? Services\Encryption : ($name is 'role' ? Services\Role : ($name is 'permission' ? Services\Permission : ($name is 'constants' ? Services\Constants : ($name is 'project-settings' ? Services\ProjectSettings : ($name is 'api-token'|'api-token-content-api'|'api-token-admin' ? Services\ApiToken : ($name is 'transfer' ? Services\Transfer\Transfer : ($name is 'homepage' ? Services\Homepage : object)))))))))))))
      */
     public static function getService(Strapi $strapi, string $name): object
     {

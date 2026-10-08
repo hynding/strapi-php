@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Strapi\Admin\Controllers;
 
+use Strapi\Admin\Services\ProjectSettings as ProjectSettingsService;
 use Strapi\Admin\Utils\Utils;
+use Strapi\Admin\Validation\ProjectSettings as ProjectSettingsValidation;
 use Strapi\Core\Strapi;
 use Strapi\Types\Core\Context;
 use Strapi\Utils\Errors\NotImplementedError;
@@ -68,10 +70,27 @@ final class Admin
             'data' => [
                 'uuid' => $uuid,
                 'hasAdmin' => $hasAdmin,
-                'menuLogo' => is_array($menuLogo) && $menuLogo !== [] ? ($menuLogo['url'] ?? null) : null,
-                'authLogo' => is_array($authLogo) && $authLogo !== [] ? ($authLogo['url'] ?? null) : null,
+                ...self::logoUrl('menuLogo', $menuLogo),
+                ...self::logoUrl('authLogo', $authLogo),
             ],
         ];
+    }
+
+    /**
+     * `logo ? logo.url : null`; a logo without `url` (an empty object is truthy) leaves the key
+     * out, as JSON drops `undefined`.
+     *
+     * @return array<string, mixed>
+     */
+    private static function logoUrl(string $key, mixed $logo): array
+    {
+        if (is_object($logo)) {
+            $logo = get_object_vars($logo);
+        } elseif (!is_array($logo)) {
+            return [$key => null];
+        }
+
+        return array_key_exists('url', $logo) ? [$key => $logo['url']] : [];
     }
 
     public function getProjectSettings(): mixed
@@ -81,8 +100,21 @@ final class Admin
 
     public function updateProjectSettings(Context $ctx): mixed
     {
-        // validation/project-settings.ts and the upload-backed service are not ported yet
-        throw new NotImplementedError('Updating the project settings is not ported yet');
+        $body = $ctx->requestBody();
+        $files = array_map(ProjectSettingsService::toFormidableFile(...), $ctx->files());
+
+        $projectSettingsService = Utils::getService($this->strapi, 'project-settings');
+
+        ProjectSettingsValidation::validateUpdateProjectSettings(is_array($body) ? $body : []);
+        ProjectSettingsValidation::validateUpdateProjectSettingsFiles($files);
+
+        $formatedFiles = $projectSettingsService->parseFilesData($files);
+        ProjectSettingsValidation::validateUpdateProjectSettingsImagesDimensions($formatedFiles);
+
+        return $projectSettingsService->updateProjectSettings([
+            ...(is_array($body) ? $body : []),
+            ...$formatedFiles,
+        ]);
     }
 
     /** `@strapi/typescript-utils` isUsingTypeScript(dir): a `tsconfig.json` in `dir`. */

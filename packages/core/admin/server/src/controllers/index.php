@@ -17,7 +17,7 @@ return [
     'authentication' => static fn (Strapi $strapi): object => new Controllers\Authentication($strapi),
     'permission' => static fn (Strapi $strapi): object => new Controllers\Permission($strapi),
     'role' => static fn (Strapi $strapi): object => new Controllers\Role($strapi),
-    'transfer' => static fn (Strapi $strapi): object => new Controllers\Transfer\Transfer($strapi),
+    'transfer' => static fn (Strapi $strapi): object => Controllers\Transfer\Transfer::create($strapi),
     'user' => static fn (Strapi $strapi): object => new Controllers\User($strapi),
     'webhooks' => static fn (Strapi $strapi): object => new Controllers\Webhooks($strapi),
     'content-api' => static fn (Strapi $strapi): object => new Controllers\ContentApi($strapi),

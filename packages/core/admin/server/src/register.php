@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Strapi\Admin;
 
+use Strapi\Admin\Ai\Services\Ai as AiAdminService;
 use Strapi\Admin\Migrations\Database\MigratePreferedLanguageDkToDa;
 use Strapi\Admin\Routes\ServeAdminPanel;
 use Strapi\Admin\Strategies\Admin as AdminAuthStrategy;
+use Strapi\Admin\Strategies\AdminToken as AdminTokenAuthStrategy;
+use Strapi\Admin\Strategies\ContentApiToken as ContentApiTokenAuthStrategy;
 use Strapi\Admin\Utils\Utils;
 use Strapi\Core\Strapi;
 
-/**
- * Port of server/src/register.ts.
- *
- * Not ported yet (later work): the `admin-token` (admin) and `content-api-token` (content-api)
- * auth strategies and the `ai.admin` service. Until the content-api-token strategy is
- * registered, core's PHP-port fallback keeps the content API public (see core's Auth service).
- */
+/** Port of server/src/register.ts. */
 final class Register
 {
     public function __invoke(Strapi $strapi): void
@@ -27,10 +24,10 @@ final class Register
 
         $strapi->server()->api('admin')->use($passportMiddleware);
         $strapi->get('auth')->register('admin', AdminAuthStrategy::strategy($strapi));
-        // PLACEHOLDER: strategies/admin-token.ts (admin) and strategies/content-api-token.ts
-        // (content-api) are not ported yet.
+        $strapi->get('auth')->register('admin', AdminTokenAuthStrategy::strategy($strapi));
+        $strapi->get('auth')->register('content-api', ContentApiTokenAuthStrategy::strategy($strapi));
 
-        // PLACEHOLDER: `strapi.add('ai.admin', () => createAiAdminService({ strapi }))` (ai/services/ai.ts) is not ported yet.
+        $strapi->add('ai.admin', static fn (): AiAdminService => AiAdminService::createAiAdminService($strapi));
 
         $shouldServeAdminPanel = $strapi->config()->get('admin.serveAdminPanel');
 

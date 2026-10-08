@@ -179,6 +179,8 @@ final class RoleTest extends BootedAppTestCase
         $superAdmin = self::role()->getSuperAdmin();
         $actions = array_column(self::permission()->findMany(['where' => ['role' => ['id' => $superAdmin['id'] ?? 0]]]), 'action');
         $expected = array_column(array_filter(self::permission()->actionProvider->values(), static fn (array $a): bool => $a['section'] !== 'internal'), 'actionId');
+        // an action with subjects (content-manager's) gives one permission per subject
+        $actions = array_values(array_unique($actions));
         sort($actions);
         sort($expected);
 
