@@ -42,7 +42,7 @@ final class EnsureAdminDependencies
         $missing = [];
         foreach (self::ADMIN_PEER_DEPS as $name) {
             if (!isset($deps[$name])) {
-                $missing[] = ['name' => $name, 'wantedVersion' => str_starts_with($name, '@strapi/') ? CliStrapi::version() : 'latest'];
+                $missing[] = ['name' => $name, 'wantedVersion' => str_starts_with($name, '@strapi/') ? CliStrapi::upstreamVersion() : 'latest'];
             } elseif (Plugins::getModule($name, $cwd) === null) {
                 $missing[] = ['name' => $name, 'wantedVersion' => (string) $deps[$name]];
             }
@@ -64,8 +64,8 @@ final class EnsureAdminDependencies
 
         $installed = Plugins::getModule('@strapi/admin', $cwd);
         $installedVersion = is_string($installed['version'] ?? null) ? $installed['version'] : null;
-        if ($installedVersion !== null && $installedVersion !== CliStrapi::version()) {
-            throw new \RuntimeException("Installed @strapi/admin is {$installedVersion} but strapi/strapi is " . CliStrapi::version() . '. Run `npm install` to install the pinned version.');
+        if ($installedVersion !== null && $installedVersion !== CliStrapi::upstreamVersion()) {
+            throw new \RuntimeException("Installed @strapi/admin is {$installedVersion} but strapi/strapi " . CliStrapi::version() . ' serves ' . CliStrapi::upstreamVersion() . '. Run `npm install` to install the pinned version.');
         }
 
         return true;
@@ -78,14 +78,15 @@ final class EnsureAdminDependencies
      */
     public static function assertVersionsMatch(array $deps): void
     {
-        $version = CliStrapi::version();
+        // the npm side is the upstream release: 5.56.0.1 and 5.56.0-beta.1 both serve 5.56.0
+        $version = CliStrapi::upstreamVersion();
         foreach (['@strapi/admin', '@strapi/strapi'] as $name) {
             $declared = $deps[$name] ?? null;
             if (!is_string($declared)) {
                 continue;
             }
             if (ltrim($declared, '=v') !== $version) {
-                throw new \RuntimeException("package.json pins {$name} to \"{$declared}\" but the strapi/strapi Composer package is {$version}: the admin bundle must match the backend exactly (see VERSIONING.md).");
+                throw new \RuntimeException("package.json pins {$name} to \"{$declared}\" but the strapi/strapi Composer package mirrors Strapi {$version}: the admin bundle must match the backend exactly (see VERSIONING.md).");
             }
         }
     }
