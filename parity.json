@@ -1,10 +1,10 @@
 {
     "upstreamTag": "v5.56.0",
-    "generatedAt": "2026-10-08T08:24:00+00:00",
+    "generatedAt": "2026-10-08T08:53:16+00:00",
     "totals": {
         "files": 1921,
         "ported": 794,
-        "ee": 69
+        "ee": 157
     },
     "changed": [],
     "files": {
@@ -2203,202 +2203,242 @@
         "packages/core/content-releases/server/src/audit-logs.ts": {
             "upstream": "5c41ec7dfb1e3708435106d5174600061210ccc9",
             "php": "packages/core/content-releases/server/src/audit-logs.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/bootstrap.ts": {
             "upstream": "7e2340eb118605da0ec377009794007d8caf6f56",
             "php": "packages/core/content-releases/server/src/bootstrap.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/constants.ts": {
             "upstream": "d5e95c4ea93bbab7219d719f4b2847d568b17e32",
             "php": "packages/core/content-releases/server/src/constants.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/content-types/index.ts": {
             "upstream": "5a4328817c4fa734616ff4817983285d1db1dce3",
             "php": "packages/core/content-releases/server/src/content-types/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/content-types/release-action/index.ts": {
             "upstream": "ccba625b050e362f8d764aac388f9417442e4ab0",
             "php": "packages/core/content-releases/server/src/content-types/release-action/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/content-types/release-action/schema.ts": {
             "upstream": "50a21a683e1376dacb54bfac5becf1b977b96b8a",
             "php": "packages/core/content-releases/server/src/content-types/release-action/schema.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/content-types/release/index.ts": {
             "upstream": "a6fddbad083080599b5d9606b0d4ab954435dcbb",
             "php": "packages/core/content-releases/server/src/content-types/release/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/content-types/release/schema.ts": {
             "upstream": "9a958a7f96945a8484efdd8606b2381af55fa731",
             "php": "packages/core/content-releases/server/src/content-types/release/schema.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/homepage.ts": {
             "upstream": "f2a3b11e4f9050e95e63dfcc76d864c449af6a15",
             "php": "packages/core/content-releases/server/src/controllers/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/index.ts": {
             "upstream": "48f7e8f2a4bc3581049d4ffd6c20581a1f0b2ced",
             "php": "packages/core/content-releases/server/src/controllers/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/release-action.ts": {
             "upstream": "a4ce05bb083625260b136dd510b4b05225d765c6",
             "php": "packages/core/content-releases/server/src/controllers/release-action.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/release.ts": {
             "upstream": "dce5b3e2b33b77e246ae4266bf830de6c24505ca",
             "php": "packages/core/content-releases/server/src/controllers/release.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/settings.ts": {
             "upstream": "4390cc0f69364283c2537eb1c769191d3fb0e031",
             "php": "packages/core/content-releases/server/src/controllers/settings.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/validation/release-action.ts": {
             "upstream": "dfff28b11f4d9488587bf07258791e202a97ab7c",
             "php": "packages/core/content-releases/server/src/controllers/validation/release-action.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/validation/release.ts": {
             "upstream": "a71af219713e665e121e11a07db4217208ca8f41",
             "php": "packages/core/content-releases/server/src/controllers/validation/release.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/controllers/validation/settings.ts": {
             "upstream": "40d01f4c726925ed7574f7ad22820f41037e0fc1",
             "php": "packages/core/content-releases/server/src/controllers/validation/settings.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/destroy.ts": {
             "upstream": "745bfb979d1a3ab26883bd8a61d55656917cca4a",
             "php": "packages/core/content-releases/server/src/destroy.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/index.ts": {
             "upstream": "b8b9200824013e4c0aeb9ab4c422af782b47e345",
             "php": "packages/core/content-releases/server/src/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/middlewares/documents.ts": {
             "upstream": "f7a2bc22feb5a8728c94fa5201114e598c423166",
             "php": "packages/core/content-releases/server/src/middlewares/documents.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/migrations/database/5.0.0-document-id-in-actions.ts": {
             "upstream": "6a6abf557f17338fa5c8743e1314557400b85ef0",
             "php": "packages/core/content-releases/server/src/migrations/database/5.0.0-document-id-in-actions.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/migrations/index.ts": {
             "upstream": "186e8e2fd5d56e5759b35e66ad2d0617e3351ac8",
             "php": "packages/core/content-releases/server/src/migrations/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/register.ts": {
             "upstream": "518aa00757a22b62ec75cb33dff7b5813e855438",
             "php": "packages/core/content-releases/server/src/register.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/routes/homepage.ts": {
             "upstream": "22a30813b53adb9ceb1225fbb05606051f410ee2",
             "php": "packages/core/content-releases/server/src/routes/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/routes/index.ts": {
             "upstream": "a7c25563b7a8849094eb13a60ffe0c8995577f54",
             "php": "packages/core/content-releases/server/src/routes/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/routes/release-action.ts": {
             "upstream": "cf1b5525762f90dd0b7298a0058b86ccf9424ed1",
             "php": "packages/core/content-releases/server/src/routes/release-action.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/routes/release.ts": {
             "upstream": "b2de399b432dd4c75fa3dd44888ca7a0a46d0a8e",
             "php": "packages/core/content-releases/server/src/routes/release.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/routes/settings.ts": {
             "upstream": "c9d9fd08085c04eb98efd682e679f80b55d6821c",
             "php": "packages/core/content-releases/server/src/routes/settings.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/homepage.ts": {
             "upstream": "ae0070527c3e5a48d2c437b931dfb6b698c99417",
             "php": "packages/core/content-releases/server/src/services/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/index.ts": {
             "upstream": "251ae05163b4d3705340a6441b8a95c3c01e2c82",
             "php": "packages/core/content-releases/server/src/services/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/release-action.ts": {
             "upstream": "f12c043e2af6359a9b1169fea7278051b8a2493a",
             "php": "packages/core/content-releases/server/src/services/release-action.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/release.ts": {
             "upstream": "a7b918d70a9a576fdec8a0833796df4f560e3491",
             "php": "packages/core/content-releases/server/src/services/release.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/scheduling.ts": {
             "upstream": "51e57a42bf2995b2f499f2bfc26b9f1758087c56",
             "php": "packages/core/content-releases/server/src/services/scheduling.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/settings.ts": {
             "upstream": "c92511696a1e0f25f0aa61438853b49a4690c304",
             "php": "packages/core/content-releases/server/src/services/settings.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/services/validation.ts": {
             "upstream": "edb80365a5b17c8fd3d0393fc3eefd8459b52aa3",
             "php": "packages/core/content-releases/server/src/services/validation.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/server/src/utils/index.ts": {
             "upstream": "98dfc5565c6a69f49cd64ab47db50018b2d2c9dd",
             "php": "packages/core/content-releases/server/src/utils/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/shared/contracts/homepage.ts": {
             "upstream": "ba7346e0771b0982c12dedbe7c05975cf99052b2",
             "php": "packages/core/content-releases/shared/contracts/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/shared/contracts/release-actions.ts": {
             "upstream": "0bbd454e40dfc186baa152411ec5a99129be767a",
             "php": "packages/core/content-releases/shared/contracts/release-actions.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/shared/contracts/releases.ts": {
             "upstream": "ccf39beb848ae6d4265cb0210c0d41ab52c101b0",
             "php": "packages/core/content-releases/shared/contracts/releases.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/shared/contracts/settings.ts": {
             "upstream": "d70f6c379e1c85d742daf9651b6bee72775104df",
             "php": "packages/core/content-releases/shared/contracts/settings.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-releases/shared/types.ts": {
             "upstream": "aac79458718a78e3dd2072277fb346112170f442",
             "php": "packages/core/content-releases/shared/types.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/content-type-builder/server/src/bootstrap.ts": {
             "upstream": "ea967bc17a77c15a2492db276194985350a91896",
@@ -5205,242 +5245,290 @@
         "packages/core/review-workflows/server/src/bootstrap.ts": {
             "upstream": "fab36b8b45601a34cb1e422c7b3225e468421562",
             "php": "packages/core/review-workflows/server/src/bootstrap.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/config/actions.ts": {
             "upstream": "2042cd60f23bdd26f3fa78da6841032598f45495",
             "php": "packages/core/review-workflows/server/src/config/actions.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/constants/default-stages.json": {
             "upstream": "57aec704ebabc7c360ad10cef74132f5fb3519be",
             "php": "packages/core/review-workflows/server/src/constants/default-stages.json",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/constants/default-workflow.json": {
             "upstream": "61d107d38aed03ec44e7772b1f17d3ed05378a29",
             "php": "packages/core/review-workflows/server/src/constants/default-workflow.json",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/constants/webhook-events.ts": {
             "upstream": "7e2f941d918c826e9fdbe40a61028cc74f0acf27",
             "php": "packages/core/review-workflows/server/src/constants/webhook-events.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/constants/workflows.ts": {
             "upstream": "7509ca3ed8db7569c75c759ec75919ca08c5ec39",
             "php": "packages/core/review-workflows/server/src/constants/workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/content-types/index.ts": {
             "upstream": "3a05a4b606ce6e123fd059df9d0503a62012e3db",
             "php": "packages/core/review-workflows/server/src/content-types/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/content-types/workflow-stage/index.ts": {
             "upstream": "14468c6503fb379776e5c87edcb0c8d7f2334749",
             "php": "packages/core/review-workflows/server/src/content-types/workflow-stage/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/content-types/workflow/index.ts": {
             "upstream": "c6797ba224e86f8049f676872fa453e2f2b01def",
             "php": "packages/core/review-workflows/server/src/content-types/workflow/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/controllers/assignees.ts": {
             "upstream": "660d5b2b0839d7161fbc6c7bf5a12f39a7078e2c",
             "php": "packages/core/review-workflows/server/src/controllers/assignees.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/controllers/index.ts": {
             "upstream": "cd05aa6ad90c6a96f5bc89bbaededac15918e0d3",
             "php": "packages/core/review-workflows/server/src/controllers/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/controllers/stages.ts": {
             "upstream": "972380c76ba21b0d219cfd6ce07688727c38e108",
             "php": "packages/core/review-workflows/server/src/controllers/stages.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/controllers/workflows.ts": {
             "upstream": "b1a5bbdde7f19c32893f192a9928264529d32a25",
             "php": "packages/core/review-workflows/server/src/controllers/workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/destroy.ts": {
             "upstream": "18554e89e92526fde805133f9e06ad0f173af426",
             "php": "packages/core/review-workflows/server/src/destroy.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/controllers/homepage.ts": {
             "upstream": "085567ff43a966654ce94c0a1a88ad819f7eba63",
             "php": "packages/core/review-workflows/server/src/homepage/controllers/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/controllers/index.ts": {
             "upstream": "c65d8499781cc1f0c9957e512e977aa2c278f439",
             "php": "packages/core/review-workflows/server/src/homepage/controllers/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/index.ts": {
             "upstream": "f3c8c10a39ca7234307a50c9205f5073785e45cf",
             "php": "packages/core/review-workflows/server/src/homepage/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/routes/homepage.ts": {
             "upstream": "a016c1d3678d6bb3e471616c24653ff5c33d80e4",
             "php": "packages/core/review-workflows/server/src/homepage/routes/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/routes/index.ts": {
             "upstream": "520f7fa766acfee4ecc77ad5aec7b1d2556ce2b8",
             "php": "packages/core/review-workflows/server/src/homepage/routes/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/services/homepage.ts": {
             "upstream": "f48769d8e902321c583ffaf5e0f71f648cc1e651",
             "php": "packages/core/review-workflows/server/src/homepage/services/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/homepage/services/index.ts": {
             "upstream": "4901193b60f251ceef1206ed20d0ba3c47fd08e8",
             "php": "packages/core/review-workflows/server/src/homepage/services/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/index.ts": {
             "upstream": "303cad03ff9ec3babffbbfde2400f2295a563a02",
             "php": "packages/core/review-workflows/server/src/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/middlewares/review-workflows.ts": {
             "upstream": "c5e4fcf611e13a485ce2fd1e733b01e237897b6e",
             "php": "packages/core/review-workflows/server/src/middlewares/review-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/handle-deleted-ct-in-workflows.ts": {
             "upstream": "6e2cc8845ebe8cff124d8f7c5bc3333fcf686d84",
             "php": "packages/core/review-workflows/server/src/migrations/handle-deleted-ct-in-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/multiple-workflows.ts": {
             "upstream": "5e4e2516d49540c636e2a3829441c6e2ef6c89c6",
             "php": "packages/core/review-workflows/server/src/migrations/multiple-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/set-stages-default-color.ts": {
             "upstream": "426036c27a6fc2db3d88bbafa58dc27207803a6c",
             "php": "packages/core/review-workflows/server/src/migrations/set-stages-default-color.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/set-stages-roles.ts": {
             "upstream": "ee91a2c37c2eedde4a10e7625d11f65fe9254515",
             "php": "packages/core/review-workflows/server/src/migrations/set-stages-roles.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/set-workflow-default-name.ts": {
             "upstream": "568e1ba60af3e03686bb18c5e03f09df18c36e22",
             "php": "packages/core/review-workflows/server/src/migrations/set-workflow-default-name.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/migrations/setup-stage-transfer-to-roles.ts": {
             "upstream": "130c6ea8a3a09a9c94f77b2e27dda004fc32b06a",
             "php": "packages/core/review-workflows/server/src/migrations/setup-stage-transfer-to-roles.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/register.ts": {
             "upstream": "648946a2b8f394d0965f1a6c884ab552ae4bb383",
             "php": "packages/core/review-workflows/server/src/register.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/routes/index.ts": {
             "upstream": "f8d63415e057f371b8b2f083690853bb01c64812",
             "php": "packages/core/review-workflows/server/src/routes/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/routes/review-workflows.ts": {
             "upstream": "ea511a42822eeed0650d848fa06a1c379725293e",
             "php": "packages/core/review-workflows/server/src/routes/review-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/routes/utils.ts": {
             "upstream": "80e0a9ad855b63b4f478e1320eee9f07548d5729",
             "php": "packages/core/review-workflows/server/src/routes/utils.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/assignees.ts": {
             "upstream": "b33b07d51410e2bbb10076927494253f9c6adfc6",
             "php": "packages/core/review-workflows/server/src/services/assignees.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/document-service-middleware.ts": {
             "upstream": "346b1ac5418bae5c49ac79772191c0f32434da49",
             "php": "packages/core/review-workflows/server/src/services/document-service-middleware.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/index.ts": {
             "upstream": "946ed391ac38a4111a21ef8f806043cdb0611689",
             "php": "packages/core/review-workflows/server/src/services/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/metrics/index.ts": {
             "upstream": "2e44a3d3454ab64cfaeec2f9f8c6b7705b711051",
             "php": "packages/core/review-workflows/server/src/services/metrics/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/metrics/weekly-metrics.ts": {
             "upstream": "05fc94d2fa86a5546a58bbabe921f8dc196ff3ea",
             "php": "packages/core/review-workflows/server/src/services/metrics/weekly-metrics.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/stage-permissions.ts": {
             "upstream": "7db28998335583abd505ca40f1966a480601d01a",
             "php": "packages/core/review-workflows/server/src/services/stage-permissions.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/stages.ts": {
             "upstream": "fbbb26b66789dce3c99788c18249f4972a7273d4",
             "php": "packages/core/review-workflows/server/src/services/stages.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/validation.ts": {
             "upstream": "462146291acc08a66fab046386ae6b2ba50fd36c",
             "php": "packages/core/review-workflows/server/src/services/validation.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/workflow-content-types.ts": {
             "upstream": "f56511679797b0fa3176d1c91a05d5427556226a",
             "php": "packages/core/review-workflows/server/src/services/workflow-content-types.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/services/workflows.ts": {
             "upstream": "54be7408831e6d783dcf199e42ad5a925a9f4d6d",
             "php": "packages/core/review-workflows/server/src/services/workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/utils/index.ts": {
             "upstream": "6910e93cf5fb0b8b20f3145fb135b326551f0268",
             "php": "packages/core/review-workflows/server/src/utils/index.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/utils/review-workflows.ts": {
             "upstream": "0bddaff563ae2b726af847ef70e401f3a4580d39",
             "php": "packages/core/review-workflows/server/src/utils/review-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/server/src/validation/review-workflows.ts": {
             "upstream": "12af6de02c833c24f45ae9ec41f593bc3133679a",
             "php": "packages/core/review-workflows/server/src/validation/review-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/shared/contracts/homepage.ts": {
             "upstream": "9b3713c7214e0c8fa5e8c680fca75fe9224f112d",
             "php": "packages/core/review-workflows/shared/contracts/homepage.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/review-workflows/shared/contracts/review-workflows.ts": {
             "upstream": "6e2b1b42314a323f819bf260182e8188206014d0",
             "php": "packages/core/review-workflows/shared/contracts/review-workflows.php",
-            "ported": false
+            "ported": false,
+            "ee": true
         },
         "packages/core/strapi/bin/strapi.js": {
             "upstream": "b0b100fc3c846e1719a514bc33a43fe160327ccb",
