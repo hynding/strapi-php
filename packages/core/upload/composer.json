@@ -10,12 +10,13 @@
         "strapi/core": "self.version",
         "strapi/utils": "self.version",
         "strapi/types": "self.version",
-        "strapi/admin": "self.version"
+        "strapi/admin": "self.version",
+        "strapi/provider-upload-local": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/upload",
-            "status": "in-progress",
+            "status": "ported",
             "compatibleWith": "5.x",
             "kind": "plugin",
             "name": "upload",
@@ -27,7 +28,8 @@
     "prefer-stable": true,
     "autoload": {
         "classmap": [
-            "server/src/"
+            "server/src/",
+            "shared/"
         ]
     },
     "autoload-dev": {

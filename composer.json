@@ -15,7 +15,8 @@
         "strapi/admin": "self.version",
         "strapi/content-manager": "self.version",
         "strapi/content-type-builder": "self.version",
-        "strapi/upload": "self.version"
+        "strapi/upload": "self.version",
+        "strapi/provider-upload-local": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",
