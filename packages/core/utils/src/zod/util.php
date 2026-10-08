@@ -162,7 +162,7 @@ final class Util
             is_string($data) => 'string',
             is_array($data) => array_is_list($data) ? 'array' : 'object',
             $data instanceof \Closure => 'function',
-            $data instanceof \stdClass => 'object',
+            $data instanceof \stdClass, $data instanceof \Strapi\Utils\EmptyObject => 'object',
             $data instanceof \DateTimeInterface => 'Date',
             is_object($data) => (new \ReflectionClass($data))->getShortName(),
             default => 'unknown',

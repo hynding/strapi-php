@@ -35,7 +35,9 @@ final class Transform
 
         $data = $useJsonAPIFormat ? self::transformEntry($strapi, $resource, $contentType) : $resource;
 
-        // encodeSourceMaps (content-source-maps service) is not ported: no-op
+        if (($opts['encodeSourceMaps'] ?? false) === true && $contentType !== null) {
+            $data = $strapi->get('content-source-maps')->encodeSourceMaps($data, $contentType);
+        }
 
         // an empty meta must serialize as `{}` like upstream, not `[]`
         return ['data' => $data, 'meta' => $meta === [] ? new \stdClass() : $meta];

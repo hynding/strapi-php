@@ -51,11 +51,6 @@ final class MiscTest extends TestCase
     {
         self::assertNull(PublicationFilter::parsePublicationFilter(null));
         self::assertSame('modified', PublicationFilter::parsePublicationFilter('modified'));
-        self::assertTrue(PublicationFilter::parseHasPublishedVersionQueryParam('true'));
-        self::assertFalse(PublicationFilter::parseHasPublishedVersionQueryParam(false));
-        self::assertNull(PublicationFilter::parseHasPublishedVersionQueryParam(null));
-        self::assertSame('has-published-version-document', PublicationFilter::hasPublishedVersionBooleanToPublicationFilterMode(true));
-        self::assertSame('never-published-document', PublicationFilter::hasPublishedVersionBooleanToPublicationFilterMode(false));
 
         try {
             PublicationFilter::validatePublicationFilterQueryParam('nope');
@@ -64,9 +59,6 @@ final class MiscTest extends TestCase
             self::assertStringStartsWith("Invalid value for 'publicationFilter'. Expected one of: never-published", $e->getMessage());
             self::assertSame(['source' => 'query', 'param' => 'publicationFilter'], $e->details);
         }
-
-        $this->expectException(ValidationError::class);
-        PublicationFilter::parseHasPublishedVersionQueryParam('yes');
     }
 
     public function testContentApiConstants(): void

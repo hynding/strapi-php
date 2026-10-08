@@ -7,6 +7,7 @@ namespace Strapi\Core\Services\DocumentService\Transform;
 use Strapi\Core\Services\DocumentService\Params;
 use Strapi\Core\Services\DocumentService\PublicationFilter as DocPublicationFilter;
 use Strapi\Core\Strapi;
+use Strapi\Utils\HasPublishedVersionParam;
 use Strapi\Utils\PublicationFilter;
 
 /**
@@ -26,11 +27,11 @@ final class Query
         $query = $strapi->get('query-params')->transform($uid, $allowlisted);
 
         $explicitPublicationFilter = PublicationFilter::parsePublicationFilter($allowlisted['publicationFilter'] ?? null);
-        $legacyHasPublishedVersion = PublicationFilter::parseHasPublishedVersionQueryParam($rawParams['hasPublishedVersion'] ?? null);
+        $legacyHasPublishedVersion = HasPublishedVersionParam::parseHasPublishedVersionQueryParam($rawParams['hasPublishedVersion'] ?? null);
 
         $effectivePublicationFilter = $explicitPublicationFilter;
         if ($effectivePublicationFilter === null && $legacyHasPublishedVersion !== null) {
-            $effectivePublicationFilter = PublicationFilter::hasPublishedVersionBooleanToPublicationFilterMode($legacyHasPublishedVersion);
+            $effectivePublicationFilter = HasPublishedVersionParam::hasPublishedVersionBooleanToPublicationFilterMode($legacyHasPublishedVersion);
         }
 
         $status = ($allowlisted['status'] ?? null) === 'published' ? 'published' : 'draft';

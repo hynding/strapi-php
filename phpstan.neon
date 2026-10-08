@@ -34,6 +34,11 @@ parameters:
         - packages/providers/email-mailgun/src
         - packages/providers/email-sendgrid/src
         - packages/utils/api-tests/src
+        - packages/utils/upgrade/src
+        - packages/utils/upgrade/resources
+        - packages/cli/create-strapi-app/src
+        - packages/cli/create-strapi-app/bin/create-strapi-app
+        - packages/cli/create-strapi-app/templates
         - scripts
         - examples/plugins/announcements/server/src
         - examples/plugins/announcements/tests/php

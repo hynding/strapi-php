@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Core\Tests\EntityValidator;
 
 use Strapi\Core\Tests\BootedAppTestCase;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\YupValidationError;
 
 /** Port of packages/core/core/src/services/entity-validator/__tests__/index.test.ts. */
@@ -228,5 +229,44 @@ final class EntityValidatorTest extends BootedAppTestCase
 
         $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['count' => 9]));
         self::assertSame('count must be less than or equal to 5', $error['message']);
+    }
+
+    /**
+     * PHP port: request bodies keep a JSON `{}` apart from `[]` (Strapi\Utils\EmptyObject), so the
+     * component checks of upstream's yup schemas apply: a single component sent as `[]`, or a
+     * repeatable component / dynamic zone sent as `{}`, is a type error.
+     */
+    public function testComponentsTellAnEmptyObjectFromAnEmptyArray(): void
+    {
+        $model = self::model([
+            'single' => ['type' => 'component', 'component' => 'default.dish', 'repeatable' => false],
+            'many' => ['type' => 'component', 'component' => 'default.dish', 'repeatable' => true],
+            'dz' => ['type' => 'dynamiczone', 'components' => ['default.dish']],
+            'json' => ['type' => 'json'],
+        ]);
+        $validator = self::strapi()->entityValidator();
+
+        // `{}` is a single component (cast with its defaults); `[]` a repeatable one or a dynamic zone
+        $valid = $validator->validateEntityCreation($model, ['single' => new EmptyObject(), 'many' => [], 'dz' => [], 'json' => new EmptyObject()]);
+        self::assertSame(['name' => 'My super dish'], $valid['single']);
+        self::assertSame([], $valid['many']);
+        self::assertSame([], $valid['dz']);
+        self::assertInstanceOf(EmptyObject::class, $valid['json'], 'a json `{}` is stored (and answered) as `{}`');
+
+        $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['single' => []]));
+        self::assertSame('single must be a `object` type, but the final value was: `[]`.', $error['message']);
+
+        $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['many' => new EmptyObject()]));
+        self::assertSame('many must be a `array` type, but the final value was: `{}`.', $error['message']);
+
+        $error = self::catchValidation(fn () => $validator->validateEntityUpdate($model, ['dz' => new EmptyObject()], null, ['id' => 1]));
+        self::assertSame('dz must be a `array` type, but the final value was: `{}`.', $error['message']);
+
+        $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['many' => [[]]]));
+        // array items are cast (no preventCast): yup's object transform turns `[]` into null
+        self::assertSame('many[0] must be a `object` type, but the final value was: `null` (cast from the value `[]`).', $error['message']);
+
+        // a component item sent as `{}` is an object (with its defaults)
+        self::assertSame([['name' => 'My super dish']], $validator->validateEntityCreation($model, ['many' => [new EmptyObject()]])['many']);
     }
 }

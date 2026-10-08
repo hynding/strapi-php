@@ -28,7 +28,7 @@ Files mirror upstream one for one (`server/src/<same path>.php`, `shared/<same p
 | Middleware | `middlewares/upload` (`GET /uploads/(.*)` static serving with byte ranges) |
 | Migrations | `migrations/unsign-richtext-and-blocks-urls` |
 | Utils | `utils/{index,cron,images,mime-validation}` |
-| MCP | `mcp/register-upload-mcp-tools` (10 tool definitions), `handlers/{read,write,folder}-handlers`, `handlers/constants`, `schemas/{input,output}-schemas`, `sanitizers/sanitize-media`, `permissions`, `ambient-instance`, `utils`, `types` |
+| MCP | `mcp/register-upload-mcp-tools` (10 tool definitions), `handlers/{read,write,folder}-handlers`, `handlers/constants`, `schemas/{input,output}-schemas`, `sanitizers/sanitize-media`, `permissions`, `ambient-instance`, `utils`, `types` — registered on core's `strapi.ai.mcp` (exposed on `POST /mcp` when `server.mcp.enabled`); `tests/api/core/mcp/mcp-upload-rbac` passes 123/123 |
 | Shared | `shared/constants` (`shared/contracts/*` are TypeScript types only) |
 
 Barrel files (`controllers/index`, `services/index`, `routes/index`, `content-types/index` are
@@ -71,7 +71,6 @@ objects. What is persisted is the JSON-serializable part (`Utils::toPlain()`).
 | `uploadFromUrls` streams Server-Sent Events | the same events, sent as one `text/event-stream` body when the last URL is done |
 | `createAIMetadataJob` runs the job detached | it runs after the response (`register_shutdown_function`) |
 | `strapi.ai.admin` | read from the `ai.admin` container entry (registered by the admin package); AI metadata is unavailable without it |
-| `strapi.ai.mcp.registerTool()` | core's MCP service is a stub: registration is skipped while it has no `registerTool()` |
 | sharp `cache` / `concurrency` options | ignored (no GD counterpart) |
 | koa's EPIPE error filter (`middlewares/upload`) | no counterpart |
 

@@ -711,6 +711,20 @@ class QueryBuilder
     }
 
     /**
+     * `qb.stream({ mapResults })`: the select query read in batches (helpers/streams/readable.php).
+     *
+     * @param array{mapResults?: bool} $options
+     */
+    public function stream(array $options = []): Helpers\Streams\Readable
+    {
+        if ($this->state['type'] === 'select') {
+            return new Helpers\Streams\Readable($this, $this->db, $this->uid, $options['mapResults'] ?? true);
+        }
+
+        throw new DatabaseError("query-builder.stream() has been called with an unsupported query type: \"{$this->state['type']}\"");
+    }
+
+    /**
      * @param list<string|Raw> $items
      *
      * @return list<string|Raw>

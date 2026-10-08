@@ -261,14 +261,42 @@ final class Upload
     }
 
     /**
-     * @param array{data: array<string, mixed>, files: \ArrayObject<string, mixed>|list<\ArrayObject<string, mixed>>} $params
-     * @param CommonOptions $opts
+     * @param \ArrayObject<string, mixed>|array<string, mixed>|list<\ArrayObject<string, mixed>|array<string, mixed>> $files
+     * @return \ArrayObject<string, mixed>|list<\ArrayObject<string, mixed>>
+     */
+    private static function toFileObjects(\ArrayObject|array $files): \ArrayObject|array
+    {
+        if ($files instanceof \ArrayObject) {
+            return $files;
+        }
+        if (!array_is_list($files)) {
+            /** @var array<string, mixed> $files */
+            return new \ArrayObject($files);
+        }
+
+        $objects = [];
+        foreach ($files as $file) {
+            /** @var array<string, mixed> $file */
+            $objects[] = $file instanceof \ArrayObject ? $file : new \ArrayObject($file);
+        }
+
+        return $objects;
+    }
+
+    /**
+     * Files are the body middleware's `\ArrayObject`s; plain arrays (`{ filepath, originalFilename,
+     * mimetype, size }` given by a caller, as upstream tests do) are wrapped. `$opts` may be null
+     * (JS `undefined`).
+     *
+     * @param array{data: array<string, mixed>, files: \ArrayObject<string, mixed>|array<string, mixed>|list<\ArrayObject<string, mixed>|array<string, mixed>>} $params
+     * @param CommonOptions|null $opts
      * @return list<array<string, mixed>>
      */
-    public function upload(array $params, array $opts = []): array
+    public function upload(array $params, ?array $opts = []): array
     {
         $data = $params['data'];
         $files = $params['files'];
+        $files = self::toFileObjects($files);
         $user = $opts['user'] ?? null;
         // create temporary folder to store files for stream manipulation
         $tmpWorkingDirectory = $this->createAndAssignTmpWorkingDirectoryToFiles($files);

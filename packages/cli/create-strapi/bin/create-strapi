@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * `create-strapi` (port of packages/cli/create-strapi/bin/index.js): runs `create-strapi-app`.
+ * The relative path is the same installed (vendor/strapi/create-strapi/bin) and in the monorepo
+ * (packages/cli/create-strapi/bin).
+ */
+require __DIR__ . '/../../create-strapi-app/bin/create-strapi-app';

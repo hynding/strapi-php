@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// `strapi-upgrade`: port of @strapi/upgrade's bin/upgrade.js (`npx @strapi/upgrade`)
+
+$autoloaders = [
+    __DIR__ . '/../vendor/autoload.php',          // this package installed on its own
+    __DIR__ . '/../../../autoload.php',           // vendor/strapi/upgrade/bin
+    __DIR__ . '/../../../../vendor/autoload.php', // the strapi-php monorepo
+];
+
+foreach ($autoloaders as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+
+if (!class_exists(Strapi\Upgrade\Cli\Cli::class)) {
+    fwrite(STDERR, "strapi-upgrade: run `composer install` first\n");
+    exit(1);
+}
+
+exit(Strapi\Upgrade\Cli\Cli::run());

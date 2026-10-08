@@ -23,7 +23,7 @@ repository root for the naming rules. The React admin (`admin/`) is upstream's n
 | Services | `components`, `configuration`, `content-structure`, `content-types`, `data-mapper`, `document-manager`, `document-metadata`, `field-sizes`, `metrics`, `permission`, `permission-checker`, `populate-builder`, `uid`; `utils/{store,count,draft,draft-relations,populate}`, `utils/configuration/{index,attributes,layouts,metadatas,settings}` |
 | Routes, policies, middlewares | `routes/{index,admin}`, `policies/{index,hasPermissions}`, `middlewares/{index,routing}`; `validation/zod`, `validation/policies/hasPermissions` |
 | Homepage | `homepage/index`, `controllers/{index,homepage}`, `routes/{index,homepage}`, `services/{index,homepage,homepage-query-utils}` (`getCountDocuments` runs upstream's knex queries as SQL on the DBAL connection) |
-| MCP | `mcp/register-content-manager-mcp-tools` (returns early when MCP is disabled, see below) |
+| MCP | `mcp/register-content-manager-mcp-tools` (from `bootstrap`, skipped when MCP is disabled), `mcp/derive-content-type-mcp-tools` (`list_/get_/create_/update_/delete_<slug>`, `publish_/unpublish_<slug>`, `discard_<slug>_draft` for collection types; `get_/write_/delete_<slug>` + draft tools for single types; schemas resolved per request from the token's ability), `mcp/handlers/{collection,single-type}-handlers`, `handlers/constants`, `mcp/schemas/{input,data,blocks,sort,filters,output}-schemas`, `mcp/sanitizers/shape-relations` (identity-only relations), `mcp/permissions`, `mcp/utils`. Permitted-field sets are PHP sets (`array<string, true>`, `null` = all). `mcp/types`, `mcp/handlers/index`, `mcp/schemas/index` are types/barrels. |
 
 PHP shapes (see `docs/porting-feature-packages.md`):
 
@@ -50,7 +50,6 @@ PHP shapes (see `docs/porting-feature-packages.md`):
 | Upstream | State |
 | --- | --- |
 | `history/**`, `preview/**` | Not ported: both directories are under Strapi's Enterprise licence (their own `LICENSE` file). `register`/`bootstrap`/`destroy` skip them; their routes, controllers and services (`history-version`, `preview`, `preview-config`) are not registered, and the `history-version` model is not created |
-| `mcp/**` (but `register-content-manager-mcp-tools`) | PLACEHOLDER: core's MCP service has no `registerTool()`; when `server.mcp.enabled` is on, a warning is logged and no content-type tool is registered (`derive-content-type-mcp-tools`, `handlers/*`, `schemas/*`, `sanitizers/*`, `permissions`, `utils`, `types` not ported) |
 | `shared/contracts/**`, `shared/index` | TypeScript types only, nothing executable |
 
 ## Tests
@@ -67,8 +66,10 @@ Ported: services `components`, `content-types` (as `ConfigurationTest`), `conten
 `bulkDelete`, `content-types`, `countDraftRelations`, `relations-find-available` (+ the skipped
 `relations` cases), `status-lookup` (as `Utils/DocumentStatusTest`), `utils/clone`,
 `validation/{dimensions,model-configuration}`; `validation/{zod,zod-yup-compat}`; homepage
-`homepage`, `homepage-query-utils`. Not ported: the `mcp/**` tests (MCP not ported) and
-`history/**`, `preview/**` (Enterprise licence).
+`homepage`, `homepage-query-utils`; `tests/Mcp/` ports `mcp/__tests__/{derive-content-type-mcp-tools,blocks-schema}`,
+`schemas/__tests__/output-schemas` and `sanitizers/__tests__/shape-relations` on the booted getstarted app
+(plus a create/get/list/publish/unpublish/delete run through core's MCP server). Not ported:
+`history/**`, `preview/**` (Enterprise licence). API: `tests/api/core/mcp/mcp-content-manager-{rbac,shaping}` pass.
 
 Upstream's HTTP suite (`tests/api/core/content-manager`) runs against this package; failures left
 are in packages not ported yet (i18n, users-permissions, history/preview) or come from PHP not

@@ -38,6 +38,9 @@ jobs:
           - { path: packages/providers/email-amazon-ses, repo: provider-email-amazon-ses }
           - { path: packages/providers/email-mailgun, repo: provider-email-mailgun }
           - { path: packages/providers/email-sendgrid, repo: provider-email-sendgrid }
+          - { path: packages/utils/upgrade, repo: upgrade }
+          - { path: packages/cli/create-strapi-app, repo: create-strapi-app }
+          - { path: packages/cli/create-strapi, repo: create-strapi }
     steps:
       - uses: actions/checkout@v4
         with:

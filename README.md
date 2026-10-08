@@ -15,10 +15,10 @@ serves it.
 | Logger (Monolog) | `strapi/logger` | ported |
 | Permission engine (CASL + sift semantics) | `strapi/permissions` | ported, 88 tests |
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
-| Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (admin/MCP/AI providers stubbed), 72 tests |
-| CLI: `strapi start / develop / build / console / routes:list / cron:run / migrations:run` | `strapi/strapi` | ported |
+| Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (MCP server with content-manager/upload tools; AI providers stubbed); MCP API 140/144 |
+| CLI: `strapi start / develop / build / console / routes:list / *:list / report / cron:run / migrations:run` | `strapi/strapi` | ported |
 | Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 313/333 |
-| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 749/781 |
+| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 760/781 |
 | Content-Type Builder | `strapi/content-type-builder` | ported; 62/63 |
 | Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 182/193 |
 | Email + sendmail, nodemailer, Amazon SES, Mailgun, SendGrid providers | `strapi/email`, `strapi/provider-email-*` | ported |
@@ -28,7 +28,8 @@ serves it.
 | Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers through `strapi transfer:serve`) | `strapi/data-transfer` | ported; 3/3 (+ admin push security 3/3) |
 | OpenAPI generator and the documentation plugin (Swagger UI) | `strapi/openapi`, `strapi/plugin-documentation` | ported; documents identical to Node's for the same app |
 | `strapi generate`, sentry, color-picker | `strapi/generators`, `strapi/plugin-sentry`, `strapi/plugin-color-picker` | ported |
-| create-strapi-app, upgrade | | not ported yet |
+| Project generator: `composer create-project strapi/create-strapi-app my-project` (same prompts and flags as `npx create-strapi-app`, vanilla and example templates in PHP, fresh `.env` secrets, `composer install` + npm install of the pinned admin bundle) | `strapi/create-strapi-app`, `strapi/create-strapi` | ported (Strapi Cloud login not ported); 44 tests |
+| Upgrade tool `strapi-upgrade` (upstream's `npx @strapi/upgrade` commands; composer.json and package.json upgraded in lockstep; PHP codemods, upstream's JS codemods via npx) | `strapi/upgrade` | ported; 186 tests |
 | content-releases, review-workflows | | not ported: the whole packages are Enterprise-licensed |
 
 `parity.json` lists every upstream server file and whether it is ported. `php
@@ -36,8 +37,8 @@ scripts/parity-map.php` regenerates it.
 
 The numbers are upstream's own Jest API suite (`tests/api`, see its README) run unmodified
 against the PHP app, one package directory at a time, each test file on a fresh database:
-2,969 of 3,181 across all directories, `tests/api/core/strapi` (core's REST, document
-service, relations, validation) at 1360/1497. What still fails is mostly Enterprise
+3,132 of 3,325 across all directories, `tests/api/core/strapi` (core's REST, document
+service, relations, validation) at 1372/1497. What still fails is mostly Enterprise
 features and tests that replace functions inside the server from the Jest process, which
 can't cross into PHP.
 

@@ -46,7 +46,7 @@ final class Metrics
      */
     public function send(string $event, array $payload = []): bool
     {
-        $this->strapi->log()->debug("Telemetry is disabled: event {$event} was not sent");
+        $this->strapi->log()->debug("Telemetry is disabled: event {$event} was not sent", $payload === [] ? [] : ['payload' => $payload]);
 
         return false;
     }
