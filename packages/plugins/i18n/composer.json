@@ -1,19 +1,26 @@
 {
-    "name": "strapi/plugin-i18n",
-    "description": "Internationalization: locales and localized content (port of @strapi/plugin-i18n server)",
+    "name": "strapi/i18n",
+    "description": "Internationalization: locales and localized content (port of @strapi/i18n server)",
     "type": "library",
     "license": "MIT",
     "version": "5.56.0",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/core": "self.version"
+        "strapi/core": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
-            "upstream": "@strapi/plugin-i18n",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "upstream": "@strapi/i18n",
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "i18n",
+            "namespace": "Strapi\\Plugin\\I18n",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

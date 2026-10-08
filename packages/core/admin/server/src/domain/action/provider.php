@@ -172,6 +172,20 @@ final class Provider
         return $this->provider->get($key);
     }
 
+    /**
+     * Not upstream: writes back an action a caller changed (upstream mutates the action objects
+     * returned by `values()` in place, e.g. i18n's `updateActionsProperties`).
+     *
+     * @param array<string, mixed> $action
+     * @return $this
+     */
+    public function replace(string $key, array $action): static
+    {
+        $this->provider->replace($key, $action);
+
+        return $this;
+    }
+
     /** @return list<array<string, mixed>> */
     public function values(): array
     {

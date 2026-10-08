@@ -81,7 +81,7 @@ final class HomepageTest extends TestCase
         $stats = self::service()->getKeyStatistics();
 
         self::assertSame(['assets', 'contentTypes', 'components', 'locales', 'admins', 'webhooks', 'apiTokens'], array_keys($stats));
-        self::assertNull($stats['locales'], 'i18n is not installed');
+        self::assertSame(1, $stats['locales'], 'the i18n plugin is installed with its default locale');
         self::assertSame(0, $stats['webhooks']);
     }
 }
