@@ -183,7 +183,11 @@ final class Server
             $this->mount();
         }
 
-        $ctx = new Context($request);
+        $keys = $this->strapi->config()->get('server.app.keys');
+        $ctx = new Context($request, [
+            'proxy' => (bool) $this->strapi->config()->get('server.proxy.koa', false),
+            'keys' => is_array($keys) ? array_values(array_map('strval', $keys)) : null,
+        ]);
 
         $pipeline = $this->pipeline ??= Compose::compose([...$this->middlewares, $this->dispatchMiddleware()]);
 
