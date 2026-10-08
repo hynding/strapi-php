@@ -17,10 +17,21 @@ serves it.
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (admin/MCP/AI providers stubbed), 72 tests |
 | CLI: `strapi start / develop / build / console / routes:list / cron:run / migrations:run` | `strapi/strapi` | ported |
-| Admin API, Content Manager, Content-Type Builder, Upload, Email, i18n, plugins, providers | the rest | scaffolded, not ported |
+| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); upstream API suite 301/330 |
+| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 684/781 |
+| Content-Type Builder | `strapi/content-type-builder` | ported; 62/63 |
+| Upload + local provider (GD instead of sharp) | `strapi/upload`, `strapi/provider-upload-local` | ported; 179/193 |
+| i18n, users-permissions, email, data-transfer, graphql, documentation, other providers, CLI tooling | the rest | scaffolded, not ported |
 
-`parity.json` lists every upstream server file and whether it is ported
-(362 of 1,746 at the time of writing). `php scripts/parity-map.php` regenerates it.
+`parity.json` lists every upstream server file and whether it is ported (672 of 1,921 at the
+time of writing; 69 are Enterprise-licensed and blocked). `php scripts/parity-map.php`
+regenerates it.
+
+The numbers above are upstream's own Jest API suite (`tests/api`, see its README) run
+unmodified against the PHP app, one package directory at a time. Most of what still fails
+needs a package not ported yet (i18n alone accounts for 589 of core's 745 failures in
+`tests/api/core/strapi`), or replaces functions inside the server from the Jest process,
+which can't cross into PHP.
 
 ## Try it
 
