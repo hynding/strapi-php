@@ -35,8 +35,9 @@ final class Sqlite extends Dialect
         $filename = $connection['filename'] ?? null;
         if (is_string($filename) && $filename !== ':memory:' && $filename !== '') {
             $dir = dirname($filename);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0o777, true);
+            // several workers may boot at once (FrankenPHP): another one can create it in between
+            if (!is_dir($dir) && !@mkdir($dir, 0o777, true) && !is_dir($dir)) {
+                throw new \RuntimeException("Cannot create the database directory {$dir}");
             }
             $resolved = realpath($dir);
             $connection['filename'] = ($resolved !== false ? $resolved : $dir) . DIRECTORY_SEPARATOR . basename($filename);

@@ -130,6 +130,32 @@ final class Strapi extends Container implements StrapiContract
         return $this->get('reload');
     }
 
+    /**
+     * Upstream resolves a relative SQLite filename with `path.resolve()`, i.e. against the process
+     * working directory, which for Node Strapi is always the project root. Under PHP's web SAPIs
+     * (FPM, FrankenPHP, the built-in server) the working directory is `public/`, so the same
+     * relative path would put the database inside the web root, where it can be downloaded. Resolve
+     * it against the project root instead, which is what upstream gets.
+     *
+     * @param array<string, mixed> $databaseConfig
+     * @return array<string, mixed>
+     */
+    public static function resolveSqliteFilename(array $databaseConfig, string $root): array
+    {
+        $client = $databaseConfig['connection']['client'] ?? null;
+        $filename = $databaseConfig['connection']['connection']['filename'] ?? null;
+        if (!in_array($client, ['sqlite', 'sqlite3', 'better-sqlite3'], true) || !is_string($filename)) {
+            return $databaseConfig;
+        }
+        if ($filename === '' || $filename === ':memory:' || str_starts_with($filename, 'file:') || str_starts_with($filename, '/') || preg_match('#^[A-Za-z]:[\\\\/]#', $filename) === 1) {
+            return $databaseConfig;
+        }
+
+        $databaseConfig['connection']['connection']['filename'] = rtrim($root, '/') . '/' . $filename;
+
+        return $databaseConfig;
+    }
+
     public function db(): Database
     {
         return $this->get('db');
@@ -444,6 +470,7 @@ final class Strapi extends Container implements StrapiContract
             ->add('db', function () use ($logger): Database {
                 $databaseConfig = $this->config()->get('database');
                 $databaseConfig = is_array($databaseConfig) ? $databaseConfig : [];
+                $databaseConfig = self::resolveSqliteFilename($databaseConfig, $this->dirs()->root);
 
                 return new Database(\Strapi\Utils\Primitives\Objects::merge($databaseConfig, [
                     'logger' => $logger,
@@ -537,6 +564,43 @@ final class Strapi extends Container implements StrapiContract
     }
 
     public function bootstrap(): static
+    {
+        // PHP port: upstream boots one process. FrankenPHP and FPM boot several at once on the same
+        // project, and bootstrap writes to the database (schema sync, migrations, the default
+        // roles and permissions plugins create), so concurrent first boots race. Serialize them.
+        $lock = $this->acquireBootstrapLock();
+
+        try {
+            return $this->doBootstrap();
+        } finally {
+            if ($lock !== null) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
+        }
+    }
+
+    /** @return resource|null */
+    private function acquireBootstrapLock()
+    {
+        $dir = $this->dirs()->root . '/.tmp';
+        if (!is_dir($dir) && !@mkdir($dir, 0o777, true) && !is_dir($dir)) {
+            return null;
+        }
+        $handle = @fopen($dir . '/bootstrap.lock', 'c');
+        if ($handle === false) {
+            return null;
+        }
+        if (!flock($handle, LOCK_EX)) {
+            fclose($handle);
+
+            return null;
+        }
+
+        return $handle;
+    }
+
+    private function doBootstrap(): static
     {
         // content types + components (Schema objects) and the raw models (core store, webhooks)
         $models = [...array_values($this->contentTypes()), ...array_values($this->components()), ...$this->get('models')->get()];
