@@ -8,15 +8,19 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "intervention/image": "^3.11",
-        "league/flysystem": "^3.29",
-        "symfony/mime": "^7.2"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/upload",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "in-progress",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "upload",
+            "namespace": "Strapi\\Upload",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

@@ -12,7 +12,10 @@
         "strapi/types": "self.version",
         "strapi/permissions": "self.version",
         "strapi/logger": "self.version",
-        "strapi/admin": "self.version"
+        "strapi/admin": "self.version",
+        "strapi/content-manager": "self.version",
+        "strapi/content-type-builder": "self.version",
+        "strapi/upload": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",

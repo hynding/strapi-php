@@ -7,13 +7,20 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/core": "self.version"
+        "strapi/core": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/content-manager",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "in-progress",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "content-manager",
+            "namespace": "Strapi\\ContentManager",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

@@ -8,13 +8,19 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "strapi/generators": "self.version"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/content-type-builder",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "in-progress",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "content-type-builder",
+            "namespace": "Strapi\\ContentTypeBuilder",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",
