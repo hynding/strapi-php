@@ -11,9 +11,6 @@ use Strapi\Plugin\UsersPermissions\Utils\Sanitize\Sanitizers;
 
 /**
  * Port of server/src/register.js.
- *
- * Not ported: the GraphQL extension (`server/src/graphql`, loaded when the graphql plugin is
- * installed; strapi/plugin-graphql is not ported yet).
  */
 final class Register
 {
@@ -26,8 +23,7 @@ final class Register
         ProviderHttp::$defaultFetch = $strapi->fetch();
 
         if ($strapi->hasPlugin('graphql')) {
-            // server/src/graphql is not ported (the graphql plugin is not ported yet)
-            $strapi->log()->warning('[users-permissions] the GraphQL extension is not ported: no users-permissions GraphQL types or resolvers are registered');
+            (new Graphql\Graphql())($strapi);
         }
 
         if ($strapi->hasPlugin('documentation')) {

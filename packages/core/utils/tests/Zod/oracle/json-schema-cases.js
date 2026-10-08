@@ -9,6 +9,11 @@ module.exports = (z) => {
   registry.add(withArticle, { id: 'B' });
   const Cat = z.lazy(() => z.object({ name: z.string(), children: z.array(Cat) }));
   const Node = z.lazy(() => z.object({ name: z.string(), children: z.array(Node).optional() }));
+  // ids in a schema's own .meta() (zod's global registry)
+  const MetaNested = z.object({ value: z.string() }).meta({ id: 'MetaNested', description: 'nested' });
+  const metaRegistry = z.registry();
+  metaRegistry.add(z.object({ nested: MetaNested, other: z.object({ inner: z.string().meta({ id: 'MetaInner' }) }) }), { id: 'MetaRoot' });
+  metaRegistry.add(z.object({ again: MetaNested }), { id: 'MetaOther' });
 
   return [
     {
@@ -40,6 +45,11 @@ module.exports = (z) => {
     { name: 'literal mixed', js: z.literal(['a', 1]), php: "z::literal(['a', 1])" },
     { name: 'literal null', js: z.literal(null), php: 'z::literal(null)' },
     { name: 'metadata registry', js: z.object({ x: article }), php: "z::object(['x' => self::article()])", params: { metadata: registry }, phpParams: "['metadata' => self::registry()]" },
+    { name: 'meta id nested', js: z.object({ a: MetaNested, b: MetaNested }), php: "z::object(['a' => self::metaNested(), 'b' => self::metaNested()])" },
+    { name: 'registry meta id __shared', js: metaRegistry, php: 'self::metaRegistry()', params: { target: 'draft-2020-12', io: 'output', uri: (id) => `#/components/schemas/${id}` }, phpParams: "['target' => 'draft-2020-12', 'io' => 'output', 'uri' => fn (string \$id) => \"#/components/schemas/{\$id}\"]" },
+    { name: 'describe on wrappers (key order)', js: z.object({ a: z.string().default('d').optional().describe('x'), b: z.number().int().readonly().describe('r'), c: z.boolean().nullable().optional().describe('n'), d: z.string().describe('in').default('d').describe('out'), e: z.string().meta({ title: 'T' }).optional().describe('m'), f: z.union([z.string(), z.number()]).optional().describe('u') }), php: "z::object(['a' => z::string()->default('d')->optional()->describe('x'), 'b' => z::number()->int()->readonly()->describe('r'), 'c' => z::boolean()->nullable()->optional()->describe('n'), 'd' => z::string()->describe('in')->default('d')->describe('out'), 'e' => z::string()->meta(['title' => 'T'])->optional()->describe('m'), 'f' => z::union([z::string(), z::number()])->optional()->describe('u')])" },
+    { name: 'date default', js: z.string().default(new Date(0)), php: "z::string()->default(new \\DateTimeImmutable('@0'))" },
+    { name: 'enum integer-like values first', js: z.enum(['t', '1', 'true', 'f', '0', 'false']), php: "z::enum(['t', '1', 'true', 'f', '0', 'false'])" },
     { name: 'registry', js: registry, php: 'self::registry()', params: { target: 'draft-2020-12', io: 'output', uri: (id) => `#/components/schemas/${id}` }, phpParams: "['target' => 'draft-2020-12', 'io' => 'output', 'uri' => fn (string \$id) => \"#/components/schemas/{\$id}\"]" },
   ];
 };

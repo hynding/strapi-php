@@ -10,7 +10,8 @@
         "strapi/core": "self.version",
         "strapi/utils": "self.version",
         "strapi/types": "self.version",
-        "strapi/admin": "self.version"
+        "strapi/admin": "self.version",
+        "strapi/generators": "self.version"
     },
     "extra": {
         "strapi": {

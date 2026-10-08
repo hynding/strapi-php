@@ -35,8 +35,28 @@ class ZodEnum extends ZodType
             $entries = $values;
         }
         /** @var array<string, string|int> $entries */
-        $this->entries = $entries;
+        $this->entries = self::jsKeyOrder($entries);
         $this->withParams($params);
+    }
+
+    /**
+     * zod builds the entries as a JS object (`Object.fromEntries(values.map((v) => [v, v]))`):
+     * integer-like keys enumerate first, in ascending order (`z.enum(['t', '1', '0'])` lists `0`,
+     * `1`, `t`).
+     *
+     * @param array<array-key, string|int> $entries
+     *
+     * @return array<array-key, string|int>
+     */
+    private static function jsKeyOrder(array $entries): array
+    {
+        $integers = array_filter($entries, static fn (int|string $key): bool => is_int($key) && $key >= 0 && $key < 4294967295, ARRAY_FILTER_USE_KEY);
+        if ($integers === []) {
+            return $entries;
+        }
+        ksort($integers);
+
+        return $integers + array_diff_key($entries, $integers);
     }
 
     public function type(): string

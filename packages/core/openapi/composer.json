@@ -8,13 +8,15 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "cebe/php-openapi": "^1.7"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/openapi",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "namespace": "Strapi\\Openapi"
         }
     },
     "minimum-stability": "stable",
@@ -26,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Strapi\\OpenApi\\Tests\\": "tests/"
+            "Strapi\\Openapi\\Tests\\": "tests/"
         }
     }
 }

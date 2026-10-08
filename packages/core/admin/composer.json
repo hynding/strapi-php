@@ -8,6 +8,7 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
+        "strapi/data-transfer": "self.version",
         "strapi/utils": "self.version",
         "strapi/permissions": "self.version",
         "strapi/types": "self.version"

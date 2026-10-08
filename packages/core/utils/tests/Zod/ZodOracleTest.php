@@ -44,7 +44,8 @@ final class ZodOracleTest extends TestCase
     }
 
     /**
-     * toJSONSchema() is best effort; compared with zod's output ignoring key order.
+     * toJSONSchema() compared with zod's output, key order included (OpenAPI documents are
+     * compared with upstream's byte for byte).
      *
      * @param \Closure(): (ZodType|ZodRegistry) $factory
      * @param \Closure(): array<string, mixed> $params
@@ -52,8 +53,9 @@ final class ZodOracleTest extends TestCase
     #[DataProviderExternal(ZodOracleCases::class, 'jsonSchemaCases')]
     public function testJsonSchemaMatchesZod(\Closure $factory, \Closure $params, string $expected): void
     {
-        $actual = json_decode((string) json_encode(z::toJSONSchema($factory(), $params())), true);
+        $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+        $actual = json_encode(json_decode((string) json_encode(z::toJSONSchema($factory(), $params()))), $flags);
 
-        self::assertEquals(json_decode($expected, true), $actual);
+        self::assertSame(json_encode(json_decode($expected), $flags), $actual);
     }
 }

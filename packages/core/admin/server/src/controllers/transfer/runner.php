@@ -5,18 +5,29 @@ declare(strict_types=1);
 namespace Strapi\Admin\Controllers\Transfer;
 
 use Strapi\Admin\Strategies\DataTransfer as DataTransferAuthStrategy;
+use Strapi\DataTransfer\Strapi\Remote\Handlers\Pull;
+use Strapi\DataTransfer\Strapi\Remote\Handlers\Push;
 use Strapi\Types\Core\Context;
-use Strapi\Utils\Errors\NotImplementedError;
 use Strapi\Utils\Errors\UnauthorizedError;
 
 /**
- * Port of server/src/controllers/transfer/runner.ts. The push and pull handlers are
- * `@strapi/data-transfer`'s WebSocket controllers (`createPushController` /
- * `createPullController`), which are not ported: both throw {@see NotImplementedError} once the
- * request is authenticated and verified for its scope.
+ * Port of server/src/controllers/transfer/runner.ts: the push and pull routes are
+ * `@strapi/data-transfer`'s WebSocket controllers (`createPushController({ verify })` /
+ * `createPullController({ verify })`).
+ *
+ * The WebSocket upgrade needs the raw connection: the transfer server (`strapi transfer:serve`,
+ * which the reverse proxy routes `/admin/transfer/runner/*` to) provides it. A request served by
+ * FPM/FrankenPHP cannot be upgraded and answers `501 Not Implemented` (once it has passed the
+ * route's `data-transfer` authentication, as upstream).
  */
 final class Runner
 {
+    /** @var (\Closure(Context): void)|null */
+    private static ?\Closure $pushController = null;
+
+    /** @var (\Closure(Context): void)|null */
+    private static ?\Closure $pullController = null;
+
     /**
      * @param string|null $scope the scope to verify
      */
@@ -33,17 +44,17 @@ final class Runner
 
     public function push(Context $ctx): mixed
     {
-        self::verify($ctx, 'push');
+        self::$pushController ??= Push::createPushController(['verify' => self::verify(...)]);
+        (self::$pushController)($ctx);
 
-        // createPushController({ verify }) from @strapi/data-transfer
-        throw new NotImplementedError('Remote data transfer (push) requires @strapi/data-transfer, which is not ported');
+        return null;
     }
 
     public function pull(Context $ctx): mixed
     {
-        self::verify($ctx, 'pull');
+        self::$pullController ??= Pull::createPullController(['verify' => self::verify(...)]);
+        (self::$pullController)($ctx);
 
-        // createPullController({ verify }) from @strapi/data-transfer
-        throw new NotImplementedError('Remote data transfer (pull) requires @strapi/data-transfer, which is not ported');
+        return null;
     }
 }

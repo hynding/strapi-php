@@ -11,9 +11,8 @@ use Strapi\Admin\Controllers\Transfer\Runner;
 use Strapi\Admin\Tests\BootedAdminApp;
 use Strapi\Core\Strapi;
 use Strapi\Utils\Errors\NotImplementedError;
-use Strapi\Utils\Errors\UnauthorizedError;
 
-/** server/src/middlewares/data-transfer.ts and the runner stub (no upstream unit test). */
+/** server/src/middlewares/data-transfer.ts and the transfer runner outside `transfer:serve` (no upstream unit test). */
 final class DataTransferTest extends TestCase
 {
     private static ?Strapi $strapi = null;
@@ -67,16 +66,12 @@ final class DataTransferTest extends TestCase
         self::assertSame(['code' => 'INVALID_TOKEN_SALT'], $body['error']['details']);
     }
 
-    public function testTheRunnerVerifiesThenReportsTheMissingDataTransferPackage(): void
+    public function testTheRunnerNeedsTheTransferServerToUpgrade(): void
     {
+        // Upstream authenticates the upgrade at the route (`data-transfer` strategy) and verifies the
+        // token's scope in the handler, on `init`. Served by the HTTP worker, the runner cannot hold
+        // the WebSocket: it answers 501 and points to `strapi transfer:serve`.
         $ctx = BootedAdminApp::ctx();
-        try {
-            (new Runner())->push($ctx);
-            self::fail('expected an UnauthorizedError');
-        } catch (UnauthorizedError) {
-            self::addToAssertionCount(1);
-        }
-
         $ability = new class () {
             public function can(string $action): bool
             {
@@ -86,6 +81,7 @@ final class DataTransferTest extends TestCase
         $ctx->state()->set('auth', ['credentials' => ['id' => 1, 'expiresAt' => null], 'ability' => $ability]);
 
         $this->expectException(NotImplementedError::class);
+        $this->expectExceptionMessage('strapi transfer:serve');
         (new Runner())->push($ctx);
     }
 }

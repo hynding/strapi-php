@@ -26,16 +26,11 @@ repository root for the naming rules. The package is an internal plugin (`compos
 | Routes | `admin`, `content-api`, `validation/locale` (`I18nLocaleRouteValidator`) |
 | Validation / domain | `validation/{content-types,locales,settings}`, `domain/locale` |
 | Utils | `utils/index` (`getService`, `getCoreStore` + typed helpers) |
+| GraphQL | `graphql` (the `I18NLocaleCode` scalar, the `I18NLocaleArg` nexus plugin adding `locale` to localized queries / mutations, `locale` / `localizations` disabled in inputs, the locale queries' scopes); runs when `strapi/plugin-graphql` is installed |
 
 Barrel files `services/index`, `controllers/index`, `routes/index`, `content-types/index`,
 `models/index` are registries and ported; `routes/validation/index` only re-exports.
 `shared/contracts/*` are TypeScript types only.
-
-### Stubbed
-
-| File | Why |
-| --- | --- |
-| `graphql` | `@strapi/plugin-graphql` (nexus) is not ported: `Graphql::register()` throws `NotImplementedError`; it only runs when a `graphql` plugin is installed. |
 
 ### PHP-port additions
 
@@ -55,3 +50,5 @@ Barrel files `services/index`, `controllers/index`, `routes/index`, `content-typ
 - AI localizations run synchronously in the document-service middleware (upstream does not await
   them); errors are logged as upstream.
 - `setDefaultLocale()` returns `null` (core-store `set()` is void).
+- `graphql`: the nexus plugin's `onAddOutputField` returns the field config with the `locale`
+  argument added (nexus accepts a returned replacement) instead of mutating it.

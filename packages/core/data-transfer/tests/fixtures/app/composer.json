@@ -1,0 +1,14 @@
+{
+    "name": "strapi/data-transfer-tests-app",
+    "description": "The app the data-transfer PHPUnit tests boot (copied to a temporary directory per test class)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "strapi/strapi": "*"
+    },
+    "extra": {
+        "strapi": {
+            "uuid": "data-transfer-tests"
+        }
+    }
+}

@@ -127,4 +127,50 @@ final class Helpers
             }
         };
     }
+
+    public const string TRANSFER_PROGRESS_FIELD_SEP = ' · ';
+
+    /**
+     * Stage / prep timing: plain `readableTime` (e.g. `1.2s`) when no ETA; with ETA, append
+     * `, ~4.0s remaining` (`~` = approximate). Same base format for every stage; remaining is additive.
+     */
+    public static function formatElapsedAndMaybeRemainingLabel(int|float $elapsedMs, int|float|null $remainingMs): string
+    {
+        return $remainingMs !== null
+            ? self::readableTime($elapsedMs) . ', ~' . self::readableTime($remainingMs) . ' remaining'
+            : self::readableTime($elapsedMs);
+    }
+
+    /**
+     * `assertUrlHasProtocol(url, protocol)` (exits through {@see ExitError}).
+     *
+     * @param string|list<string>|null $protocol e.g. `['https:', 'http:']`
+     */
+    public static function assertUrlHasProtocol(string $url, string|array|null $protocol = null): void
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $urlProtocol = is_string($scheme) && $scheme !== '' ? strtolower($scheme) . ':' : '';
+
+        if ($urlProtocol === '') {
+            throw new ExitError(1, "{$url} does not have a protocol");
+        }
+
+        // if just checking for the existence of a protocol, return
+        if ($protocol === null) {
+            return;
+        }
+
+        if (is_string($protocol)) {
+            if ($protocol !== $urlProtocol) {
+                throw new ExitError(1, "{$url} must have the protocol {$protocol}");
+            }
+
+            return;
+        }
+
+        // assume an array
+        if (!in_array($urlProtocol, $protocol, true)) {
+            throw new ExitError(1, "{$url} must have one of the following protocols: " . implode(',', $protocol));
+        }
+    }
 }

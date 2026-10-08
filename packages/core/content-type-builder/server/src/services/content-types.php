@@ -9,17 +9,16 @@ use Strapi\ContentTypeBuilder\Services\SchemaBuilder\SchemaHandler;
 use Strapi\ContentTypeBuilder\Utils\Attributes;
 use Strapi\ContentTypeBuilder\Utils\Utils;
 use Strapi\Core\Strapi;
+use Strapi\Generators\Generators;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\ContentTypes as ContentTypesUtils;
 use Strapi\Utils\Errors\ApplicationError;
-use Strapi\Utils\Primitives\Strings;
 
 /**
  * Port of server/src/services/content-types.ts.
  *
- * `generateAPI()` calls `@strapi/generators`' `content-type` generator upstream; that package is
- * not ported yet, so the files it writes (`schema.json` plus the core controller, service and
- * router of the API) are generated here, in their PHP form (see examples/getstarted/src/api).
+ * `generateAPI()` calls `@strapi/generators`' `content-type` generator (strapi/generators), which
+ * writes the PHP form of the API files (see examples/getstarted/src/api).
  */
 final class ContentTypes
 {
@@ -266,74 +265,30 @@ final class ContentTypes
     }
 
     /**
-     * Generate an API skeleton: `@strapi/generators` `content-type` with `destination: 'new'` and
-     * `bootstrapApi: true` (schema.json, then the core controller, service and router), PHP edition.
+     * Generate an API skeleton: `@strapi/generators`' `content-type` generator with
+     * `destination: 'new'` and `bootstrapApi: true` (schema.json, then the core controller,
+     * service and router), on the project root.
      *
      * @param array{singularName?: mixed, kind?: mixed, pluralName?: mixed, displayName?: mixed} $options
      */
     public function generateAPI(array $options): void
     {
-        $singularName = (string) ($options['singularName'] ?? '');
-        $pluralName = (string) ($options['pluralName'] ?? '');
-        $kind = (string) ($options['kind'] ?? 'collectionType');
-        $displayName = (string) ($options['displayName'] ?? '');
-        $id = $singularName;
-        $uid = "api::{$id}.{$singularName}";
+        $singularName = $options['singularName'] ?? null;
 
-        $filePath = SchemaHandler::join($this->strapi->dirs()->src, 'api', $id);
-
-        self::addFile(
-            SchemaHandler::join($filePath, 'content-types', $singularName, 'schema.json'),
-            SchemaHandler::stringify([
-                'kind' => $kind,
-                'collectionName' => Strings::slugify($pluralName, ['separator' => '_']),
-                'info' => [
-                    'singularName' => $singularName,
-                    'pluralName' => $pluralName,
-                    'displayName' => $displayName,
-                ],
-                'options' => ['comment' => ''],
+        Generators::generate(
+            'content-type',
+            [
+                'kind' => $options['kind'] ?? 'collectionType',
+                'singularName' => $singularName,
+                'id' => $singularName,
+                'pluralName' => $options['pluralName'] ?? null,
+                'displayName' => $options['displayName'] ?? null,
+                'destination' => 'new',
+                'bootstrapApi' => true,
                 'attributes' => [],
-            ]) . "\n",
+            ],
+            ['dir' => $this->strapi->dirs()->root],
         );
-
-        $factory = static fn (string $what, string $factoryName): string => <<<PHP
-            <?php
-
-            declare(strict_types=1);
-
-            /**
-             * {$id} {$what}
-             */
-
-            use Strapi\\Core\\Factories;
-
-            return Factories::{$factoryName}('{$uid}');
-
-            PHP;
-
-        self::addFile(SchemaHandler::join($filePath, 'controllers', "{$singularName}.php"), $factory('controller', 'createCoreController'));
-        self::addFile(SchemaHandler::join($filePath, 'services', "{$singularName}.php"), $factory('service', 'createCoreService'));
-        self::addFile(SchemaHandler::join($filePath, 'routes', "{$singularName}.php"), $factory('router', 'createCoreRouter'));
-    }
-
-    /** A plop `add` action: creates the file, failing when it already exists. */
-    private static function addFile(string $path, string $contents): void
-    {
-        if (file_exists($path)) {
-            throw new \RuntimeException("File already exists\n -> {$path}");
-        }
-
-        $dir = dirname($path);
-        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
-            throw new \RuntimeException("EACCES: permission denied, mkdir '{$dir}'");
-        }
-        if (@file_put_contents($path, $contents) === false) {
-            throw new \RuntimeException("EACCES: permission denied, open '{$path}'");
-        }
-        if (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($path, true);
-        }
     }
 
     /**

@@ -99,8 +99,10 @@ final class Router
         foreach ($this->stack as $index => $entry) {
             $methods = $entry['method'] === 'ALL' ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] : [$entry['method']];
             if (str_contains($entry['path'], '(')) {
+                // koa-router's `:name(regex)` params become named groups
+                $regex = preg_replace('~:([A-Za-z_][A-Za-z0-9_]*)\(~', '(?P<$1>', $entry['path']) ?? $entry['path'];
                 foreach ($methods as $method) {
-                    $this->regexRoutes[] = ['regex' => '~^' . $entry['path'] . '$~', 'method' => $method, 'handler' => $entry['handler'], 'route' => $entry['route']];
+                    $this->regexRoutes[] = ['regex' => '~^' . $regex . '$~', 'method' => $method, 'handler' => $entry['handler'], 'route' => $entry['route']];
                 }
                 continue;
             }
@@ -172,11 +174,18 @@ final class Router
         // regex routes (koa-static catch-all etc.) are checked after the declarative ones
         $allowed = $result[0] === Dispatcher::METHOD_NOT_ALLOWED ? $result[1] : [];
         foreach ($this->regexRoutes as $regexRoute) {
-            if (preg_match($regexRoute['regex'], $path) !== 1) {
+            if (preg_match($regexRoute['regex'], $path, $matches) !== 1) {
                 continue;
             }
             if ($regexRoute['method'] === $lookup) {
-                return ['found' => ['handler' => $regexRoute['handler'], 'params' => [], 'route' => $regexRoute['route']], 'allowed' => []];
+                $params = [];
+                foreach ($matches as $name => $value) {
+                    if (is_string($name)) {
+                        $params[$name] = $value;
+                    }
+                }
+
+                return ['found' => ['handler' => $regexRoute['handler'], 'params' => $params, 'route' => $regexRoute['route']], 'allowed' => []];
             }
             $allowed[] = $regexRoute['method'];
         }

@@ -17,6 +17,10 @@ namespace Strapi\Utils\Zod;
  *
  * Recursive schemas (through `z.lazy()`) become `$ref`s: `#` for the root, `#/$defs/__schemaN`
  * otherwise. Empty schemas (`z.any()`, `z.unknown()`) are `stdClass` so `json_encode` writes `{}`.
+ *
+ * A nested schema with an `id` in its own `.meta()` (zod's global registry) is extracted like zod
+ * does: into `$defs` (`#/$defs/<id>`) for a single schema; for a registry, when the schema is not
+ * one of its entries, into a `__shared` entry referenced as `<uri('__shared')>#/$defs/<id>`.
  */
 final class ToJsonSchema
 {
@@ -44,6 +48,9 @@ final class ToJsonSchema
 
     private ?string $rootId = null;
 
+    /** @var \ArrayObject<string, array<string, mixed>|\stdClass>|null registry mode: the `__shared` definitions */
+    private ?\ArrayObject $shared = null;
+
     /** @param array<string, mixed> $params */
     private function __construct(array $params)
     {
@@ -65,18 +72,24 @@ final class ToJsonSchema
         if ($input instanceof ZodRegistry) {
             $schemas = [];
             $hasUri = ($params['uri'] ?? null) instanceof \Closure;
+            /** @var \ArrayObject<string, array<string, mixed>|\stdClass> $shared */
+            $shared = new \ArrayObject();
             foreach ($input->all() as [$schema, $meta]) {
                 if (!isset($meta['id']) || !is_string($meta['id'])) {
                     continue;
                 }
                 $generator = new self(['metadata' => $input] + $params);
                 $generator->rootId = $meta['id'];
+                $generator->shared = $shared;
                 $json = $generator->root($schema);
                 $head = $generator->schemaHeader();
                 if ($hasUri) {
                     $head['$id'] = ($generator->uri)($meta['id']);
                 }
                 $schemas[$meta['id']] = $head + (array) $json + $generator->definitions();
+            }
+            if (count($shared) > 0) {
+                $schemas['__shared'] = [in_array($params['target'] ?? null, ['draft-07', 'draft-04'], true) ? 'definitions' : '$defs' => $shared->getArrayCopy()];
             }
 
             return ['schemas' => $schemas];
@@ -154,6 +167,26 @@ final class ToJsonSchema
             return ['$ref' => $this->defRef($id)];
         }
 
+        // an id from the schema's own `.meta()` (zod's global registry)
+        $ownMeta = $target->meta();
+        $globalId = is_array($ownMeta) && is_string($ownMeta['id'] ?? null) ? $ownMeta['id'] : null;
+        if ($id === null && $globalId !== null && !($isRoot && $target === $this->root)) {
+            if ($this->shared !== null) {
+                if (!isset($this->shared[$globalId])) {
+                    $this->shared[$globalId] = new \stdClass(); // placeholder against cycles
+                    $this->shared[$globalId] = $this->build($target);
+                }
+
+                return ['$ref' => ($this->uri)('__shared') . '#/' . (in_array($this->target, ['draft-07', 'draft-04'], true) ? 'definitions' : '$defs') . '/' . $globalId];
+            }
+            if (!isset($this->defs[$globalId])) {
+                $this->defs[$globalId] = new \stdClass(); // placeholder against cycles
+                $this->defs[$globalId] = $this->build($target);
+            }
+
+            return ['$ref' => $this->defRef($globalId)];
+        }
+
         if (isset($this->stack[$oid])) {
             if ($target === $this->root) {
                 return ['$ref' => $this->rootId !== null ? ($this->uri)($this->rootId) : '#'];
@@ -179,11 +212,18 @@ final class ToJsonSchema
     /** @return array<string, mixed>|\stdClass */
     private function build(ZodType $schema): array|\stdClass
     {
-        $json = $this->buildType($schema);
         $metadata = $schema->meta();
-        if (is_array($metadata)) {
-            unset($metadata['id']);
-            $json = $json + $metadata;
+        $metadata = is_array($metadata) ? $metadata : [];
+        unset($metadata['id']);
+
+        // zod's key order: a wrapper (optional, default, readonly, pipe...) emits its own keys, then its
+        // metadata, then the inner schema's keys; any other schema its keys, then its metadata
+        $wrapper = $this->wrapperParts($schema);
+        if ($wrapper !== null) {
+            [$own, $inner] = $wrapper;
+            $json = $own + $metadata + (array) $inner;
+        } else {
+            $json = $this->buildType($schema) + $metadata;
         }
         $registryMeta = $this->metadata?->get($schema);
         if ($registryMeta !== null) {
@@ -213,17 +253,46 @@ final class ToJsonSchema
             $schema instanceof ZodIntersection => ['allOf' => [$this->process($schema->left()), $this->process($schema->right())]],
             $schema instanceof ZodRecord => $this->record($schema),
             $schema instanceof ZodTuple => $this->tuple($schema),
-            $schema instanceof ZodOptional, $schema instanceof ZodNonOptional => (array) $this->process($schema->unwrap()),
             $schema instanceof ZodNullable => $this->nullable($schema),
-            $schema instanceof ZodDefault => ['default' => $schema->defaultValue()] + (array) $this->process($schema->unwrap()),
-            $schema instanceof ZodReadonly => ['readOnly' => true] + (array) $this->process($schema->unwrap()),
-            $schema instanceof ZodPipe => (array) $this->process($this->io === 'input'
-                ? ($schema->in() instanceof ZodTransform ? $schema->out() : $schema->in())
-                : $schema->out()),
             $schema instanceof ZodTransform => $this->unrepresentable('Transforms cannot be represented in JSON Schema'),
             $schema instanceof ZodCustom => $this->unrepresentable('Custom types cannot be represented in JSON Schema'),
             default => $this->unrepresentable(get_class($schema) . ' cannot be represented in JSON Schema'),
         };
+    }
+
+    /**
+     * The own keys and the processed inner schema of a wrapper schema, or null for other schemas.
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>|\stdClass}|null
+     */
+    private function wrapperParts(ZodType $schema): ?array
+    {
+        return match (true) {
+            $schema instanceof ZodOptional, $schema instanceof ZodNonOptional => [[], $this->process($schema->unwrap())],
+            // zod: `JSON.parse(JSON.stringify(defaultValue))`
+            $schema instanceof ZodDefault => [['default' => self::jsonValue($schema->defaultValue())], $this->process($schema->unwrap())],
+            $schema instanceof ZodReadonly => [['readOnly' => true], $this->process($schema->unwrap())],
+            $schema instanceof ZodPipe => [[], $this->process($this->io === 'input'
+                ? ($schema->in() instanceof ZodTransform ? $schema->out() : $schema->in())
+                : $schema->out())],
+            default => null,
+        };
+    }
+
+    /** `JSON.parse(JSON.stringify(value))` of a default value: dates become ISO strings. */
+    private static function jsonValue(mixed $value): mixed
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return \DateTimeImmutable::createFromInterface($value)->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\\TH:i:s.v\\Z');
+        }
+        if ($value instanceof \JsonSerializable) {
+            return self::jsonValue($value->jsonSerialize());
+        }
+        if (is_array($value)) {
+            return array_map(self::jsonValue(...), $value);
+        }
+
+        return $value;
     }
 
     /** @return array<string, mixed> */
