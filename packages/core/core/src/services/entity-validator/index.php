@@ -123,7 +123,7 @@ final class EntityValidator
 
         if ($attr['repeatable'] ?? false) {
             $validator = Yup::array()->of(
-                Yup::lazy(fn (mixed $item): Yup => $this->createModelValidator($createOrUpdate, ['componentContext' => $componentContext, 'model' => $model, 'data' => is_array($item) ? $item : []], $options)->notNull()),
+                Yup::lazy(fn (mixed $item): Yup => $this->createModelValidator($createOrUpdate, ['componentContext' => $componentContext, 'model' => $model, 'data' => is_array($item) ? $item : []], $options)->notNull()->rejectEmptyList()),
             );
 
             $validator = self::addRequiredValidation($createOrUpdate, $validator, true);
@@ -135,11 +135,13 @@ final class EntityValidator
             return $validator;
         }
 
+        // a component sent as `[]` is a JSON array, not an object (request bodies keep `{}` apart
+        // as an EmptyObject): yup's object type check fails it, as upstream's does
         $validator = $this->createModelValidator($createOrUpdate, [
             'model' => $model,
             'data' => is_array($updatedAttribute['value']) ? $updatedAttribute['value'] : [],
             'componentContext' => $componentContext,
-        ], $options);
+        ], $options)->rejectEmptyList();
 
         return self::addRequiredValidation($createOrUpdate, $validator, !($options['isDraft'] ?? false) && ($attr['required'] ?? false));
     }
@@ -159,7 +161,7 @@ final class EntityValidator
             $model = is_string($componentUid) ? $this->strapi->getModel($componentUid) : null;
             $schema = Yup::object([
                 '__component' => Yup::string()->required()->oneOf(array_keys($this->strapi->components())),
-            ])->notNull();
+            ])->notNull()->rejectEmptyList();
 
             return $model !== null
                 ? $schema->concat($this->createModelValidator($createOrUpdate, ['model' => $model, 'data' => is_array($item) ? $item : [], 'componentContext' => $componentContext], $options))

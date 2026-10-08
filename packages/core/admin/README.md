@@ -32,7 +32,7 @@ Upstream server files (`server/src/…`, `shared/…`) and their state here. `ee
 | Project settings | service `project-settings` (logos through the upload plugin: `upload.formatFileInfo`, `image-manipulation.getDimensions`, `plugin('upload').provider.uploadStream/delete`); `admin.updateProjectSettings`; validation `project-settings` |
 | AI | `ai/routes/ai`, `ai/controllers/ai`, `ai/services/ai` (registered as `ai.admin`; `strapi.ai.admin` in core) |
 | Routes | all: `admin`, `authentication`, `users`, `permissions`, `roles`, `webhooks`, `api-tokens`, `admin-tokens`, `content-api`, `transfer`, `homepage`, `serve-admin-panel`, `ai/routes/ai` |
-| Shared | `shared/utils/session-auth`, `auth-cookie-name`, `auth-cookie-path`, `auth-cookie-domain` |
+| Shared | `shared/utils/session-auth`, `auth-cookie-name`, `auth-cookie-path`, `auth-cookie-domain`, `audit-log-export` (constants; their consumers are EE) |
 
 ### Stubbed / not ported yet
 
@@ -41,4 +41,3 @@ Upstream server files (`server/src/…`, `shared/…`) and their state here. `ee
 | `controllers/transfer/runner` push/pull | ported: the request is authenticated (`data-transfer` strategy), verified for its scope and upgraded to the `strapi/data-transfer` push/pull handler. FPM and FrankenPHP cannot hold the WebSocket, so the upgrade only happens under `strapi transfer:serve` (route `/admin/transfer/runner/*` to it); a runner request served by the HTTP worker answers `501 Not Implemented` saying so. See packages/core/data-transfer/README.md |
 | `controllers/admin.licenseTrialTimeLeft` | Enterprise license registry: throws `NotImplementedError` |
 | `ai/services/ai` | ported; without an Enterprise license (never in the PHP port) `isAvailable()`/`isStrapiManagedAiEnabled()` are false, the AI routes answer 404 and the AI server is never contacted, as upstream on an unlicensed project |
-| `shared/utils/audit-log-export` | not ported (used by the EE audit-logs export) |

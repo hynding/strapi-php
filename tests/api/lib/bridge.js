@@ -293,6 +293,25 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
             args[0]({ trx: undefined, commit: noop, rollback: noop, onCommit: noop, onRollback: noop })
           );
         }
+        // `strapi.ai.mcp.registerTool(definition)` (synchronous, not awaited upstream): the Zod schemas cross as JSON Schema (rebuilt as
+        // PHP Zod by Strapi\ApiTests\McpDefinition) and the handler runs here, called back with the
+        // JSON params (`{ args, extra }`); `createHandler` gets no strapi/context of the worker
+        if (last && last.get === 'registerTool' && prev && prev.get === 'mcp' && callbacks && args[0] && typeof args[0] === 'object') {
+          const { z } = require('@strapi/utils');
+          const def = args[0];
+          const toJson = (schema, io) => z.toJSONSchema(schema, { target: 'draft-2020-12', io });
+          const encoded = {
+            $mcpTool: {
+              ...Object.fromEntries(Object.entries(def).filter(([, v]) => typeof v !== 'function')),
+              inputJsonSchema: def.resolveInputSchema ? toJson(def.resolveInputSchema({}), 'input') : undefined,
+              outputJsonSchema: toJson(def.resolveOutputSchema({}), 'output'),
+              handler: { $callback: { url: callbacks.url, id: callbacks.register((params) => def.createHandler(root, {})(params)) } },
+            },
+          };
+          // synchronous upstream, and called without await: send it now
+          runSync([...steps, { call: [encodeArg(encoded)] }]);
+          return undefined;
+        }
         // `strapi.db.lifecycles.subscribe(subscriber)` is synchronous upstream and returns the
         // unsubscribe function: subscribe now, with the subscriber's functions called back in this
         // process (Strapi\ApiTests\Callback), and hand back a function that unsubscribes

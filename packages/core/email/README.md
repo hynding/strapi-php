@@ -29,8 +29,11 @@ repository root for the naming rules. The package is an internal plugin (`compos
 
 Barrel files `controllers/index`, `services/index`, `routes/index`, `middlewares/index` are
 registries and ported; `routes/validation/index` only re-exports and is not. `server/src/types.ts`
-and `shared/types.ts` are TypeScript types only. `shared/email-address-parser.ts` is used by the
-admin Settings page only (the JS admin bundle ships it).
+and `shared/types.ts` are TypeScript types only. `shared/email-address-parser.ts` (used by the admin
+Settings page) is `shared/email-address-parser.php` (`EmailAddressParser::parseEmailAddress()`,
+`formatEmailAddress()`, `isValidEmail()`, `parseMultipleEmailAddresses()`; `tests/Shared/`), and
+`documentation/1.0.0/overrides/email-Email.json` (the documentation plugin's legacy override) is
+copied as is.
 
 ### Provider loading
 

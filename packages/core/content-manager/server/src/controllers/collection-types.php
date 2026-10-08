@@ -16,10 +16,11 @@ use Strapi\ContentManager\Utils\Utils;
 use Strapi\Core\Services\Server\Context;
 use Strapi\Core\Strapi;
 use Strapi\Utils\ContentTypes;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\ForbiddenError;
 use Strapi\Utils\Errors\NotFoundError;
 use Strapi\Utils\Primitives\Objects;
-use Strapi\Utils\PublicationFilter;
+use Strapi\Utils\HasPublishedVersionParam;
 use Strapi\Utils\SetCreatorFields;
 
 /** Port of server/src/controllers/collection-types.ts. */
@@ -59,6 +60,19 @@ final class CollectionTypes
     private static function body(Context $ctx): array
     {
         $body = $ctx->requestBody();
+
+        return is_array($body) ? $body : [];
+    }
+
+    /**
+     * The body as document data: a JSON `{}` stays an EmptyObject in component, dynamic-zone and
+     * json values, so the entity validator tells it from `[]` (see Strapi\Utils\EmptyObject).
+     *
+     * @return array<string, mixed>
+     */
+    private function documentBody(Context $ctx, string $model): array
+    {
+        $body = EmptyObject::keepInDocumentData($ctx->requestBody(true), $this->strapi->getModel($model), $this->strapi->getModel(...));
 
         return is_array($body) ? $body : [];
     }
@@ -275,7 +289,7 @@ final class CollectionTypes
     {
         $user = $ctx->state()->get('user');
         $model = self::model($ctx);
-        $body = self::body($ctx);
+        $body = $this->documentBody($ctx, $model);
 
         $documentManager = Utils::getService($this->strapi, 'document-manager');
         $permissionChecker = $this->permissionChecker($ctx, $model);
@@ -316,7 +330,7 @@ final class CollectionTypes
         $user = $ctx->state()->get('user');
         $id = (string) $ctx->param('id');
         $model = self::model($ctx);
-        $body = self::body($ctx);
+        $body = $this->documentBody($ctx, $model);
 
         $documentManager = Utils::getService($this->strapi, 'document-manager');
         $permissionChecker = $this->permissionChecker($ctx, $model);
@@ -434,9 +448,9 @@ final class CollectionTypes
         if (array_key_exists('publicationFilter', $query)) {
             $findPageParams['publicationFilter'] = $query['publicationFilter'];
         } else {
-            $legacy = PublicationFilter::parseHasPublishedVersionQueryParam($query['hasPublishedVersion'] ?? null);
+            $legacy = HasPublishedVersionParam::parseHasPublishedVersionQueryParam($query['hasPublishedVersion'] ?? null);
             if ($legacy !== null) {
-                $findPageParams['publicationFilter'] = PublicationFilter::hasPublishedVersionBooleanToPublicationFilterMode($legacy);
+                $findPageParams['publicationFilter'] = HasPublishedVersionParam::hasPublishedVersionBooleanToPublicationFilterMode($legacy);
             }
         }
 
@@ -605,7 +619,7 @@ final class CollectionTypes
         $user = $ctx->state()->get('user');
         $model = self::model($ctx);
         $id = (string) $ctx->param('sourceId');
-        $body = self::body($ctx);
+        $body = $this->documentBody($ctx, $model);
 
         $documentManager = Utils::getService($this->strapi, 'document-manager');
         $permissionChecker = $this->permissionChecker($ctx, $model);

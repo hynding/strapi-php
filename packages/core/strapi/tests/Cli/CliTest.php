@@ -31,7 +31,7 @@ final class CliTest extends TestCase
     {
         $application = Cli::createCLI([], self::$appDir);
 
-        foreach (['start', 'develop', 'build', 'console', 'version', 'routes:list', 'content-types:list', 'cron:run', 'migrations:run', 'configuration:dump', 'configuration:restore', 'admin:create-user', 'admin:reset-user-password', 'telemetry:enable', 'telemetry:disable'] as $name) {
+        foreach (['start', 'develop', 'build', 'console', 'version', 'routes:list', 'content-types:list', 'cron:run', 'migrations:run', 'configuration:dump', 'configuration:restore', 'admin:create-user', 'admin:reset-user-password', 'telemetry:enable', 'telemetry:disable', 'components:list', 'controllers:list', 'hooks:list', 'middlewares:list', 'policies:list', 'services:list', 'report', 'templates:generate', 'openapi:generate'] as $name) {
             self::assertTrue($application->has($name), "command {$name} is registered");
         }
 
@@ -97,6 +97,64 @@ final class CliTest extends TestCase
         self::assertSame(0, $code, $text);
         self::assertStringContainsString('api::article.article', $text);
         self::assertStringContainsString('api::homepage.homepage', $text);
+    }
+
+    /** components:list, controllers:list, hooks:list, middlewares:list, policies:list, services:list */
+    public function testRegistryListCommands(): void
+    {
+        $expected = [
+            'components:list' => ['basic.simple', 'blog.test-como'],
+            'controllers:list' => ['api::article.article', 'plugin::upload.content-api'],
+            'hooks:list' => ['strapi::content-types.beforeSync', 'strapi::content-types.afterSync'],
+            'middlewares:list' => ['strapi::errors', 'strapi::body'],
+            'policies:list' => ['global::deny', 'admin::isAuthenticatedAdmin'],
+            'services:list' => ['api::article.article', 'plugin::upload.upload'],
+        ];
+
+        foreach ($expected as $command => $names) {
+            $application = Cli::createCLI([], self::$appDir);
+            $output = new BufferedOutput();
+            $code = $application->run(new ArrayInput(['command' => $command]), $output);
+            $text = $output->fetch();
+
+            self::assertSame(0, $code, $text);
+            self::assertStringContainsString('| Name', $text, $command);
+            foreach ($names as $name) {
+                self::assertStringContainsString("| {$name} ", $text, $command);
+            }
+        }
+    }
+
+    public function testReportCommand(): void
+    {
+        $application = Cli::createCLI([], self::$appDir);
+        $output = new BufferedOutput();
+        $code = $application->run(new ArrayInput(['command' => 'report', '--all' => true]), $output);
+        $text = $output->fetch();
+
+        self::assertSame(0, $code, $text);
+        self::assertMatchesRegularExpression('/^Launched In: \d+ ms$/m', $text);
+        self::assertStringContainsString('Environment: ', $text);
+        self::assertStringContainsString('Strapi Version: ' . \Strapi\Core\Configuration\Configuration::upstreamVersion(), $text);
+        self::assertStringContainsString('PHP Version: ' . PHP_VERSION, $text);
+        self::assertStringContainsString('Edition: Community', $text);
+        self::assertStringContainsString('Database: sqlite', $text);
+        self::assertStringContainsString('UUID: ', $text);
+        self::assertStringContainsString('Dependencies: {', $text);
+
+        $output = new BufferedOutput();
+        $application->run(new ArrayInput(['command' => 'report']), $output);
+        self::assertStringNotContainsString('UUID: ', $output->fetch());
+    }
+
+    public function testTemplatesGenerateIsDeprecated(): void
+    {
+        $application = Cli::createCLI([], sys_get_temp_dir());
+        $output = new BufferedOutput();
+        $code = $application->run(new ArrayInput(['command' => 'templates:generate', 'directory' => 'tpl']), $output);
+
+        self::assertSame(0, $code);
+        self::assertSame("This command is deprecated and will be removed in the next major release.\nYou can now copy an existing app and use it as a template.\n", $output->fetch());
     }
 
     public function testCronRunAndMigrationsRun(): void

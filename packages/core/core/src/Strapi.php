@@ -489,7 +489,8 @@ final class Strapi extends Container implements StrapiContract
                     'settings' => ['migrations' => ['dir' => $this->dirs()->root . '/database/migrations']],
                 ]));
             })
-            ->add('reload', fn (): Reloader => Reloader::createReloader($this));
+            ->add('reload', fn (): Reloader => Reloader::createReloader($this))
+            ->add('content-source-maps', fn (): Services\ContentSourceMaps => Services\ContentSourceMaps::createContentSourceMapsService($this));
 
         // the restricted-relation sanitizers consult `strapi.auth.verify`
         AuthScope::setVerifier(function (mixed $auth, string $scope): bool {

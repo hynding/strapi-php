@@ -7,6 +7,7 @@ namespace Strapi\Core\Tests\Server;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Strapi\Core\Services\Server\Context;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\HttpError;
 
 /** Koa semantics of the request context. */
@@ -88,6 +89,21 @@ final class ContextTest extends TestCase
         self::assertSame('yes', $response->getHeaderLine('X-Test'));
         self::assertSame('application/json; charset=utf-8', $response->getHeaderLine('Content-Type'));
         self::assertSame('{"ok":true,"f":1.0}', (string) $response->getBody());
+    }
+
+    public function testRequestBodyKeepsEmptyObjectsOnlyWhenAsked(): void
+    {
+        $ctx = self::ctx('POST');
+        $ctx->setRequestBody(['data' => ['comp' => new EmptyObject(), 'list' => []]]);
+
+        self::assertSame(['data' => ['comp' => [], 'list' => []]], $ctx->requestBody());
+        $marked = $ctx->requestBody(true);
+        self::assertIsArray($marked);
+        self::assertInstanceOf(EmptyObject::class, $marked['data']['comp']);
+        self::assertSame([], $marked['data']['list']);
+
+        $ctx->setRequestBody(['other' => 1]);
+        self::assertSame(['other' => 1], $ctx->requestBody());
     }
 
     public function testRedirect(): void

@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Strapi\Cli\Cli\Commands\Policies;
+
+use Strapi\Cli\Cli\Commands\StrapiCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/** Port of packages/core/strapi/src/cli/commands/policies/list.ts: `$ strapi policies:list`. */
+final class List_ extends StrapiCommand
+{
+    protected function configure(): void
+    {
+        parent::configure();
+        $this->setName('policies:list')->setDescription('List all the application policies');
+    }
+
+    protected function action(InputInterface $input, OutputInterface $output): int
+    {
+        $app = $this->createStrapi()->register();
+
+        $list = $app->get('policies')->keys();
+
+        $infoTable = new Table($output);
+        $infoTable->setHeaders(['<fg=blue>Name</>']);
+        foreach ($list as $name) {
+            $infoTable->addRow([$name]);
+        }
+        $infoTable->render();
+
+        $app->destroy();
+
+        return Command::SUCCESS;
+    }
+}

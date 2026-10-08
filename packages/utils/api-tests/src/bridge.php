@@ -262,6 +262,9 @@ final class Bridge
 
             return $this->replay($steps);
         }
+        if (array_keys($value) === ['$mcpTool'] && is_array($value['$mcpTool'])) {
+            return McpDefinition::fromTest($this->resolveRefs($value['$mcpTool']));
+        }
         if (array_keys($value) === ['$callback'] && is_array($value['$callback'])) {
             return new Callback((string) ($value['$callback']['url'] ?? ''), (int) ($value['$callback']['id'] ?? 0));
         }

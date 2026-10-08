@@ -38,8 +38,15 @@ interface Context
     /** @param array<array-key, mixed> $query */
     public function setQuery(array $query): void;
 
-    /** @return mixed parsed request body (JSON object as array, multipart as ['data' => ..., 'files' => ...]) */
-    public function requestBody(): mixed;
+    /**
+     * The parsed request body (JSON object as array, multipart as ['data' => ..., 'files' => ...]).
+     *
+     * JSON `{}` and `[]` both read as `[]`, unless `$emptyObjects`: then an empty JSON object is a
+     * `Strapi\Utils\EmptyObject` (for validation that must tell an object from an array).
+     *
+     * @return mixed
+     */
+    public function requestBody(bool $emptyObjects = false): mixed;
 
     /** @return array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>> a list when the multipart field is repeated (koa-body) */
     public function files(): array;

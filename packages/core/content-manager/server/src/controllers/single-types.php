@@ -12,6 +12,7 @@ use Strapi\ContentManager\Services\Utils\Populate;
 use Strapi\ContentManager\Utils\Utils;
 use Strapi\Core\Services\Server\Context;
 use Strapi\Core\Strapi;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\ForbiddenError;
 use Strapi\Utils\Errors\NotFoundError;
 use Strapi\Utils\SetCreatorFields;
@@ -40,6 +41,19 @@ final class SingleTypes
     private static function body(Context $ctx): array
     {
         $body = $ctx->requestBody();
+
+        return is_array($body) ? $body : [];
+    }
+
+    /**
+     * The body as document data: a JSON `{}` stays an EmptyObject in component, dynamic-zone and
+     * json values, so the entity validator tells it from `[]` (see Strapi\Utils\EmptyObject).
+     *
+     * @return array<string, mixed>
+     */
+    private function documentBody(Context $ctx, string $model): array
+    {
+        $body = EmptyObject::keepInDocumentData($ctx->requestBody(true), $this->strapi->getModel($model), $this->strapi->getModel(...));
 
         return is_array($body) ? $body : [];
     }
@@ -92,7 +106,7 @@ final class SingleTypes
     {
         $user = $ctx->state()->get('user');
         $model = (string) $ctx->param('model');
-        $body = self::body($ctx);
+        $body = $this->documentBody($ctx, $model);
         $query = $ctx->query();
 
         $documentManager = Utils::getService($this->strapi, 'document-manager');

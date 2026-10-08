@@ -72,3 +72,9 @@ binary), `STRAPI_API_TESTS_TMP` (scratch dir, default `.tmp/`; give concurrent r
 
 Logs: each server writes `.tmp/app/.tmp/frankenphp-<port>.log` (the transfer sidecar
 `transfer-serve-<port>.log`).
+
+- `strapi.ai.mcp.registerTool(definition)` from a test's `register`/`bootstrap` callback (synchronous
+  and not awaited upstream) is sent at once: the Zod schemas cross as JSON Schema 2020-12 and are
+  rebuilt as PHP Zod (`Strapi\ApiTests\McpDefinition`), the handler stays in the test process and
+  is called back with the JSON params. `tests/api/core/mcp` needs `ajv` and `ajv-formats`
+  (devDependencies, as upstream's root `package.json` pins them).

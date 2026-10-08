@@ -36,7 +36,11 @@ arrays (`['uid' => ..., 'modelType' => ..., 'attributes' => [...]]`); `ContentTy
 | `parse-type.ts` | `src/parse-type.php` | `ParseType::parseType(['type', 'value', 'forceCast'])`, `isBooleanLike()`, `parseBoolean()`, `parseDate()`, `parseTime()`, `parseDateTimeOrTimestamp()`, `parseISO()`, `toNumber()`. Same error messages as upstream. |
 | `template.ts` | `src/template.php` | `Template::createStrictInterpolationRegExp()`, `createLooseInterpolationRegExp()`, plus `render()`. |
 | `print-value.ts` | `src/print-value.php` | `PrintValue::printValue()`. |
-| `publication-filter.ts` (parsing half) | `src/publication-filter.php` | `PublicationFilter::parsePublicationFilter()`, `validatePublicationFilterQueryParam()`, and `has-published-version-param.ts`'s `parseHasPublishedVersionQueryParam()` / `hasPublishedVersionBooleanToPublicationFilterMode()`. |
+| `publication-filter.ts` (parsing half) | `src/publication-filter.php` | `PublicationFilter::parsePublicationFilter()`, `validatePublicationFilterQueryParam()`. |
+| `has-published-version-param.ts` | `src/has-published-version-param.php` | `HasPublishedVersionParam::parseHasPublishedVersionQueryParam()`, `hasPublishedVersionBooleanToPublicationFilterMode()`. |
+| `route-serialization.ts` | `src/route-serialization.php` | `RouteSerialization::sanitizeRouteForSerialization()`, `sanitizeRoutesArrayForSerialization()`, `sanitizeRoutesMapForSerialization()` (used by core's content API and users-permissions). |
+| `content-api-router.ts` | `src/content-api-router.php` | `ContentApiRouter::createContentApiRoutesFactory(fn)`: an invokable factory (`{ type: 'content-api', routes }`, built once) with an assignable `routes` property. The plugin route files return router arrays, which the loader accepts as is. |
+| `install-id.ts` | `src/install-id.php` | `InstallId::generateInstallId($projectId, $installId)` (node-machine-id's sources: dbus/`/etc/machine-id`, `IOPlatformUUID`, `MachineGuid`). |
 | `model-cache.ts` | `src/model-cache.php` | `ModelCache::createModelCache($getModel)` → `getModel()`, `clear()`, `callable()`. |
 | `relations.ts` | `src/relations.php` | `Relations::isOneToAny/isManyToAny/isAnyToOne/isAnyToMany/isPolymorphic/getRelationalFields()`, `validRelationOrderingKeys()`. |
 | `content-api-constants.ts` | `src/content-api-constants.php` | `ContentApiConstants::SHARED_QUERY_PARAM_KEYS`, `ALLOWED_QUERY_PARAM_KEYS`, `RESERVED_INPUT_PARAM_KEYS`. |
@@ -61,8 +65,7 @@ arrays (`['uid' => ..., 'modelType' => ..., 'attributes' => [...]]`); `ContentTy
 | --- | --- |
 | `zod.ts`, `yup.ts`, `validators.ts`, `format-yup-error.ts`, `validation/*` (route validators, utilities) | JS validation libraries; phase 2. `YupValidationError` keeps the error shape so later validators can raise it. |
 | `publication-filter.ts` → `buildPublicationFilterWhere` | Builds knex subqueries; belongs to the database package. |
-| `content-api-router.ts`, `route-serialization.ts` | Belong to core (router). |
-| `package-manager.ts`, `get-preferred-pm.ts`, `install-id.ts`, `user-agent.ts`, `import-default.ts`, `file.ts`, `security.ts`, `sessions.ts`, `audit-logs.ts`, `typescript/*` | Node/npm tooling, streams, CSP merging and admin session helpers; not foundation. |
+| `import-default.ts` | Not applicable: `require()` interop with ES module default exports (listed as such in `scripts/parity-map.php`). |
 | `sanitize/visitors/remove-user-relation-from-role-entities` | Does not exist in upstream 5.56.0. |
 
 ## Deviations from upstream

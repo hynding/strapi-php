@@ -28,8 +28,15 @@ cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 3. `data-transfer`, `graphql`, `documentation` + `openapi`, `content-releases`, `generators`,
    `create-strapi-app`, `upgrade`, `sentry`, `color-picker`.
 
+Fixed gaps:
+- Request bodies: JSON `{}` and `[]` used to both decode to a PHP `[]`, so validation could not
+  tell an object from an array (components). A `{}` is now kept as a `Strapi\Utils\EmptyObject`
+  for the readers that ask for it. See [`empty-json-objects.md`](empty-json-objects.md).
+- Yup array validation on `min`/`max` component sets: profiled, and it scales linearly
+  (entity validator, 1280 repeatable items with nested components ≈ 0.55 s, 2560 ≈ 1.1 s).
+  Each request in the `*-min-max` component suites takes under 100 ms. `max_execution_time = 0`
+  in tests/api is there for worker startup (php/strapi.ini), not for validation.
+
 Known gaps worth their own fix:
-- Request bodies: JSON `{}` and `[]` both decode to a PHP `[]`, so validation that must tell
-  an object from an array (components) can't (about a dozen API tests).
-- Yup array validation on large `min`/`max` component sets is slow enough to hit PHP's time
-  limit (tests/api disables it).
+- A JSON `{}` is read back as `{}` only for content `json` attributes (`api::` content types,
+  components). Internal JSON columns (admin permissions, history versions...) still read it as `[]`.

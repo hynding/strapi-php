@@ -29,7 +29,8 @@
     "prefer-stable": true,
     "autoload": {
         "classmap": [
-            "server/src/"
+            "server/src/",
+            "shared/"
         ]
     },
     "autoload-dev": {

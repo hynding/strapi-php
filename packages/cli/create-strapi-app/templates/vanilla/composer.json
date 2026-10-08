@@ -1,0 +1,10 @@
+{
+    "scripts": {
+        "build": "@php bin/strapi build",
+        "develop": "@php bin/strapi develop",
+        "dev": "@php bin/strapi develop",
+        "console": "@php bin/strapi console",
+        "start": "@php bin/strapi start",
+        "strapi": "@php bin/strapi"
+    }
+}

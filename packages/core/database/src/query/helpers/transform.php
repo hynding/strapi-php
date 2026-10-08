@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Database\Query\Helpers;
 
 use Strapi\Database\Fields\Fields;
+use Strapi\Database\Fields\JsonField;
 use Strapi\Database\Utils\Types;
 
 /**
@@ -28,6 +29,10 @@ final class Transform
 
         $attributes = $meta['attributes'];
         $obj = [];
+        // PHP port: a content `json` attribute (api:: content types, components) reads `{}` as an
+        // EmptyObject, answered as `{}`; internal models (admin::, plugin::, strapi::) keep `[]`
+        $uid = $meta['uid'];
+        $keepEmptyObjects = str_starts_with($uid, 'api::') || ($uid !== '' && !str_contains($uid, '::'));
 
         foreach ($row as $column => $value) {
             if (!array_key_exists($column, $meta['columnToAttribute'])) {
@@ -38,7 +43,10 @@ final class Transform
             $attribute = $attributes[$attributeName];
             $type = (string) ($attribute['type'] ?? '');
 
-            if (Types::isScalar($type)) {
+            if ($type === 'json' && $value !== null && $keepEmptyObjects) {
+                $field = Fields::createField($attribute);
+                $obj[$attributeName] = $field instanceof JsonField ? $field->fromDBKeepingEmptyObjects($value) : $field->fromDB($value);
+            } elseif (Types::isScalar($type)) {
                 $obj[$attributeName] = $value === null ? null : Fields::createField($attribute)->fromDB($value);
             } elseif (Types::isRelation($type)) {
                 $obj[$attributeName] = $value;

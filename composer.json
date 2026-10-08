@@ -95,10 +95,15 @@
             "Strapi\\DataTransfer\\Tests\\": "packages/core/data-transfer/tests/",
             "StrapiPlugin\\Announcements\\Tests\\": "examples/plugins/announcements/tests/php/",
             "Strapi\\Openapi\\Tests\\": "packages/core/openapi/tests/",
-            "Strapi\\Plugin\\Documentation\\Tests\\": "packages/plugins/documentation/tests/"
+            "Strapi\\Plugin\\Documentation\\Tests\\": "packages/plugins/documentation/tests/",
+            "Strapi\\Upgrade\\Tests\\": "packages/utils/upgrade/tests/",
+            "Strapi\\CreateStrapiApp\\Tests\\": "packages/cli/create-strapi-app/tests/"
         },
         "classmap": [
-            "examples/plugins/announcements/server/src/"
+            "examples/plugins/announcements/server/src/",
+            "packages/core/email/shared/",
+            "packages/utils/upgrade/src/",
+            "packages/cli/create-strapi-app/src/"
         ]
     },
     "scripts": {

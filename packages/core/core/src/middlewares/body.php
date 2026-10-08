@@ -6,6 +6,7 @@ namespace Strapi\Core\Middlewares;
 
 use Strapi\Core\Services\Server\Context;
 use Strapi\Core\Strapi;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\ValidationError;
 use Strapi\Utils\Qs;
 
@@ -16,6 +17,9 @@ use Strapi\Utils\Qs;
  * `jsonLimit`, `formLimit`, `textLimit` (`'1mb'`-style strings or bytes), `multipart`, `formidable.maxFileSize`.
  *
  * Multipart `data` fields holding JSON are decoded, as the upload endpoints expect.
+ *
+ * JSON is decoded with {@see EmptyObject::decode()}: an empty object `{}` becomes an `EmptyObject`
+ * marker, which `$ctx->requestBody()` turns back into `[]` unless a reader asks for it.
  */
 final class Body
 {
@@ -121,7 +125,7 @@ final class Body
                 // koa-body + Strapi: multipart `data` is a JSON string
                 foreach ($fields as $key => $value) {
                     if (is_string($value) && $value !== '' && ($value[0] === '{' || $value[0] === '[') && json_validate($value)) {
-                        $fields[$key] = json_decode($value, true);
+                        $fields[$key] = EmptyObject::decode($value);
                     }
                 }
 
@@ -291,7 +295,7 @@ final class Body
     private static function decodeJson(string $raw): mixed
     {
         try {
-            return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+            return EmptyObject::decode($raw, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             if ($e->getCode() !== JSON_ERROR_UTF16) {
                 throw $e;
@@ -303,7 +307,7 @@ final class Body
                 $raw,
             );
 
-            return json_decode($fixed, true, 512, JSON_THROW_ON_ERROR);
+            return EmptyObject::decode($fixed, 512, JSON_THROW_ON_ERROR);
         }
     }
 }
