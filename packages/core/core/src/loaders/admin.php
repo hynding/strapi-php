@@ -6,6 +6,8 @@ namespace Strapi\Core\Loaders;
 
 use Strapi\Core\Strapi;
 use Strapi\Database\Utils\SchemaFactory;
+use Strapi\Types\Core\State;
+use Strapi\Utils\Policy\PolicyContext;
 use Strapi\Utils\Primitives\Objects;
 
 /**
@@ -21,6 +23,10 @@ use Strapi\Utils\Primitives\Objects;
  * and the users-permissions user/role/permission tables. Upstream gets them from the admin, upload
  * and users-permissions packages; until those are ported, the ones missing from the registries are
  * registered here from {@see SchemaFactory::builtinSchemas()} so the database schema stays identical.
+ *
+ * Built-in policies: plugin admin routes name `admin::isAuthenticatedAdmin` (nearly every upstream
+ * plugin does). Until `strapi/admin` provides its policies, the ones it would define are registered
+ * here, so such plugins boot; see {@see self::builtinPolicies()}.
  */
 final class Admin
 {
@@ -39,11 +45,28 @@ final class Admin
         $strapi->get('services')->add('admin::', $admin['services'] ?? []);
         $strapi->get('controllers')->add('admin::', $admin['controllers'] ?? []);
         $strapi->get('content-types')->add('admin::', self::formatContentTypes($admin['contentTypes'] ?? []));
-        $strapi->get('policies')->add('admin::', $admin['policies'] ?? []);
+        $strapi->get('policies')->add('admin::', [...self::builtinPolicies(), ...($admin['policies'] ?? [])]);
         $strapi->get('middlewares')->add('admin::', $admin['middlewares'] ?? []);
 
         $userAdminConfig = $strapi->config()->get('admin', []);
         $strapi->get('config')->set('admin', Objects::merge([], $admin['config'] ?? [], is_array($userAdminConfig) ? $userAdminConfig : []));
+    }
+
+    /**
+     * Policies upstream's admin package defines, ported as-is; the admin module's own win.
+     *
+     * @return array<string, callable>
+     */
+    private static function builtinPolicies(): array
+    {
+        return [
+            // packages/core/admin/server/src/policies/isAuthenticatedAdmin.ts
+            'isAuthenticatedAdmin' => static function (PolicyContext $policyCtx): bool {
+                $state = $policyCtx['state'];
+
+                return $state instanceof State && $state->isAuthenticated();
+            },
+        ];
     }
 
     private static function registerBuiltinSchemas(Strapi $strapi): void

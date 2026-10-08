@@ -1,0 +1,9 @@
+{
+  "description": "The admin summary refuses anonymous requests with a 401",
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/announcements/summary" },
+      "expect": { "status": 401, "body": { "data": null, "error": { "status": 401, "name": "UnauthorizedError" } } }
+    }
+  ]
+}

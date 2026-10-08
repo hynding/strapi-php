@@ -63,6 +63,8 @@ Rules:
 
 - `packages/` — one Composer package per upstream package (see `packages/*/*/README.md`).
 - `examples/getstarted` — the upstream example project, PHP edition.
+- `examples/plugins/announcements` — a third-party plugin that runs on both Strapi and strapi-php from
+  one JSON spec (generated types, `.ts`/`.php` parity check, shared conformance fixtures).
 - `tests/api` — upstream's Jest HTTP suite, run against this backend.
 - `scripts/check-package-versions.php` — all packages share one version.
 - `scripts/strapi-release-watch.php` — polls npm for a new upstream version.

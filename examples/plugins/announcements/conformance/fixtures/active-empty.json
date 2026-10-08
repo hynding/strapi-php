@@ -1,0 +1,9 @@
+{
+  "description": "No announcements: an empty list, not an error",
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active" },
+      "expect": { "status": 200, "body": { "data": [], "meta": { "limit": 3 } } }
+    }
+  ]
+}

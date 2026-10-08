@@ -69,8 +69,12 @@
             "Strapi\\Logger\\Tests\\": "packages/utils/logger/tests/",
             "Strapi\\Database\\Tests\\": "packages/core/database/tests/",
             "Strapi\\Core\\Tests\\": "packages/core/core/tests/",
-            "Strapi\\Cli\\Tests\\": "packages/core/strapi/tests/"
-        }
+            "Strapi\\Cli\\Tests\\": "packages/core/strapi/tests/",
+            "StrapiPlugin\\Announcements\\Tests\\": "examples/plugins/announcements/tests/php/"
+        },
+        "classmap": [
+            "examples/plugins/announcements/server/src/"
+        ]
     },
     "scripts": {
         "test": "phpunit",

@@ -1,0 +1,13 @@
+{
+  "type": "admin",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/summary",
+      "handler": "announcement.summary",
+      "config": {
+        "policies": ["admin::isAuthenticatedAdmin"]
+      }
+    }
+  ]
+}

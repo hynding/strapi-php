@@ -39,3 +39,24 @@ jobs:
       - run: cp examples/getstarted/.env.example examples/getstarted/.env
       - run: php examples/getstarted/bin/strapi routes:list
       - run: php tests/php/smoke.php
+
+  example-plugin:
+    name: announcements plugin on Strapi (spec in sync, conformance)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/plugins/announcements
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: examples/plugins/announcements/package-lock.json
+      - run: npm ci
+      # generated types current, every server .ts has its .php twin, manifests in lockstep
+      - run: npm run check
+      - run: npm run typecheck
+      - run: npm run build
+      # the same fixtures run against strapi-php in the php job (composer test)
+      - run: npm run test:conformance

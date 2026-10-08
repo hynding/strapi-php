@@ -1,0 +1,46 @@
+{
+  "description": "Active announcements: most severe first, newest first within a level, capped by maxActive (3)",
+  "seed": {
+    "plugin::announcements.announcement": [
+      { "title": "A", "level": "info" },
+      { "title": "B", "level": "critical" },
+      { "title": "C", "level": "warning" },
+      { "title": "D", "level": "info" },
+      { "title": "E", "level": "critical" },
+      { "title": "F", "level": "critical", "active": false }
+    ]
+  },
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active" },
+      "expect": {
+        "status": 200,
+        "body": {
+          "data": [
+            { "title": "E", "level": "critical" },
+            { "title": "B", "level": "critical" },
+            { "title": "C", "level": "warning" }
+          ],
+          "meta": { "limit": 3 }
+        }
+      }
+    },
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active?limit=2" },
+      "expect": {
+        "status": 200,
+        "body": {
+          "data": [{ "title": "E" }, { "title": "B" }],
+          "meta": { "limit": 2 }
+        }
+      }
+    },
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active?limit=50" },
+      "expect": {
+        "status": 200,
+        "body": { "meta": { "limit": 3 } }
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+    "name": "strapi-plugin/announcements",
+    "description": "Example dual-runtime plugin: one spec, a Strapi (Node) server, a strapi-php server and a shared admin",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0",
+    "require": {
+        "php": ">=8.3",
+        "strapi/core": "^5.56",
+        "strapi/utils": "^5.56"
+    },
+    "autoload": {
+        "classmap": [
+            "server/src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "StrapiPlugin\\Announcements\\Tests\\": "tests/php/"
+        }
+    },
+    "extra": {
+        "strapi": {
+            "kind": "plugin",
+            "name": "announcements",
+            "displayName": "Announcements",
+            "description": "Site-wide announcements, ordered by severity",
+            "server": "server/src/index.php",
+            "namespace": "StrapiPlugin\\Announcements"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

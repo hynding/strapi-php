@@ -1,0 +1,27 @@
+{
+  "description": "An invalid limit is a 400 ValidationError with Strapi's error envelope",
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active?limit=0" },
+      "expect": {
+        "status": 400,
+        "body": {
+          "data": null,
+          "error": {
+            "status": 400,
+            "name": "ValidationError",
+            "message": "limit must be a positive integer",
+            "details": { "limit": "0" }
+          }
+        }
+      }
+    },
+    {
+      "request": { "method": "GET", "path": "/api/announcements/active?limit=abc" },
+      "expect": {
+        "status": 400,
+        "body": { "error": { "name": "ValidationError", "details": { "limit": "abc" } } }
+      }
+    }
+  ]
+}
