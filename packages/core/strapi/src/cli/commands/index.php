@@ -13,8 +13,9 @@ use Symfony\Component\Console\Command\Command;
  *
  * Not ported (see the package README): admin:delete-user / active-user / block-user / list-users,
  * components:list, controllers:list, hooks:list, middlewares:list, policies:list, services:list,
- * content-types:rename-field, generate, templates:generate, ts:generate-types, report, export,
- * import, transfer, openapi, enterprise, cloud. Added: cron:run, migrations:run.
+ * content-types:rename-field, templates:generate, ts:generate-types, report, enterprise, cloud.
+ * `openapi generate` is `openapi:generate`. Added: cron:run, migrations:run, transfer:serve (the
+ * remote transfer WebSocket server, see commands/transfer/serve.php).
  */
 final class Commands
 {
@@ -28,7 +29,9 @@ final class Commands
             static fn (CliContext $ctx): Command => new Configuration\Restore($ctx),
             static fn (CliContext $ctx): Command => new Console($ctx),
             static fn (CliContext $ctx): Command => new ContentTypes\List_($ctx),
+            static fn (CliContext $ctx): Command => new Generate($ctx),
             static fn (CliContext $ctx): Command => new Routes\List_($ctx),
+            static fn (CliContext $ctx): Command => new Openapi\Generate($ctx),
             static fn (CliContext $ctx): Command => new Start($ctx),
             static fn (CliContext $ctx): Command => new Telemetry\Disable($ctx),
             static fn (CliContext $ctx): Command => new Telemetry\Enable($ctx),
@@ -37,6 +40,10 @@ final class Commands
             static fn (CliContext $ctx): Command => new Develop($ctx),
             static fn (CliContext $ctx): Command => new Cron\Run($ctx),
             static fn (CliContext $ctx): Command => new Migrations\Run($ctx),
+            static fn (CliContext $ctx): Command => new Export\Command($ctx),
+            static fn (CliContext $ctx): Command => new Import\Command($ctx),
+            static fn (CliContext $ctx): Command => new Transfer\Command($ctx),
+            static fn (CliContext $ctx): Command => new Transfer\Serve($ctx),
         ];
     }
 }

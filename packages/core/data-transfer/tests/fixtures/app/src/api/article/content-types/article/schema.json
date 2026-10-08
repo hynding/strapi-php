@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "articles",
+  "info": {
+    "singularName": "article",
+    "pluralName": "articles",
+    "displayName": "Article"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "articles"
+    },
+    "block": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.block"
+      ]
+    },
+    "permissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::permission"
+    }
+  }
+}
