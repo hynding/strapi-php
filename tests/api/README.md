@@ -33,4 +33,15 @@ binary), `STRAPI_API_TESTS_TMP` (scratch dir, default `.tmp/`; give concurrent r
   parsing, which keeps only the last of a repeated field: `strapi::body` parses `php://input` and
   keeps them all, as koa-body does (several `files`, one `fileInfo` per file).
 
+- `app/config/plugins.php` gives the email plugin nodemailer's `jsonTransport` (messages are built,
+  nothing is sent). Upstream keeps the template's sendmail, which delivers in the background while
+  Node keeps serving (and the suites mock `send`); here delivery is synchronous in the one worker
+  and remote MX hosts time out in sandboxes (`POST /admin/forgot-password` would hang).
+
+- `jest.spyOn(<remote service>, 'method')` (e.g. `strapi.plugin('email').service('email')`)
+  works across the process boundary: the bridge replaces the registered service in the worker by
+  a `Strapi\ApiTests\Spy` whose spied method calls the jest mock back over HTTP (a callback
+  server in the test process, lib/bridge.js); `mockRestore()` puts the service back. Assigning a
+  mock to any other remote object stays local to the test process, as before.
+
 Logs: each server writes `.tmp/app/.tmp/frankenphp-<port>.log`.

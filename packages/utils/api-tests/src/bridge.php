@@ -107,6 +107,10 @@ final class Bridge
         for (; $i < $count; $i++) {
             $step = $steps[$i];
             $this->nullIsValue = false;
+            if (array_key_exists('spy', $step) || array_key_exists('unspy', $step)) {
+                // `jest.spyOn(remote, method)` / `mockRestore()` (lib/bridge.js): last step of the chain
+                return $this->toggleSpy($value, $step);
+            }
             if (!array_key_exists('get', $step)) {
                 // a bare call: the current value is a callable
                 $value = self::invoke($value, $this->args($step['call'] ?? []));
@@ -125,6 +129,45 @@ final class Bridge
         }
 
         return $value;
+    }
+
+    /**
+     * Installs (`spy: { method, url, id }`) or removes (`unspy: method`) a jest mock on a service:
+     * the service registered under the object's uid is replaced by a {@see Spy} wrapping it.
+     *
+     * @param array<string, mixed> $step
+     */
+    private function toggleSpy(mixed $target, array $step): bool
+    {
+        if (!is_object($target)) {
+            throw new \InvalidArgumentException('Only methods of a service object can be spied on, got ' . get_debug_type($target));
+        }
+
+        $services = $this->strapi->get('services');
+        $uid = null;
+        foreach ($services->getAll() as $serviceUid => $service) {
+            if ($service === $target) {
+                $uid = (string) $serviceUid;
+                break;
+            }
+        }
+        if ($uid === null) {
+            throw new \InvalidArgumentException('Only methods of a registered service can be spied on, got ' . get_debug_type($target));
+        }
+
+        if (isset($step['spy']) && is_array($step['spy'])) {
+            $spy = $target instanceof Spy ? $target : new Spy($target);
+            $spy->spy((string) $step['spy']['method'], (string) $step['spy']['url'], (int) $step['spy']['id']);
+            $services->set($uid, $spy);
+
+            return true;
+        }
+
+        if ($target instanceof Spy && !$target->unspy((string) $step['unspy'])) {
+            $services->set($uid, $target->original);
+        }
+
+        return true;
     }
 
     /**
