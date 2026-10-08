@@ -1,9 +1,9 @@
 {
     "upstreamTag": "v5.56.0",
-    "generatedAt": "2026-10-08T03:00:53+00:00",
+    "generatedAt": "2026-10-08T08:24:00+00:00",
     "totals": {
         "files": 1921,
-        "ported": 672,
+        "ported": 794,
         "ee": 69
     },
     "changed": [],
@@ -4745,57 +4745,57 @@
         "packages/core/email/server/src/bootstrap.ts": {
             "upstream": "9d45b982538f45fb11acd17a1bf026257699fac1",
             "php": "packages/core/email/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/config.ts": {
             "upstream": "81518d1bc590af8bc018c9c7eb920506f65cd529",
             "php": "packages/core/email/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/controllers/email.ts": {
             "upstream": "47442465b0f0992b35e1cd149b295a9b330d1902",
             "php": "packages/core/email/server/src/controllers/email.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/controllers/index.ts": {
             "upstream": "755626a72730bb1a3d320b05a41b16507c4c1426",
             "php": "packages/core/email/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/index.ts": {
             "upstream": "be363d35132145ef0357c7e26a37aa3508d13e59",
             "php": "packages/core/email/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/middlewares/index.ts": {
             "upstream": "82108c640d4c22ecdc0b9244d15da0d466eee20d",
             "php": "packages/core/email/server/src/middlewares/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/middlewares/rateLimit.ts": {
             "upstream": "321700a5a34a1f53348542c205fc0b53aa4a4c7f",
             "php": "packages/core/email/server/src/middlewares/rateLimit.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/routes/admin.ts": {
             "upstream": "d324b7815ac10cd58084d11c75530ae06f052c35",
             "php": "packages/core/email/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/routes/content-api.ts": {
             "upstream": "f9e7a8b0517f6fb2e77cf0228f3b25c7118d163d",
             "php": "packages/core/email/server/src/routes/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/routes/index.ts": {
             "upstream": "d6b08414d6a43231a9cd67b4f7d8c5ba5858a18a",
             "php": "packages/core/email/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/routes/validation/email.ts": {
             "upstream": "7a853d4e1af9e0d82e077f46b5586a22f5e3d145",
             "php": "packages/core/email/server/src/routes/validation/email.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/routes/validation/index.ts": {
             "upstream": "7dff5ef16a453d959f404531ed83e30c0c3d787f",
@@ -4805,12 +4805,12 @@
         "packages/core/email/server/src/services/email.ts": {
             "upstream": "b335fc3d1c3007dcbc1a7a8fe369d1619edeaec3",
             "php": "packages/core/email/server/src/services/email.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/services/index.ts": {
             "upstream": "535c46e0a2589b5d44294008d42bfaacaaa91e8b",
             "php": "packages/core/email/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/core/email/server/src/types.ts": {
             "upstream": "c00cddf2b6d46a02c85818f30a4da08208ee8e70",
@@ -8210,117 +8210,117 @@
         "packages/plugins/i18n/server/src/audit-logs.ts": {
             "upstream": "3fa2fad81261bbcd61fa1b07f0a047511da6f6a7",
             "php": "packages/plugins/i18n/server/src/audit-logs.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/bootstrap.ts": {
             "upstream": "43502e98b7a562ae4e0cdf55c73e5f977c93150c",
             "php": "packages/plugins/i18n/server/src/bootstrap.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/constants/index.ts": {
             "upstream": "ad0f6b2002d1636b4fa45abaa69d42e0a30da799",
             "php": "packages/plugins/i18n/server/src/constants/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/constants/iso-locales.json": {
             "upstream": "379d455b14d0feaaa0d91b3dfbaf1e828f19fe5e",
             "php": "packages/plugins/i18n/server/src/constants/iso-locales.json",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/content-types/index.ts": {
             "upstream": "8708b815bcf78f08a3b0929444a3c899bf273882",
             "php": "packages/plugins/i18n/server/src/content-types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/content-types/locale/index.ts": {
             "upstream": "0ba247d41e6791e917b8d6f4466f27bae97dcdda",
             "php": "packages/plugins/i18n/server/src/content-types/locale/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/content-types/locale/schema.json": {
             "upstream": "c89571c9d5f8569b5b213daf705e58125436f0af",
             "php": "packages/plugins/i18n/server/src/content-types/locale/schema.json",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/ai-localization-jobs.ts": {
             "upstream": "b6cfb09b6e10f8db53b5a48719f5eaf8d7d0cc48",
             "php": "packages/plugins/i18n/server/src/controllers/ai-localization-jobs.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/content-types.ts": {
             "upstream": "77f8600c43f1420e48806239c2c8f007313f80e0",
             "php": "packages/plugins/i18n/server/src/controllers/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/index.ts": {
             "upstream": "81b0945b1399834924a87c72e810b1346c7a14e0",
             "php": "packages/plugins/i18n/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/iso-locales.ts": {
             "upstream": "228eb0917083a5375982a0fa2aa78f552bc0d15a",
             "php": "packages/plugins/i18n/server/src/controllers/iso-locales.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/locales.ts": {
             "upstream": "8dcb0edfc5aee32b5355098b9ed923e28f2e4a20",
             "php": "packages/plugins/i18n/server/src/controllers/locales.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/settings.ts": {
             "upstream": "cbd446e4fc0029c9023bfc1320942405c818a87d",
             "php": "packages/plugins/i18n/server/src/controllers/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/controllers/validate-locale-creation.ts": {
             "upstream": "be94149a602597e3dd002471240af6652757f6be",
             "php": "packages/plugins/i18n/server/src/controllers/validate-locale-creation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/domain/locale.ts": {
             "upstream": "8cefec78558898f699b72610f63b9dc403dbbd45",
             "php": "packages/plugins/i18n/server/src/domain/locale.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/graphql.ts": {
             "upstream": "3cc37fab78239f0816c12d852008848029a12b81",
             "php": "packages/plugins/i18n/server/src/graphql.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/index.ts": {
             "upstream": "0cd13954b2f9f02cb138ce53459ea29741b8e11f",
             "php": "packages/plugins/i18n/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/models/ai-localization-job.ts": {
             "upstream": "20ebab3606afd6d92aadaca19789fbfa04c953d7",
             "php": "packages/plugins/i18n/server/src/models/ai-localization-job.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/models/index.ts": {
             "upstream": "958514dd1f6d897b4faa083d0cae38766afb6bce",
             "php": "packages/plugins/i18n/server/src/models/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/register.ts": {
             "upstream": "a301c88f217e5681e0d89e48988badf0a5084f70",
             "php": "packages/plugins/i18n/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/routes/admin.ts": {
             "upstream": "4ea8f766690a1bddbf82f7c11e6ca974c56dfea3",
             "php": "packages/plugins/i18n/server/src/routes/admin.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/routes/content-api.ts": {
             "upstream": "39996232361e3d154fb458aa1e2747e6b58691a4",
             "php": "packages/plugins/i18n/server/src/routes/content-api.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/routes/index.ts": {
             "upstream": "79b873972f378a7b70583bfec6241e0fdd825978",
             "php": "packages/plugins/i18n/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/routes/validation/index.ts": {
             "upstream": "9d65a681504189eb65122447c9dc9a3c31ad8e25",
@@ -8330,117 +8330,117 @@
         "packages/plugins/i18n/server/src/routes/validation/locale.ts": {
             "upstream": "9b192340d9449e3a737726211bdff7368baa0748",
             "php": "packages/plugins/i18n/server/src/routes/validation/locale.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/ai-localization-jobs.ts": {
             "upstream": "af3e4e4857b1e25a235b8023ac5e5bd51c8acb1f",
             "php": "packages/plugins/i18n/server/src/services/ai-localization-jobs.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/ai-localizations.ts": {
             "upstream": "da80f85a38bdee1ab2bd54da8c51650b9be60abe",
             "php": "packages/plugins/i18n/server/src/services/ai-localizations.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/ai-translations-strapi-managed.ts": {
             "upstream": "f2cdb897ceaea8a3962eb964188b092ce8ce3f26",
             "php": "packages/plugins/i18n/server/src/services/ai-translations-strapi-managed.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/ai-translations.ts": {
             "upstream": "a7fa5b145913ab1f5e1ed3fb12e49395b292749e",
             "php": "packages/plugins/i18n/server/src/services/ai-translations.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/content-types.ts": {
             "upstream": "74f807f7df5ecc7dfa1e356cb62de9942e0ba46f",
             "php": "packages/plugins/i18n/server/src/services/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/fill-from-locale.ts": {
             "upstream": "c8a1b089f59143c84927cb6e58f4fd5370d15ea2",
             "php": "packages/plugins/i18n/server/src/services/fill-from-locale.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/index.ts": {
             "upstream": "9eb2586e2c2fc8ac226a69323d1f7e99ad1cc9c7",
             "php": "packages/plugins/i18n/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/iso-locales.ts": {
             "upstream": "c9fa8fdabb501d535d2f021f8beb4c32c366438f",
             "php": "packages/plugins/i18n/server/src/services/iso-locales.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/locales.ts": {
             "upstream": "26e27c99520b68abc8ab082d1d1d4139eef95136",
             "php": "packages/plugins/i18n/server/src/services/locales.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/localizations.ts": {
             "upstream": "7686b09ce14a41145253b172bd72fbd0a62a5ec6",
             "php": "packages/plugins/i18n/server/src/services/localizations.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/metrics.ts": {
             "upstream": "5f9dfd2bab989e02b10bd3c36f18de9cef59d349",
             "php": "packages/plugins/i18n/server/src/services/metrics.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/permissions.ts": {
             "upstream": "b541aaba06b997472ec8a50fd8d8694cb658fe01",
             "php": "packages/plugins/i18n/server/src/services/permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/permissions/actions.ts": {
             "upstream": "15d6e5b76aabbaaf95e75b68e92438a12c572db9",
             "php": "packages/plugins/i18n/server/src/services/permissions/actions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/permissions/conditions.ts": {
             "upstream": "9c2ee05825d6ce4ea8536d94227f7f9e69c9d252",
             "php": "packages/plugins/i18n/server/src/services/permissions/conditions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/permissions/engine.ts": {
             "upstream": "ed2f974f4555909154226bba32ef91114d57b88c",
             "php": "packages/plugins/i18n/server/src/services/permissions/engine.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/permissions/sections-builder.ts": {
             "upstream": "3e4563fcfd25070142f3dad317eba156c62faaba",
             "php": "packages/plugins/i18n/server/src/services/permissions/sections-builder.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/sanitize/index.ts": {
             "upstream": "b1dde1e6bfd6335ad33ab2c3ac4db5f3cda74ef3",
             "php": "packages/plugins/i18n/server/src/services/sanitize/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/services/settings.ts": {
             "upstream": "0975e8f317ab6cb72ca4c67f20f86a4f1180baa8",
             "php": "packages/plugins/i18n/server/src/services/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/utils/index.ts": {
             "upstream": "766b57d87f2f3a0c903db1b37f0c64d3ac8e82da",
             "php": "packages/plugins/i18n/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/validation/content-types.ts": {
             "upstream": "53c70d155fa1eee5fb5093dec5ddda95e4df71e2",
             "php": "packages/plugins/i18n/server/src/validation/content-types.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/validation/locales.ts": {
             "upstream": "8f2e350722145a259df7a1b5ccea6f6001d1ce3c",
             "php": "packages/plugins/i18n/server/src/validation/locales.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/server/src/validation/settings.ts": {
             "upstream": "aa9230a4cf8e4306dccdd4533caf437dd344f55f",
             "php": "packages/plugins/i18n/server/src/validation/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/i18n/shared/contracts/ai-localization-jobs.ts": {
             "upstream": "ece371e152dd56ef6ade2e20ac2e2ee775f8f7c1",
@@ -8515,92 +8515,92 @@
         "packages/plugins/users-permissions/server/src/bootstrap/index.js": {
             "upstream": "d4d7644e40a4554cc95aaf80a31be12be6b76f75",
             "php": "packages/plugins/users-permissions/server/src/bootstrap/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/bootstrap/users-permissions-actions.js": {
             "upstream": "255decd9153815b72024e4158701dadab411d0e3",
             "php": "packages/plugins/users-permissions/server/src/bootstrap/users-permissions-actions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/config.js": {
             "upstream": "9440a2070d024176005e159079da214d376985c1",
             "php": "packages/plugins/users-permissions/server/src/config.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/content-types/index.js": {
             "upstream": "8476e7dd2716b601f88e3f24051c900452ecaedd",
             "php": "packages/plugins/users-permissions/server/src/content-types/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/content-types/permission/index.js": {
             "upstream": "70648c8b1c52c9e30caa74a3dffb6ebb6492d2a2",
             "php": "packages/plugins/users-permissions/server/src/content-types/permission/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/content-types/role/index.js": {
             "upstream": "ceb45c64e579646bb8ec7085141909d118dab821",
             "php": "packages/plugins/users-permissions/server/src/content-types/role/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/content-types/user/index.js": {
             "upstream": "f5f5a74a9ef0b8e80935fef41be1c26a70a629cf",
             "php": "packages/plugins/users-permissions/server/src/content-types/user/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/content-types/user/schema-config.js": {
             "upstream": "7442cd13b80ad2d6d3e1aeccac86d09e3cbf2bfb",
             "php": "packages/plugins/users-permissions/server/src/content-types/user/schema-config.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/auth.js": {
             "upstream": "a7bf5df8781a6c2759359d9a68b4b370596fc702",
             "php": "packages/plugins/users-permissions/server/src/controllers/auth.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/content-manager-user.js": {
             "upstream": "539a81b81bc7506bdb9b07a3ab4ca17bb031a996",
             "php": "packages/plugins/users-permissions/server/src/controllers/content-manager-user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/index.js": {
             "upstream": "8a0250873869972adfc8f0a7638b1eabb61c03c9",
             "php": "packages/plugins/users-permissions/server/src/controllers/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/permissions.js": {
             "upstream": "3213215dd090027817eca1753815285c6d5c9168",
             "php": "packages/plugins/users-permissions/server/src/controllers/permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/role.js": {
             "upstream": "4e08da139ab8ce85ad2d76d943d63759a7120fec",
             "php": "packages/plugins/users-permissions/server/src/controllers/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/settings.js": {
             "upstream": "1ae8ab262a77dc7b8aa597a50b7dd1173f94fb18",
             "php": "packages/plugins/users-permissions/server/src/controllers/settings.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/user.js": {
             "upstream": "f80ec68884d0523742cf342659953ee2dc782ea7",
             "php": "packages/plugins/users-permissions/server/src/controllers/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/validation/auth.js": {
             "upstream": "cb0c7ce0384a05a9aa25c87f10e7a23173f2c937",
             "php": "packages/plugins/users-permissions/server/src/controllers/validation/auth.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/validation/email-template.js": {
             "upstream": "49b3f765f76c32d0062173e338b1305a963d6d8c",
             "php": "packages/plugins/users-permissions/server/src/controllers/validation/email-template.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/controllers/validation/user.js": {
             "upstream": "4492b3262db51eac8699fe83c1f3824126043ac1",
             "php": "packages/plugins/users-permissions/server/src/controllers/validation/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/graphql/index.js": {
             "upstream": "4780f3241a463027e2e9df784914110c53ed4847",
@@ -8755,142 +8755,142 @@
         "packages/plugins/users-permissions/server/src/index.js": {
             "upstream": "14629aa6ad2c9518ce6734b4f828625f8bc80bd6",
             "php": "packages/plugins/users-permissions/server/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/middlewares/index.js": {
             "upstream": "2abf96cbb1fe51fe28f59968a56e82a36baadb4b",
             "php": "packages/plugins/users-permissions/server/src/middlewares/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/middlewares/rateLimit.js": {
             "upstream": "6662ab18915787fcea1f91af8e95fd2c2577c6a5",
             "php": "packages/plugins/users-permissions/server/src/middlewares/rateLimit.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/register.js": {
             "upstream": "9bb8b6881a3351b20975c35b484886f176b64b68",
             "php": "packages/plugins/users-permissions/server/src/register.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/auth.js": {
             "upstream": "9a5a9c3982d7bacb0ba54465f76a9456749cd76e",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/auth.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/index.js": {
             "upstream": "e228bbe97ba203c9efe572ce3ee1a04099ee9087",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/permissions.js": {
             "upstream": "b2f4bf20768c7869d14413a1ded747abe58c7751",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/role.js": {
             "upstream": "4ac5e6966c8c37fb0d6346c14437e487aa7506c8",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/user.js": {
             "upstream": "d4941c2632fe4b8aa35382b006047b50a63039f4",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/content-api/validation.js": {
             "upstream": "890c5a23eb07031c451274fbea4163b26950caf8",
             "php": "packages/plugins/users-permissions/server/src/routes/content-api/validation.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/routes/index.js": {
             "upstream": "6939f2d01284888183145a8459b9e13a6725d878",
             "php": "packages/plugins/users-permissions/server/src/routes/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/constants.js": {
             "upstream": "295391109456f0fd84454cc1b70d6100231de252",
             "php": "packages/plugins/users-permissions/server/src/services/constants.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/index.js": {
             "upstream": "3df8e27da2b17cc61e25d4782029ac2eabd0c682",
             "php": "packages/plugins/users-permissions/server/src/services/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/jwt.js": {
             "upstream": "e99279321f337d3bc84a2f605952e6e55e1120a5",
             "php": "packages/plugins/users-permissions/server/src/services/jwt.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/permission.js": {
             "upstream": "1b0d228c0c75d35751e7717d617bc2fd32aab309",
             "php": "packages/plugins/users-permissions/server/src/services/permission.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/providers-registry.js": {
             "upstream": "f75b28bf4e5ffa6d7425ed71d8e52555f996998b",
             "php": "packages/plugins/users-permissions/server/src/services/providers-registry.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/providers.js": {
             "upstream": "cd1b66d2e046a55992eb4fb523b23212add21ce4",
             "php": "packages/plugins/users-permissions/server/src/services/providers.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/role.js": {
             "upstream": "34fa6efda79daf7bd92918d3ed6e39c588161f4b",
             "php": "packages/plugins/users-permissions/server/src/services/role.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/user.js": {
             "upstream": "7eaf962bb44b880105fa7ebfd5a17c227e9fc19b",
             "php": "packages/plugins/users-permissions/server/src/services/user.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/services/users-permissions.js": {
             "upstream": "9c3b7b90740b2fd3b8e9df7c1cda91af98e7e32a",
             "php": "packages/plugins/users-permissions/server/src/services/users-permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/strategies/users-permissions.js": {
             "upstream": "b99f22fe477c3863c67f3d12bdfe804e09b4a87a",
             "php": "packages/plugins/users-permissions/server/src/strategies/users-permissions.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/index.js": {
             "upstream": "1623d48fc83e1f108f8dd6af18c797095f059e93",
             "php": "packages/plugins/users-permissions/server/src/utils/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/oauth-connect/index.js": {
             "upstream": "96f65af22d932e247f362168c005ec86b0665873",
             "php": "packages/plugins/users-permissions/server/src/utils/oauth-connect/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/oauth-connect/oauth1.js": {
             "upstream": "9d3747388e39ba36b66738d716f033eb05ab4360",
             "php": "packages/plugins/users-permissions/server/src/utils/oauth-connect/oauth1.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/oauth-connect/oauth2.js": {
             "upstream": "a4170f55e10cb583ed34a9d6047a9e6fa707dd87",
             "php": "packages/plugins/users-permissions/server/src/utils/oauth-connect/oauth2.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/oauth-connect/providers.js": {
             "upstream": "372653a9cc17b09367d3c7f2c08dcd65f8760b2c",
             "php": "packages/plugins/users-permissions/server/src/utils/oauth-connect/providers.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/provider-http.js": {
             "upstream": "303a0288b6e3adba0423609f5b2eccca6bdc06a5",
             "php": "packages/plugins/users-permissions/server/src/utils/provider-http.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/refresh-cookie-options.js": {
             "upstream": "d173fb452a4662cfb8c06797e7d241ca7c5ec163",
             "php": "packages/plugins/users-permissions/server/src/utils/refresh-cookie-options.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/sanitize/index.js": {
             "upstream": "db0884f7483ba1f78e0590ad8cd45373d378ba1f",
@@ -8900,7 +8900,7 @@
         "packages/plugins/users-permissions/server/src/utils/sanitize/sanitizers.js": {
             "upstream": "912421807a7ae747bb81c66024a249cbee493d08",
             "php": "packages/plugins/users-permissions/server/src/utils/sanitize/sanitizers.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/sanitize/visitors/index.js": {
             "upstream": "bc20d0f5d9e908007b5805edfdfbe3aa00e840da",
@@ -8910,27 +8910,27 @@
         "packages/plugins/users-permissions/server/src/utils/sanitize/visitors/remove-user-relation-from-role-entities.js": {
             "upstream": "007640992e740d2329dc05e7a0b4e5a7db38532a",
             "php": "packages/plugins/users-permissions/server/src/utils/sanitize/visitors/remove-user-relation-from-role-entities.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/trim-grant-session-response.js": {
             "upstream": "cb070ff0f490b37493326cc5f8138f2e8a657526",
             "php": "packages/plugins/users-permissions/server/src/utils/trim-grant-session-response.php",
-            "ported": false
+            "ported": true
         },
         "packages/plugins/users-permissions/server/src/utils/verify-jwt-with-jwks.js": {
             "upstream": "c97a5bd10100f02986bb4722abcad19a3793daee",
             "php": "packages/plugins/users-permissions/server/src/utils/verify-jwt-with-jwks.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-amazon-ses/src/index.ts": {
             "upstream": "edcba83e3fabdc1fd488ab84a6af4d13f01d1a2a",
             "php": "packages/providers/email-amazon-ses/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-amazon-ses/src/utils.ts": {
             "upstream": "48b993540af424644a27e02c9a9b3aec4d019e00",
             "php": "packages/providers/email-amazon-ses/src/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-amazon-ses/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -8940,7 +8940,7 @@
         "packages/providers/email-mailgun/src/index.ts": {
             "upstream": "3e6903240054dd7431a652055a690022f0b2ce80",
             "php": "packages/providers/email-mailgun/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-mailgun/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -8950,12 +8950,12 @@
         "packages/providers/email-nodemailer/src/index.ts": {
             "upstream": "998fdb18d7ed22bc22d98eeb62c7c916790e825b",
             "php": "packages/providers/email-nodemailer/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-nodemailer/src/utils/email-address.ts": {
             "upstream": "b4eeb72a05b5377d0d02ec11bcf08c6f3bc50d38",
             "php": "packages/providers/email-nodemailer/src/utils/email-address.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-nodemailer/src/utils/index.ts": {
             "upstream": "a8be750e1e75dced64d9153d27140f5b62ce7390",
@@ -8970,27 +8970,27 @@
         "packages/providers/email-sendgrid/src/index.ts": {
             "upstream": "cae6f7b328b0a2b09d877fc606dc63d5efb6fcbd",
             "php": "packages/providers/email-sendgrid/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-sendmail/src/addressing.ts": {
             "upstream": "2f6cd4fd7266828f195b06b0674fdfff8463d85d",
             "php": "packages/providers/email-sendmail/src/addressing.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-sendmail/src/direct-smtp.ts": {
             "upstream": "22ee79e9953fa8e536a788850fb99911ff670e9a",
             "php": "packages/providers/email-sendmail/src/direct-smtp.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-sendmail/src/index.ts": {
             "upstream": "37529b3a724435070f2bde4a499e0acbdb96fb02",
             "php": "packages/providers/email-sendmail/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-sendmail/src/logger.ts": {
             "upstream": "83a40542b901310d16101b0d9f5fb1c0cafbb723",
             "php": "packages/providers/email-sendmail/src/logger.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/email-sendmail/src/types.ts": {
             "upstream": "4bed0c6bfa2f0456657ecc371c927d77d89d0df9",
@@ -9005,12 +9005,12 @@
         "packages/providers/upload-aws-s3/src/index.ts": {
             "upstream": "6206bf45d3d3714edea3fbff97066a256ff728d1",
             "php": "packages/providers/upload-aws-s3/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/upload-aws-s3/src/utils.ts": {
             "upstream": "eb47e5cba0b1687f59ddf1c7eb5669e2327069b9",
             "php": "packages/providers/upload-aws-s3/src/utils.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/upload-aws-s3/vitest.config.ts": {
             "upstream": "be135973dac9c1ffc63942a9950510a0a9ad140f",
@@ -9020,7 +9020,7 @@
         "packages/providers/upload-cloudinary/src/index.ts": {
             "upstream": "c1049fbbe3c0bf62420be6f9307dc28c4166dfc6",
             "php": "packages/providers/upload-cloudinary/src/index.php",
-            "ported": false
+            "ported": true
         },
         "packages/providers/upload-local/src/index.ts": {
             "upstream": "ecf83d5224658bfcbcbffd21da7888d638204934",

@@ -16,7 +16,17 @@
         <testsuite name="content-type-builder"><directory>packages/core/content-type-builder/tests</directory></testsuite>
         <testsuite name="upload"><directory>packages/core/upload/tests</directory></testsuite>
         <testsuite name="provider-upload-local"><directory>packages/providers/upload-local/tests</directory></testsuite>
+        <testsuite name="provider-upload-aws-s3"><directory>packages/providers/upload-aws-s3/tests</directory></testsuite>
+        <testsuite name="provider-upload-cloudinary"><directory>packages/providers/upload-cloudinary/tests</directory></testsuite>
+        <testsuite name="i18n"><directory>packages/plugins/i18n/tests</directory></testsuite>
+        <testsuite name="email"><directory>packages/core/email/tests</directory></testsuite>
+        <testsuite name="provider-email-sendmail"><directory>packages/providers/email-sendmail/tests</directory></testsuite>
+        <testsuite name="provider-email-nodemailer"><directory>packages/providers/email-nodemailer/tests</directory></testsuite>
+        <testsuite name="provider-email-amazon-ses"><directory>packages/providers/email-amazon-ses/tests</directory></testsuite>
+        <testsuite name="provider-email-mailgun"><directory>packages/providers/email-mailgun/tests</directory></testsuite>
+        <testsuite name="provider-email-sendgrid"><directory>packages/providers/email-sendgrid/tests</directory></testsuite>
         <testsuite name="strapi"><directory>packages/core/strapi/tests</directory></testsuite>
+        <testsuite name="users-permissions"><directory>packages/plugins/users-permissions/tests</directory></testsuite>
         <testsuite name="integration"><directory>tests/php</directory></testsuite>
         <testsuite name="example-plugins"><directory>examples/plugins/announcements/tests/php</directory></testsuite>
     </testsuites>

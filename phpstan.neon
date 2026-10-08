@@ -16,6 +16,16 @@ parameters:
         - packages/core/upload/server/src
         - packages/core/upload/shared
         - packages/providers/upload-local/src
+        - packages/providers/upload-aws-s3/src
+        - packages/providers/upload-cloudinary/src
+        - packages/plugins/i18n/server/src
+        - packages/plugins/users-permissions/server/src
+        - packages/core/email/server/src
+        - packages/providers/email-sendmail/src
+        - packages/providers/email-nodemailer/src
+        - packages/providers/email-amazon-ses/src
+        - packages/providers/email-mailgun/src
+        - packages/providers/email-sendgrid/src
         - packages/utils/api-tests/src
         - scripts
         - examples/plugins/announcements/server/src

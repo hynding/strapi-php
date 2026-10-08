@@ -17,11 +17,13 @@ serves it.
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (admin/MCP/AI providers stubbed), 72 tests |
 | CLI: `strapi start / develop / build / console / routes:list / cron:run / migrations:run` | `strapi/strapi` | ported |
-| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); upstream API suite 301/330 |
-| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 684/781 |
+| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); upstream API suite 308/332 |
+| Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 746/863 |
 | Content-Type Builder | `strapi/content-type-builder` | ported; 62/63 |
 | Upload + local provider (GD instead of sharp) | `strapi/upload`, `strapi/provider-upload-local` | ported; 179/193 |
-| i18n, users-permissions, email, data-transfer, graphql, documentation, other providers, CLI tooling | the rest | scaffolded, not ported |
+| Email + sendmail, nodemailer, Amazon SES, Mailgun, SendGrid providers (symfony/mailer; HTTP APIs over `strapi.fetch`) | `strapi/email`, `strapi/provider-email-*` | ported |
+| Users & Permissions: public users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported (GraphQL extension waits for the graphql plugin); 107/129 (4 skipped upstream; the 18 failures are GraphQL) |
+| i18n, data-transfer, graphql, documentation, other providers, CLI tooling | the rest | scaffolded, not ported |
 
 `parity.json` lists every upstream server file and whether it is ported (672 of 1,921 at the
 time of writing; 69 are Enterprise-licensed and blocked). `php scripts/parity-map.php`
@@ -42,6 +44,10 @@ cp examples/getstarted/.env.example examples/getstarted/.env
 php examples/getstarted/bin/strapi routes:list
 php examples/getstarted/bin/strapi start          # http://localhost:1337/api/articles
 ```
+
+Like upstream, the content API is closed by default: grant the Public role access in the
+admin panel (Settings → Users & Permissions → Roles), or call it with an API token
+(Settings → API Tokens), e.g. `curl -H "Authorization: Bearer <token>" localhost:1337/api/articles`.
 
 `strapi start` uses PHP's built-in server for development. For production, point
 PHP-FPM or [FrankenPHP](https://frankenphp.dev) (worker mode, `public/index.php` boots
