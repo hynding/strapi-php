@@ -14,6 +14,7 @@ module.exports = {
   testMatch: ['**/?(*.)+(spec|test).api.(js|ts)'],
   testPathIgnorePatterns: ['/node_modules/', '/ee/'],
   testEnvironment: 'node',
+  testSequencer: path.join(apiTestsDir, 'lib', 'sequencer.js'),
   globalSetup: path.join(apiTestsDir, 'lib', 'global-setup.js'),
   setupFilesAfterEnv: [path.join(apiTestsDir, 'lib', 'jest-setup.js'), path.join(upstreamDir, 'tests', 'setup', 'jest-api.setup.js')],
   moduleNameMapper: {

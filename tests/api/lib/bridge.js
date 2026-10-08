@@ -61,8 +61,30 @@ const encodeArg = (value) => {
   return value;
 };
 
+// upstream tests check error classes (`rejects.toThrow(errors.ValidationError)`): rebuild a PHP
+// ApplicationError as the matching @strapi/utils class, the same module instance the test imports
+let utilsErrors = null;
+const errorClass = (name) => {
+  if (utilsErrors === null) {
+    try {
+      utilsErrors = require('@strapi/utils').errors || {};
+    } catch {
+      utilsErrors = {};
+    }
+  }
+  const Cls = Object.prototype.hasOwnProperty.call(utilsErrors, name) ? utilsErrors[name] : null;
+  return typeof Cls === 'function' ? Cls : null;
+};
+
 const toError = (error) => {
-  const e = new Error(error.message);
+  const Cls = errorClass(error.name);
+  let e;
+  try {
+    e = Cls ? new Cls(error.message, error.details) : new Error(error.message);
+  } catch {
+    e = new Error(error.message);
+  }
+  e.message = error.message;
   e.name = error.name;
   if (error.details !== undefined) e.details = error.details;
   if (error.status !== undefined) e.status = error.status;
@@ -168,8 +190,13 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   const assigned = new Set();
 
   const make = (steps) => {
-    // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args)
-    const target = function remote() {};
+    // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args).
+    // A chain that ends in a call is a result, not a callable: an object target keeps
+    // `typeof` at 'object', so Jest's `expect(strapi.documents(uid).findMany(..)).rejects`
+    // awaits it instead of calling it (it calls any function it is given).
+    let pending = null;
+    const last = steps[steps.length - 1];
+    const target = last && Object.prototype.hasOwnProperty.call(last, 'call') && !Object.prototype.hasOwnProperty.call(last, 'get') ? {} : function remote() {};
     return new Proxy(target, {
       // `jest.spyOn(remote, 'method')` assigns a mock function: the PHP object's method then calls
       // it back (see startCallbackServer); `mockRestore()` deletes it again
@@ -221,14 +248,15 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       get(_, prop) {
         if (prop === CHAIN) return steps;
         if (typeof prop === 'string' && spies.has(spyKey(steps, prop))) return spies.get(spyKey(steps, prop));
-        if (prop === 'then') {
+        if (prop === 'then' || prop === 'catch' || prop === 'finally') {
           if (steps.length === 0) return undefined; // the root itself is not a thenable
-          const promise = run(steps);
-          return promise.then.bind(promise);
-        }
-        if (prop === 'catch' || prop === 'finally') {
-          const promise = run(steps);
-          return promise[prop].bind(promise);
+          // one request per proxy: Jest reads `then` to check for a promise and again to await
+          // it; a second request would leave the first one's rejection unhandled
+          if (!pending) {
+            pending = run(steps);
+            pending.catch(() => {}); // handled by whoever awaits it
+          }
+          return pending[prop].bind(pending);
         }
         if (prop === Symbol.toPrimitive) {
           // used as a primitive (property key, template string, arithmetic): resolve it now
@@ -256,7 +284,8 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       apply(_, __, args) {
         // `strapi.db.transaction(cb)`: a JS callback cannot run in the PHP worker. Run it here,
         // without a database transaction (no rollback: what the callback writes is kept).
-        const last = steps[steps.length - 1];
+        let pending = null;
+    const last = steps[steps.length - 1];
         const prev = steps[steps.length - 2];
         if (typeof args[0] === 'function' && last && last.get === 'transaction' && prev && prev.get === 'db') {
           const noop = () => {};
