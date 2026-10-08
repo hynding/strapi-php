@@ -34,7 +34,8 @@ use Strapi\Utils\Errors\ApplicationError;
  *
  * - `strapi.db.getConnection()` (a knex instance upstream) is the database's knex-like
  *   {@see SqlBuilder} (`$db->sql()`), so `getConnection().from(t).where(...).update(...)` replays;
- *   awaiting a builder runs it.
+ *   awaiting a builder runs it. `strapi.db.connection(table)` (knex called with a table name) is
+ *   that builder `from(table)`, wrapped in {@see KnexQuery} for knex's `select(a, b)`/`first()`.
  *
  * Only enabled when the worker script mounts it (tests/api/app/public/index.php); never in an app.
  */
@@ -65,7 +66,7 @@ final class Bridge
             $value = $this->replay($payload['steps'] ?? []);
 
             // a knex query builder is a thenable: awaiting it runs the query
-            if ($value instanceof SqlBuilder) {
+            if ($value instanceof SqlBuilder || $value instanceof KnexQuery) {
                 $value = $value->run();
             }
 
@@ -156,6 +157,11 @@ final class Bridge
 
         if ($target instanceof Database && $name === 'getConnection' && $args === []) {
             return $target->sql();
+        }
+
+        // `strapi.db.connection(table)`: knex called with a table name
+        if ($target instanceof Database && $name === 'connection' && count($args) === 1 && is_string($args[0])) {
+            return new KnexQuery($target->sql()->from($args[0]));
         }
 
         if (is_object($target) && method_exists($target, $name)) {

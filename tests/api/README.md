@@ -29,4 +29,8 @@ binary), `STRAPI_API_TESTS_TMP` (scratch dir, default `.tmp/`; give concurrent r
 - `lib/global-setup.js` copies upstream's helpers to `.tmp/api-tests` with a few asserted patches
   (synchronous in-process reads that must be awaited across the process boundary).
 
+- `php/strapi.ini` (added to `PHP_INI_SCAN_DIR` by lib/server.js) turns off PHP's own multipart
+  parsing, which keeps only the last of a repeated field: `strapi::body` parses `php://input` and
+  keeps them all, as koa-body does (several `files`, one `fileInfo` per file).
+
 Logs: each server writes `.tmp/app/.tmp/frankenphp-<port>.log`.

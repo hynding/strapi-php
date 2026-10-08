@@ -94,66 +94,73 @@ const createStrapiInstance = async ({
     },
   });
 
-  const httpServer = new String(server.url); // eslint-disable-line no-new-wrappers
-  httpServer.address = () => ({ address: '127.0.0.1', family: 'IPv4', port: server.port });
+  // a setup that throws never reaches the test's afterAll(strapi.destroy): stop the worker here
+  try {
+    const httpServer = new String(server.url); // eslint-disable-line no-new-wrappers
+    httpServer.address = () => ({ address: '127.0.0.1', family: 'IPv4', port: server.port });
 
-  let instance;
-  const local = {
-    server: new Proxy(
-      {},
-      {
-        get(_t, prop) {
-          if (prop === 'httpServer') return httpServer.toString();
-          return instance && root.server[prop];
-        },
+    let instance;
+    const local = {
+      server: new Proxy(
+        {},
+        {
+          get(_t, prop) {
+            // a String object: supertest reads it as a server (`address().port`), and tests that
+            // call `strapi.server.httpServer.address()` themselves get the port too
+            if (prop === 'httpServer') return httpServer;
+            return instance && root.server[prop];
+          },
+        }
+      ),
+      destroy: async () => {
+        await server.stop();
+      },
+      log: { level: 'warn', info() {}, warn() {}, error() {}, debug() {} },
+      __url: server.url,
+      __logFile: server.logFile,
+    };
+    const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local);
+    local.__class = classRef;
+    // strapi.config is synchronous upstream (`jwt.verify(token, strapi.config.get('admin.auth.secret'))`)
+    local.config = {
+      get: (...args) => callSync([{ get: 'config' }, { get: 'get' }, { call: args }]),
+      set: (...args) => callSync([{ get: 'config' }, { get: 'set' }, { call: args }]),
+      has: (...args) => callSync([{ get: 'config' }, { get: 'has' }, { call: args }]),
+    };
+    instance = root;
+
+    if (!skipDefaultSessionConfig) {
+      const THIRTY_DAYS_SEC = 30 * 24 * 60 * 60;
+      const ONE_DAY_SEC = 24 * 60 * 60;
+      if ((await instance.config.get('admin.auth.sessions.maxRefreshTokenLifespan')) == null) {
+        await instance.config.set('admin.auth.sessions.maxRefreshTokenLifespan', THIRTY_DAYS_SEC);
       }
-    ),
-    destroy: async () => {
-      await server.stop();
-    },
-    log: { level: 'warn', info() {}, warn() {}, error() {}, debug() {} },
-    __url: server.url,
-    __logFile: server.logFile,
-  };
-  const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local);
-  local.__class = classRef;
-  // strapi.config is synchronous upstream (`jwt.verify(token, strapi.config.get('admin.auth.secret'))`)
-  local.config = {
-    get: (...args) => callSync([{ get: 'config' }, { get: 'get' }, { call: args }]),
-    set: (...args) => callSync([{ get: 'config' }, { get: 'set' }, { call: args }]),
-    has: (...args) => callSync([{ get: 'config' }, { get: 'has' }, { call: args }]),
-  };
-  instance = root;
-
-  if (!skipDefaultSessionConfig) {
-    const THIRTY_DAYS_SEC = 30 * 24 * 60 * 60;
-    const ONE_DAY_SEC = 24 * 60 * 60;
-    if ((await instance.config.get('admin.auth.sessions.maxRefreshTokenLifespan')) == null) {
-      await instance.config.set('admin.auth.sessions.maxRefreshTokenLifespan', THIRTY_DAYS_SEC);
+      if ((await instance.config.get('admin.auth.sessions.maxSessionLifespan')) == null) {
+        await instance.config.set('admin.auth.sessions.maxSessionLifespan', ONE_DAY_SEC);
+      }
     }
-    if ((await instance.config.get('admin.auth.sessions.maxSessionLifespan')) == null) {
-      await instance.config.set('admin.auth.sessions.maxSessionLifespan', ONE_DAY_SEC);
+
+    if (register) await register({ strapi: instance });
+    await postPhase(server.url, 'register');
+    if (bootstrap) await bootstrap({ strapi: instance });
+    await postPhase(server.url, 'bootstrap');
+
+    // warnings logged while bootstrapping, for a `strapi.log.warn` spy installed by the callback
+    const { warnings = [] } = await postJson(`${server.url}/__api-tests/warnings`, {});
+    warnings.forEach((message) => instance.log.warn(message));
+
+    global.strapi = instance;
+
+    if (ensureSuperAdmin) {
+      // upstream's own utils, through the bridge
+      const { createUtils } = require('api-tests/utils');
+      await createUtils(instance).createUserIfNotExists({ ...superAdminCredentials });
     }
+    return instance;
+  } catch (error) {
+    await server.stop();
+    throw error;
   }
-
-  if (register) await register({ strapi: instance });
-  await postPhase(server.url, 'register');
-  if (bootstrap) await bootstrap({ strapi: instance });
-  await postPhase(server.url, 'bootstrap');
-
-  // warnings logged while bootstrapping, for a `strapi.log.warn` spy installed by the callback
-  const { warnings = [] } = await postJson(`${server.url}/__api-tests/warnings`, {});
-  warnings.forEach((message) => instance.log.warn(message));
-
-  global.strapi = instance;
-
-  if (ensureSuperAdmin) {
-    // upstream's own utils, through the bridge
-    const { createUtils } = require('api-tests/utils');
-    await createUtils(instance).createUserIfNotExists({ ...superAdminCredentials });
-  }
-
-  return instance;
 };
 
 module.exports = {

@@ -141,6 +141,16 @@ const createRemote = (rpcUrl, local = {}) => {
         return make([...steps, { get: prop }]);
       },
       apply(_, __, args) {
+        // `strapi.db.transaction(cb)`: a JS callback cannot run in the PHP worker. Run it here,
+        // without a database transaction (no rollback: what the callback writes is kept).
+        const last = steps[steps.length - 1];
+        const prev = steps[steps.length - 2];
+        if (typeof args[0] === 'function' && last && last.get === 'transaction' && prev && prev.get === 'db') {
+          const noop = () => {};
+          return Promise.resolve().then(() =>
+            args[0]({ trx: undefined, commit: noop, rollback: noop, onCommit: noop, onRollback: noop })
+          );
+        }
         return make([...steps, { call: args.map(encodeArg) }]);
       },
     });

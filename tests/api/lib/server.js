@@ -33,10 +33,32 @@ const ping = (url) =>
   });
 
 // a test that fails in beforeAll never calls strapi.destroy(): never leave a worker behind
-const running = new Set();
-process.on('exit', () => {
-  for (const child of running) child.kill('SIGKILL');
-});
+// process-wide (Jest gives every test file a fresh module registry, the process is shared)
+const running = (process.__strapiApiTestServers ??= new Set());
+if (!process.__strapiApiTestExitHook) {
+  process.__strapiApiTestExitHook = true;
+  process.on('exit', () => {
+    for (const child of running) child.kill('SIGKILL');
+  });
+}
+
+/**
+ * Kills every worker still running. A worker left paused inside bootstrap() holds the app's
+ * bootstrap lock, so the next test file's worker would wait for it forever.
+ */
+const stopAll = async () => {
+  const children = [...running];
+  await Promise.all(
+    children.map(
+      (child) =>
+        new Promise((resolve) => {
+          child.once('exit', resolve);
+          child.kill('SIGKILL');
+          setTimeout(resolve, 5000).unref();
+        })
+    )
+  );
+};
 
 const startServer = async ({ appDir, env = {} }) => {
   const frankenphp = process.env.FRANKENPHP_BIN || path.join(__dirname, '..', '.bin', 'frankenphp');
@@ -54,7 +76,14 @@ const startServer = async ({ appDir, env = {} }) => {
     ['php-server', '--listen', `127.0.0.1:${port}`, '--root', path.join(appDir, 'public'), '--worker', `${path.join(appDir, 'public', 'index.php')},1`],
     {
       cwd: appDir,
-      env: { ...process.env, ...env, PORT: String(port), HOST: '127.0.0.1' },
+      env: {
+        ...process.env,
+        ...env,
+        PORT: String(port),
+        HOST: '127.0.0.1',
+        // php/strapi.ini: let strapi::body parse multipart bodies (repeated fields) as koa-body does
+        PHP_INI_SCAN_DIR: `${process.env.PHP_INI_SCAN_DIR ?? ''}:${path.join(__dirname, '..', 'php')}`,
+      },
       stdio: ['ignore', log, log],
     }
   );
@@ -89,4 +118,4 @@ const startServer = async ({ appDir, env = {} }) => {
   return { url, port, logFile, stop };
 };
 
-module.exports = { startServer };
+module.exports = { startServer, stopAll };

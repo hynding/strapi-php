@@ -15,7 +15,7 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/ee/'],
   testEnvironment: 'node',
   globalSetup: path.join(apiTestsDir, 'lib', 'global-setup.js'),
-  setupFilesAfterEnv: [path.join(upstreamDir, 'tests', 'setup', 'jest-api.setup.js')],
+  setupFilesAfterEnv: [path.join(apiTestsDir, 'lib', 'jest-setup.js'), path.join(upstreamDir, 'tests', 'setup', 'jest-api.setup.js')],
   moduleNameMapper: {
     '^api-tests/(.*)$': `${helpersDir}/$1`,
   },
@@ -24,6 +24,8 @@ module.exports = {
   transform: {
     '^.+\\.(t|j)s$': ['@swc/jest'],
   },
-  transformIgnorePatterns: ['/node_modules/'],
+  // upstream's api-tests helpers are CommonJS that babel-jest leaves alone (a module-level arrow's
+  // `this` is module.exports, which builder/action-registry.js relies on); SWC would turn it into undefined
+  transformIgnorePatterns: ['/node_modules/', `^${helpersDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`],
   testTimeout: 60000,
 };
