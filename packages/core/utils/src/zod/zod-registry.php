@@ -39,17 +39,17 @@ final class ZodRegistry
     /** @return array<string, mixed>|null */
     public function get(ZodType $schema): ?array
     {
-        return $this->entries->contains($schema) ? $this->entries[$schema] : null;
+        return $this->entries->offsetExists($schema) ? $this->entries[$schema] : null;
     }
 
     public function has(ZodType $schema): bool
     {
-        return $this->entries->contains($schema);
+        return $this->entries->offsetExists($schema);
     }
 
     public function remove(ZodType $schema): self
     {
-        $this->entries->detach($schema);
+        $this->entries->offsetUnset($schema);
 
         return $this;
     }

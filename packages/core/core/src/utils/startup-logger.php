@@ -70,7 +70,7 @@ final class StartupLogger
             ['Launched in', ((int) floor(microtime(true) * 1000) - $launchedAt) . ' ms'],
             ['Environment', $config->get('environment')],
             ['Process PID', getmypid()],
-            ['Version', $config->get('info.strapi') . ' (php ' . PHP_VERSION . ')'],
+            ['Version', $config->get('info.strapiPhp', $config->get('info.strapi')) . ' (php ' . PHP_VERSION . ')'],
             ['Plan', 'Community'],
             ['Database', $dbInfo['client'] ?? null],
             ['Database name', $dbInfo['displayName'] ?? null],

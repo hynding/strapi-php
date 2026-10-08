@@ -398,6 +398,11 @@ final class ZodOracleCases
         yield 'literal mixed' => [static fn (): ZodType|ZodRegistry => z::literal(['a', 1]), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","enum":["a",1]}'];
         yield 'literal null' => [static fn (): ZodType|ZodRegistry => z::literal(null), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"null","const":null}'];
         yield 'metadata registry' => [static fn (): ZodType|ZodRegistry => z::object(['x' => self::article()]), static fn (): array => ['metadata' => self::registry()], '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"x":{"$ref":"#/$defs/Article"}},"required":["x"],"additionalProperties":false,"$defs":{"Article":{"type":"object","properties":{"title":{"type":"string"}},"required":["title"],"additionalProperties":false}}}'];
+        yield 'meta id nested' => [static fn (): ZodType|ZodRegistry => z::object(['a' => self::metaNested(), 'b' => self::metaNested()]), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"a":{"$ref":"#/$defs/MetaNested"},"b":{"$ref":"#/$defs/MetaNested"}},"required":["a","b"],"additionalProperties":false,"$defs":{"MetaNested":{"type":"object","properties":{"value":{"type":"string"}},"required":["value"],"additionalProperties":false,"description":"nested"}}}'];
+        yield 'registry meta id __shared' => [static fn (): ZodType|ZodRegistry => self::metaRegistry(), static fn (): array => ['target' => 'draft-2020-12', 'io' => 'output', 'uri' => fn (string $id) => "#/components/schemas/{$id}"], '{"schemas":{"MetaRoot":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"#/components/schemas/MetaRoot","type":"object","properties":{"nested":{"$ref":"#/components/schemas/__shared#/$defs/MetaNested"},"other":{"type":"object","properties":{"inner":{"$ref":"#/components/schemas/__shared#/$defs/MetaInner"}},"required":["inner"],"additionalProperties":false}},"required":["nested","other"],"additionalProperties":false},"MetaOther":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"#/components/schemas/MetaOther","type":"object","properties":{"again":{"$ref":"#/components/schemas/__shared#/$defs/MetaNested"}},"required":["again"],"additionalProperties":false},"__shared":{"$defs":{"MetaNested":{"type":"object","properties":{"value":{"type":"string"}},"required":["value"],"additionalProperties":false,"description":"nested"},"MetaInner":{"type":"string"}}}}}'];
+        yield 'describe on wrappers (key order)' => [static fn (): ZodType|ZodRegistry => z::object(['a' => z::string()->default('d')->optional()->describe('x'), 'b' => z::number()->int()->readonly()->describe('r'), 'c' => z::boolean()->nullable()->optional()->describe('n'), 'd' => z::string()->describe('in')->default('d')->describe('out'), 'e' => z::string()->meta(['title' => 'T'])->optional()->describe('m'), 'f' => z::union([z::string(), z::number()])->optional()->describe('u')]), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"a":{"description":"x","default":"d","type":"string"},"b":{"readOnly":true,"description":"r","type":"integer","minimum":-9007199254740991,"maximum":9007199254740991},"c":{"description":"n","anyOf":[{"type":"boolean"},{"type":"null"}]},"d":{"default":"d","description":"out","type":"string"},"e":{"description":"m","type":"string","title":"T"},"f":{"description":"u","anyOf":[{"type":"string"},{"type":"number"}]}},"required":["b","d"],"additionalProperties":false}'];
+        yield 'date default' => [static fn (): ZodType|ZodRegistry => z::string()->default(new \DateTimeImmutable('@0')), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","default":"1970-01-01T00:00:00.000Z","type":"string"}'];
+        yield 'enum integer-like values first' => [static fn (): ZodType|ZodRegistry => z::enum(['t', '1', 'true', 'f', '0', 'false']), static fn (): array => [], '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"string","enum":["0","1","t","true","f","false"]}'];
         yield 'registry' => [static fn (): ZodType|ZodRegistry => self::registry(), static fn (): array => ['target' => 'draft-2020-12', 'io' => 'output', 'uri' => fn (string $id) => "#/components/schemas/{$id}"], '{"schemas":{"Article":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"#/components/schemas/Article","type":"object","properties":{"title":{"type":"string"}},"required":["title"],"additionalProperties":false},"B":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"#/components/schemas/B","type":"object","properties":{"a":{"$ref":"#/components/schemas/Article"},"list":{"type":"array","items":{"$ref":"#/components/schemas/Article"}},"self":{"$ref":"#/components/schemas/B"}},"required":["a","list"],"additionalProperties":false}}}'];
     }
 
@@ -461,5 +466,23 @@ final class ZodOracleCases
         }
 
         return self::$registry;
+    }
+
+    private static ?ZodType $metaNested = null;
+
+    private static ?ZodRegistry $metaRegistry = null;
+
+    /** `z.object({ value: z.string() }).meta({ id: 'MetaNested', description: 'nested' })` */
+    public static function metaNested(): ZodType
+    {
+        return self::$metaNested ??= z::object(['value' => z::string()])->meta(['id' => 'MetaNested', 'description' => 'nested']);
+    }
+
+    /** The metaRegistry of json-schema-cases.js: entries whose nested schemas carry `.meta({ id })`. */
+    public static function metaRegistry(): ZodRegistry
+    {
+        return self::$metaRegistry ??= z::registry()
+            ->add(z::object(['nested' => self::metaNested(), 'other' => z::object(['inner' => z::string()->meta(['id' => 'MetaInner'])])]), ['id' => 'MetaRoot'])
+            ->add(z::object(['again' => self::metaNested()]), ['id' => 'MetaOther']);
     }
 }

@@ -39,7 +39,7 @@ final class RegisterRoutes
         self::registerAdminRoutes($strapi);
         self::registerAPIRoutes($strapi);
         self::registerPluginRoutes($strapi);
-        // registerOpenAPIRoute: the OpenAPI generator (services/server/openapi.ts) is not ported
+        Openapi::registerOpenAPIRoute($strapi);
     }
 
     private static function registerAdminRoutes(Strapi $strapi): void
@@ -51,16 +51,22 @@ final class RegisterRoutes
         $generateRouteScope = self::createRouteScopeGenerator('admin::');
         $routers = self::instantiateRouterInputs($admin['routes'], $strapi);
 
-        foreach ($routers as $router) {
+        foreach ($routers as $key => $router) {
             $router['type'] ??= 'admin';
             $router['prefix'] ??= '/admin';
+            $router['routes'] ??= [];
             foreach ($router['routes'] as &$route) {
                 $generateRouteScope($route);
-                $route['info'] = ['pluginName' => 'admin'];
+                // upstream: the route manager's Object.assign(route, { info: { type } }) mutates the stored route
+                $route['info'] = ['pluginName' => 'admin', 'type' => $router['type']];
             }
             unset($route);
+            $routers[$key] = $router;
             $strapi->server()->routes($router);
         }
+
+        // upstream mutates strapi.admin.routes in place (instantiated routers, route info)
+        $strapi->set('admin', [...$admin, 'routes' => $routers]);
     }
 
     private static function registerPluginRoutes(Strapi $strapi): void
@@ -73,7 +79,7 @@ final class RegisterRoutes
             if (array_is_list($routes)) {
                 $routes = array_map(static function (array $route) use ($generateRouteScope, $pluginName): array {
                     $generateRouteScope($route);
-                    $route['info'] = ['pluginName' => $pluginName];
+                    $route['info'] = ['pluginName' => $pluginName, 'type' => 'admin'];
 
                     return $route;
                 }, $routes);
@@ -91,7 +97,7 @@ final class RegisterRoutes
                 $router['routes'] ??= [];
                 foreach ($router['routes'] as &$route) {
                     $generateRouteScope($route);
-                    $route['info'] = ['pluginName' => $pluginName];
+                    $route['info'] = ['pluginName' => $pluginName, 'type' => $router['type']];
                 }
                 unset($route);
                 $strapi->contentAPI()->applyExtraParamsToRoutes($router['routes']);
@@ -117,7 +123,7 @@ final class RegisterRoutes
                 $router['routes'] ??= [];
                 foreach ($router['routes'] as &$route) {
                     $generateRouteScope($route);
-                    $route['info'] = ['apiName' => $apiName];
+                    $route['info'] = ['apiName' => $apiName, 'type' => 'content-api'];
                 }
                 unset($route);
                 $strapi->contentAPI()->applyExtraParamsToRoutes($router['routes']);

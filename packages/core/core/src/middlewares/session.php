@@ -46,10 +46,11 @@ final class Session
         $secret = (string) $keys[0];
 
         return static function (Context $ctx, callable $next) use ($options, $key, $secret): void {
-            $cookies = $ctx->request()->getCookieParams();
+            // read the Cookie header: PHP's cookie params turn the `.` of `koa.sess` into `_`
+            $cookies = $ctx->cookies();
             $session = [];
-            $raw = $cookies[$key] ?? null;
-            $sig = $cookies[$key . '.sig'] ?? null;
+            $raw = $cookies->get($key, ['signed' => false]);
+            $sig = $cookies->get($key . '.sig', ['signed' => false]);
             if (is_string($raw) && $raw !== '' && is_string($sig) && hash_equals(self::sign($key . '=' . $raw, $secret), $sig)) {
                 $decoded = json_decode(base64_decode($raw, true) ?: '', true);
                 $session = is_array($decoded) ? $decoded : [];
