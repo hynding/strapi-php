@@ -51,4 +51,14 @@ final class Strapi
 
         return self::$version = $version ?? '0.0.0';
     }
+
+    /**
+     * The upstream Strapi release this version mirrors, i.e. the npm version of `@strapi/admin`
+     * it serves (VERSIONING.md): `5.56.0` for `5.56.0`, `5.56.0.1` (PHP-only fix) and
+     * `5.56.0-beta.1` (port in progress) alike.
+     */
+    public static function upstreamVersion(): string
+    {
+        return preg_match('/^v?(\d+\.\d+\.\d+)/', self::version(), $m) === 1 ? $m[1] : self::version();
+    }
 }

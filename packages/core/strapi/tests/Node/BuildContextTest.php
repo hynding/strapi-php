@@ -58,7 +58,7 @@ final class BuildContextTest extends TestCase
 
     public function testPackageJsonMustPinTheComposerVersion(): void
     {
-        EnsureAdminDependencies::assertVersionsMatch(['@strapi/admin' => Strapi::version(), 'react' => '^18']);
+        EnsureAdminDependencies::assertVersionsMatch(['@strapi/admin' => Strapi::upstreamVersion(), 'react' => '^18']);
         EnsureAdminDependencies::assertVersionsMatch([]);
 
         $this->expectException(\RuntimeException::class);
@@ -70,7 +70,13 @@ final class BuildContextTest extends TestCase
     {
         $packageJson = json_decode((string) file_get_contents(self::$appDir . '/package.json'), true);
 
-        self::assertSame(Strapi::version(), $packageJson['dependencies']['@strapi/admin']);
-        self::assertSame(Strapi::version(), $packageJson['dependencies']['@strapi/strapi']);
+        self::assertSame(Strapi::upstreamVersion(), $packageJson['dependencies']['@strapi/admin']);
+        self::assertSame(Strapi::upstreamVersion(), $packageJson['dependencies']['@strapi/strapi']);
+    }
+
+    public function testUpstreamVersionDropsThePhpOnlyParts(): void
+    {
+        self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', Strapi::upstreamVersion());
+        self::assertStringStartsWith(Strapi::upstreamVersion(), Strapi::version());
     }
 }

@@ -23,6 +23,21 @@ jobs:
           - { path: packages/core/database, repo: database }
           - { path: packages/core/core, repo: core }
           - { path: packages/core/strapi, repo: strapi }
+          - { path: packages/core/admin, repo: admin }
+          - { path: packages/core/content-manager, repo: content-manager }
+          - { path: packages/core/content-type-builder, repo: content-type-builder }
+          - { path: packages/core/upload, repo: upload }
+          - { path: packages/core/email, repo: email }
+          - { path: packages/plugins/i18n, repo: i18n }
+          - { path: packages/plugins/users-permissions, repo: plugin-users-permissions }
+          - { path: packages/providers/upload-local, repo: provider-upload-local }
+          - { path: packages/providers/upload-aws-s3, repo: provider-upload-aws-s3 }
+          - { path: packages/providers/upload-cloudinary, repo: provider-upload-cloudinary }
+          - { path: packages/providers/email-sendmail, repo: provider-email-sendmail }
+          - { path: packages/providers/email-nodemailer, repo: provider-email-nodemailer }
+          - { path: packages/providers/email-amazon-ses, repo: provider-email-amazon-ses }
+          - { path: packages/providers/email-mailgun, repo: provider-email-mailgun }
+          - { path: packages/providers/email-sendgrid, repo: provider-email-sendgrid }
     steps:
       - uses: actions/checkout@v4
         with:

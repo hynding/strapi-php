@@ -3,7 +3,7 @@
     "description": "Upgrade tool and codemods on rector (port of @strapi/upgrade)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",

@@ -72,11 +72,15 @@ $phpPathFor = static function (string $upstreamPath): string {
 // folders (below a package root) whose own LICENSE is the Enterprise licence
 $enterpriseDirs = [];
 foreach ($lines as $line) {
-    if (preg_match('/^\d+ blob ([0-9a-f]+)\t(packages\/[^\/]+\/[^\/]+\/.+)\/LICENSE$/', $line, $m) !== 1) {
+    // a nested folder's own LICENSE, or a package root LICENSE that covers the whole package
+    // ("All software that resides within this directory": content-releases, review-workflows);
+    // a root LICENSE that only covers ee/ folders does not make the package EE
+    if (preg_match('/^\d+ blob ([0-9a-f]+)\t(packages\/[^\/]+\/[^\/]+(?:\/.+)?)\/LICENSE$/', $line, $m) !== 1) {
         continue;
     }
     $licence = (string) shell_exec(sprintf('git -C %s cat-file -p %s 2>/dev/null', escapeshellarg($upstream), escapeshellarg($m[1])));
-    if (str_contains($licence, 'Enterprise License')) {
+    $isPackageRoot = substr_count($m[2], '/') === 2;
+    if (str_contains($licence, 'Enterprise License') && (!$isPackageRoot || str_contains($licence, 'resides within this directory'))) {
         $enterpriseDirs[] = $m[2] . '/';
     }
 }
