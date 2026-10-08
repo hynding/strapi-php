@@ -1,0 +1,11 @@
+{
+    "name": "strapi/api-tests-app",
+    "description": "The app upstream's API suite runs against: create-strapi-app's vanilla template, PHP edition",
+    "type": "project",
+    "license": "MIT",
+    "extra": {
+        "strapi": {
+            "uuid": "api-tests"
+        }
+    }
+}
