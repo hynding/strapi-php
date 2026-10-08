@@ -3,18 +3,25 @@
     "description": "Swagger UI documentation plugin (port of @strapi/plugin-documentation server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "symfony/yaml": "^7.2"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "symfony/yaml": "^7.2",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/plugin-documentation",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "documentation",
+            "namespace": "Strapi\\Plugin\\Documentation",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

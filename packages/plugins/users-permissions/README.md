@@ -28,16 +28,11 @@ project's `config/plugins.php` entry (`'users-permissions' => ['config' => [...]
 | Strategy | `strategies/users-permissions` (JWT or public role, `verify` by scope) |
 | Middleware | `middlewares/rateLimit` (koa2-ratelimit through the admin package's port, `Strapi\Admin\Middlewares\RateLimit::middleware()`) |
 | Utils | `utils/index`, `utils/oauth-connect/{index,oauth1,oauth2,providers}` (the grant-free OAuth 1/2 flow), `utils/provider-http`, `utils/verify-jwt-with-jwks`, `utils/refresh-cookie-options`, `utils/trim-grant-session-response`, `utils/sanitize/{sanitizers,visitors/remove-user-relation-from-role-entities}` |
+| GraphQL | `graphql/index` (registered by `register` when `strapi/plugin-graphql` is installed), `graphql/{utils,resolvers-configs}`, `graphql/types/{index,me,me-role,register-input,login-input,password-payload,login-payload,create-role-payload,update-role-payload,delete-role-payload,user-input}`, `graphql/queries/{index,me}`, `graphql/mutations/index`, `graphql/mutations/auth/{login,register,forgot-password,reset-password,change-password,email-confirmation,rate-limit}`, `graphql/mutations/crud/user/{create-user,update-user,delete-user}`, `graphql/mutations/crud/role/{create-role,update-role,delete-role}` |
 
 Barrel files (`controllers/index`, `services/index`, `routes/index`, `content-types/index`,
 `middlewares/index` are registries and ported; `utils/sanitize/index`,
 `utils/sanitize/visitors/index` only re-export and are not).
-
-### Not ported
-
-| Upstream | Why |
-| --- | --- |
-| `server/src/graphql/**` | the GraphQL extension needs `strapi/plugin-graphql`, not ported yet; `register` logs a warning when a graphql plugin is installed |
 
 ### PHP-port additions
 
@@ -45,6 +40,8 @@ Barrel files (`controllers/index`, `services/index`, `routes/index`, `content-ty
 | --- | --- |
 | `middlewares/rate-limit.php` (`Middlewares\RateLimit`) | the body of `rateLimit.js` with its exported helpers (`buildPrefixKey`, `normalizeRequestPathForRateLimit`, `buildRateLimitLoadConfig`, `ROUTES_WITHOUT_IDENTIFIER`); `rateLimit.php` must return the middleware factory |
 | `utils/url-join.php` | the `url-join` npm package (4.0.1) |
+| `graphql/bad-request-exception.php` | the plain `Error` with `code` / `data` that `checkBadRequest()` throws |
+| `graphql/utils.php` `controllerAction()` | `strapi.plugin('users-permissions').controller(name)[action]` called by the GraphQL resolvers |
 
 ### Deviations
 
@@ -57,18 +54,21 @@ Barrel files (`controllers/index`, `services/index`, `routes/index`, `content-ty
 | `crypto.createPublicKey({ format: 'jwk' })` | an RSA public key built from the JWK's `n` / `e` |
 | `strapi.plugin('i18n').service('sanitize')` in the role controller | used when the i18n plugin is installed (always upstream) |
 | `async` service functions | synchronous; in refresh mode `jwt.issue()` returns the access token itself |
+| `graphql/mutations/auth/rate-limit.js` queues the operations sharing one Koa context (batched GraphQL requests) | operations run one after the other already (synchronous): the request path / body / params / response are swapped and restored around each call |
 
 ### Tests
 
 `tests/` ports `__tests__` (PHPUnit) on a booted `examples/getstarted` app (`tests/BootedApp.php`)
 instead of upstream's `global.strapi` mocks: `Controllers/AuthSessionsTest`,
 `Controllers/Validation/{AuthTest,EmailTemplateTest}`, `Middlewares/RateLimitTest`,
-`Services/{JwtTest,ProvidersRegistryTest}`, `Utils/{IndexTest,OauthConnectTest,RefreshCookieOptionsTest,TrimGrantSessionResponseTest}`.
-Not ported: `graphql/mutations/auth/__tests__/rate-limit.test.js` (GraphQL).
+`Services/{JwtTest,ProvidersRegistryTest}`, `Utils/{IndexTest,OauthConnectTest,RefreshCookieOptionsTest,TrimGrantSessionResponseTest}`,
+`Graphql/Mutations/Auth/RateLimitTest` (the rate-limit middleware and the auth controller are
+replaced by recorders in the registries).
 
-Upstream's API suite (`tests/api/plugins/users-permissions`, see `tests/api/README.md`): 107 of
-129 pass (4 skipped upstream); every failure is GraphQL (`graphql.test.api.js`,
-`users-graphql.test.api.js`, the GraphQL cases of `email-confirmation.test.api.js`), which needs
-the GraphQL plugin. `email-confirmation.test.api.js` spies on the email service
+Upstream's API suite (`tests/api/plugins/users-permissions`, see `tests/api/README.md`): 120 of
+129 pass (4 skipped upstream), every file passes on its own. Run as a directory, five cases of
+`users-graphql.test.api.js` fail when it runs after `email-confirmation.test.api.js`, which turns
+the `email_confirmation` advanced setting on and never turns it off (register then returns no
+JWT; the test files share the app's database and plugin store). `email-confirmation.test.api.js` spies on the email service
 (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`): the harness forwards such spies
 to the PHP worker (`Strapi\ApiTests\Spy`).

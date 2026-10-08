@@ -1,0 +1,34 @@
+{
+    "name": "strapi/create-strapi",
+    "description": "Generate a new Strapi application: `composer create-project strapi/create-strapi my-project` (port of create-strapi, an alias of strapi/create-strapi-app)",
+    "type": "library",
+    "keywords": [
+        "create-strapi",
+        "create",
+        "new",
+        "generate",
+        "strapi"
+    ],
+    "license": "MIT",
+    "version": "5.56.0-beta.1",
+    "homepage": "https://github.com/hynding/strapi-php",
+    "require": {
+        "php": ">=8.3",
+        "strapi/create-strapi-app": "self.version"
+    },
+    "extra": {
+        "strapi": {
+            "upstream": "create-strapi",
+            "status": "ported",
+            "compatibleWith": "5.x"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "bin": [
+        "bin/create-strapi"
+    ],
+    "scripts": {
+        "post-create-project-cmd": "@php vendor/strapi/create-strapi-app/bin/create-strapi-app --in-place"
+    }
+}

@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Strapi\Utils\Yup;
 
+use Strapi\Utils\EmptyObject;
+
 /**
- * `yup.object(shape?)`. A JS object is an associative array here (`[]` counts as `{}`); a field
- * whose schema is null is a known key without validation (yup's `undefined` shape entries).
+ * `yup.object(shape?)`. A JS object is an associative array here, or a JSON `{}` decoded to an
+ * {@see EmptyObject}; `[]` counts as `{}` too, unless {@see self::rejectEmptyList()} (for values
+ * decoded with EmptyObject markers, where `[]` was a JSON array). A field whose schema is null is a
+ * known key without validation (yup's `undefined` shape entries).
  */
 class YupObject extends Yup
 {
@@ -33,15 +37,31 @@ class YupObject extends Yup
         }
     }
 
-    /** yup's `isObject`: a plain object (an associative array, or `[]`). */
+    /** yup's `isObject`: a plain object (an associative array, an {@see EmptyObject}, or `[]`). */
     public static function isPlainObject(mixed $value): bool
     {
-        return is_array($value) && ($value === [] || !array_is_list($value));
+        return $value instanceof EmptyObject || (is_array($value) && ($value === [] || !array_is_list($value)));
     }
 
     protected function typeCheck(mixed $value): bool
     {
+        if ($value === [] && ($this->spec['rejectEmptyList'] ?? false)) {
+            return false;
+        }
+
         return self::isPlainObject($value) || is_object($value);
+    }
+
+    /**
+     * PHP port: `[]` fails the type check (it is a JSON array), as it does in JS. For data decoded
+     * with {@see EmptyObject} markers (`$ctx->requestBody(true)`), where `{}` is not `[]`.
+     */
+    public function rejectEmptyList(bool $reject = true): static
+    {
+        $next = clone $this;
+        $next->spec['rejectEmptyList'] = $reject;
+
+        return $next;
     }
 
     protected function typeTransform(mixed $value): mixed
@@ -122,7 +142,11 @@ class YupObject extends Yup
         if ($value instanceof Undefined) {
             return $this->getDefault();
         }
-        if (!$this->typeCheck($value) || !is_array($value)) {
+        // a JSON `{}`: cast as `[]`, and stays the marker unless the cast adds keys (defaults)
+        $emptyObject = $value instanceof EmptyObject ? $value : null;
+        if ($emptyObject !== null) {
+            $value = [];
+        } elseif (!$this->typeCheck($value) || !is_array($value)) {
             return $value;
         }
 
@@ -169,7 +193,7 @@ class YupObject extends Yup
         }
 
         if (!$isChanged) {
-            return $value;
+            return $emptyObject ?? $value;
         }
 
         // Fields are cast in yup's node order (reverse declaration order without `when()`
@@ -205,8 +229,12 @@ class YupObject extends Yup
             $errors[] = $err;
         }
 
-        if (!$recursive || !self::isPlainObject($value)) {
+        if (!$recursive || !self::isPlainObject($value) || !$this->typeCheck($value)) {
             return [$errors[0] ?? null, $value];
+        }
+        $result = $value;
+        if ($value instanceof EmptyObject) {
+            $value = [];
         }
         /** @var array<string, mixed> $value */
         $originalValue = Yup::truthy($originalValue) ? $originalValue : $value;
@@ -236,7 +264,7 @@ class YupObject extends Yup
         $sortKeys = $this->sortKeys;
         $sort = static fn (YupError $a, YupError $b): int => self::keyIndex($sortKeys, $a) <=> self::keyIndex($sortKeys, $b);
 
-        return [self::runTests($tests, $value, $parentPath, $abortEarly, $errors, $sort), $value];
+        return [self::runTests($tests, $value, $parentPath, $abortEarly, $errors, $sort), $result];
     }
 
     /**

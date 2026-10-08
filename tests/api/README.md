@@ -44,4 +44,37 @@ binary), `STRAPI_API_TESTS_TMP` (scratch dir, default `.tmp/`; give concurrent r
   server in the test process, lib/bridge.js); `mockRestore()` puts the service back. Assigning a
   mock to any other remote object stays local to the test process, as before.
 
-Logs: each server writes `.tmp/app/.tmp/frankenphp-<port>.log`.
+- `strapi.plugin(name).config(path)` is answered synchronously (a blocking request), like
+  `strapi.config.get()`: upstream reads it synchronously (`expect(strapi.plugin('graphql').config('maxLimit')).toBe(...)`).
+
+- The worker gets `STRAPI_GRAPHQL_V4_COMPATIBILITY_MODE=true` (unless set), as upstream's runner
+  (`tests/scripts/run-api-tests.js`) gives it to the whole suite.
+
+- Remote data transfer (`ws://…/admin/transfer/runner/{push,pull}`) needs a process that keeps the
+  WebSocket open, which the FrankenPHP worker cannot: `strapi.server.httpServer.address()` is a
+  small TCP proxy (lib/transfer-proxy.js) that pipes every connection to the worker, except one
+  opening with `GET /admin/transfer/runner/`, which goes to a `strapi transfer:serve` sidecar of the
+  same app (same env and database), started on first use and stopped with the instance. That is
+  the reverse-proxy routing a deployment uses (packages/core/data-transfer/README.md). The `ws`
+  client the tests import is a devDependency here.
+
+- `@strapi/data-transfer` (imported by `core/data-transfer`) is lib/data-transfer.js: its local
+  Strapi providers run in the worker (`Strapi\ApiTests\DataTransfer`), one bridge call per stage.
+
+- A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)` and
+  `strapi.dirs` (in `Core.StrapiDirectories`' shape) are answered synchronously;
+  `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the
+  test process (`Strapi\ApiTests\Callback`) and returns a working unsubscribe function; an object
+  with methods assigned to a remote property (`strapi.plugin('upload').provider = { ...provider,
+  uploadStream(file) {} }`) replaces it in the worker by a `Strapi\ApiTests\RemoteObject` whose
+  methods call back into the test (changes they make to an argument, like `file.url`, are copied
+  back), until the original is assigned again.
+
+Logs: each server writes `.tmp/app/.tmp/frankenphp-<port>.log` (the transfer sidecar
+`transfer-serve-<port>.log`).
+
+- `strapi.ai.mcp.registerTool(definition)` from a test's `register`/`bootstrap` callback (synchronous
+  and not awaited upstream) is sent at once: the Zod schemas cross as JSON Schema 2020-12 and are
+  rebuilt as PHP Zod (`Strapi\ApiTests\McpDefinition`), the handler stays in the test process and
+  is called back with the JSON params. `tests/api/core/mcp` needs `ajv` and `ajv-formats`
+  (devDependencies, as upstream's root `package.json` pins them).

@@ -23,6 +23,7 @@ const path = require('path');
 const http = require('http');
 const { createRemote, startCallbackServer } = require('./bridge');
 const { startServer } = require('./server');
+const { startTransferProxy } = require('./transfer-proxy');
 const { appDir, repoRoot } = require('./paths');
 
 const superAdminCredentials = {
@@ -80,19 +81,28 @@ const createStrapiInstance = async ({
   const envPath = process.env.ENV_PATH || path.join(appDir, '.env');
   const env = dotenv.parse(require('fs').readFileSync(envPath));
 
-  const server = await startServer({
-    appDir: path.dirname(envPath),
-    env: {
-      ...env,
-      STRAPI_API_TESTS_BYPASS_AUTH: bypassAuth ? '1' : '0',
-      STRAPI_API_TESTS_AUTOLOAD: path.join(repoRoot, 'vendor', 'autoload.php'),
-      // upstream tests switch process.env.NODE_ENV (e.g. to 'production') before creating the instance
-      NODE_ENV: process.env.NODE_ENV || 'test',
-      STRAPI_API_TESTS_PHASES: '1',
-      STRAPI_DISABLE_EE: '1',
-      STRAPI_TELEMETRY_DISABLED: 'true',
-    },
-  });
+  const workerEnv = {
+    ...env,
+    STRAPI_API_TESTS_BYPASS_AUTH: bypassAuth ? '1' : '0',
+    STRAPI_API_TESTS_AUTOLOAD: path.join(repoRoot, 'vendor', 'autoload.php'),
+    // upstream tests switch process.env.NODE_ENV (e.g. to 'production') before creating the instance
+    NODE_ENV: process.env.NODE_ENV || 'test',
+    STRAPI_API_TESTS_PHASES: '1',
+    STRAPI_DISABLE_EE: '1',
+    STRAPI_TELEMETRY_DISABLED: 'true',
+    // upstream's runner (tests/scripts/run-api-tests.js) runs the whole suite with it
+    STRAPI_GRAPHQL_V4_COMPATIBILITY_MODE: process.env.STRAPI_GRAPHQL_V4_COMPATIBILITY_MODE ?? 'true',
+  };
+  const server = await startServer({ appDir: path.dirname(envPath), env: workerEnv });
+
+  // remote data transfer WebSockets go to a `strapi transfer:serve` sidecar (lib/transfer-proxy.js)
+  let transfer;
+  try {
+    transfer = await startTransferProxy({ appDir: path.dirname(envPath), env: workerEnv, upstreamPort: server.port });
+  } catch (error) {
+    await server.stop();
+    throw error;
+  }
 
   // jest spies on remote methods call back into this process (lib/bridge.js)
   const callbacks = await startCallbackServer();
@@ -100,7 +110,8 @@ const createStrapiInstance = async ({
   // a setup that throws never reaches the test's afterAll(strapi.destroy): stop the worker here
   try {
     const httpServer = new String(server.url); // eslint-disable-line no-new-wrappers
-    httpServer.address = () => ({ address: '127.0.0.1', family: 'IPv4', port: server.port });
+    // the transfer proxy's port: the worker's for every request but the transfer WebSockets
+    httpServer.address = () => ({ address: '127.0.0.1', family: 'IPv4', port: transfer.port });
 
     let instance;
     const local = {
@@ -116,6 +127,7 @@ const createStrapiInstance = async ({
         }
       ),
       destroy: async () => {
+        await transfer.close();
         await server.stop();
         await callbacks.close();
       },
@@ -131,6 +143,16 @@ const createStrapiInstance = async ({
       set: (...args) => callSync([{ get: 'config' }, { get: 'set' }, { call: args }]),
       has: (...args) => callSync([{ get: 'config' }, { get: 'has' }, { call: args }]),
     };
+    // strapi.dirs is synchronous upstream (`join(strapi.dirs.static.public, 'uploads')`), in the
+    // Core.StrapiDirectories shape (the PHP instance's directories are flat)
+    Object.defineProperty(local, 'dirs', {
+      enumerable: true,
+      get: () => {
+        const d = callSync([{ get: 'dirs' }]);
+        const tree = _.pick(d, ['root', 'src', 'api', 'components', 'extensions', 'policies', 'middlewares', 'config']);
+        return { static: { public: d.public }, app: tree, dist: tree };
+      },
+    });
     instance = root;
 
     if (!skipDefaultSessionConfig) {
@@ -162,6 +184,7 @@ const createStrapiInstance = async ({
     }
     return instance;
   } catch (error) {
+    await transfer.close();
     await server.stop();
     throw error;
   }

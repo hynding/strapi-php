@@ -33,6 +33,17 @@ final class Configuration
         return self::$version;
     }
 
+    /**
+     * The upstream Strapi release this port mirrors (VERSIONING.md): `5.56.0` for `5.56.0`,
+     * `5.56.0.1` and `5.56.0-beta.1`. It is what `info.strapi` reports, because everything that
+     * reads it talks to the Strapi ecosystem: the admin bundle, data-transfer's version check
+     * against Node instances, OpenAPI's x-strapi-version.
+     */
+    public static function upstreamVersion(): string
+    {
+        return preg_match('/^v?(\d+\.\d+\.\d+)/', self::version(), $m) === 1 ? $m[1] : self::version();
+    }
+
     /** Load `.env` into the process (idempotent) and return the environment helper. */
     public static function loadEnv(string $appDir): EnvHelper
     {
@@ -93,7 +104,9 @@ final class Configuration
             'info' => [
                 ...($pkgJSON !== [] ? $pkgJSON : ['name' => $composerJSON['name'] ?? basename($appDir), 'version' => $composerJSON['version'] ?? '0.0.0']),
                 'composer' => $composerJSON,
-                'strapi' => self::version(),
+                'strapi' => self::upstreamVersion(),
+                // the strapi-php package version (may carry a pre-release or a fourth number)
+                'strapiPhp' => self::version(),
             ],
             'admin' => ['serveAdminPanel' => $serveAdminPanel],
         ];

@@ -408,6 +408,12 @@ final class Strapi extends Container implements StrapiContract
         return $this->get('content-api');
     }
 
+    /** Upstream `strapi.contentAPISchemaRegistry`: the content-API Zod schemas by OpenAPI component name. */
+    public function contentAPISchemaRegistry(): CoreApi\Routes\Validation\SchemaRegistry
+    {
+        return $this->get('content-api-schema-registry');
+    }
+
     public function sanitizers(): Registries\Sanitizers
     {
         return $this->get('sanitizers');
@@ -471,6 +477,7 @@ final class Strapi extends Container implements StrapiContract
             ->add('entityService', fn (): EntityService => EntityService::createEntityService($this))
             ->add('documents', fn (): DocumentService => DocumentService::createDocumentService($this))
             ->add('localization', static fn (): Localization => Localization::createLocalizationService())
+            ->add('content-api-schema-registry', static fn (): CoreApi\Routes\Validation\SchemaRegistry => CoreApi\Routes\Validation\SchemaRegistry::createContentAPISchemaRegistry())
             ->add('db', function () use ($logger): Database {
                 $databaseConfig = $this->config()->get('database');
                 /** @var array<string, mixed> $databaseConfig */
@@ -482,7 +489,8 @@ final class Strapi extends Container implements StrapiContract
                     'settings' => ['migrations' => ['dir' => $this->dirs()->root . '/database/migrations']],
                 ]));
             })
-            ->add('reload', fn (): Reloader => Reloader::createReloader($this));
+            ->add('reload', fn (): Reloader => Reloader::createReloader($this))
+            ->add('content-source-maps', fn (): Services\ContentSourceMaps => Services\ContentSourceMaps::createContentSourceMapsService($this));
 
         // the restricted-relation sanitizers consult `strapi.auth.verify`
         AuthScope::setVerifier(function (mixed $auth, string $scope): bool {

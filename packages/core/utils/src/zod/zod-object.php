@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Strapi\Utils\Zod;
 
+use Strapi\Utils\EmptyObject;
+
 /**
  * Not an upstream file: the subset of npm zod 4.4.3 Strapi uses.
  *
@@ -263,7 +265,8 @@ class ZodObject extends ZodType
                 $payload->issues[] = ['code' => 'unrecognized_keys', 'keys' => $unrecognized, 'input' => $input, 'inst' => $this];
             }
         }
-        $payload->value = $output;
+        // a JSON `{}` (EmptyObject) parsed to nothing stays one
+        $payload->value = $output === [] && $input instanceof EmptyObject ? $input : $output;
 
         return $payload;
     }

@@ -150,6 +150,24 @@ out += `    }
 
         return self::$registry;
     }
+
+    private static ?ZodType $metaNested = null;
+
+    private static ?ZodRegistry $metaRegistry = null;
+
+    /** \`z.object({ value: z.string() }).meta({ id: 'MetaNested', description: 'nested' })\` */
+    public static function metaNested(): ZodType
+    {
+        return self::$metaNested ??= z::object(['value' => z::string()])->meta(['id' => 'MetaNested', 'description' => 'nested']);
+    }
+
+    /** The metaRegistry of json-schema-cases.js: entries whose nested schemas carry \`.meta({ id })\`. */
+    public static function metaRegistry(): ZodRegistry
+    {
+        return self::$metaRegistry ??= z::registry()
+            ->add(z::object(['nested' => self::metaNested(), 'other' => z::object(['inner' => z::string()->meta(['id' => 'MetaInner'])])]), ['id' => 'MetaRoot'])
+            ->add(z::object(['again' => self::metaNested()]), ['id' => 'MetaOther']);
+    }
 }
 `;
 

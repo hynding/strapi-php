@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Strapi\Core\Services\Errors;
 use Strapi\Types\Core\Context as ContextContract;
+use Strapi\Utils\EmptyObject;
 use Strapi\Utils\Errors\HttpError;
 
 /**
@@ -32,6 +33,9 @@ final class Context implements ContextContract
     private bool $queryParsed = false;
 
     private mixed $requestBody = null;
+
+    /** @var array{value: mixed}|null {@see self::requestBody()} without markers, computed once */
+    private ?array $plainRequestBody = null;
 
     private bool $bodyParsed = false;
 
@@ -119,20 +123,25 @@ final class Context implements ContextContract
         return $this->request->getUri()->getQuery();
     }
 
-    public function requestBody(): mixed
+    public function requestBody(bool $emptyObjects = false): mixed
     {
         if (!$this->bodyParsed) {
             $parsed = $this->request->getParsedBody();
-            $this->requestBody = $parsed;
-            $this->bodyParsed = true;
+            $this->setRequestBody($parsed);
+        }
+        if ($emptyObjects) {
+            return $this->requestBody;
         }
 
-        return $this->requestBody;
+        // the body as `json_decode($json, true)` gives it: every `{}` marker back to `[]`
+        return ($this->plainRequestBody ??= ['value' => EmptyObject::toArrays($this->requestBody)])['value'];
     }
 
+    /** `$body` may hold {@see EmptyObject} markers (strapi::body decodes JSON `{}` to one). */
     public function setRequestBody(mixed $body): void
     {
         $this->requestBody = $body;
+        $this->plainRequestBody = null;
         $this->bodyParsed = true;
     }
 

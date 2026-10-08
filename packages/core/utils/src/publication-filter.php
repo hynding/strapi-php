@@ -50,27 +50,4 @@ final class PublicationFilter
             throw $e;
         }
     }
-
-    /**
-     * Port of has-published-version-param.ts: parses the deprecated `hasPublishedVersion` param.
-     */
-    public static function parseHasPublishedVersionQueryParam(mixed $value): ?bool
-    {
-        if ($value === null) {
-            return null;
-        }
-        if ($value === true || $value === 'true') {
-            return true;
-        }
-        if ($value === false || $value === 'false') {
-            return false;
-        }
-
-        throw new ValidationError("Invalid value for 'hasPublishedVersion'. Expected boolean or 'true'/'false' string.");
-    }
-
-    public static function hasPublishedVersionBooleanToPublicationFilterMode(bool $value): string
-    {
-        return $value ? 'has-published-version-document' : 'never-published-document';
-    }
 }

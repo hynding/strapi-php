@@ -60,10 +60,16 @@ final class OutputSchemas
         ]);
     }
 
-    /** Folder tree node. `children` is recursive and unbounded in depth, so it is typed lazily. */
+    private static ?ZodType $mediaFolderNodeSchema = null;
+
+    /**
+     * Folder tree node. `children` is recursive and unbounded in depth, so it is typed lazily. One
+     * instance, like upstream's module constant: the JSON Schema conversion detects the cycle by
+     * identity (and emits a `$ref`), a fresh lazy per level would recurse forever.
+     */
     public static function mediaFolderNodeSchema(): ZodType
     {
-        return z::lazy(static fn (): ZodType => z::object([
+        return self::$mediaFolderNodeSchema ??= z::lazy(static fn (): ZodType => z::object([
             'id' => z::number(),
             'name' => z::string(),
             'children' => z::array(self::mediaFolderNodeSchema()),

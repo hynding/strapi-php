@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_blocks",
+  "info": {
+    "displayName": "Block"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string"
+    },
+    "permissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "admin::permission"
+    }
+  }
+}

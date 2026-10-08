@@ -3,17 +3,23 @@
     "description": "Color picker custom field (port of @strapi/plugin-color-picker server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/core": "self.version"
+        "strapi/core": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/plugin-color-picker",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "color-picker",
+            "namespace": "Strapi\\Plugin\\ColorPicker",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

@@ -27,6 +27,6 @@
     "config": {
         "allow-plugins": false
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "beta",
     "prefer-stable": true
 }

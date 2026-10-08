@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Strapi\Core\CoreApi\Routes;
 
+use Strapi\Core\CoreApi\Routes\Validation\CoreContentTypeRouteValidator;
 use Strapi\Core\Strapi;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\ContentTypes;
+use Strapi\Utils\Zod as z;
 
 /**
- * Port of core-api/routes/index.ts (`createRoutes`): the default REST routes of a content type.
- * The Zod request/response validators (core-api/routes/validation/*) are not ported; `request.query`
- * lists the accepted query params as keys so the strictParams allowlist keeps working.
+ * Port of core-api/routes/index.ts (`createRoutes`): the default REST routes of a content type,
+ * with their Zod request (`query`, `params`, `body`) and `response` schemas
+ * (core-api/routes/validation, `CoreContentTypeRouteValidator`).
  */
 final class Routes
 {
@@ -25,20 +27,13 @@ final class Routes
         return self::getCollectionTypeRoutes($strapi, $contentType);
     }
 
-    /**
-     * @param list<string> $params
-     * @return array<string, null>
-     */
-    private static function queryParams(array $params): array
-    {
-        return array_fill_keys($params, null);
-    }
-
     /** @return array<string, array<string, mixed>> */
     private static function getSingleTypeRoutes(Strapi $strapi, Schema $schema): array
     {
         $uid = $schema->uid;
         $singularName = (string) $schema->info['singularName'];
+
+        $validator = new CoreContentTypeRouteValidator($strapi, $uid);
         $conditional = self::getConditionalQueryParams($strapi, $schema);
 
         return [
@@ -46,21 +41,31 @@ final class Routes
                 'method' => 'GET',
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.find",
-                'request' => ['query' => self::queryParams(['fields', 'populate', 'filters', ...$conditional])],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', 'filters', ...$conditional]),
+                ],
+                'response' => z::object(['data' => $validator->document()]),
                 'config' => [],
             ],
             'update' => [
                 'method' => 'PUT',
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.update",
-                'request' => ['query' => self::queryParams(['fields', 'populate', ...$conditional])],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                    'body' => ['application/json' => $validator->partialBody()],
+                ],
+                'response' => z::object(['data' => $validator->document()]),
                 'config' => [],
             ],
             'delete' => [
                 'method' => 'DELETE',
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.delete",
-                'request' => ['query' => self::queryParams(['fields', 'populate', ...$conditional])],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                ],
+                'response' => z::object(['data' => $validator->document()]),
                 'config' => [],
             ],
         ];
@@ -71,6 +76,8 @@ final class Routes
     {
         $uid = $schema->uid;
         $pluralName = (string) $schema->info['pluralName'];
+
+        $validator = new CoreContentTypeRouteValidator($strapi, $uid);
         $conditional = self::getConditionalQueryParams($strapi, $schema);
 
         return [
@@ -78,33 +85,53 @@ final class Routes
                 'method' => 'GET',
                 'path' => "/{$pluralName}",
                 'handler' => "{$uid}.find",
-                'request' => ['query' => self::queryParams(['fields', 'filters', '_q', 'pagination', 'sort', 'populate', ...$conditional])],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'filters', '_q', 'pagination', 'sort', 'populate', ...$conditional]),
+                ],
+                'response' => z::object(['data' => $validator->documents()]),
                 'config' => [],
             ],
             'findOne' => [
                 'method' => 'GET',
                 'path' => "/{$pluralName}/:id",
                 'handler' => "{$uid}.findOne",
-                'request' => ['params' => ['id' => null], 'query' => self::queryParams(['fields', 'populate', 'filters', 'sort', ...$conditional])],
+                'request' => [
+                    'params' => ['id' => $validator->documentID()],
+                    'query' => $validator->queryParams(['fields', 'populate', 'filters', 'sort', ...$conditional]),
+                ],
+                'response' => z::object(['data' => $validator->document()]),
             ],
             'create' => [
                 'method' => 'POST',
                 'path' => "/{$pluralName}",
                 'handler' => "{$uid}.create",
-                'request' => ['query' => self::queryParams(['fields', 'populate', ...$conditional])],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                    'body' => ['application/json' => $validator->body()],
+                ],
+                'response' => z::object(['data' => $validator->document()]),
                 'config' => [],
             ],
             'update' => [
                 'method' => 'PUT',
                 'path' => "/{$pluralName}/:id",
                 'handler' => "{$uid}.update",
-                'request' => ['query' => self::queryParams(['fields', 'populate', ...$conditional]), 'params' => ['id' => null]],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                    'params' => ['id' => $validator->documentID()],
+                    'body' => ['application/json' => $validator->partialBody()],
+                ],
+                'response' => z::object(['data' => $validator->document()]),
             ],
             'delete' => [
                 'method' => 'DELETE',
                 'path' => "/{$pluralName}/:id",
                 'handler' => "{$uid}.delete",
-                'request' => ['query' => self::queryParams(['fields', 'populate', 'filters', ...$conditional]), 'params' => ['id' => null]],
+                'request' => [
+                    'query' => $validator->queryParams(['fields', 'populate', 'filters', ...$conditional]),
+                    'params' => ['id' => $validator->documentID()],
+                ],
+                'response' => z::object(['data' => $validator->document()]),
             ],
         ];
     }

@@ -3,11 +3,13 @@
     "description": "Strapi CLI and entrypoint: bin/strapi start|develop|build|console (port of @strapi/strapi)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
+        "strapi/data-transfer": "self.version",
+        "strapi/generators": "self.version",
         "symfony/console": "^7.2",
         "symfony/process": "^7.2",
         "vlucas/phpdotenv": "^5.6"

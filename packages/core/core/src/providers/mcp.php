@@ -7,7 +7,7 @@ namespace Strapi\Core\Providers;
 use Strapi\Core\Services\Mcp\Mcp as McpService;
 use Strapi\Core\Strapi;
 
-/** Port of packages/core/core/src/providers/mcp.ts (the MCP service is a stub). */
+/** Port of packages/core/core/src/providers/mcp.ts. */
 final class Mcp extends AbstractProvider
 {
     public function init(Strapi $strapi): void
@@ -17,11 +17,29 @@ final class Mcp extends AbstractProvider
 
     public function bootstrap(Strapi $strapi): void
     {
-        $mcp = $strapi->get('ai.mcp');
+        $mcp = $strapi->ai()->mcp();
         if ($mcp->isEnabled()) {
-            $strapi->log()->debug('[MCP] MCP server is not available in the PHP port yet');
+            try {
+                $strapi->log()->info('[MCP] Starting MCP server...');
+                $mcp->start();
+            } catch (\Throwable $error) {
+                $strapi->log()->error('[MCP] Failed to start MCP server', ['error' => $error]);
+            }
         } else {
             $strapi->log()->debug('[MCP] MCP server is disabled in configuration');
+        }
+    }
+
+    public function destroy(Strapi $strapi): void
+    {
+        $mcp = $strapi->ai()->mcp();
+        if ($mcp->isRunning()) {
+            try {
+                $strapi->log()->info('[MCP] Stopping MCP server...');
+                $mcp->stop();
+            } catch (\Throwable $error) {
+                $strapi->log()->error('[MCP] Failed to stop MCP server', ['error' => $error]);
+            }
         }
     }
 }

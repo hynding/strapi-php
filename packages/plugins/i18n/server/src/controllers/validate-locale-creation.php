@@ -26,8 +26,8 @@ final class ValidateLocaleCreation
         $model ??= (string) ($ctx->params()['model'] ?? '');
         $query = $ctx->query();
 
-        // Prevent empty body
-        $body = $ctx->requestBody();
+        // Prevent empty body (the body is written back: keep its JSON `{}` markers, see EmptyObject)
+        $body = $ctx->requestBody(true);
         if ($body === null || $body === '' || $body === false) {
             $body = [];
             $this->setRequestBody($ctx, $body);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Upload\Routes\Validation;
 
 use Strapi\Core\Strapi;
+use Strapi\Utils\Validation\RouteValidators\AbstractRouteValidator;
 use Strapi\Utils\Zod as z;
 use Strapi\Utils\Zod\ZodArray;
 use Strapi\Utils\Zod\ZodNumber;
@@ -13,12 +14,10 @@ use Strapi\Utils\Zod\ZodType;
 
 /**
  * Port of server/src/routes/validation/upload.ts: validation for upload/file routes.
- *
- * Upstream extends `@strapi/utils`' `AbstractRouteValidator` for the common query parameters
- * (`fields`, `populate`, `sort`, `pagination`, `filters`); that class is not ported, so those
- * schemas are permissive here (core only reads the declared query keys, for strictParams).
+ * The common query parameters (`fields`, `populate`, `sort`, `pagination`, `filters`) come from
+ * `@strapi/utils`' `AbstractRouteValidator`.
  */
-final class UploadRouteValidator
+final class UploadRouteValidator extends AbstractRouteValidator
 {
     public function __construct(protected readonly ?Strapi $strapi = null)
     {
@@ -113,32 +112,5 @@ final class UploadRouteValidator
                 ]),
             )->optional(),
         ]);
-    }
-
-    // AbstractRouteValidator's query parameter schemas
-
-    public function queryFields(): ZodType
-    {
-        return z::any();
-    }
-
-    public function queryPopulate(): ZodType
-    {
-        return z::any();
-    }
-
-    public function querySort(): ZodType
-    {
-        return z::any();
-    }
-
-    public function pagination(): ZodType
-    {
-        return z::any();
-    }
-
-    public function filters(): ZodType
-    {
-        return z::any();
     }
 }

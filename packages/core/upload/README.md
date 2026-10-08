@@ -20,7 +20,7 @@ Files mirror upstream one for one (`server/src/<same path>.php`, `shared/<same p
 
 | Area | Files |
 | --- | --- |
-| Module | `index`, `register` (provider loading, see below; `documentation/content-api.json` is registered with the documentation plugin when present), `bootstrap` (settings / view configuration defaults, admin actions through `admin::permission`'s `actionProvider->registerMany()`, webhook events, weekly metrics cron, document-service URL signing), `config`, `constants`, `errors` (`FolderContainsUnauthorizedAssetsError`), `media-library-default-notice`, `types` (phpstan types), `graphql` (needs the GraphQL plugin, not ported) |
+| Module | `index`, `register` (provider loading, see below; `documentation/content-api.json` is registered with the documentation plugin when present), `bootstrap` (settings / view configuration defaults, admin actions through `admin::permission`'s `actionProvider->registerMany()`, webhook events, weekly metrics cron, document-service URL signing), `config`, `constants`, `errors` (`FolderContainsUnauthorizedAssetsError`), `media-library-default-notice`, `types` (phpstan types), `graphql` (the upload types, `updateUploadFile` / `deleteUploadFile` mutations and scopes, registered through `strapi/plugin-graphql`'s extension service when that plugin is installed) |
 | Content types / models | `content-types/{file,folder,index}` (they replace core's fallback `plugin::upload.*` schemas: same tables, columns and indexes), `models/ai-metadata-job` |
 | Services | `upload`, `provider`, `image-manipulation`, `file` (incl. `fetchUrlToInputFile` with the SSRF block list), `folder`, `api-upload-folder`, `metrics`, `weekly-metrics`, `extensions/{index,utils}` (signing / unsigning media, richtext and blocks URLs for private providers), `ai-metadata`, `ai-metadata-jobs`, `ai-metadata-provider`, `ai-metadata-strapi-managed` |
 | Controllers | `admin-file`, `admin-folder`, `admin-folder-file`, `admin-settings`, `admin-upload` (incl. `uploadFromUrls` Server-Sent Events), `content-api`, `view-configuration`, `utils/{find-entity-and-check-permissions,folders}`, `validation/admin/{ai-metadata,configureView,folder,folder-file,settings,upload,utils}`, `validation/content-api/upload` |
@@ -28,7 +28,7 @@ Files mirror upstream one for one (`server/src/<same path>.php`, `shared/<same p
 | Middleware | `middlewares/upload` (`GET /uploads/(.*)` static serving with byte ranges) |
 | Migrations | `migrations/unsign-richtext-and-blocks-urls` |
 | Utils | `utils/{index,cron,images,mime-validation}` |
-| MCP | `mcp/register-upload-mcp-tools` (10 tool definitions), `handlers/{read,write,folder}-handlers`, `handlers/constants`, `schemas/{input,output}-schemas`, `sanitizers/sanitize-media`, `permissions`, `ambient-instance`, `utils`, `types` |
+| MCP | `mcp/register-upload-mcp-tools` (10 tool definitions), `handlers/{read,write,folder}-handlers`, `handlers/constants`, `schemas/{input,output}-schemas`, `sanitizers/sanitize-media`, `permissions`, `ambient-instance`, `utils`, `types` — registered on core's `strapi.ai.mcp` (exposed on `POST /mcp` when `server.mcp.enabled`); `tests/api/core/mcp/mcp-upload-rbac` passes 123/123 |
 | Shared | `shared/constants` (`shared/contracts/*` are TypeScript types only) |
 
 Barrel files (`controllers/index`, `services/index`, `routes/index`, `content-types/index` are
@@ -71,7 +71,6 @@ objects. What is persisted is the JSON-serializable part (`Utils::toPlain()`).
 | `uploadFromUrls` streams Server-Sent Events | the same events, sent as one `text/event-stream` body when the last URL is done |
 | `createAIMetadataJob` runs the job detached | it runs after the response (`register_shutdown_function`) |
 | `strapi.ai.admin` | read from the `ai.admin` container entry (registered by the admin package); AI metadata is unavailable without it |
-| `strapi.ai.mcp.registerTool()` | core's MCP service is a stub: registration is skipped while it has no `registerTool()` |
 | sharp `cache` / `concurrency` options | ignored (no GD counterpart) |
 | koa's EPIPE error filter (`middlewares/upload`) | no counterpart |
 

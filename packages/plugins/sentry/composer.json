@@ -3,18 +3,23 @@
     "description": "Sentry error reporting (port of @strapi/plugin-sentry server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "sentry/sentry": "^4.10"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/plugin-sentry",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "sentry",
+            "namespace": "Strapi\\Plugin\\Sentry",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

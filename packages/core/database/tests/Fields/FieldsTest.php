@@ -18,6 +18,8 @@ use Strapi\Database\Fields\NumberField;
 use Strapi\Database\Fields\Shared\Parsers;
 use Strapi\Database\Fields\StringField;
 use Strapi\Database\Fields\TimestampField;
+use Strapi\Database\Query\Helpers\Transform;
+use Strapi\Utils\EmptyObject;
 
 /** Port of fields/__tests__/*.vitest.test.ts, fields/shared/__tests__/parsers.vitest.test.ts and __tests__/numeric-fields.test.ts. */
 final class FieldsTest extends TestCase
@@ -96,6 +98,33 @@ final class FieldsTest extends TestCase
         self::assertSame('{not json', $field->fromDB('{not json'));
         self::assertSame(['already' => 'object'], $field->fromDB(['already' => 'object']));
         self::assertNull($field->fromDB(null));
+    }
+
+    /** PHP port: `{}` stays apart from `[]` both ways (Strapi\Utils\EmptyObject). */
+    public function testJsonEmptyObjects(): void
+    {
+        $field = new JsonField();
+        self::assertSame('{}', $field->toDB(new EmptyObject()));
+        self::assertSame('{"a":{},"b":[]}', $field->toDB(['a' => new EmptyObject(), 'b' => []]));
+
+        self::assertSame([], $field->fromDB('{}'), 'fromDB() reads `{}` as json_decode($json, true) does');
+        self::assertInstanceOf(EmptyObject::class, $field->fromDBKeepingEmptyObjects('{}'));
+        self::assertSame([], $field->fromDBKeepingEmptyObjects('[]'));
+        self::assertSame('{"a":{},"b":[]}', json_encode($field->fromDBKeepingEmptyObjects('{"a":{},"b":[]}')));
+        self::assertInstanceOf(EmptyObject::class, $field->fromDBKeepingEmptyObjects(json_encode('{}')), 'legacy double-encoded value');
+    }
+
+    public function testFromRowKeepsEmptyObjectsForContentModelsOnly(): void
+    {
+        $meta = static fn (string $uid): array => [
+            'uid' => $uid, 'singularName' => 'x', 'tableName' => 'x', 'attributes' => ['data' => ['type' => 'json']],
+            'indexes' => [], 'foreignKeys' => [], 'lifecycles' => [], 'columnToAttribute' => ['data' => 'data'],
+        ];
+
+        self::assertInstanceOf(EmptyObject::class, Transform::fromSingleRow($meta('api::article.article'), ['data' => '{}'])['data'] ?? null);
+        self::assertInstanceOf(EmptyObject::class, Transform::fromSingleRow($meta('default.dish'), ['data' => '{}'])['data'] ?? null);
+        self::assertSame(['data' => []], Transform::fromSingleRow($meta('admin::permission'), ['data' => '{}']));
+        self::assertSame(['data' => []], Transform::fromSingleRow($meta('plugin::upload.file'), ['data' => '{}']));
     }
 
     public function testString(): void

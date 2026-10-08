@@ -8,6 +8,7 @@ use Strapi\Database\Fields\Fields;
 use Strapi\Database\Query\QueryBuilder;
 use Strapi\Database\Query\Raw;
 use Strapi\Database\Query\SqlBuilder;
+use Strapi\Database\Utils\Knex;
 use Strapi\Database\Utils\Types;
 use Strapi\Utils\Operators;
 
@@ -35,7 +36,7 @@ final class Where
             return $value;
         }
 
-        if (Types::isScalar((string) ($attribute['type'] ?? '')) && !($value instanceof SqlBuilder) && !($value instanceof Raw)) {
+        if (Types::isScalar((string) ($attribute['type'] ?? '')) && !Knex::isKnexQuery($value)) {
             return $value === null ? null : Fields::createField($attribute)->toDB($value);
         }
 
@@ -215,10 +216,10 @@ final class Where
                 $qb->whereNot(static fn (SqlBuilder $sub) => self::applyWhereToColumn($sub, $column, $value));
                 break;
             case '$in':
-                $qb->whereIn($column, $value instanceof SqlBuilder || $value instanceof Raw ? $value : (is_array($value) ? array_values($value) : [$value]));
+                $qb->whereIn($column, Knex::isKnexQuery($value) ? $value : (is_array($value) ? array_values($value) : [$value]));
                 break;
             case '$notIn':
-                $qb->whereNotIn($column, $value instanceof SqlBuilder || $value instanceof Raw ? $value : (is_array($value) ? array_values($value) : [$value]));
+                $qb->whereNotIn($column, Knex::isKnexQuery($value) ? $value : (is_array($value) ? array_values($value) : [$value]));
                 break;
             case '$eq':
                 if ($value === null) {

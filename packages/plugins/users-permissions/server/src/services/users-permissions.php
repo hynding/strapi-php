@@ -11,6 +11,7 @@ use Strapi\Plugin\UsersPermissions\Utils\UrlJoin;
 use Strapi\Plugin\UsersPermissions\Utils\Utils;
 use Strapi\Utils\Errors\ApplicationError;
 use Strapi\Utils\Primitives\Objects;
+use Strapi\Utils\RouteSerialization;
 use Strapi\Utils\Template;
 
 /** Port of server/src/services/users-permissions.js. */
@@ -143,26 +144,6 @@ final class UsersPermissions
         return $out;
     }
 
-    /**
-     * `sanitizeRoutesMapForSerialization` (@strapi/utils route-serialization): drops the Zod
-     * `request` / `response` validators.
-     *
-     * @param array<string, list<array<string, mixed>>> $map
-     * @return array<string, list<array<string, mixed>>>
-     */
-    private static function sanitizeRoutesMapForSerialization(array $map): array
-    {
-        foreach ($map as $key => $routes) {
-            $map[$key] = array_map(static function (array $route): array {
-                unset($route['request'], $route['response']);
-
-                return $route;
-            }, $routes);
-        }
-
-        return $map;
-    }
-
     /** @return array<string, list<array<string, mixed>>> */
     public function getRoutes(): array
     {
@@ -205,7 +186,7 @@ final class UsersPermissions
             ], $routes);
         }
 
-        return self::sanitizeRoutesMapForSerialization($routesMap);
+        return RouteSerialization::sanitizeRoutesMapForSerialization($routesMap);
     }
 
     public function syncPermissions(): void

@@ -84,6 +84,15 @@ their share are cut and suffixed with 5 hex chars of SHAKE256 (`components_defau
 | Document index | `<collectionName>_documents_idx (document_id, locale, published_at)` | `articles_documents_idx` |
 | FK index for join columns | `<table>_<column>_fk` | `articles_created_by_id_fk` |
 
+Also ported: `query/helpers/streams/readable.ts` → `Query\Helpers\Streams\Readable` (`QueryBuilder::stream(['mapResults'])`:
+the Node object-mode Readable becomes an `IteratorAggregate` that reads the select in `batchSize`
+windows within the query's own offset/limit, applies the populate and maps the rows; `read($size)`
+is `_read`), `utils/knex.ts` → `Utils\Knex` (`isKnexQuery()` = `SqlBuilder|Raw`, used by the where
+helper; `addSchema()`), `lifecycles/subscribers/index.ts` → `Lifecycles\Subscribers\Subscribers::isValidSubscriber()`
+(`subscribe()` enforces it through its parameter type). `metadata/index.ts`'s `createMetadata()` is
+`Metadata::create()` in `metadata/metadata.php` (a parity-map alias: an `index` file would take the
+`Metadata` class name). Tests: `tests/Query/Helpers/Streams/ReadableTest.php`, `tests/Lifecycles/SubscribersTest.php`.
+
 ## Deviations from upstream
 
 - **Knex → DBAL.** Doctrine DBAL has no nested-callback query builder, so `src/query/sql-builder.php`
@@ -128,7 +137,6 @@ their share are cut and suffixed with 5 hex chars of SHAKE256 (`components_defau
 | `migrations/internal-migrations/5.0.0-*` | Registered under their upstream names as **no-ops** so `strapi_migrations_internal` stays identical; the v4 → v5 data migrations themselves (identifier renames, document ids) are not ported (`TODO` in `internal-migrations/index.php`). |
 | `migrations/heartbeat.ts` | Ported as a working helper, but nothing uses it (the document-id migration that did is not ported). |
 | `migrations/file-builder.ts`, `schema/rename-helpers.ts`, `Dialect::renameSchemaObject/dropSchemaObject` | Not ported: content-type-builder rename migrations (generated migration files). `canRenameSchemaObjects()` is kept. |
-| `query/helpers/streams/*` (`QueryBuilder.stream()`) | Not ported (Node streams). |
 | `Dialect::getColumnTypeConversionSQL` + `Builder::handleSpecialTypeConversions` | The PostgreSQL time ↔ datetime `USING` conversion SQL is exposed by `Postgresql::getColumnTypeConversionSQL()` but the builder does not apply it yet. |
 | `index.ts` connection functions (`connection.connection` as a function), knex `pool.afterCreate` | Not applicable: DBAL opens one connection, `Dialect::initialize()` runs on it. |
 

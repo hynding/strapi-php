@@ -3,14 +3,15 @@
     "description": "Content-Type Builder: schema.json writer and API file generator (port of @strapi/content-type-builder server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
         "strapi/utils": "self.version",
         "strapi/types": "self.version",
-        "strapi/admin": "self.version"
+        "strapi/admin": "self.version",
+        "strapi/generators": "self.version"
     },
     "extra": {
         "strapi": {

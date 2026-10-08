@@ -6,6 +6,7 @@ namespace Strapi\Core\Services\ContentApi;
 
 use Strapi\Core\Services\ContentApi\Permissions\Permissions;
 use Strapi\Core\Strapi;
+use Strapi\Utils\RouteSerialization;
 use Strapi\Utils\ContentApiConstants;
 use Strapi\Utils\Sanitize\ApiSanitizers;
 use Strapi\Utils\Sanitize\Sanitize;
@@ -203,7 +204,7 @@ final class ContentApi
                 continue;
             }
             $routesMap["api::{$apiName}"] = array_map(
-                static fn (array $route): array => self::sanitizeRoute([...$route, 'path' => $apiPrefix . $route['path']]),
+                static fn (array $route): array => [...$route, 'path' => $apiPrefix . $route['path']],
                 $routes,
             );
         }
@@ -221,12 +222,12 @@ final class ContentApi
                 continue;
             }
             $routesMap["plugin::{$pluginName}"] = array_map(
-                static fn (array $route): array => self::sanitizeRoute([...$route, 'path' => $apiPrefix . $route['path']]),
+                static fn (array $route): array => [...$route, 'path' => $apiPrefix . $route['path']],
                 $routes,
             );
         }
 
-        return $routesMap;
+        return RouteSerialization::sanitizeRoutesMapForSerialization($routesMap);
     }
 
     /**
@@ -250,16 +251,5 @@ final class ContentApi
         }
 
         return $out;
-    }
-
-    /**
-     * @param array<string, mixed> $route
-     * @return array<string, mixed>
-     */
-    private static function sanitizeRoute(array $route): array
-    {
-        unset($route['request'], $route['response']);
-
-        return $route;
     }
 }

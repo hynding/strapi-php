@@ -19,6 +19,13 @@
         "strapi/i18n": "self.version",
         "strapi/plugin-users-permissions": "self.version",
         "strapi/email": "self.version",
+        "strapi/data-transfer": "self.version",
+        "strapi/openapi": "self.version",
+        "strapi/generators": "self.version",
+        "strapi/plugin-graphql": "self.version",
+        "strapi/plugin-documentation": "self.version",
+        "strapi/plugin-sentry": "self.version",
+        "strapi/plugin-color-picker": "self.version",
         "strapi/provider-upload-local": "self.version"
     },
     "require-dev": {
@@ -85,10 +92,18 @@
             "Strapi\\Database\\Tests\\": "packages/core/database/tests/",
             "Strapi\\Core\\Tests\\": "packages/core/core/tests/",
             "Strapi\\Cli\\Tests\\": "packages/core/strapi/tests/",
-            "StrapiPlugin\\Announcements\\Tests\\": "examples/plugins/announcements/tests/php/"
+            "Strapi\\DataTransfer\\Tests\\": "packages/core/data-transfer/tests/",
+            "StrapiPlugin\\Announcements\\Tests\\": "examples/plugins/announcements/tests/php/",
+            "Strapi\\Openapi\\Tests\\": "packages/core/openapi/tests/",
+            "Strapi\\Plugin\\Documentation\\Tests\\": "packages/plugins/documentation/tests/",
+            "Strapi\\Upgrade\\Tests\\": "packages/utils/upgrade/tests/",
+            "Strapi\\CreateStrapiApp\\Tests\\": "packages/cli/create-strapi-app/tests/"
         },
         "classmap": [
-            "examples/plugins/announcements/server/src/"
+            "examples/plugins/announcements/server/src/",
+            "packages/core/email/shared/",
+            "packages/utils/upgrade/src/",
+            "packages/cli/create-strapi-app/src/"
         ]
     },
     "scripts": {
@@ -105,7 +120,7 @@
         "optimize-autoloader": true,
         "allow-plugins": false
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "beta",
     "prefer-stable": true,
-    "version": "5.56.0"
+    "version": "5.56.0-beta.1"
 }

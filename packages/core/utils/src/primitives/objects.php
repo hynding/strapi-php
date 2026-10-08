@@ -159,11 +159,12 @@ final class Objects
 
     /**
      * True for an "object-like" associative array (not a list) — the PHP stand-in for `_.isPlainObject`.
-     * Empty arrays count as plain objects, as `{}` would.
+     * Empty arrays count as plain objects, as `{}` would, and so does a JSON `{}` decoded to an
+     * {@see \Strapi\Utils\EmptyObject}.
      */
     public static function isPlainObject(mixed $value): bool
     {
-        return is_array($value) && ($value === [] || !array_is_list($value));
+        return $value instanceof \Strapi\Utils\EmptyObject || (is_array($value) && ($value === [] || !array_is_list($value)));
     }
 
     /** `_.isObject` analogue: arrays and objects. */

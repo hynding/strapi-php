@@ -8,7 +8,6 @@ use Strapi\Core\Domain\ContentType\ContentType;
 use Strapi\Core\Strapi;
 use Strapi\Core\Utils\LoadConfigFile;
 use Strapi\Core\Utils\LoadFiles;
-use Strapi\Utils\Primitives\Objects;
 
 /**
  * Port of packages/core/core/src/loaders/plugins/index.ts (`loadPlugins`).
@@ -89,6 +88,28 @@ final class Plugins
         }
     }
 
+    /**
+     * lodash `_.defaultsDeep(object, source)`: `$source`'s values fill the keys `$object` lacks
+     * (`undefined` upstream; a `null` stays), recursively into nested arrays; `$object`'s keys come first.
+     *
+     * @param array<array-key, mixed> $object
+     * @param array<array-key, mixed> $source
+     *
+     * @return array<array-key, mixed>
+     */
+    private static function defaultsDeep(array $object, array $source): array
+    {
+        foreach ($source as $key => $value) {
+            if (!array_key_exists($key, $object)) {
+                $object[$key] = $value;
+            } elseif (is_array($object[$key]) && is_array($value)) {
+                $object[$key] = self::defaultsDeep($object[$key], $value);
+            }
+        }
+
+        return $object;
+    }
+
     /** @param array<string, array<string, mixed>> $plugins */
     private static function applyUserConfig(Strapi $strapi, array &$plugins): void
     {
@@ -103,7 +124,8 @@ final class Plugins
                 $defaultConfig = $defaultConfig($strapi->env());
             }
 
-            $config = Objects::merge([], is_array($defaultConfig) ? $defaultConfig : [], $userPluginConfig);
+            // lodash/fp `defaultsDeep(defaultConfig, userPluginConfig)`: the user's config, completed by the defaults
+            $config = self::defaultsDeep($userPluginConfig, is_array($defaultConfig) ? $defaultConfig : []);
 
             try {
                 $validator = $plugin['config']['validator'] ?? null;

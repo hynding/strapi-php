@@ -63,4 +63,16 @@ final class RouterTest extends TestCase
         self::assertIsArray($deep);
         self::assertSame('content-manager/collection-types', $deep['params']['path']);
     }
+
+    /** koa-router `:name(regex)` params (the documentation plugin's `/v:major(\\d+).:minor(\\d+).:patch(\\d+)`). */
+    public function testRegexRoutesCaptureNamedParams(): void
+    {
+        $router = new Router('/documentation');
+        $router->add('GET', '/v:major(\\d+).:minor(\\d+).:patch(\\d+)', static fn (): null => null, ['handler' => 'documentation.index']);
+
+        $match = $router->match('GET', '/documentation/v1.2.3');
+        self::assertIsArray($match);
+        self::assertSame(['major' => '1', 'minor' => '2', 'patch' => '3'], $match['params']);
+        self::assertNull($router->match('GET', '/documentation/vx.2.3'));
+    }
 }

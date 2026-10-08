@@ -32,6 +32,14 @@ use Strapi\Utils\Errors\ApplicationError;
  *   `require()` directly (api-tests/models.js uses document-service/components): static methods
  *   are called statically, instance methods on `new Class($strapi)`.
  *
+ * - a function of the test process is sent as `{"$callback": {"url", "id"}}` and arrives as a
+ *   {@see Callback} (`strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })`). A chain ending
+ *   with `{"keep": true}` keeps its value in the worker and answers `{"$handle": n}`; a chain that
+ *   starts with `{"handle": n}` continues from that value (the unsubscribe function).
+ * - an object with functions assigned to a property (`plugin.provider = { ...provider, uploadStream() {} }`)
+ *   is an `{"assign": {"prop", "methods", "values"}}` step: the property becomes a {@see RemoteObject}
+ *   until a `{"restore": prop}` step puts the original back.
+ *
  * - `strapi.db.getConnection()` (a knex instance upstream) is the database's knex-like
  *   {@see SqlBuilder} (`$db->sql()`), so `getConnection().from(t).where(...).update(...)` replays;
  *   awaiting a builder runs it. `strapi.db.connection(table)` (knex called with a table name) is
@@ -45,6 +53,12 @@ final class Bridge
 
     /** Whether the last replayed call returns a nullable type, so its `null` is a value (JS `null`, not `undefined`). */
     private bool $nullIsValue = false;
+
+    /** @var array<int, mixed> values kept by a `{"keep": true}` step */
+    private array $handles = [];
+
+    /** @var array<string, mixed> original values of properties replaced by an `assign` step */
+    private array $assigned = [];
 
     public function __construct(private readonly Strapi $strapi)
     {
@@ -102,11 +116,26 @@ final class Bridge
             }
             $value = new ClassRef($class, $this->strapi);
             $i = 1;
+        } elseif (isset($steps[0]['handle'])) {
+            $handle = (int) $steps[0]['handle'];
+            if (!array_key_exists($handle, $this->handles)) {
+                throw new \InvalidArgumentException("Unknown handle {$handle}");
+            }
+            $value = $this->handles[$handle];
+            $i = 1;
         }
 
         for (; $i < $count; $i++) {
             $step = $steps[$i];
             $this->nullIsValue = false;
+            if (array_key_exists('keep', $step)) {
+                $this->handles[] = $value;
+
+                return ['$handle' => array_key_last($this->handles)];
+            }
+            if (array_key_exists('assign', $step) || array_key_exists('restore', $step)) {
+                return $this->toggleAssign($value, $step);
+            }
             if (array_key_exists('spy', $step) || array_key_exists('unspy', $step)) {
                 // `jest.spyOn(remote, method)` / `mockRestore()` (lib/bridge.js): last step of the chain
                 return $this->toggleSpy($value, $step);
@@ -171,6 +200,49 @@ final class Bridge
     }
 
     /**
+     * Replaces (`assign: { prop, methods, values }`) or restores (`restore: prop`) a property of an
+     * object with an object of the test process (lib/bridge.js); last step of the chain.
+     *
+     * @param array<string, mixed> $step
+     */
+    private function toggleAssign(mixed $target, array $step): bool
+    {
+        if (!is_object($target)) {
+            throw new \InvalidArgumentException('Only a property of an object can be assigned, got ' . get_debug_type($target));
+        }
+
+        if (isset($step['assign']) && is_array($step['assign'])) {
+            $prop = (string) ($step['assign']['prop'] ?? '');
+            $key = spl_object_id($target) . "\0" . $prop;
+            $original = array_key_exists($key, $this->assigned) ? $this->assigned[$key] : $target->{$prop};
+            $methods = [];
+            foreach ((array) ($step['assign']['methods'] ?? []) as $name => $callback) {
+                $resolved = $this->resolveRefs($callback);
+                if ($resolved instanceof Callback) {
+                    $methods[(string) $name] = $resolved;
+                }
+            }
+            $values = [];
+            foreach ((array) ($step['assign']['values'] ?? []) as $name => $v) {
+                $values[(string) $name] = $this->resolveRefs($v);
+            }
+            $this->assigned[$key] = $original;
+            $target->{$prop} = new RemoteObject($original, $methods, $values);
+
+            return true;
+        }
+
+        $prop = (string) $step['restore'];
+        $key = spl_object_id($target) . "\0" . $prop;
+        if (array_key_exists($key, $this->assigned)) {
+            $target->{$prop} = $this->assigned[$key];
+            unset($this->assigned[$key]);
+        }
+
+        return true;
+    }
+
+    /**
      * @param list<mixed> $args
      * @return list<mixed>
      */
@@ -189,6 +261,12 @@ final class Bridge
             $steps = $value['$ref'];
 
             return $this->replay($steps);
+        }
+        if (array_keys($value) === ['$mcpTool'] && is_array($value['$mcpTool'])) {
+            return McpDefinition::fromTest($this->resolveRefs($value['$mcpTool']));
+        }
+        if (array_keys($value) === ['$callback'] && is_array($value['$callback'])) {
+            return new Callback((string) ($value['$callback']['url'] ?? ''), (int) ($value['$callback']['id'] ?? 0));
         }
 
         return array_map(fn (mixed $v): mixed => $this->resolveRefs($v), $value);
@@ -293,6 +371,9 @@ final class Bridge
         }
         if ($value instanceof \JsonSerializable) {
             return self::export($value->jsonSerialize(), $depth + 1);
+        }
+        if ($value instanceof \ArrayObject) {
+            return self::export($value->getArrayCopy(), $depth + 1);
         }
         if ($value instanceof \DateTimeInterface) {
             return $value->format('Y-m-d\TH:i:s.v\Z');

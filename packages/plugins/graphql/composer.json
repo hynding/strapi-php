@@ -3,18 +3,24 @@
     "description": "GraphQL API on webonyx/graphql-php (port of @strapi/plugin-graphql server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
         "webonyx/graphql-php": "^15.19"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/plugin-graphql",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "graphql",
+            "namespace": "Strapi\\Plugin\\Graphql",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",
@@ -26,7 +32,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Strapi\\Plugin\\GraphQL\\Tests\\": "tests/"
+            "Strapi\\Plugin\\Graphql\\Tests\\": "tests/"
         }
     }
 }

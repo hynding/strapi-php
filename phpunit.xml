@@ -26,7 +26,16 @@
         <testsuite name="provider-email-mailgun"><directory>packages/providers/email-mailgun/tests</directory></testsuite>
         <testsuite name="provider-email-sendgrid"><directory>packages/providers/email-sendgrid/tests</directory></testsuite>
         <testsuite name="strapi"><directory>packages/core/strapi/tests</directory></testsuite>
+        <testsuite name="data-transfer"><directory>packages/core/data-transfer/tests</directory></testsuite>
         <testsuite name="users-permissions"><directory>packages/plugins/users-permissions/tests</directory></testsuite>
+        <testsuite name="graphql"><directory>packages/plugins/graphql/tests</directory></testsuite>
+        <testsuite name="color-picker"><directory>packages/plugins/color-picker/tests</directory></testsuite>
+        <testsuite name="sentry"><directory>packages/plugins/sentry/tests</directory></testsuite>
+        <testsuite name="generators"><directory>packages/generators/generators/tests</directory></testsuite>
+        <testsuite name="openapi"><directory>packages/core/openapi/tests</directory></testsuite>
+        <testsuite name="documentation"><directory>packages/plugins/documentation/tests</directory></testsuite>
+        <testsuite name="upgrade"><directory>packages/utils/upgrade/tests</directory></testsuite>
+        <testsuite name="create-strapi-app"><directory>packages/cli/create-strapi-app/tests</directory></testsuite>
         <testsuite name="integration"><directory>tests/php</directory></testsuite>
         <testsuite name="example-plugins"><directory>examples/plugins/announcements/tests/php</directory></testsuite>
     </testsuites>

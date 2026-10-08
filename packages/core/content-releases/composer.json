@@ -1,9 +1,9 @@
 {
     "name": "strapi/content-releases",
-    "description": "Scheduled content releases (port of @strapi/content-releases server)",
+    "description": "Content releases — upstream Enterprise licence (whole package); not ported (port of @strapi/content-releases server)",
     "type": "library",
     "license": "MIT",
-    "version": "5.56.0",
+    "version": "5.56.0-beta.1",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
@@ -12,7 +12,7 @@
     "extra": {
         "strapi": {
             "upstream": "@strapi/content-releases",
-            "status": "planned",
+            "status": "blocked-licence",
             "compatibleWith": "5.x"
         }
     },
