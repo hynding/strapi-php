@@ -15,7 +15,7 @@
     "extra": {
         "strapi": {
             "upstream": "@strapi/content-type-builder",
-            "status": "in-progress",
+            "status": "ported",
             "compatibleWith": "5.x",
             "kind": "plugin",
             "name": "content-type-builder",

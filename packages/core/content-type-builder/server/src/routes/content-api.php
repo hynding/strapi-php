@@ -1,0 +1,177 @@
+<?php
+
+declare(strict_types=1);
+
+// Port of server/src/routes/content-api.ts. Upstream wraps the routes with
+// `createContentApiRoutesFactory()` (a factory that also exposes `.routes`); the router loader
+// accepts a `callable(Strapi): array` factory, which builds the routes once.
+
+use Strapi\ContentTypeBuilder\Controllers\Validation\Common;
+use Strapi\Utils\Zod as z;
+
+$componentUIDRegexp = '/^[\w-]+\.[\w-]+$/';
+
+$routes = null;
+
+return static function () use (&$routes, $componentUIDRegexp): array {
+    if ($routes === null) {
+        $baseAttributeSchema = z::object([
+            'type' => z::string(),
+            'configurable' => z::literal(false)->optional(),
+            'private' => z::boolean()->optional(),
+            'pluginOptions' => z::record(z::string(), z::unknown())->optional(),
+        ]);
+
+        $mediaAttributeSchema = $baseAttributeSchema->extend([
+            'type' => z::literal('media'),
+            'multiple' => z::boolean(),
+            'required' => z::boolean()->optional(),
+            'allowedTypes' => z::array(z::string())->optional(),
+        ]);
+
+        $relationAttributeSchema = $baseAttributeSchema->extend([
+            'type' => z::literal('relation'),
+            'relation' => z::string(),
+            'target' => z::string()->regex(Common::CONTENT_TYPE_UID_REGEX),
+            'targetAttribute' => z::string()->nullable(),
+            'autoPopulate' => z::boolean()->optional(),
+            'mappedBy' => z::string()->optional(),
+            'inversedBy' => z::string()->optional(),
+        ]);
+
+        $componentAttributeSchema = $baseAttributeSchema->extend([
+            'type' => z::literal('component'),
+            'component' => z::string(),
+            'repeatable' => z::boolean(),
+            'required' => z::boolean()->optional(),
+            'min' => z::number()->optional(),
+            'max' => z::number()->optional(),
+        ]);
+
+        $dynamicZoneAttributeSchema = $baseAttributeSchema->extend([
+            'type' => z::literal('dynamiczone'),
+            'components' => z::array(z::string()->regex($componentUIDRegexp)),
+            'required' => z::boolean()->optional(),
+            'min' => z::number()->optional(),
+            'max' => z::number()->optional(),
+        ]);
+
+        $uidAttributeSchema = $baseAttributeSchema->extend([
+            'type' => z::literal('uid'),
+            'targetField' => z::string()->optional(),
+        ]);
+
+        $genericAttributeSchema = z::object([
+            'type' => z::string(),
+            'required' => z::boolean()->optional(),
+            'unique' => z::boolean()->optional(),
+            'default' => z::unknown()->optional(),
+            'min' => z::union([z::number(), z::string()])->optional(),
+            'max' => z::union([z::number(), z::string()])->optional(),
+            'minLength' => z::number()->optional(),
+            'maxLength' => z::number()->optional(),
+            'enum' => z::array(z::string())->optional(),
+            'regex' => z::string()->optional(),
+            'private' => z::boolean()->optional(),
+            'configurable' => z::boolean()->optional(),
+            'pluginOptions' => z::record(z::string(), z::unknown())->optional(),
+        ]);
+
+        $attributeSchema = z::union([
+            $mediaAttributeSchema,
+            $relationAttributeSchema,
+            $componentAttributeSchema,
+            $dynamicZoneAttributeSchema,
+            $uidAttributeSchema,
+            $genericAttributeSchema,
+        ]);
+
+        $contentTypeSchemaBase = z::object([
+            'displayName' => z::string(),
+            'singularName' => z::string(),
+            'pluralName' => z::string(),
+            'description' => z::string(),
+            'draftAndPublish' => z::boolean(),
+            'kind' => z::enum(['collectionType', 'singleType']),
+            'collectionName' => z::string()->optional(),
+            'attributes' => z::record(z::string(), $attributeSchema),
+            'visible' => z::boolean(),
+            'restrictRelationsTo' => z::array(z::string())->nullable(),
+            'pluginOptions' => z::record(z::string(), z::unknown())->optional(),
+            'options' => z::record(z::string(), z::unknown())->optional(),
+            'reviewWorkflows' => z::boolean()->optional(),
+            'populateCreatorFields' => z::boolean()->optional(),
+            'comment' => z::string()->optional(),
+            'version' => z::string()->optional(),
+        ]);
+
+        $formattedContentTypeSchema = z::object([
+            'uid' => z::string()->regex(Common::CONTENT_TYPE_UID_REGEX),
+            'plugin' => z::string()->optional(),
+            'apiID' => z::string(),
+            'schema' => $contentTypeSchemaBase,
+        ]);
+
+        $componentSchemaBase = z::object([
+            'displayName' => z::string(),
+            'description' => z::string(),
+            'icon' => z::string()->optional(),
+            'connection' => z::string()->optional(),
+            'collectionName' => z::string()->optional(),
+            'attributes' => z::record(z::string(), $attributeSchema),
+            'pluginOptions' => z::record(z::string(), z::unknown())->optional(),
+        ]);
+
+        $formattedComponentSchema = z::object([
+            'uid' => z::string()->regex($componentUIDRegexp),
+            'category' => z::string(),
+            'apiId' => z::string(),
+            'schema' => $componentSchemaBase,
+        ]);
+
+        $routes = [
+            [
+                'method' => 'GET',
+                'path' => '/content-types',
+                'handler' => 'content-types.getContentTypes',
+                'request' => [
+                    'query' => ['kind' => z::enum(['collectionType', 'singleType'])],
+                ],
+                'response' => z::object(['data' => z::array($formattedContentTypeSchema)]),
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/content-types/:uid',
+                'handler' => 'content-types.getContentType',
+                'request' => [
+                    'params' => [
+                        'uid' => z::string()->regex(Common::CONTENT_TYPE_UID_REGEX),
+                    ],
+                ],
+                'response' => z::object(['data' => $formattedContentTypeSchema]),
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/components',
+                'handler' => 'components.getComponents',
+                'response' => z::object(['data' => z::array($formattedComponentSchema)]),
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/components/:uid',
+                'handler' => 'components.getComponent',
+                'request' => [
+                    'params' => [
+                        'uid' => z::string()->regex($componentUIDRegexp),
+                    ],
+                ],
+                'response' => z::object(['data' => $formattedComponentSchema]),
+            ],
+        ];
+    }
+
+    return [
+        'type' => 'content-api',
+        'routes' => $routes,
+    ];
+};
