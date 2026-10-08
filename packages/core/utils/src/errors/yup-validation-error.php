@@ -15,7 +15,7 @@ use Strapi\Utils\Yup\YupError;
  * `formatYupErrors`); passing a {@see YupError} does the same. A list of already formatted
  * errors is accepted too.
  *
- * @phpstan-type FormattedError array{path: list<string>, message: string, name: string, value: mixed}
+ * @phpstan-type FormattedError array{path: list<string>, message: string, name: string, value?: mixed}
  */
 class YupValidationError extends ValidationError
 {

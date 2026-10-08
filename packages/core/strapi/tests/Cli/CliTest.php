@@ -136,19 +136,25 @@ final class CliTest extends TestCase
         unlink($file);
     }
 
-    public function testAdminCommandsAreStubs(): void
+    public function testAdminCommands(): void
     {
         $application = Cli::createCLI([], self::$appDir);
+        $application->setAutoExit(false);
 
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:create-user', '--email' => 'not-an-email']), $output);
         self::assertSame(1, $code);
         self::assertStringContainsString('Invalid email address', $output->fetch());
 
+        // each command boots its own instance on an in-memory database
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:create-user', '--email' => 'a@b.co', '--password' => 'Passw0rd', '--firstname' => 'A']), $output);
+        self::assertSame(0, $code, $output->fetch());
+
+        $output = new BufferedOutput();
+        $code = $application->run(new ArrayInput(['command' => 'admin:reset-user-password', '--email' => 'a@b.co', '--password' => 'Passw0rd2']), $output);
         self::assertSame(1, $code);
-        self::assertStringContainsString('not ported yet', $output->fetch());
+        self::assertStringContainsString('User not found for email: a@b.co', $output->fetch());
 
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:reset-user-password', '--email' => 'a@b.co', '--password' => 'weak']), $output);

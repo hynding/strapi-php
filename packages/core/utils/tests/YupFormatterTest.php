@@ -74,7 +74,7 @@ final class YupFormatterTest extends TestCase
         self::assertSame('2 errors occurred', $formatted['message']);
         self::assertSame([
             ['path' => ['name'], 'message' => 'name must be a string', 'name' => 'ValidationError', 'value' => 12],
-            ['path' => ['price'], 'message' => 'price is required', 'name' => 'ValidationError', 'value' => null],
+            ['path' => ['price'], 'message' => 'price is required', 'name' => 'ValidationError'],
         ], $formatted['errors']);
     }
 
@@ -85,6 +85,6 @@ final class YupFormatterTest extends TestCase
 
         self::assertSame('Invalid ids', $error->getMessage());
         self::assertSame(400, $error->status);
-        self::assertSame([['path' => ['1', 'id'], 'message' => '[1].id is a required field', 'name' => 'ValidationError', 'value' => null]], $error->errors());
+        self::assertSame([['path' => ['1', 'id'], 'message' => '[1].id is a required field', 'name' => 'ValidationError']], $error->errors());
     }
 }

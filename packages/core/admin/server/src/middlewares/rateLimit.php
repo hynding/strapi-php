@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
+use Strapi\Admin\Middlewares\RateLimit;
 use Strapi\Core\Strapi;
 
-// PLACEHOLDER: not ported yet (middlewares/rateLimit.ts)
-return static fn (array $config, Strapi $strapi): callable => static function (mixed $ctx, callable $next): void {
-    $next();
-};
+// Port of server/src/middlewares/rateLimit.ts
+return static fn (array $config, Strapi $strapi): callable => RateLimit::create($config, $strapi);

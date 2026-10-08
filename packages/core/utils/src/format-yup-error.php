@@ -18,12 +18,18 @@ final class FormatYupError
     /** @return FormattedError */
     private static function formatYupInnerError(YupError $yupError): array
     {
-        return [
+        $formatted = [
             'path' => array_map('strval', Objects::toPath($yupError->path ?? '')),
             'message' => $yupError->getMessage(),
             'name' => $yupError->name,
-            'value' => $yupError->value instanceof Undefined ? null : $yupError->value,
         ];
+
+        // an `undefined` value is dropped from the JSON upstream sends
+        if (!$yupError->value instanceof Undefined) {
+            $formatted['value'] = $yupError->value;
+        }
+
+        return $formatted;
     }
 
     /** @return array{errors: list<FormattedError>, message: string} */

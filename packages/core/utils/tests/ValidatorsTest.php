@@ -133,7 +133,7 @@ final class ValidatorsTest extends TestCase
             self::assertSame('2 errors occurred', $e->getMessage());
             self::assertSame([
                 'errors' => [
-                    ['path' => ['name'], 'message' => 'name is a required field', 'name' => 'ValidationError', 'value' => null],
+                    ['path' => ['name'], 'message' => 'name is a required field', 'name' => 'ValidationError'],
                     ['path' => ['pageSize'], 'message' => 'pageSize must be a `number` type, but the final value was: `"10"`.', 'name' => 'ValidationError', 'value' => '10'],
                 ],
             ], $e->details);

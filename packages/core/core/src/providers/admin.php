@@ -10,19 +10,24 @@ use Strapi\Core\Strapi;
 /**
  * Port of packages/core/core/src/providers/admin.ts.
  *
- * STUB: `strapi/admin` is not ported yet. The provider registers an empty `admin` module and, at
- * bootstrap, mounts `/admin` on the server: it serves a built admin bundle when
- * `<root>/.strapi/client` (output of `strapi build`) or `node_modules/@strapi/admin/dist` exists,
- * otherwise a 200 HTML placeholder explaining the bundle is not built.
+ * `init` adds the admin module: `strapi.add('admin', () => require('@strapi/admin/strapi-server'))`
+ * becomes the `strapi-server.php` of the installed `strapi/admin` Composer package
+ * ({@see LoadAdmin::adminServerFile()}). The admin module registers its own panel route.
+ *
+ * PHP-port fallback when `strapi/admin` is not installed: the module is empty (`[]`) and, at
+ * bootstrap, `/admin` is mounted on core's {@see \Strapi\Core\Services\Server\AdminStaticHandler}
+ * (the built bundle, or a placeholder page explaining it is not built).
  */
 final class Admin extends AbstractProvider
 {
     public function init(Strapi $strapi): void
     {
-        // the admin package will replace this resolver with its strapi-server module
-        if (!$strapi->has('admin')) {
-            $strapi->add('admin', static fn (): array => []);
+        if ($strapi->has('admin')) {
+            return;
         }
+
+        $serverFile = LoadAdmin::adminServerFile($strapi);
+        $strapi->add('admin', $serverFile !== null ? static fn (): mixed => require $serverFile : static fn (): array => []);
     }
 
     public function register(Strapi $strapi): void
@@ -42,7 +47,8 @@ final class Admin extends AbstractProvider
             $admin['bootstrap']($strapi);
         }
 
-        if ($strapi->config()->get('admin.serveAdminPanel') === false) {
+        // PHP-port fallback: without the admin package, serve the admin bundle (or a placeholder)
+        if (LoadAdmin::hasAdminModule($strapi) || $strapi->config()->get('admin.serveAdminPanel') === false) {
             return;
         }
 
