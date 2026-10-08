@@ -18,6 +18,8 @@ module.exports = {
   setupFilesAfterEnv: [path.join(apiTestsDir, 'lib', 'jest-setup.js'), path.join(upstreamDir, 'tests', 'setup', 'jest-api.setup.js')],
   moduleNameMapper: {
     '^api-tests/(.*)$': `${helpersDir}/$1`,
+    // the local Strapi providers of packages/core/data-transfer, run in the worker
+    '^@strapi/data-transfer$': path.join(apiTestsDir, 'lib', 'data-transfer.js'),
   },
   // upstream files live outside rootDir: resolve their imports from our node_modules
   modulePaths: [path.join(apiTestsDir, 'node_modules')],

@@ -17,14 +17,16 @@ serves it.
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (admin/MCP/AI providers stubbed), 72 tests |
 | CLI: `strapi start / develop / build / console / routes:list / cron:run / migrations:run` | `strapi/strapi` | ported |
-| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 303/330 |
+| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 306/335 |
 | Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 743/781 |
 | Content-Type Builder | `strapi/content-type-builder` | ported; 61/63 |
-| Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 179/193 |
+| Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 182/193 |
 | Email + sendmail, nodemailer, Amazon SES, Mailgun, SendGrid providers | `strapi/email`, `strapi/provider-email-*` | ported |
-| Internationalization | `strapi/i18n` | ported; 54/64 |
-| Users & Permissions: end users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported (its GraphQL extension waits for graphql); 107/125 |
-| data-transfer, graphql, documentation + openapi, content-releases, generators, CLI tooling, sentry, color-picker | the rest | scaffolded, not ported |
+| Internationalization | `strapi/i18n` | ported; 56/64 |
+| Users & Permissions: end users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported; 120/125 |
+| GraphQL (webonyx/graphql-php; nexus, Apollo Server 4 behaviour ported) | `strapi/plugin-graphql` | ported; 119/123 |
+| Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers to and from Node apps through `strapi transfer:serve`) | `strapi/data-transfer` | ported; `core/data-transfer` 3/3, `admin/data-transfer-push-security` 3/3 |
+| documentation + openapi, content-releases, generators, CLI tooling, sentry, color-picker | the rest | scaffolded, not ported |
 
 `parity.json` lists every upstream server file and whether it is ported (794 of 1,921 at the
 time of writing; 69 are Enterprise-licensed and blocked). `php scripts/parity-map.php`
@@ -32,8 +34,8 @@ regenerates it.
 
 The numbers are upstream's own Jest API suite (`tests/api`, see its README) run unmodified
 against the PHP app, one package directory at a time; `tests/api/core/strapi` (core's REST,
-document service, relations, validation) is at 1193/1497. What still fails is mostly graphql
-(not ported), Enterprise features, and tests that replace functions inside the server from
+document service, relations, validation) is at 1193/1497. What still fails is mostly
+Enterprise features, and tests that replace functions inside the server from
 the Jest process, which can't cross into PHP.
 
 ## Try it

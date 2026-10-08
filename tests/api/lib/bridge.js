@@ -117,7 +117,9 @@ const startCallbackServer = () =>
           const fn = callbacks.get(id);
           if (!fn) throw new Error(`api-tests bridge: unknown callback ${id}`);
           const result = await fn(...args);
-          reply({ result: result === undefined ? null : result });
+          // the arguments as the function left them: Strapi\ApiTests\RemoteObject copies the
+          // changes back (`file.url = ...` in a replaced upload provider)
+          reply({ result: result === undefined ? null : result, args });
         } catch (error) {
           reply({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } });
         }
@@ -162,6 +164,8 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   // jest spies installed on remote methods: `${JSON.stringify(steps)}#${method}` → mock function
   const spies = new Map();
   const spyKey = (steps, prop) => `${JSON.stringify(steps)}#${prop}`;
+  // remote properties replaced by an object of this process (`plugin.provider = { uploadStream() {} }`)
+  const assigned = new Set();
 
   const make = (steps) => {
     // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args)
@@ -171,12 +175,29 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       // it back (see startCallbackServer); `mockRestore()` deletes it again
       set(target, prop, value) {
         const local = () => Reflect.set(target, prop, value); // not reflected in PHP
+        // an object with methods assigned to a remote property (a stub upload provider): the
+        // property becomes a Strapi\ApiTests\RemoteObject whose methods call these back
+        if (
+          typeof prop === 'string' && steps.length > 0 && callbacks && value && typeof value === 'object' &&
+          !Array.isArray(value) && !value[CHAIN] && Object.values(value).some((v) => typeof v === 'function')
+        ) {
+          const methods = {};
+          const values = {};
+          for (const [k, v] of Object.entries(value)) {
+            if (typeof v === 'function' && !v[CHAIN]) methods[k] = { $callback: { url: callbacks.url, id: callbacks.register(v) } };
+            else if (typeof v !== 'function') values[k] = encodeArg(v);
+          }
+          runSync([...steps, { assign: { prop, methods, values } }]);
+          assigned.add(spyKey(steps, prop));
+          return true;
+        }
         if (typeof prop !== 'string' || steps.length === 0 || typeof value !== 'function' || !callbacks) {
           return local();
         }
         if (value[CHAIN] && JSON.stringify(value[CHAIN]) === JSON.stringify([...steps, { get: prop }])) {
-          // restoring the original remote method
+          // restoring the original remote method (or property)
           if (spies.delete(spyKey(steps, prop))) runSync([...steps, { unspy: prop }]);
+          if (assigned.delete(spyKey(steps, prop))) runSync([...steps, { restore: prop }]);
           return true;
         }
         try {
@@ -220,6 +241,16 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         if (steps.length === 0 && Object.prototype.hasOwnProperty.call(local, prop)) {
           return local[prop];
         }
+        // `strapi.plugin(name).config(path)` is synchronous upstream (tests compare its result
+        // directly); awaiting it still works since it returns the value itself
+        if (prop === 'config' && steps.length === 2 && steps[0].get === 'plugin' && steps[1].call) {
+          return (...args) => callSync([...steps, { get: 'config' }, { call: args }]);
+        }
+        // `strapi.db.metadata.get(uid)` is synchronous upstream too (tests read
+        // `.attributes.createdBy.joinColumn.name` off it and use it as a property key)
+        if (prop === 'get' && steps.length === 2 && steps[0].get === 'db' && steps[1].get === 'metadata') {
+          return (...args) => callSync([...steps, { get: 'get' }, { call: args }]);
+        }
         return make([...steps, { get: prop }]);
       },
       apply(_, __, args) {
@@ -232,6 +263,20 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
           return Promise.resolve().then(() =>
             args[0]({ trx: undefined, commit: noop, rollback: noop, onCommit: noop, onRollback: noop })
           );
+        }
+        // `strapi.db.lifecycles.subscribe(subscriber)` is synchronous upstream and returns the
+        // unsubscribe function: subscribe now, with the subscriber's functions called back in this
+        // process (Strapi\ApiTests\Callback), and hand back a function that unsubscribes
+        if (last && last.get === 'subscribe' && prev && prev.get === 'lifecycles' && callbacks) {
+          const toCallback = (fn) => ({ $callback: { url: callbacks.url, id: callbacks.register(fn) } });
+          const subscriber =
+            typeof args[0] === 'function' && !args[0][CHAIN]
+              ? toCallback(args[0])
+              : Object.fromEntries(
+                  Object.entries(args[0] ?? {}).map(([k, v]) => [k, typeof v === 'function' && !v[CHAIN] ? toCallback(v) : v])
+                );
+          const handle = runSync([...steps, { call: [encodeArg(subscriber)] }, { keep: true }]);
+          return () => runSync([{ handle: handle.$handle }, { call: [] }]);
         }
         return make([...steps, { call: args.map(encodeArg) }]);
       },

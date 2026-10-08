@@ -17,3 +17,7 @@
 /composer.dev.json
 /composer.dev.lock
 /.tmp/
+# @strapi/plugin-documentation output, generated at boot outside production
+/examples/*/src/extensions/documentation/
+/examples/plugins/*/tests/php/app/src/extensions/documentation/
+/tests/api/app/src/extensions/documentation/
