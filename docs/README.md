@@ -22,7 +22,7 @@ cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 1. ~~`strapi/admin` server~~ and ~~`strapi/content-manager`, `strapi/content-type-builder`,
    `strapi/upload` server halves~~: done (milestone 1); see the status table in the root
    README for the upstream API suite results.
-2. `strapi/plugin-i18n` and `strapi/plugin-users-permissions` (most remaining API-suite
+2. `strapi/i18n` and `strapi/plugin-users-permissions` (most remaining API-suite
    failures in core and the content manager need them), `strapi/email` + providers, the other
    upload providers. Then tag `5.56.0-beta.1`.
 3. `data-transfer`, `graphql`, `documentation` + `openapi`, `content-releases`, `generators`,

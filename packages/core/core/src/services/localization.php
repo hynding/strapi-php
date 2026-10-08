@@ -11,7 +11,8 @@ use Strapi\Utils\ContentTypes;
 /**
  * Port of packages/core/core/src/services/localization.ts: the localization capability used by core.
  *
- * Without a registered provider (the i18n plugin is not ported yet) upstream reports no content type
+ * The i18n plugin (packages/plugins/i18n) registers its provider in `register()`. Without one (the
+ * plugin not installed) upstream reports no content type
  * as localized and a `null` default locale. This port keeps that contract but, because the
  * `pluginOptions.i18n.localized` schemas of the example project must still get a `locale` column
  * value, {@see self::isLocalizedContentType()} reads the schema flag and the default locale falls

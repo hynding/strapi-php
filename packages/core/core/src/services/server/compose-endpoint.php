@@ -30,8 +30,7 @@ final class ComposeEndpoint
             $route = $ctx->state()->route();
 
             try {
-                $routeType = $route['info']['type'] ?? null;
-                $this->strapi->auth()->verify($auth, $route['config']['auth'] ?? [], is_string($routeType) ? $routeType : null);
+                $this->strapi->auth()->verify($auth, $route['config']['auth'] ?? []);
                 $next();
             } catch (UnauthorizedError) {
                 $ctx->unauthorized();

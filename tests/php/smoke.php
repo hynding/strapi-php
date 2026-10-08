@@ -4,8 +4,9 @@
 declare(strict_types=1);
 
 /**
- * Smoke test: boots examples/getstarted on an in-memory SQLite database and sends three requests
- * through `strapi.server.handle()`. Exit code 0 when everything matches, 1 otherwise.
+ * Smoke test: boots examples/getstarted on an in-memory SQLite database and sends requests
+ * through `strapi.server.handle()`: anonymously (the public role grants nothing, so 403 as
+ * upstream), then with a full-access API token. Exit code 0 when everything matches, 1 otherwise.
  *
  *     php tests/php/smoke.php
  */
@@ -39,8 +40,12 @@ try {
 echo "booted examples/getstarted (" . count($strapi->contentTypes()) . " content types)\n";
 
 $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
-$send = static function (string $method, string $uri, ?array $json = null) use ($strapi, $factory): array {
+$token = null;
+$send = static function (string $method, string $uri, ?array $json = null) use ($strapi, $factory, &$token): array {
     $request = $factory->createServerRequest($method, 'http://localhost:1337' . $uri);
+    if ($token !== null) {
+        $request = $request->withHeader('Authorization', "Bearer {$token}");
+    }
     if ($json !== null) {
         $request = $request->withHeader('Content-Type', 'application/json')->withBody($factory->createStream((string) json_encode($json)));
     }
@@ -48,6 +53,14 @@ $send = static function (string $method, string $uri, ?array $json = null) use (
 
     return [$response->getStatusCode(), json_decode((string) $response->getBody(), true), $response];
 };
+
+// 0. anonymous: users-permissions' public role has no permissions until an admin grants them
+[$status] = $send('GET', '/api/articles');
+$check('anonymous GET /api/articles → 403', $status === 403, "got {$status}");
+
+$created = $strapi->service('admin::api-token')->create(['name' => 'smoke', 'type' => 'full-access', 'lifespan' => null]);
+$token = is_string($created['accessKey'] ?? null) ? $created['accessKey'] : null;
+$check('full-access API token created', $token !== null);
 
 // 1. empty collection
 [$status, $body] = $send('GET', '/api/articles');

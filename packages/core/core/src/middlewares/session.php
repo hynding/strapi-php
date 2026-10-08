@@ -9,11 +9,17 @@ use Strapi\Core\Strapi;
 
 /**
  * Port of packages/core/core/src/middlewares/session.ts (koa-session, minimal): a signed cookie
- * session (`koa.sess`) available as `$ctx->state()->get('session')` (an array); it is written back
- * when modified. Requires `server.app.keys`.
+ * session (`koa.sess`) available as `$ctx->state()->get(Session::STATE_KEY)` (an array); it is written
+ * back when modified. Requires `server.app.keys`.
+ *
+ * Koa keeps `ctx.session` apart from `ctx.state.session` (where the admin and users-permissions
+ * strategies expose the current auth session `{ id }`), so the koa session has its own state key.
  */
 final class Session
 {
+    /** The state key holding koa-session's `ctx.session`. */
+    public const STATE_KEY = 'koaSession';
+
     /** @var array<string, mixed> */
     private const DEFAULTS = [
         'key' => 'koa.sess',
@@ -49,11 +55,11 @@ final class Session
                 $session = is_array($decoded) ? $decoded : [];
             }
             $original = $session;
-            $ctx->state()->set('session', $session);
+            $ctx->state()->set(self::STATE_KEY, $session);
 
             $next();
 
-            $updated = $ctx->state()->get('session');
+            $updated = $ctx->state()->get(self::STATE_KEY);
             $updated = is_array($updated) ? $updated : [];
             if ($updated === $original && !$options['rolling']) {
                 return;

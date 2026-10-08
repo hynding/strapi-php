@@ -94,10 +94,57 @@ const postSync = (url, body) => {
 };
 
 /**
+ * A local HTTP server the PHP worker calls back while it serves a request: a jest mock installed
+ * on a remote object (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`) runs here, in
+ * the test process, when the PHP code calls that method (Strapi\\ApiTests\\Spy). The worker waits
+ * for the answer; Node is free to serve it because the test is awaiting the worker's HTTP response.
+ */
+const startCallbackServer = () =>
+  new Promise((resolve, reject) => {
+    const callbacks = new Map();
+    let nextId = 1;
+    const server = http.createServer((req, res) => {
+      const chunks = [];
+      req.on('data', (c) => chunks.push(c));
+      req.on('end', async () => {
+        const reply = (body) => {
+          const data = Buffer.from(JSON.stringify(body));
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': data.length });
+          res.end(data);
+        };
+        try {
+          const { id, args = [] } = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          const fn = callbacks.get(id);
+          if (!fn) throw new Error(`api-tests bridge: unknown callback ${id}`);
+          const result = await fn(...args);
+          reply({ result: result === undefined ? null : result });
+        } catch (error) {
+          reply({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } });
+        }
+      });
+    });
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      server.unref();
+      const { port } = server.address();
+      resolve({
+        url: `http://127.0.0.1:${port}/`,
+        register(fn) {
+          const id = nextId++;
+          callbacks.set(id, fn);
+          return id;
+        },
+        close: () => new Promise((r) => server.close(() => r())),
+      });
+    });
+  });
+
+/**
  * @param {string} rpcUrl  e.g. http://127.0.0.1:41234/__api-tests/rpc
  * @param {object} local   synchronous values that override the remote chain at the root
+ * @param {object} [callbacks] a {@link startCallbackServer} result, for jest spies on remote methods
  */
-const createRemote = (rpcUrl, local = {}) => {
+const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   const run = async (steps) => {
     const response = await post(rpcUrl, { steps });
     if (response.error) throw toError(response.error);
@@ -112,12 +159,47 @@ const createRemote = (rpcUrl, local = {}) => {
     return response.result === null ? undefined : response.result;
   };
 
+  // jest spies installed on remote methods: `${JSON.stringify(steps)}#${method}` → mock function
+  const spies = new Map();
+  const spyKey = (steps, prop) => `${JSON.stringify(steps)}#${prop}`;
+
   const make = (steps) => {
     // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args)
     const target = function remote() {};
     return new Proxy(target, {
+      // `jest.spyOn(remote, 'method')` assigns a mock function: the PHP object's method then calls
+      // it back (see startCallbackServer); `mockRestore()` deletes it again
+      set(target, prop, value) {
+        const local = () => Reflect.set(target, prop, value); // not reflected in PHP
+        if (typeof prop !== 'string' || steps.length === 0 || typeof value !== 'function' || !callbacks) {
+          return local();
+        }
+        if (value[CHAIN] && JSON.stringify(value[CHAIN]) === JSON.stringify([...steps, { get: prop }])) {
+          // restoring the original remote method
+          if (spies.delete(spyKey(steps, prop))) runSync([...steps, { unspy: prop }]);
+          return true;
+        }
+        try {
+          const id = callbacks.register(value);
+          runSync([...steps, { spy: { method: prop, url: callbacks.url, id } }]);
+        } catch {
+          // only methods of registered services can be replaced in PHP
+          return local();
+        }
+        spies.set(spyKey(steps, prop), value);
+        return true;
+      },
+      deleteProperty(target, prop) {
+        if (typeof prop === 'string' && spies.has(spyKey(steps, prop))) {
+          spies.delete(spyKey(steps, prop));
+          runSync([...steps, { unspy: prop }]);
+          return true;
+        }
+        return Reflect.deleteProperty(target, prop);
+      },
       get(_, prop) {
         if (prop === CHAIN) return steps;
+        if (typeof prop === 'string' && spies.has(spyKey(steps, prop))) return spies.get(spyKey(steps, prop));
         if (prop === 'then') {
           if (steps.length === 0) return undefined; // the root itself is not a thenable
           const promise = run(steps);
@@ -164,4 +246,4 @@ const createRemote = (rpcUrl, local = {}) => {
   return { root, classRef, callSync };
 };
 
-module.exports = { createRemote };
+module.exports = { createRemote, startCallbackServer };

@@ -8,13 +8,19 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "symfony/rate-limiter": "^7.2"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/plugin-users-permissions",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "users-permissions",
+            "namespace": "Strapi\\Plugin\\UsersPermissions",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

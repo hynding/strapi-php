@@ -48,8 +48,11 @@ final class GetEnabledPlugins
     }
 
     /**
+     * `enabled` stays null (upstream: `undefined`) when the declaration does not set it, so an
+     * installed plugin declared only for its `config` keeps the installed default (`enabled: true`).
+     *
      * @param bool|array<string, mixed> $declaration
-     * @return array{enabled: bool, pathToPlugin?: string}
+     * @return array{enabled: bool|null, pathToPlugin?: string}
      */
     private static function toDetailedDeclaration(Strapi $strapi, bool|array $declaration): array
     {
@@ -57,7 +60,7 @@ final class GetEnabledPlugins
             return ['enabled' => $declaration];
         }
 
-        $detailed = ['enabled' => (bool) ($declaration['enabled'] ?? false)];
+        $detailed = ['enabled' => isset($declaration['enabled']) ? (bool) $declaration['enabled'] : null];
 
         if (!empty($declaration['resolve'])) {
             $resolve = (string) $declaration['resolve'];

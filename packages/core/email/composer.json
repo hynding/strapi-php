@@ -8,13 +8,21 @@
     "require": {
         "php": ">=8.3",
         "strapi/core": "self.version",
-        "symfony/mailer": "^7.2"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "strapi/admin": "self.version",
+        "symfony/mailer": "^7.2",
+        "strapi/provider-email-sendmail": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/email",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "plugin",
+            "name": "email",
+            "namespace": "Strapi\\Email",
+            "server": "strapi-server.php"
         }
     },
     "minimum-stability": "stable",

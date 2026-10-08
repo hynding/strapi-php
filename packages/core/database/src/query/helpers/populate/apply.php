@@ -664,7 +664,7 @@ final class Apply
 
             $typeQb = $db->entityManager->createQueryBuilder($type);
             $rows = $typeQb
-                ->init(is_array($on) && isset($on[$type]) ? $on[$type] : $typePopulate)
+                ->init(is_array($on) && isset($on[$type]) ? (is_array($on[$type]) ? $on[$type] : []) : $typePopulate) // `on: { [type]: true }`: init(true) reads no params upstream
                 ->addSelect("{$typeQb->alias}.{$idColumn['referencedColumn']}")
                 ->where([$idColumn['referencedColumn'] => array_values(array_unique($ids))])
                 ->execute(['mapResults' => false]);
@@ -746,7 +746,7 @@ final class Apply
 
             $typeQb = $db->entityManager->createQueryBuilder($type);
             $rows = $typeQb
-                ->init(is_array($on) && isset($on[$type]) ? $on[$type] : $typePopulate)
+                ->init(is_array($on) && isset($on[$type]) ? (is_array($on[$type]) ? $on[$type] : []) : $typePopulate) // `on: { [type]: true }`: init(true) reads no params upstream
                 ->addSelect("{$typeQb->alias}.{$idColumn['referencedColumn']}")
                 ->where([$idColumn['referencedColumn'] => array_values(array_unique($ids))])
                 ->execute(['mapResults' => false]);

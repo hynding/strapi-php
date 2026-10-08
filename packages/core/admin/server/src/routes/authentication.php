@@ -46,10 +46,7 @@ return [
         'handler' => 'authentication.forgotPassword',
         'config' => [
             'auth' => false,
-            // upstream: middlewares: ['plugin::email.rateLimit']. strapi/email is not ported yet and
-            // route middlewares are resolved when the route is registered (an unknown one aborts
-            // the boot): restore it together with the email plugin port.
-            'middlewares' => [],
+            'middlewares' => ['plugin::email.rateLimit'],
         ],
     ],
     [

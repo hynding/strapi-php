@@ -10,6 +10,16 @@ return static fn (): array => [
             'sessions' => ['httpOnly' => true],
         ],
     ],
+    // Not in the vanilla template. Upstream's default sendmail provider delivers in the background
+    // while the Node process keeps serving requests (and the suites mock `send`); here delivery is
+    // synchronous in the one worker, and remote MX hosts on port 25 time out (60 s each) in CI
+    // sandboxes. nodemailer's jsonTransport builds each message and sends nothing.
+    'email' => [
+        'config' => [
+            'provider' => 'nodemailer',
+            'providerOptions' => ['jsonTransport' => true],
+        ],
+    ],
     'upload' => [
         'config' => [
             'security' => [

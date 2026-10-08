@@ -10,6 +10,7 @@
     "@strapi/utils": "5.56.0",
     "@swc/core": "^1.7.26",
     "@swc/jest": "^0.2.36",
+    "bcryptjs": "2.4.3",
     "dotenv": "16.6.1",
     "fs-extra": "11.3.4",
     "jest": "^29.7.0",

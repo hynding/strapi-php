@@ -36,17 +36,19 @@ abstract class AppTestCase extends TestCase
         $_ENV['DATABASE_FILENAME'] = ':memory:';
 
         self::$factory = new Psr17Factory();
-        self::$strapi = Core::createStrapi(['appDir' => self::appDir()])->load();
+        $strapi = Core::createStrapi(['appDir' => self::appDir()]);
 
-        // The admin package registers the `content-api-token` strategy, so the content API needs
-        // credentials, as upstream. users-permissions (the public role) is not ported: register
-        // upstream's test-app bypass strategy, as tests/api/app/public/index.php does.
-        self::$strapi->get('auth')->register('content-api', [
+        // The content API needs credentials, as upstream (admin's API tokens, users-permissions'
+        // JWTs and public role). Register upstream's test-app bypass strategy before loading, as
+        // api-tests/strapi.js and tests/api/app/public/index.php do, so it is tried first.
+        $strapi->get('auth')->register('content-api', [
             'name' => 'test-auth',
             'authenticate' => static fn (): array => ['authenticated' => true],
             'verify' => static function (): void {
             },
         ]);
+
+        self::$strapi = $strapi->load();
     }
 
     public static function tearDownAfterClass(): void

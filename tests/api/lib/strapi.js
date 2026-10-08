@@ -21,7 +21,7 @@ const _ = require('lodash');
 const dotenv = require('dotenv');
 const path = require('path');
 const http = require('http');
-const { createRemote } = require('./bridge');
+const { createRemote, startCallbackServer } = require('./bridge');
 const { startServer } = require('./server');
 const { appDir, repoRoot } = require('./paths');
 
@@ -94,6 +94,9 @@ const createStrapiInstance = async ({
     },
   });
 
+  // jest spies on remote methods call back into this process (lib/bridge.js)
+  const callbacks = await startCallbackServer();
+
   // a setup that throws never reaches the test's afterAll(strapi.destroy): stop the worker here
   try {
     const httpServer = new String(server.url); // eslint-disable-line no-new-wrappers
@@ -114,12 +117,13 @@ const createStrapiInstance = async ({
       ),
       destroy: async () => {
         await server.stop();
+        await callbacks.close();
       },
       log: { level: 'warn', info() {}, warn() {}, error() {}, debug() {} },
       __url: server.url,
       __logFile: server.logFile,
     };
-    const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local);
+    const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local, callbacks);
     local.__class = classRef;
     // strapi.config is synchronous upstream (`jwt.verify(token, strapi.config.get('admin.auth.secret'))`)
     local.config = {

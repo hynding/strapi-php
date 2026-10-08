@@ -7,14 +7,16 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/upload": "self.version",
-        "cloudinary/cloudinary_php": "^3.1"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/provider-upload-cloudinary",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "provider",
+            "main": "Strapi\\Provider\\UploadCloudinary\\UploadCloudinary"
         }
     },
     "minimum-stability": "stable",

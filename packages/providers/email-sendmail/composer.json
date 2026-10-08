@@ -7,14 +7,18 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/email": "self.version",
-        "symfony/mailer": "^7.2"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version",
+        "symfony/mailer": "^7.2",
+        "strapi/provider-email-nodemailer": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/provider-email-sendmail",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "provider",
+            "main": "Strapi\\Provider\\EmailSendmail\\EmailSendmail"
         }
     },
     "minimum-stability": "stable",

@@ -16,12 +16,21 @@
         "strapi/content-manager": "self.version",
         "strapi/content-type-builder": "self.version",
         "strapi/upload": "self.version",
+        "strapi/i18n": "self.version",
+        "strapi/plugin-users-permissions": "self.version",
+        "strapi/email": "self.version",
         "strapi/provider-upload-local": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",
         "phpstan/phpstan": "^2.1",
-        "strapi/api-tests": "self.version"
+        "strapi/api-tests": "self.version",
+        "strapi/provider-email-amazon-ses": "self.version",
+        "strapi/provider-email-mailgun": "self.version",
+        "strapi/provider-email-nodemailer": "self.version",
+        "strapi/provider-email-sendgrid": "self.version",
+        "strapi/provider-upload-aws-s3": "self.version",
+        "strapi/provider-upload-cloudinary": "self.version"
     },
     "repositories": [
         {

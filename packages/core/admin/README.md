@@ -41,5 +41,4 @@ Upstream server files (`server/src/…`, `shared/…`) and their state here. `ee
 | `controllers/transfer/runner` push/pull | the request is authenticated (`data-transfer` strategy) and verified for its scope, then `NotImplementedError` (501): the WebSocket handlers come from `@strapi/data-transfer`, not ported |
 | `controllers/admin.licenseTrialTimeLeft` | Enterprise license registry: throws `NotImplementedError` |
 | `ai/services/ai` | ported; without an Enterprise license (never in the PHP port) `isAvailable()`/`isStrapiManagedAiEnabled()` are false, the AI routes answer 404 and the AI server is never contacted, as upstream on an unlicensed project |
-| `routes/forgot-password` middleware `plugin::email.rateLimit` | omitted until `strapi/email` is ported (an unknown route middleware aborts the boot); `forgotPassword` logs the missing email plugin and still answers 204 |
 | `shared/utils/audit-log-export` | not ported (used by the EE audit-logs export) |

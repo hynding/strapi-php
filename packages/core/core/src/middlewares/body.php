@@ -67,7 +67,7 @@ final class Body
                     $ctx->setRequestBody([]);
                 } else {
                     try {
-                        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+                        $decoded = self::decodeJson($raw);
                     } catch (\JsonException $e) {
                         $ctx->badRequest('Unexpected token in JSON: ' . $e->getMessage());
 
@@ -279,5 +279,31 @@ final class Body
             'svg' => 'image/svg+xml', 'pdf' => 'application/pdf', 'json' => 'application/json', 'txt' => 'text/plain',
             'csv' => 'text/csv', 'mp4' => 'video/mp4', 'mp3' => 'audio/mpeg', 'zip' => 'application/zip',
         ][$ext] ?? null;
+    }
+
+    /**
+     * `JSON.parse`: unlike PHP's decoder it accepts an unpaired UTF-16 surrogate escape
+     * (`"\\ud83d"`), which `TextEncoder`/`Buffer` later encode as U+FFFD. Such escapes are
+     * replaced by `\\ufffd` when PHP rejects the document for them.
+     *
+     * @throws \JsonException
+     */
+    private static function decodeJson(string $raw): mixed
+    {
+        try {
+            return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            if ($e->getCode() !== JSON_ERROR_UTF16) {
+                throw $e;
+            }
+
+            $fixed = (string) preg_replace_callback(
+                '/\\\\u[dD][89abAB][0-9a-fA-F]{2}\\\\u[dD][c-fC-F][0-9a-fA-F]{2}|\\\\u[dD][89a-fA-F][0-9a-fA-F]{2}|\\\\./s',
+                static fn (array $m): string => strlen($m[0]) === 6 && ($m[0][1] === 'u' || $m[0][1] === 'U') ? '\\ufffd' : $m[0],
+                $raw,
+            );
+
+            return json_decode($fixed, true, 512, JSON_THROW_ON_ERROR);
+        }
     }
 }
