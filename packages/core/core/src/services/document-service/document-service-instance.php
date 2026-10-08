@@ -55,7 +55,10 @@ final class DocumentServiceInstance implements RepositoryContract
         return $this->run('create', $params);
     }
 
-    /** @param array<string, mixed> $params @return array{documentId: string|null, entries: list<array<string, mixed>>} */
+    /**
+     * @param array<string, mixed> $params
+     * @return array{documentId: string|null, entries: list<array<string, mixed>>}
+     */
     public function clone(array $params): array
     {
         return $this->run('clone', $params);
@@ -91,13 +94,20 @@ final class DocumentServiceInstance implements RepositoryContract
         return $this->run('discardDraft', $params);
     }
 
-    /** @param array<string, mixed> $entry @param array<string, mixed> $data @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $entry
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function updateComponents(array $entry, array $data): array
     {
         return $this->repository->updateComponents($entry, $data);
     }
 
-    /** @param array<string, mixed> $data @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function omitComponentData(array $data): array
     {
         return $this->repository->omitComponentData($data);

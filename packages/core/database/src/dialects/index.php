@@ -12,6 +12,7 @@ use Strapi\Database\Dialects\Sqlite\Sqlite;
 /** Port of packages/core/database/src/dialects/index.ts (`getDialect`). */
 final class Dialects
 {
+    /** @return 'postgres'|'mysql'|'sqlite' */
     public static function getDialectName(mixed $client): string
     {
         return match ($client) {

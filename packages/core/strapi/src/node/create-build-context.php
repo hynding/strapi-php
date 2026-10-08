@@ -84,9 +84,7 @@ final class CreateBuildContext
         $env['STRAPI_ADMIN_AUTH_COOKIE_PATH'] = (string) ($strapiInstance->config()->get('admin.auth.cookie.path') ?: '');
         $env['STRAPI_ADMIN_AUTH_COOKIE_DOMAIN'] = (string) ($strapiInstance->config()->get('admin.auth.cookie.domain') ?: ($strapiInstance->config()->get('admin.auth.domain') ?: ''));
 
-        if ($env !== []) {
-            $logger->debug("Including the following ENV variables as part of the JS bundle:\n" . implode("\n", array_map(static fn (string $key): string => "    - {$key}", array_keys($env))));
-        }
+        $logger->debug("Including the following ENV variables as part of the JS bundle:\n" . implode("\n", array_map(static fn (string $key): string => "    - {$key}", array_keys($env))));
 
         $distPath = $strapiInstance->dirs()->root . '/build';
         $distDir = Files::relative($cwd, $distPath);
@@ -180,7 +178,7 @@ final class CreateBuildContext
         }
         $rc = $cwd . '/.browserslistrc';
         if (is_file($rc)) {
-            $lines = array_values(array_filter(array_map('trim', (array) file($rc)), static fn (string $line): bool => $line !== '' && !str_starts_with($line, '#') && !str_starts_with($line, '[')));
+            $lines = array_values(array_filter(array_map('trim', file($rc) ?: []), static fn (string $line): bool => $line !== '' && !str_starts_with($line, '#') && !str_starts_with($line, '[')));
 
             return $lines === [] ? null : $lines;
         }

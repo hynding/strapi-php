@@ -9,6 +9,14 @@ parameters:
         - packages/core/database/src
         - packages/core/core/src
         - packages/core/strapi/src
+        - packages/core/admin/server/src
+        - packages/core/admin/shared
+        - packages/core/content-manager/server/src
+        - packages/core/content-type-builder/server/src
+        - packages/core/upload/server/src
+        - packages/core/upload/shared
+        - packages/providers/upload-local/src
+        - packages/utils/api-tests/src
         - scripts
         - examples/plugins/announcements/server/src
         - examples/plugins/announcements/tests/php

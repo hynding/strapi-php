@@ -110,7 +110,7 @@ final class QueryPopulate
             // PHP-only: an empty array is also the empty object the conversion produces, so it is
             // traversed as an object (otherwise it would be intercepted again, forever).
             ->intercept(static fn (mixed $value): bool => $value !== [] && Factory::isStringArray($value), static function (callable $visitor, array $options, array $populate, \Closure $recurse): mixed {
-                $populateObject = self::pathsToObjectPopulate(array_values(array_map(strval(...), $populate)));
+                $populateObject = self::pathsToObjectPopulate(array_values(array_filter($populate, 'is_string')));
                 $traversedPopulate = $recurse($visitor, $options, $populateObject);
                 $paths = is_array($traversedPopulate) ? self::objectPopulateToPaths($traversedPopulate) : null;
 

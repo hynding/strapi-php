@@ -8,7 +8,13 @@ use Doctrine\DBAL\ArrayParameterType;
 use Strapi\Database\Database;
 use Strapi\Database\Dialects\SchemaInspector as SchemaInspectorInterface;
 
-/** Port of packages/core/database/src/dialects/mysql/schema-inspector.ts. */
+/**
+ * Port of packages/core/database/src/dialects/mysql/schema-inspector.ts.
+ *
+ * @phpstan-import-type Column from \Strapi\Database\Schema\Types
+ * @phpstan-import-type Index from \Strapi\Database\Schema\Types
+ * @phpstan-import-type ForeignKey from \Strapi\Database\Schema\Types
+ */
 final class SchemaInspector implements SchemaInspectorInterface
 {
     private const TABLE_LIST = "SELECT t.table_name as table_name FROM information_schema.tables t WHERE table_type = 'BASE TABLE' AND table_schema = schema()";
@@ -85,7 +91,11 @@ final class SchemaInspector implements SchemaInspectorInterface
         return $this->getBulkForeignKeys([$tableName])[$tableName] ?? [];
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<Column>>
+     */
     private function getBulkColumns(array $tables): array
     {
         $rows = $this->db->connection->fetchAllAssociative(self::BULK_COLUMNS, [$tables], [ArrayParameterType::STRING]);
@@ -98,15 +108,18 @@ final class SchemaInspector implements SchemaInspectorInterface
                 'defaultTo' => $row['column_default'],
                 'name' => (string) $row['column_name'],
                 'notNullable' => $row['is_nullable'] === 'NO',
-                'unsigned' => str_ends_with((string) $row['column_type'], ' unsigned'),
-                ...(isset($strapiType['unsigned']) ? ['unsigned' => $strapiType['unsigned']] : []),
+                'unsigned' => $strapiType['unsigned'] ?? str_ends_with((string) $row['column_type'], ' unsigned'),
             ];
         }
 
         return $result;
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<Index>>
+     */
     private function getBulkIndexes(array $tables): array
     {
         $rows = $this->db->connection->fetchAllAssociative(self::BULK_INDEXES, [$tables], [ArrayParameterType::STRING]);
@@ -121,7 +134,7 @@ final class SchemaInspector implements SchemaInspectorInterface
                 $byTable[$table][$name]['columns'][] = (string) $row['column_name'];
             } else {
                 $index = ['columns' => [(string) $row['column_name']], 'name' => $name];
-                if (!$row['non_unique'] || (string) $row['non_unique'] === '0') {
+                if (!$row['non_unique']) {
                     $index['type'] = 'unique';
                 }
                 $byTable[$table][$name] = $index;
@@ -131,7 +144,11 @@ final class SchemaInspector implements SchemaInspectorInterface
         return array_map('array_values', $byTable);
     }
 
-    /** @param list<string> $tables  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<string> $tables
+     *
+     * @return array<string, list<ForeignKey>>
+     */
     private function getBulkForeignKeys(array $tables): array
     {
         $rows = $this->db->connection->fetchAllAssociative(self::BULK_FOREIGN_KEYS, [$tables], [ArrayParameterType::STRING]);
@@ -144,7 +161,7 @@ final class SchemaInspector implements SchemaInspectorInterface
                     'name' => $name,
                     'columns' => [(string) $row['column_name']],
                     'referencedColumns' => $row['referenced_column_name'] !== null ? [(string) $row['referenced_column_name']] : [],
-                    'referencedTable' => $row['referenced_table_name'],
+                    'referencedTable' => (string) $row['referenced_table_name'],
                     'onUpdate' => $row['on_update'] !== null ? strtoupper((string) $row['on_update']) : null,
                     'onDelete' => $row['on_delete'] !== null ? strtoupper((string) $row['on_delete']) : null,
                 ];
@@ -161,7 +178,11 @@ final class SchemaInspector implements SchemaInspectorInterface
         return array_map('array_values', $byTable);
     }
 
-    /** @param array<string, mixed> $column  @return array{type: string, args?: list<mixed>, unsigned?: bool} */
+    /**
+     * @param array<string, mixed> $column
+     *
+     * @return array{type: string, args?: list<mixed>, unsigned?: bool}
+     */
     public static function toStrapiType(array $column): array
     {
         preg_match('/[^(), ]+/', strtolower((string) $column['data_type']), $m);

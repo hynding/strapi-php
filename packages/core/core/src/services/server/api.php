@@ -17,7 +17,7 @@ class Api
     protected array $middlewares = [];
 
     /** @param array{prefix?: string, type?: string} $opts */
-    public function __construct(protected readonly Strapi $strapi, array $opts = [])
+    final public function __construct(protected readonly Strapi $strapi, array $opts = [])
     {
         $this->router = new Router($opts['prefix'] ?? '');
         $this->routeManager = Routing::createRouteManager($strapi, ['type' => $opts['type'] ?? null]);

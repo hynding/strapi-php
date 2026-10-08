@@ -25,7 +25,10 @@ final class Routes
         return self::getCollectionTypeRoutes($strapi, $contentType);
     }
 
-    /** @param list<string> $params @return array<string, null> */
+    /**
+     * @param list<string> $params
+     * @return array<string, null>
+     */
     private static function queryParams(array $params): array
     {
         return array_fill_keys($params, null);

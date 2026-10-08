@@ -7,7 +7,10 @@ namespace Strapi\Types\Modules\EventHub;
 /** strapi.eventHub — mirrors Modules.EventHub.EventHub. */
 interface EventHub
 {
-    /** @param callable(mixed ...$args): void $listener  @return callable(): void unsubscribe */
+    /**
+     * @param callable(mixed ...$args): void $listener
+     * @return callable(): void unsubscribe
+     */
     public function on(string $event, callable $listener): callable;
 
     public function off(string $event, callable $listener): void;

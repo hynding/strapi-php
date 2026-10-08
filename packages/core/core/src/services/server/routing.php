@@ -13,7 +13,7 @@ final class Routing
 {
     private readonly ComposeEndpoint $composeEndpoint;
 
-    public function __construct(private readonly Strapi $strapi, private readonly ?string $type = null)
+    public function __construct(Strapi $strapi, private readonly ?string $type = null)
     {
         $this->composeEndpoint = ComposeEndpoint::createEndpointComposer($strapi);
     }

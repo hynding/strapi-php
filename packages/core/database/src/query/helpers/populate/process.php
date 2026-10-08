@@ -14,7 +14,11 @@ use Strapi\Database\Utils\Types;
  */
 final class Process
 {
-    /** @param array<string, mixed> $meta  @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $meta
+     *
+     * @return array<string, mixed>
+     */
     private static function getRootLevelPopulate(array $meta): array
     {
         $populate = [];
@@ -68,9 +72,7 @@ final class Process
             }
         } elseif (is_array($populate)) {
             $populateMap = $populate;
-        }
-
-        if (!is_array($populateMap)) {
+        } elseif ($populate !== true && $populate !== '*') {
             throw new \InvalidArgumentException('Populate must be an object');
         }
 

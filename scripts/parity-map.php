@@ -20,15 +20,17 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $opts = getopt('', ['upstream::', 'tag::', 'diff::', 'out::', 'summary']);
-$upstream = realpath((string) ($opts['upstream'] ?? $root . '/../strapi')) ?: '';
+/** getopt() yields `false` for a bare flag and a list for a repeated option: only a string is a value. */
+$opt = static fn (string $name): ?string => is_string($opts[$name] ?? null) ? $opts[$name] : null;
+$upstream = realpath($opt('upstream') ?? $root . '/../strapi') ?: '';
 if ($upstream === '' || !is_dir($upstream . '/packages')) {
     fwrite(STDERR, "Upstream checkout not found. Pass --upstream=<path to strapi/strapi>.\n");
     exit(2);
 }
 $canonical = json_decode((string) file_get_contents($root . '/packages/core/strapi/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 $tracked = preg_replace('/^(\d+\.\d+\.\d+).*$/', '$1', (string) $canonical['version']);
-$tag = (string) ($opts['tag'] ?? 'v' . $tracked);
-$out = (string) ($opts['out'] ?? $root . '/parity.json');
+$tag = $opt('tag') ?? 'v' . $tracked;
+$out = $opt('out') ?? $root . '/parity.json';
 
 // Server-side files only: skip admin UIs, tests, type declarations, build output.
 $cmd = sprintf('git -C %s ls-tree -r %s -- packages 2>/dev/null', escapeshellarg($upstream), escapeshellarg($tag));
@@ -114,8 +116,9 @@ foreach ($lines as $line) {
 ksort($entries);
 
 $changed = [];
-if (isset($opts['diff']) && is_file((string) $opts['diff'])) {
-    $old = json_decode((string) file_get_contents((string) $opts['diff']), true, 512, JSON_THROW_ON_ERROR);
+$diff = $opt('diff');
+if ($diff !== null && is_file($diff)) {
+    $old = json_decode((string) file_get_contents($diff), true, 512, JSON_THROW_ON_ERROR);
     $oldFiles = $old['files'] ?? [];
     foreach ($entries as $path => $e) {
         if (!isset($oldFiles[$path])) {

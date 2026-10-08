@@ -22,12 +22,12 @@ use Strapi\Database\Database;
  * platform generates the DDL. SQLite table rebuilds (ALTER of constraints) come for free from
  * `SQLitePlatform::getAlterTableSQL()`.
  *
- * @phpstan-import-type Schema as SchemaArray from Types
+ * @phpstan-import-type SchemaArray from Types
  * @phpstan-import-type Table from Types
- * @phpstan-import-type Column as ColumnArray from Types
- * @phpstan-import-type Index as IndexArray from Types
- * @phpstan-import-type ForeignKey as ForeignKeyArray from Types
- * @phpstan-import-type TableDiff as TableDiffArray from Types
+ * @phpstan-import-type Column from Types as ColumnArray
+ * @phpstan-import-type Index from Types as IndexArray
+ * @phpstan-import-type ForeignKey from Types as ForeignKeyArray
+ * @phpstan-import-type TableDiff from Types as TableDiffArray
  * @phpstan-import-type SchemaDiff from Types
  */
 final class Builder
@@ -36,7 +36,11 @@ final class Builder
     {
     }
 
-    /** Creates schema in DB. @param SchemaArray $schema */
+    /**
+     * Creates schema in DB.
+     *
+     * @param SchemaArray $schema
+     */
     public function createSchema(array $schema): void
     {
         $this->db->connection->transactional(function (Connection $trx) use ($schema): void {
@@ -57,7 +61,11 @@ final class Builder
         }
     }
 
-    /** Drops schema from DB. @param SchemaArray $schema */
+    /**
+     * Drops schema from DB.
+     *
+     * @param SchemaArray $schema
+     */
     public function dropSchema(array $schema, bool $dropDatabase = false): void
     {
         if ($dropDatabase) {
@@ -114,7 +122,11 @@ final class Builder
         }
     }
 
-    /** Creates a table in a database. @param Table $table */
+    /**
+     * Creates a table in a database.
+     *
+     * @param Table $table
+     */
     public function createTable(Connection $trx, array $table): void
     {
         $platform = $trx->getDatabasePlatform();
@@ -125,7 +137,11 @@ final class Builder
         }
     }
 
-    /** Creates a table's foreign key constraints. @param Table $table */
+    /**
+     * Creates a table's foreign key constraints.
+     *
+     * @param Table $table
+     */
     public function createTableForeignKeys(Connection $trx, array $table): void
     {
         if (!$this->db->dialect->canAlterConstraints() || !$this->db->dialect->usesForeignKeys()) {
@@ -138,7 +154,11 @@ final class Builder
         }
     }
 
-    /** Drops a table's foreign key constraints. @param Table $table */
+    /**
+     * Drops a table's foreign key constraints.
+     *
+     * @param Table $table
+     */
     public function dropTableForeignKeys(Connection $trx, array $table): void
     {
         if (!($this->db->config['settings']['forceMigration'] ?? false)) {
@@ -158,7 +178,11 @@ final class Builder
         }
     }
 
-    /** Drops a table from a database. @param Table $table */
+    /**
+     * Drops a table from a database.
+     *
+     * @param Table $table
+     */
     public function dropTable(Connection $trx, array $table): void
     {
         if (!($this->db->config['settings']['forceMigration'] ?? false)) {
@@ -234,7 +258,7 @@ final class Builder
                 $object = [...$object, 'type' => 'integer'];
             }
             if ($oldTable->hasColumn($object['name'])) {
-                $changedColumns[] = new ColumnDiff($oldTable->getColumn($object['name']), $this->toDbalColumn($object));
+                $changedColumns[$object['name']] = new ColumnDiff($oldTable->getColumn($object['name']), $this->toDbalColumn($object));
             }
         }
 
@@ -313,7 +337,7 @@ final class Builder
             $foreignKeys,
             [],
             null,
-            $primary !== null ? PrimaryKeyConstraint::editor()->setUnquotedColumnNames($primary)->create() : null,
+            $primary !== null && $primary !== '' ? PrimaryKeyConstraint::editor()->setUnquotedColumnNames($primary)->create() : null,
         );
     }
 
@@ -329,6 +353,9 @@ final class Builder
     public static function toDbalIndex(array $index): Index
     {
         $type = strtolower((string) ($index['type'] ?? ''));
+        if ($index['columns'] === []) {
+            throw new \InvalidArgumentException(sprintf('Index "%s" has no columns', $index['name']));
+        }
 
         return new Index(self::quoteName($index['name']), $index['columns'], $type === 'unique', $type === 'primary');
     }
@@ -352,6 +379,10 @@ final class Builder
         }
         if (!empty($foreignKey['onUpdate'])) {
             $options['onUpdate'] = $foreignKey['onUpdate'];
+        }
+
+        if ($foreignKey['columns'] === [] || $foreignKey['referencedColumns'] === []) {
+            throw new \InvalidArgumentException(sprintf('Foreign key "%s" has no columns', $foreignKey['name']));
         }
 
         return new ForeignKeyConstraint(

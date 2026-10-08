@@ -124,7 +124,11 @@ final class Apply
         return array_map(static fn (string $v): string => is_string($ordering) ? $ordering : $v, $joinTable['orderBy']);
     }
 
-    /** @param list<array<string, mixed>> $results  @return list<mixed> */
+    /**
+     * @param list<array<string, mixed>> $results
+     *
+     * @return list<mixed>
+     */
     private static function referencedValues(array $results, string $column): array
     {
         $values = [];
@@ -138,7 +142,11 @@ final class Apply
         return array_values($values);
     }
 
-    /** @param list<array<string, mixed>> $rows  @return array<string, list<array<string, mixed>>> */
+    /**
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
     private static function groupBy(array $rows, string $key): array
     {
         $map = [];

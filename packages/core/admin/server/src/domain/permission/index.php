@@ -149,9 +149,10 @@ final class Permission
     }
 
     /**
-     * @param array<string|int, mixed> $object
+     * @template TKey of array-key
+     * @param array<TKey, mixed> $object
      * @param list<string> $segments
-     * @return array<string|int, mixed>
+     * @return array<TKey, mixed>
      */
     private static function unsetPath(array $object, array $segments): array
     {

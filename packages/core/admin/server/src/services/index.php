@@ -18,7 +18,7 @@ return [
     'permission' => static fn (Strapi $strapi): object => new Services\Permission($strapi),
     'metrics' => static fn (Strapi $strapi): object => new Services\Metrics($strapi),
     'content-type' => static fn (Strapi $strapi): object => new Services\ContentType($strapi),
-    'constants' => static fn (Strapi $strapi): object => new Services\Constants($strapi),
+    'constants' => static fn (Strapi $strapi): object => new Services\Constants(),
     'condition' => static fn (Strapi $strapi): object => new Services\Condition($strapi),
     'action' => static fn (Strapi $strapi): object => new Services\Action($strapi),
     /** @deprecated Use 'api-token-content-api' instead */

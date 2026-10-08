@@ -18,7 +18,11 @@ final class EntityRepository implements EntityRepositoryContract
     {
     }
 
-    /** @param array<string, mixed> $params  @return array{0: array<string, mixed>, 1: array{page: int, pageSize: int}} */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array{0: array<string, mixed>, 1: array{page: int, pageSize: int}}
+     */
     private static function withOffsetLimit(array $params): array
     {
         $page = (int) ($params['page'] ?? 1);
@@ -30,17 +34,31 @@ final class EntityRepository implements EntityRepositoryContract
         return [[...$params, 'limit' => $pageSize, 'offset' => $offset], ['page' => $page, 'pageSize' => $pageSize]];
     }
 
+    /**
+     * @param FindParams $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function findOne(array $params = []): ?array
     {
         return $this->db->entityManager->findOne($this->uid, $params);
     }
 
+    /**
+     * @param FindParams $params
+     *
+     * @return list<array<string, mixed>>
+     */
     public function findMany(array $params = []): array
     {
         return $this->db->entityManager->findMany($this->uid, $params);
     }
 
-    /** @param FindParams $params  @return array{0: list<array<string, mixed>>, 1: int} */
+    /**
+     * @param FindParams $params
+     *
+     * @return array{0: list<array<string, mixed>>, 1: int}
+     */
     public function findWithCount(array $params = []): array
     {
         return [
@@ -49,6 +67,11 @@ final class EntityRepository implements EntityRepositoryContract
         ];
     }
 
+    /**
+     * @param FindParams $params
+     *
+     * @return array{results: list<array<string, mixed>>, pagination: array{page: int, pageSize: int, pageCount: int, total: int}}
+     */
     public function findPage(array $params = []): array
     {
         [$query, ['page' => $page, 'pageSize' => $pageSize]] = self::withOffsetLimit($params);
@@ -67,42 +90,79 @@ final class EntityRepository implements EntityRepositoryContract
         ];
     }
 
+    /**
+     * @param array{data: array<string, mixed>, select?: mixed, populate?: mixed} $params
+     *
+     * @return array<string, mixed>
+     */
     public function create(array $params): array
     {
         return $this->db->entityManager->create($this->uid, $params);
     }
 
+    /**
+     * @param array{data: list<array<string, mixed>>} $params
+     *
+     * @return array{count: int, ids: list<int|string>}
+     */
     public function createMany(array $params): array
     {
         return $this->db->entityManager->createMany($this->uid, $params);
     }
 
+    /**
+     * @param array{where: array<string, mixed>, data: array<string, mixed>, select?: mixed, populate?: mixed} $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function update(array $params): ?array
     {
         return $this->db->entityManager->update($this->uid, $params);
     }
 
+    /**
+     * @param array{where: array<string, mixed>, data: array<string, mixed>} $params
+     *
+     * @return array{count: int}
+     */
     public function updateMany(array $params): array
     {
         return $this->db->entityManager->updateMany($this->uid, $params);
     }
 
+    /**
+     * @param array{where: array<string, mixed>, select?: mixed, populate?: mixed} $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function delete(array $params): ?array
     {
         return $this->db->entityManager->delete($this->uid, $params);
     }
 
+    /**
+     * @param array{where?: array<string, mixed>} $params
+     *
+     * @return array{count: int}
+     */
     public function deleteMany(array $params = []): array
     {
         return $this->db->entityManager->deleteMany($this->uid, $params);
     }
 
+    /** @param FindParams $params */
     public function count(array $params = []): int
     {
         return $this->db->entityManager->count($this->uid, $params);
     }
 
-    /** Clones an entity (upstream `clone` is a document-service concern; kept for API parity). @param array<string, mixed> $params */
+    /**
+     * Clones an entity (upstream `clone` is a document-service concern; kept for API parity).
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function clone(int|string $id, array $params = []): ?array
     {
         return $this->db->entityManager->clone($this->uid, $id, $params);
@@ -139,12 +199,21 @@ final class EntityRepository implements EntityRepositoryContract
         $this->db->entityManager->deleteRelations($this->uid, $id);
     }
 
-    /** @param array<string, mixed> $entity  @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $entity
+     *
+     * @return array<string, mixed>
+     */
     public function populate(array $entity, mixed $populate): array
     {
         return $this->db->entityManager->populate($this->uid, $entity, $populate);
     }
 
+    /**
+     * @param array<string, mixed> $entity
+     * @param string|list<string> $field
+     * @param array<string, mixed> $params
+     */
     public function load(array $entity, string|array $field, array $params = []): mixed
     {
         return $this->db->entityManager->load($this->uid, $entity, $field, $params === [] ? null : $params);

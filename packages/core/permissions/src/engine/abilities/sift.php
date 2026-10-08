@@ -27,6 +27,7 @@ final class Sift
      * Compile a query into a tester. Throws for unsupported operators (sift: "Unsupported operation: $x").
      *
      * @param array<string, mixed>|mixed $query
+     * @param list<string>|null $operations
      * @return \Closure(mixed): bool
      */
     public static function createQueryTester(mixed $query, ?array $operations = null): \Closure
@@ -75,6 +76,7 @@ final class Sift
         }
     }
 
+    /** @param array<array-key, mixed> $value */
     private static function hasOperatorKeys(array $value): bool
     {
         foreach (array_keys($value) as $key) {
@@ -253,7 +255,7 @@ final class Sift
     }
 
     /**
-     * @param list<mixed> $queries
+     * @param array<mixed> $queries
      * @param list<string> $operations
      */
     private static function every(array $queries, mixed $value, array $operations): bool
@@ -268,7 +270,7 @@ final class Sift
     }
 
     /**
-     * @param list<mixed> $queries
+     * @param array<mixed> $queries
      * @param list<string> $operations
      */
     private static function some(array $queries, mixed $value, array $operations): bool
@@ -282,7 +284,7 @@ final class Sift
         return false;
     }
 
-    /** @param list<mixed> $candidates */
+    /** @param array<mixed> $candidates */
     private static function in(mixed $value, array $candidates): bool
     {
         foreach ($candidates as $candidate) {
@@ -396,6 +398,7 @@ final class Sift
         return false;
     }
 
+    /** @param array<array-key, mixed> $value */
     private static function isList(array $value): bool
     {
         return $value !== [] && array_is_list($value);

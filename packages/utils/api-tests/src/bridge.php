@@ -141,8 +141,11 @@ final class Bridge
         if (!is_array($value)) {
             return $value;
         }
-        if (array_keys($value) === ['$ref'] && is_array($value['$ref'])) {
-            return $this->replay($value['$ref']);
+        if (array_keys($value) === ['$ref'] && is_array($value['$ref']) && array_is_list($value['$ref'])) {
+            /** @var list<array<string, mixed>> $steps a chain recorded by lib/bridge.js */
+            $steps = $value['$ref'];
+
+            return $this->replay($steps);
         }
 
         return array_map(fn (mixed $v): mixed => $this->resolveRefs($v), $value);

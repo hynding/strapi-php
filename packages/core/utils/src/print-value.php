@@ -12,7 +12,7 @@ final class PrintValue
         if (is_float($val) && is_nan($val)) {
             return 'NaN';
         }
-        if (is_float($val) && $val === 0.0 && (1 / $val) < 0) {
+        if (is_float($val) && $val === 0.0 && fdiv(1, $val) < 0) {
             return '-0';
         }
         if (is_float($val) && is_infinite($val)) {

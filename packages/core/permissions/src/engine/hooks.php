@@ -69,7 +69,12 @@ final class Hooks
         return new WillRegisterContext($params['permission'], $params['options']);
     }
 
-    /** Helper shared by the contexts: `Permission::addCondition`. */
+    /**
+     * Helper shared by the contexts: `Permission::addCondition`.
+     *
+     * @param array<string, mixed> $permission
+     * @return array<string, mixed>
+     */
     public static function addCondition(string $condition, array $permission): array
     {
         /** @var array<string, mixed> $result */

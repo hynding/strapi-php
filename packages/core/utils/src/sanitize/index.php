@@ -15,7 +15,7 @@ use Strapi\Types\Schema\Schema;
  * ```
  * `Sanitize::contentAPI($getModel)` is a shorthand for the same thing.
  *
- * @phpstan-type Sanitizer callable(Schema|array<string, mixed>): callable(mixed): mixed
+ * @phpstan-type Sanitizer callable(Schema|array<string, mixed>): (callable(mixed): mixed)
  * @phpstan-type APIOptions array{getModel: callable(string): (Schema|array<string, mixed>|null), sanitizers?: array{input?: list<callable>, output?: list<callable>}}
  */
 final class Sanitize

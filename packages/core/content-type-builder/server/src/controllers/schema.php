@@ -43,11 +43,7 @@ final class Schema
     public function updateSchema(Context $ctx): mixed
     {
         if ($this->isUpdating === true) {
-            if (method_exists($ctx, 'conflict')) {
-                $ctx->conflict('Schema update is already in progress.');
-            } else {
-                $ctx->throw(409, 'Schema update is already in progress.');
-            }
+            $ctx->conflict('Schema update is already in progress.');
 
             return null;
         }

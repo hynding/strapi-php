@@ -11,7 +11,7 @@ namespace Strapi\Database\Schema;
  * @phpstan-type Index array{columns: list<string>, name: string, type?: string|null}
  * @phpstan-type ForeignKey array{name: string, columns: list<string>, referencedColumns: list<string>, referencedTable: string, onUpdate?: string|null, onDelete?: string|null}
  * @phpstan-type Table array{name: string, columns: list<Column>, indexes: list<Index>, foreignKeys: list<ForeignKey>}
- * @phpstan-type Schema array{tables: list<Table>}
+ * @phpstan-type SchemaArray array{tables: list<Table>}
  * @phpstan-type ObjectDiff array{name: string, object: array<string, mixed>}
  * @phpstan-type ColumnsDiff array{added: list<Column>, removed: list<Column>, updated: list<array{name: string, object: Column}>, unchanged: list<Column>}
  * @phpstan-type IndexesDiff array{added: list<Index>, removed: list<Index>, updated: list<array{name: string, object: Index}>, unchanged: list<Index>}

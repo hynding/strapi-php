@@ -428,7 +428,7 @@ final class QueryParamsTransformer
 
             $populateObject = $this->convertNestedPopulate($subPopulate, $targetSchema);
 
-            if ($populateObject === false || $populateObject === null) {
+            if ($populateObject === false) {
                 continue;
             }
 

@@ -40,10 +40,26 @@ final class Registries extends AbstractProvider
         $strapi->get('hooks')->set('strapi::content-types.afterSync', Hooks::createAsyncParallelHook());
 
         // Content migration to enable draft and publish
-        $strapi->hook('strapi::content-types.beforeSync')->register(static fn (mixed $ctx) => SyncMigrations::disable($strapi, (array) $ctx));
-        $strapi->hook('strapi::content-types.afterSync')->register(static fn (mixed $ctx) => SyncMigrations::enable($strapi, (array) $ctx));
+        $strapi->hook('strapi::content-types.beforeSync')->register(static fn (mixed $ctx) => SyncMigrations::disable($strapi, self::syncInput($ctx)));
+        $strapi->hook('strapi::content-types.afterSync')->register(static fn (mixed $ctx) => SyncMigrations::enable($strapi, self::syncInput($ctx)));
 
         // Database migrations: the v5 discard-drafts migration is registered as a no-op by the
         // database package's InternalMigrations (see strapi/database README)
+    }
+
+    /**
+     * The `{ oldContentTypes, contentTypes }` context `Strapi::bootstrap()` hands to the sync hooks.
+     *
+     * @return array{oldContentTypes: array<string, mixed>|null, contentTypes: array<string, \Strapi\Types\Schema\Schema>}
+     */
+    private static function syncInput(mixed $ctx): array
+    {
+        $oldContentTypes = is_array($ctx) ? ($ctx['oldContentTypes'] ?? null) : null;
+        $contentTypes = is_array($ctx) ? ($ctx['contentTypes'] ?? []) : [];
+
+        return [
+            'oldContentTypes' => is_array($oldContentTypes) ? $oldContentTypes : null,
+            'contentTypes' => is_array($contentTypes) ? $contentTypes : [],
+        ];
     }
 }

@@ -12,6 +12,7 @@ use Strapi\Utils\Errors\YupValidationError;
 use Strapi\Utils\Relations;
 use Strapi\Utils\Validators as UtilsValidators;
 use Strapi\Utils\Yup\TestContext;
+use Strapi\Utils\Yup\YupArray;
 use Strapi\Utils\Yup\Undefined;
 use Strapi\Utils\Yup\Yup;
 use Strapi\Utils\Yup\YupError;
@@ -27,6 +28,7 @@ use Strapi\Utils\Yup\YupObject;
  *
  * @phpstan-type ValidatorContext array{isDraft?: bool, locale?: string|null, strictRelations?: bool}
  * @phpstan-type ComponentContext array{parentContent: array{model: Schema|array<string, mixed>, id?: mixed, options?: ValidatorContext|null}, pathToComponent: list<string>, repeatableData: list<array<string, mixed>>, fullDynamicZoneContent?: list<array<string, mixed>>|null}
+ * @phpstan-type AttributeMetas array{attr: array<string, mixed>, model: Schema|array<string, mixed>, updatedAttribute: array{name: string, value: mixed}, data: array<string, mixed>, entity?: array<string, mixed>|null, componentContext?: ComponentContext|null}
  */
 final class EntityValidator
 {
@@ -48,7 +50,7 @@ final class EntityValidator
     }
 
     /** @param array{attr: array<string, mixed>, updatedAttribute: array{name: string, value: mixed}} $meta */
-    private static function addMinMax(Yup $validator, array $meta): Yup
+    private static function addMinMax(YupArray $validator, array $meta): YupArray
     {
         $attr = $meta['attr'];
         $value = $meta['updatedAttribute']['value'];
@@ -67,6 +69,11 @@ final class EntityValidator
         return $nextValidator;
     }
 
+    /**
+     * @template T of Yup
+     * @param T $validator
+     * @return T
+     */
     private static function addRequiredValidation(string $createOrUpdate, Yup $validator, bool $required): Yup
     {
         if ($required) {
@@ -303,7 +310,7 @@ final class EntityValidator
     }
 
     /**
-     * @param array<string, mixed> $metas
+     * @param AttributeMetas $metas
      * @param ValidatorContext $options
      */
     private function createScalarAttributeValidator(string $createOrUpdate, array $metas, array $options): Yup
@@ -319,7 +326,7 @@ final class EntityValidator
     }
 
     /**
-     * @param array<string, mixed> $metas
+     * @param AttributeMetas $metas
      * @param ValidatorContext $options
      */
     private function createAttributeValidator(string $createOrUpdate, array $metas, array $options): Yup
@@ -348,8 +355,8 @@ final class EntityValidator
                 $pathToComponent = [...($componentContext['pathToComponent'] ?? []), $metas['updatedAttribute']['name']];
 
                 $repeatableData = ($attr['repeatable'] ?? false) && count($pathToComponent) === 1
-                    ? (is_array($metas['updatedAttribute']['value']) ? $metas['updatedAttribute']['value'] : [])
-                    : ($componentContext['repeatableData'] ?? []);
+                    ? (is_array($metas['updatedAttribute']['value']) ? array_values($metas['updatedAttribute']['value']) : [])
+                    : $componentContext['repeatableData'];
 
                 $newComponentContext = [...$componentContext, 'pathToComponent' => $pathToComponent, 'repeatableData' => $repeatableData];
 
@@ -361,7 +368,7 @@ final class EntityValidator
             } elseif ($type === 'dynamiczone' && $componentContext !== null) {
                 $newComponentContext = [
                     ...$componentContext,
-                    'fullDynamicZoneContent' => is_array($metas['updatedAttribute']['value']) ? $metas['updatedAttribute']['value'] : [],
+                    'fullDynamicZoneContent' => is_array($metas['updatedAttribute']['value']) ? array_values($metas['updatedAttribute']['value']) : [],
                     'pathToComponent' => [...($componentContext['pathToComponent'] ?? []), $metas['updatedAttribute']['name']],
                 ];
                 $metas['componentContext'] = $newComponentContext;
@@ -407,7 +414,7 @@ final class EntityValidator
 
     /**
      * @param Schema|array<string, mixed> $model
-     * @param array<string, mixed>|null $data
+     * @param mixed $data the submitted payload, expected to be an object (`array<string, mixed>`)
      * @param ValidatorContext|null $options
      * @param array<string, mixed>|null $entity
      * @return array<string, mixed>

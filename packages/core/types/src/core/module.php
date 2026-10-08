@@ -17,11 +17,14 @@ interface Module
 
     public function destroy(Strapi $strapi): void;
 
-    /** @return array<string, mixed> */
+    /** The module's config (`config(null)` is the whole map, `config('path.to.key', $default)` a value). */
     public function config(?string $path = null, mixed $default = null): mixed;
 
-    /** @return array<string, array<string, mixed>>|list<array<string, mixed>> */
+    /** @return array<string, mixed>|list<array<string, mixed>> */
     public function routes(): array;
+
+    /** @param array<string, mixed>|list<array<string, mixed>> $routes */
+    public function setRoutes(array $routes): void;
 
     /** @return array<string, object> */
     public function controllers(): array;

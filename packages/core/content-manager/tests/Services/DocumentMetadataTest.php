@@ -22,7 +22,7 @@ final class DocumentMetadataTest extends TestCase
 {
     private static function provider(\Closure $getDefaultLocale): object
     {
-        return new class ($getDefaultLocale) {
+        return new class ($getDefaultLocale) implements \Strapi\Core\Services\Localization\LocalizationProvider {
             public function __construct(private readonly \Closure $getDefaultLocale)
             {
             }
@@ -32,9 +32,11 @@ final class DocumentMetadataTest extends TestCase
                 return true;
             }
 
-            public function getDefaultLocale(): mixed
+            public function getDefaultLocale(): ?string
             {
-                return ($this->getDefaultLocale)();
+                $locale = ($this->getDefaultLocale)();
+
+                return is_string($locale) ? $locale : null;
             }
 
             /** @return list<mixed> */

@@ -167,7 +167,7 @@ final class Cors
             if ($allowHeaders === null || $allowHeaders === '' || $allowHeaders === []) {
                 $allowHeaders = $ctx->get('Access-Control-Request-Headers');
             }
-            if ($allowHeaders !== '' && $allowHeaders !== null && $allowHeaders !== []) {
+            if ($allowHeaders !== '') {
                 $ctx->setHeader('Access-Control-Allow-Headers', $join($allowHeaders));
             }
 

@@ -44,7 +44,11 @@ abstract class StrapiCommand extends Command
 
     abstract protected function action(InputInterface $input, OutputInterface $output): int;
 
-    /** `createStrapi(compileStrapi())` on the project root. */
+    /**
+     * `createStrapi(compileStrapi())` on the project root.
+     *
+     * @param array{appDir?: string|null, distDir?: string|null, autoReload?: bool, serveAdminPanel?: bool} $options
+     */
     protected function createStrapi(array $options = []): \Strapi\Core\Strapi
     {
         $appContext = CliStrapi::compileStrapi(['appDir' => $this->ctx->cwd]);

@@ -31,6 +31,10 @@ final class Config implements ConfigContract
         $this->logger = $logger !== null ? $logger(...) : static fn (): ?LoggerInterface => null;
     }
 
+    /**
+     * @param array<string, mixed> $initialConfig
+     * @param callable(): (LoggerInterface|null)|null $logger
+     */
     public static function createConfigProvider(array $initialConfig = [], ?callable $logger = null): self
     {
         return new self($initialConfig, $logger);

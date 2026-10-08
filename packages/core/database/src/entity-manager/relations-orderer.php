@@ -12,11 +12,15 @@ use Strapi\Database\Errors\InvalidRelationError;
  * Calculates the order of relations when connecting them with positional attributes
  * (`before`, `after`, `start`, `end`). See upstream for the worked example.
  *
- * @phpstan-type Link array{id: int|string, position?: array{before?: int|string, after?: int|string, start?: bool, end?: bool}, order?: float|int, __component?: string, init?: bool}
+ * A link is `{ id, position?: { before?, after?, start?, end? }, __component?, init?, order? }`; the
+ * input is user data so it is typed loosely (`Link`), the computed relations always carry an `order`.
+ *
+ * @phpstan-type Link array<string, mixed>
+ * @phpstan-type ComputedLink array<string, mixed>
  */
 final class RelationsOrderer
 {
-    /** @var list<Link> */
+    /** @var list<ComputedLink> */
     private array $computedRelations = [];
 
     private float $maxOrder;
@@ -31,7 +35,7 @@ final class RelationsOrderer
             $this->computedRelations[] = [
                 'init' => true,
                 'id' => $r[$idColumn],
-                'order' => isset($r[$orderColumn]) && $r[$orderColumn] !== null ? (float) $r[$orderColumn] : 1.0,
+                'order' => isset($r[$orderColumn]) ? (float) $r[$orderColumn] : 1.0,
             ];
         }
         usort($this->computedRelations, static fn (array $a, array $b): int => $a['order'] <=> $b['order']);
@@ -86,8 +90,9 @@ final class RelationsOrderer
             }
 
             // upstream: `{ [relation.id]: {...relation, computed: false}, ...mapper }` — first wins
+            // (the `computed` flag is tracked separately in `$computed`)
             if ($existingRelation === null) {
-                $mappedRelations[(string) $relation['id']] = [...$relation, 'computed' => false];
+                $mappedRelations[(string) $relation['id']] = $relation;
             }
         }
 
@@ -95,56 +100,65 @@ final class RelationsOrderer
             return $connectArr;
         }
 
-        $computeRelation = function (array $relation, array $relationsSeenInBranch) use (&$computeRelation, &$mappedRelations, &$sortedConnect, $relationInInitialArray, $strictSort): void {
-            $adjacentRelId = $relation['position']['before'] ?? $relation['position']['after'] ?? null;
-            $adjacentRelation = $adjacentRelId !== null ? ($mappedRelations[(string) $adjacentRelId] ?? null) : null;
-
-            if ($adjacentRelId && isset($relationsSeenInBranch[(string) $adjacentRelId])) {
-                throw new InvalidRelationError(
-                    'A circular reference was found in the connect array. One relation is trying to connect before/after another one that is trying to connect before/after it',
-                );
-            }
-
-            if (($mappedRelations[(string) $relation['id']]['computed'] ?? false) === true) {
-                return;
-            }
-
-            $mappedRelations[(string) $relation['id']]['computed'] = true;
-
-            if (!$adjacentRelId || isset($relationInInitialArray[(string) $adjacentRelId])) {
-                $sortedConnect[] = $relation;
-
-                return;
-            }
-
-            if ($adjacentRelation !== null) {
-                $computeRelation($adjacentRelation, [...$relationsSeenInBranch, (string) $relation['id'] => true]);
-                $sortedConnect[] = $relation;
-            } elseif ($strictSort) {
-                throw new InvalidRelationError(sprintf(
-                    'There was a problem connecting relation with id %s at position %s. The relation with id %s needs to be connected first.',
-                    $relation['id'],
-                    json_encode($relation['position'] ?? null, JSON_UNESCAPED_SLASHES),
-                    $adjacentRelId,
-                ));
-            } else {
-                $sortedConnect[] = ['id' => $relation['id'], 'position' => ['end' => true]];
-            }
-        };
-
+        $computed = [];
         foreach ($connectArr as $relation) {
-            $computeRelation($relation, []);
+            self::computeRelation($relation, [], $mappedRelations, $computed, $sortedConnect, $relationInInitialArray, $strictSort);
         }
 
-        return array_map(static function (array $r): array {
-            unset($r['computed']);
-
-            return $r;
-        }, $sortedConnect);
+        return $sortedConnect;
     }
 
-    /** @return array{idx: int, relation: Link|null} */
-    private function findRelation(int|string $id): array
+    /**
+     * Recursive step of {@see sortConnectArray}: pushes `$relation` to `$sortedConnect` once the relation it
+     * is positioned next to has been pushed.
+     *
+     * @param Link $relation
+     * @param array<string, true> $relationsSeenInBranch
+     * @param array<string, Link> $mappedRelations
+     * @param array<string, true> $computed ids already pushed to `$sortedConnect`
+     * @param list<Link> $sortedConnect
+     * @param array<string, true> $relationInInitialArray
+     */
+    private static function computeRelation(array $relation, array $relationsSeenInBranch, array $mappedRelations, array &$computed, array &$sortedConnect, array $relationInInitialArray, bool $strictSort): void
+    {
+        $adjacentRelId = $relation['position']['before'] ?? $relation['position']['after'] ?? null;
+        $adjacentRelation = $adjacentRelId !== null ? ($mappedRelations[(string) $adjacentRelId] ?? null) : null;
+
+        if ($adjacentRelId && isset($relationsSeenInBranch[(string) $adjacentRelId])) {
+            throw new InvalidRelationError(
+                'A circular reference was found in the connect array. One relation is trying to connect before/after another one that is trying to connect before/after it',
+            );
+        }
+
+        if (isset($computed[(string) $relation['id']])) {
+            return;
+        }
+
+        $computed[(string) $relation['id']] = true;
+
+        if (!$adjacentRelId || isset($relationInInitialArray[(string) $adjacentRelId])) {
+            $sortedConnect[] = $relation;
+
+            return;
+        }
+
+        if ($adjacentRelation !== null) {
+            self::computeRelation($adjacentRelation, [...$relationsSeenInBranch, (string) $relation['id'] => true], $mappedRelations, $computed, $sortedConnect, $relationInInitialArray, $strictSort);
+            $sortedConnect[] = $relation;
+        } elseif ($strictSort) {
+            throw new InvalidRelationError(sprintf(
+                'There was a problem connecting relation with id %s at position %s. The relation with id %s needs to be connected first.',
+                $relation['id'],
+                json_encode($relation['position'] ?? null, JSON_UNESCAPED_SLASHES),
+                $adjacentRelId,
+            ));
+        } else {
+            $sortedConnect[] = ['id' => $relation['id'], 'position' => ['end' => true]];
+        }
+    }
+
+    /** @return array{idx: int, relation: ComputedLink|null} */
+    private function findRelation(mixed $id): array
     {
         foreach ($this->computedRelations as $idx => $r) {
             if ((string) $r['id'] === (string) $id) {
@@ -167,55 +181,57 @@ final class RelationsOrderer
     /** @param Link $r */
     private function insertRelation(array $r): void
     {
-        $position = $r['position'] ?? [];
+        $position = is_array($r['position'] ?? null) ? $r['position'] : [];
 
         if (!empty($position['before'])) {
             ['idx' => $beforeIdx, 'relation' => $relation] = $this->findRelation($position['before']);
             if ($relation === null) {
                 throw new \RuntimeException('adjacent relation not found');
             }
-            $r['order'] = !empty($relation['init']) ? $relation['order'] - 0.5 : $relation['order'];
+            $order = !empty($relation['init']) ? $relation['order'] - 0.5 : $relation['order'];
             $idx = $beforeIdx;
         } elseif (!empty($position['after'])) {
             ['idx' => $afterIdx, 'relation' => $relation] = $this->findRelation($position['after']);
             if ($relation === null) {
                 throw new \RuntimeException('adjacent relation not found');
             }
-            $r['order'] = !empty($relation['init']) ? $relation['order'] + 0.5 : $relation['order'];
+            $order = !empty($relation['init']) ? $relation['order'] + 0.5 : $relation['order'];
             $idx = $afterIdx + 1;
         } elseif (!empty($position['start'])) {
             if ($this->computedRelations !== []) {
                 $first = $this->computedRelations[0];
-                $r['order'] = !empty($first['init']) ? $first['order'] - 0.5 : $first['order'];
+                $order = !empty($first['init']) ? $first['order'] - 0.5 : $first['order'];
             } else {
-                $r['order'] = 0.5;
+                $order = 0.5;
             }
             $idx = 0;
         } else {
-            $r['order'] = $this->maxOrder + 0.5;
+            $order = $this->maxOrder + 0.5;
             $idx = count($this->computedRelations);
         }
 
-        array_splice($this->computedRelations, $idx, 0, [$r]);
+        $computed = $r;
+        $computed['id'] = $r['id'] ?? null;
+        $computed['order'] = $order;
+
+        array_splice($this->computedRelations, $idx, 0, [$computed]);
     }
 
-    /** @param Link|list<Link> $relations */
+    /** @param list<Link> $relations */
     public function disconnect(array $relations): static
     {
-        foreach (array_is_list($relations) ? $relations : [$relations] as $relation) {
+        foreach ($relations as $relation) {
             $this->removeRelation($relation);
         }
 
         return $this;
     }
 
-    /** @param Link|list<Link> $relations */
+    /** @param list<Link> $relations */
     public function connect(array $relations): static
     {
-        $list = array_is_list($relations) ? $relations : [$relations];
-
-        foreach (self::sortConnectArray($list, $this->computedRelations, $this->strict ?? true) as $relation) {
-            $this->disconnect($relation);
+        foreach (self::sortConnectArray($relations, $this->computedRelations, $this->strict ?? true) as $relation) {
+            $this->disconnect([$relation]);
 
             try {
                 $this->insertRelation($relation);
@@ -231,7 +247,7 @@ final class RelationsOrderer
         return $this;
     }
 
-    /** @return list<Link> */
+    /** @return list<ComputedLink> */
     public function get(): array
     {
         return $this->computedRelations;
@@ -251,7 +267,7 @@ final class RelationsOrderer
         }
 
         $sortedKeys = array_keys($chunks);
-        usort($sortedKeys, static fn (string $a, string $b): int => (float) $a <=> (float) $b);
+        usort($sortedKeys, static fn (int|string $a, int|string $b): int => (float) $a <=> (float) $b);
 
         foreach ($sortedKeys as $orderStr) {
             $relations = $chunks[$orderStr];

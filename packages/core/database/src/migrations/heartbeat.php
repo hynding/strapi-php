@@ -31,7 +31,11 @@ final class Heartbeat
         $this->lastEmittedAt = $this->startedAt;
     }
 
-    /** Emits `$buildMessage(elapsedSeconds)` at most once per interval. @param callable(int): string $buildMessage */
+    /**
+     * Emits `$buildMessage(elapsedSeconds)` at most once per interval.
+     *
+     * @param callable(int): string $buildMessage
+     */
     public function tick(callable $buildMessage): void
     {
         $current = ($this->now)();

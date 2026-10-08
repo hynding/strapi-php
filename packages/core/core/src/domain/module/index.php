@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Domain\Module;
 
+use Strapi\Core\Registries\ContentTypes;
+use Strapi\Core\Registries\Controllers;
+use Strapi\Core\Registries\Middlewares;
 use Strapi\Core\Registries\Namespace_;
+use Strapi\Core\Registries\Policies;
+use Strapi\Core\Registries\Services;
 use Strapi\Core\Strapi;
 use Strapi\Types\Core\Module as ModuleContract;
 use Strapi\Types\Core\Strapi as StrapiContract;
@@ -138,9 +143,13 @@ final class Module implements ModuleContract
         return $ct;
     }
 
+    /** @return array<string, Schema> */
     public function contentTypes(): array
     {
-        return $this->removeNamespacedKeys($this->strapi->get('content-types')->getAll($this->namespace));
+        $registry = $this->strapi->get('content-types');
+        \assert($registry instanceof ContentTypes);
+
+        return $this->removeNamespacedKeys($registry->getAll($this->namespace));
     }
 
     public function service(string $serviceName): object
@@ -153,9 +162,13 @@ final class Module implements ModuleContract
         return $service;
     }
 
+    /** @return array<string, object> */
     public function services(): array
     {
-        return $this->removeNamespacedKeys($this->strapi->get('services')->getAll($this->namespace));
+        $registry = $this->strapi->get('services');
+        \assert($registry instanceof Services);
+
+        return $this->removeNamespacedKeys($registry->getAll($this->namespace));
     }
 
     public function policy(string $policyName): callable
@@ -168,11 +181,15 @@ final class Module implements ModuleContract
         return $policy instanceof \Strapi\Utils\Policy\PolicyDefinition ? $policy->handler : $policy;
     }
 
+    /** @return array<string, callable> */
     public function policies(): array
     {
+        $registry = $this->strapi->get('policies');
+        \assert($registry instanceof Policies);
+
         return array_map(
-            static fn (mixed $p): callable => $p instanceof \Strapi\Utils\Policy\PolicyDefinition ? $p->handler : $p,
-            $this->removeNamespacedKeys($this->strapi->get('policies')->getAll($this->namespace)),
+            static fn (callable|\Strapi\Utils\Policy\PolicyDefinition $p): callable => $p instanceof \Strapi\Utils\Policy\PolicyDefinition ? $p->handler : $p,
+            $this->removeNamespacedKeys($registry->getAll($this->namespace)),
         );
     }
 
@@ -186,9 +203,13 @@ final class Module implements ModuleContract
         return $middleware;
     }
 
+    /** @return array<string, callable> */
     public function middlewares(): array
     {
-        return $this->removeNamespacedKeys($this->strapi->get('middlewares')->getAll($this->namespace));
+        $registry = $this->strapi->get('middlewares');
+        \assert($registry instanceof Middlewares);
+
+        return $this->removeNamespacedKeys($registry->getAll($this->namespace));
     }
 
     public function controller(string $controllerName): object
@@ -201,9 +222,13 @@ final class Module implements ModuleContract
         return $controller;
     }
 
+    /** @return array<string, object> */
     public function controllers(): array
     {
-        return $this->removeNamespacedKeys($this->strapi->get('controllers')->getAll($this->namespace));
+        $registry = $this->strapi->get('controllers');
+        \assert($registry instanceof Controllers);
+
+        return $this->removeNamespacedKeys($registry->getAll($this->namespace));
     }
 
     /**

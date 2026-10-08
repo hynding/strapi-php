@@ -192,7 +192,7 @@ final class GetEnabledPlugins
         $declaredPluginsResolves = array_values(array_filter(array_map(static fn (array $p): ?string => $p['pathToPlugin'] ?? null, $declaredPlugins)));
         $installedPluginsNotAlreadyUsed = array_filter(
             $installedPlugins,
-            static fn (array $p): bool => !in_array($p['pathToPlugin'] ?? null, $declaredPluginsResolves, true),
+            static fn (array $p): bool => !in_array($p['pathToPlugin'], $declaredPluginsResolves, true),
         );
 
         // defaultsDeep({}, internal, declared, installed): first definition wins per key

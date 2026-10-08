@@ -9,7 +9,13 @@ use Strapi\Utils\ContentTypes;
 use Strapi\Utils\Primitives\Objects;
 use Strapi\Utils\SortQuery;
 
-/** Port of packages/core/utils/src/traverse/query-sort.ts. */
+/**
+ * Port of packages/core/utils/src/traverse/query-sort.ts.
+ *
+ * @phpstan-import-type Visitor from Factory
+ * @phpstan-import-type TraverseOptions from Factory
+ * @phpstan-import-type Recurse from Factory
+ */
 final class QuerySort
 {
     private const ORDER_VALUES = ['asc', 'desc'];
@@ -86,6 +92,13 @@ final class QuerySort
         return $acc;
     }
 
+    /**
+     * @param Visitor $visitor
+     * @param TraverseOptions $options
+     * @param list<mixed> $items
+     * @param Recurse $recurse
+     * @return list<mixed>
+     */
     private static function mapRecurse(callable $visitor, array $options, array $items, \Closure $recurse): array
     {
         $out = [];
@@ -115,12 +128,12 @@ final class QuerySort
             // Array of strings ['foo', 'foo,bar'] => map(recurse), then filter out empty items
             ->intercept(
                 Factory::isStringArray(...),
-                static fn (callable $visitor, array $options, array $sort, \Closure $recurse): array => self::mapRecurse($visitor, $options, $sort, $recurse),
+                static fn (callable $visitor, array $options, array $sort, \Closure $recurse): array => self::mapRecurse($visitor, $options, array_values($sort), $recurse),
             )
             // Array of objects [{ foo: 'asc' }, { bar: 'desc', baz: 'asc' }] => map(recurse), then filter out empty items
             ->intercept(
                 Factory::isObjectArray(...),
-                static fn (callable $visitor, array $options, array $sort, \Closure $recurse): array => self::mapRecurse($visitor, $options, $sort, $recurse),
+                static fn (callable $visitor, array $options, array $sort, \Closure $recurse): array => self::mapRecurse($visitor, $options, array_values($sort), $recurse),
             )
             // Parse string values
             ->parse('is_string', static fn (): array => [

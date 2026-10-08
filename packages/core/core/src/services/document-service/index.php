@@ -14,6 +14,8 @@ use Strapi\Core\Strapi;
  * factory. `$documents('api::article.article')` (or `->get(uid)`) returns the content type's
  * {@see DocumentServiceInstance}, whose actions run through the middleware stack registered with
  * `use()` (`callable(array $ctx, callable $next): mixed`, `$ctx = ['uid', 'contentType', 'action', 'params']`).
+ *
+ * @phpstan-import-type Options from Transform\Types as TransformOptions
  */
 final class DocumentService
 {
@@ -57,13 +59,23 @@ final class DocumentService
         return $instance;
     }
 
-    /** `strapi.documents.use(middleware)` @return \Closure(): void unsubscribe */
+    /**
+     * `strapi.documents.use(middleware)`
+     *
+     * @return \Closure(): void unsubscribe
+     */
     public function use(callable $middleware): \Closure
     {
         return $this->middlewares->use($middleware);
     }
 
-    /** `strapi.documents.utils.transformData(data, opts)` @param array<string, mixed> $data @param array<string, mixed> $opts */
+    /**
+     * `strapi.documents.utils.transformData(data, opts)`
+     *
+     * @param array<string, mixed> $data
+     * @param TransformOptions $opts
+     * @return array<string, mixed>
+     */
     public function transformData(array $data, array $opts): array
     {
         return Transform\Data::transformData($this->strapi, $data, $opts);

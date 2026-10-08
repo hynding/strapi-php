@@ -132,7 +132,10 @@ final class Relations
         }
     }
 
-    /** @param Attribute $attribute  @param Meta $meta */
+    /**
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createOneToOne(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         if (self::isOwner($attribute)) {
@@ -145,7 +148,10 @@ final class Relations
         // else: this property must be set by the owner side
     }
 
-    /** @param Attribute $attribute  @param Meta $meta */
+    /**
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createOneToMany(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         if (self::shouldUseJoinTable($attribute) && !self::isBidirectional($attribute)) {
@@ -155,7 +161,10 @@ final class Relations
         }
     }
 
-    /** @param Attribute $attribute  @param Meta $meta */
+    /**
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createManyToOne(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         if (self::isBidirectional($attribute) && !self::isOwner($attribute)) {
@@ -169,7 +178,10 @@ final class Relations
         }
     }
 
-    /** @param Attribute $attribute  @param Meta $meta */
+    /**
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createManyToMany(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         if (self::shouldUseJoinTable($attribute) && (!self::isBidirectional($attribute) || self::isOwner($attribute))) {
@@ -191,7 +203,10 @@ final class Relations
         ];
     }
 
-    /** @param Attribute $attribute  @param Meta $meta */
+    /**
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createMorphToMany(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         if (isset($attribute['joinTable']) && empty($attribute['joinTable']['__internal__'])) {
@@ -254,7 +269,12 @@ final class Relations
         ];
     }
 
-    /** morphOne / morphMany: only validate the target. @param Attribute $attribute  @param Meta $meta */
+    /**
+     * morphOne / morphMany: only validate the target.
+     *
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createMorphX(string $attributeName, array &$attribute, array &$meta, Metadata $metadata): void
     {
         $target = (string) ($attribute['target'] ?? '');
@@ -269,7 +289,11 @@ final class Relations
         }
     }
 
-    /** Creates a join column info and adds it to the attribute meta. @param Attribute $attribute */
+    /**
+     * Creates a join column info and adds it to the attribute meta.
+     *
+     * @param Attribute $attribute
+     */
     private static function createJoinColumn(Metadata $metadata, string $attributeName, array &$attribute): void
     {
         $target = (string) ($attribute['target'] ?? '');
@@ -305,7 +329,12 @@ final class Relations
         }
     }
 
-    /** Creates a join table and adds it to the attribute meta. @param Attribute $attribute  @param Meta $meta */
+    /**
+     * Creates a join table and adds it to the attribute meta.
+     *
+     * @param Attribute $attribute
+     * @param Meta $meta
+     */
     private static function createJoinTable(Metadata $metadata, string $attributeName, array &$attribute, array &$meta): void
     {
         if (!self::shouldUseJoinTable($attribute)) {

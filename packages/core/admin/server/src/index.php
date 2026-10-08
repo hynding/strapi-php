@@ -13,9 +13,15 @@ use Strapi\Admin\Register;
 use Strapi\Core\Strapi;
 
 return [
-    'bootstrap' => static fn (Strapi $strapi): mixed => (new Bootstrap())($strapi),
-    'register' => static fn (Strapi $strapi): mixed => (new Register())($strapi),
-    'destroy' => static fn (Strapi $strapi): mixed => (new Destroy())($strapi),
+    'bootstrap' => static function (Strapi $strapi): void {
+        (new Bootstrap())($strapi);
+    },
+    'register' => static function (Strapi $strapi): void {
+        (new Register())($strapi);
+    },
+    'destroy' => static function (Strapi $strapi): void {
+        (new Destroy())($strapi);
+    },
     'config' => require __DIR__ . '/config/index.php',
     'policies' => require __DIR__ . '/policies/index.php',
     'routes' => require __DIR__ . '/routes/index.php',

@@ -212,7 +212,11 @@ final class Database implements DatabaseContract
         return $this->connection;
     }
 
-    /** DBAL's schema manager, the equivalent of `knex.schema`. */
+    /**
+     * DBAL's schema manager, the equivalent of `knex.schema`.
+     *
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractPlatform>
+     */
     public function getSchemaConnection(?DbalConnection $trx = null): \Doctrine\DBAL\Schema\AbstractSchemaManager
     {
         return ($trx ?? $this->connection)->createSchemaManager();

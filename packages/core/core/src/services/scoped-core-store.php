@@ -12,7 +12,7 @@ use Strapi\Types\Modules\CoreStore\CoreStore as CoreStoreContract;
  */
 final class ScopedCoreStore implements CoreStoreContract
 {
-    /** @param array<string, mixed> $defaultParams */
+    /** @param array{key?: string, value?: mixed, type?: string, environment?: string|null, name?: string|null, tag?: string|null} $defaultParams */
     public function __construct(private readonly CoreStore $store, private readonly array $defaultParams)
     {
     }

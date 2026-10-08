@@ -62,7 +62,7 @@ final class Transform
         return ['id' => $res['id'], ...$res['attributes']];
     }
 
-    /** @param array<string, mixed>|list<array<string, mixed>>|null $entry */
+    /** `$entry` is an entry (`array<string, mixed>`), a list of entries or null; anything else throws. */
     public static function transformEntry(Strapi $strapi, mixed $entry, ?Schema $type): mixed
     {
         if ($entry === null) {
@@ -91,7 +91,7 @@ final class Transform
             if ($attrType === 'relation' && self::isEntry($property) && isset($attribute['target'])) {
                 $attributeValues[$key] = ['data' => self::transformEntry($strapi, $property, $strapi->getModel((string) $attribute['target']))];
             } elseif ($attrType === 'component' && self::isEntry($property)) {
-                $attributeValues[$key] = self::transformComponent($strapi, $property, $strapi->getModel((string) $attribute['component']));
+                $attributeValues[$key] = self::transformComponent($strapi, $property, $strapi->getModel((string) ($attribute['component'] ?? '')));
             } elseif ($attrType === 'dynamiczone' && is_array($property) && array_is_list($property)) {
                 $attributeValues[$key] = array_map(
                     static fn (mixed $subProperty): mixed => self::transformComponent($strapi, $subProperty, is_array($subProperty) && isset($subProperty['__component']) ? $strapi->getModel((string) $subProperty['__component']) : null),

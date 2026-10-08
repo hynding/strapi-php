@@ -20,7 +20,7 @@ use Strapi\Database\TransactionContext;
  * query builder (`db.queryBuilder(uid)`). State is processed once (`processState`) into
  * column-level where/orderBy/joins, then compiled to a SqlBuilder (`getSqlQuery`) and run.
  *
- * @phpstan-import-type Join as JoinArray from Join
+ * @phpstan-import-type JoinArray from Join
  * @phpstan-import-type Meta from \Strapi\Database\Metadata\Metadata
  */
 class QueryBuilder
@@ -36,7 +36,7 @@ class QueryBuilder
     private string $tableName;
 
     /** @param array<string, mixed> $initialState */
-    public function __construct(public readonly string $uid, public readonly Database $db, array $initialState = [])
+    final public function __construct(public readonly string $uid, public readonly Database $db, array $initialState = [])
     {
         $this->meta = $db->metadata->get($uid);
         $this->tableName = $this->meta['tableName'];
@@ -85,6 +85,19 @@ class QueryBuilder
         return new static($this->uid, $this->db, $this->state);
     }
 
+    /**
+     * The `select` state entry, typed.
+     *
+     * @return list<string|Raw>
+     */
+    private function selectState(): array
+    {
+        /** @var list<string|Raw> $select */
+        $select = $this->state['select'];
+
+        return $select;
+    }
+
     /** @param string|Raw|list<string|Raw> $args */
     public function select(string|Raw|array $args): static
     {
@@ -97,7 +110,7 @@ class QueryBuilder
     /** @param string|Raw|list<string|Raw> $args */
     public function addSelect(string|Raw|array $args): static
     {
-        $this->state['select'] = self::unique([...$this->state['select'], ...(is_array($args) ? $args : [$args])]);
+        $this->state['select'] = self::unique([...$this->selectState(), ...(is_array($args) ? $args : [$args])]);
 
         return $this;
     }
@@ -363,6 +376,7 @@ class QueryBuilder
         return $this->mustUseAlias() ? "{$this->alias}.{$key}" : $key;
     }
 
+    /** @param list<mixed> $bindings */
     public function raw(string $sql, array $bindings = []): Raw
     {
         return new Raw($sql, $bindings);
@@ -507,7 +521,7 @@ class QueryBuilder
     {
         $this->state['select'] = array_map(
             fn (string|Raw $field): string|Raw => $field instanceof Raw ? $field : Transform::toColumnName($this->meta, $field),
-            $this->state['select'],
+            $this->selectState(),
         );
 
         if ($this->shouldUseDistinct()) {
@@ -524,7 +538,7 @@ class QueryBuilder
                 }
             }
 
-            $this->state['select'] = self::unique([...$joinsOrderByColumns, ...$orderByColumns, ...$this->state['select']]);
+            $this->state['select'] = self::unique([...$joinsOrderByColumns, ...$orderByColumns, ...$this->selectState()]);
 
             // PostgreSQL requires every ORDER BY expression to appear in the SELECT list with DISTINCT
             foreach ($this->state['orderBy'] as $ob) {
@@ -547,7 +561,7 @@ class QueryBuilder
 
         switch ($this->state['type']) {
             case 'select':
-                $qb->select(array_map(fn (string|Raw $c): string|Raw => $c instanceof Raw ? $c : $this->aliasColumn($c), $this->state['select']));
+                $qb->select(array_map(fn (string|Raw $c): string|Raw => $c instanceof Raw ? $c : $this->aliasColumn($c), $this->selectState()));
                 if ($this->shouldUseDistinct()) {
                     $qb->distinct();
                 }
@@ -696,7 +710,11 @@ class QueryBuilder
         }
     }
 
-    /** @param list<string|Raw> $items  @return list<string|Raw> */
+    /**
+     * @param list<string|Raw> $items
+     *
+     * @return list<string|Raw>
+     */
     private static function unique(array $items): array
     {
         $seen = [];

@@ -123,7 +123,7 @@ final class Security
                 $graphql = $strapi->plugin('graphql');
                 try {
                     $utils = $graphql->service('utils');
-                    $playground = is_object($utils) && method_exists($utils, 'playground') ? $utils->playground() : null;
+                    $playground = method_exists($utils, 'playground') ? $utils->playground() : null;
                     if (is_object($playground) && method_exists($playground, 'isEnabled') && $playground->isEnabled()) {
                         $specialPaths[] = (string) $graphql->config('endpoint');
 
@@ -176,7 +176,11 @@ final class Security
         };
     }
 
-    /** helmet(options)(ctx, next): set the headers. @param array<string, mixed> $options */
+    /**
+     * helmet(options)(ctx, next): set the headers.
+     *
+     * @param array<string, mixed> $options
+     */
     public static function applyHelmet(Context $ctx, array $options): void
     {
         $csp = $options['contentSecurityPolicy'] ?? [];

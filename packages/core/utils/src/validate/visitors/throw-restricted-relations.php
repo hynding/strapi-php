@@ -81,8 +81,7 @@ final class ThrowRestrictedRelations
                     }
                 }
             }
-        } elseif (self::isMorphPopulatePayload($elements)) {
-            /** @var array{on: array<string, mixed>} $elements */
+        } elseif (is_array($elements) && self::isMorphPopulatePayload($elements) && is_array($elements['on'])) {
             foreach (array_keys($elements['on']) as $uid) {
                 $scopes = array_map(static fn (string $action): string => "{$uid}.{$action}", self::ACTIONS_TO_VERIFY);
                 if (!AuthScope::hasAccessToSomeScopes($scopes, $this->auth)) {

@@ -153,7 +153,10 @@ final class SessionManager
         return $claims;
     }
 
-    /** @param array<string, mixed> $payload @param array<string, mixed> $jwtOptions */
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $jwtOptions
+     */
     private function sign(array $payload, string $key, string $algorithm, array $jwtOptions): string
     {
         unset($jwtOptions['expiresIn'], $jwtOptions['privateKey'], $jwtOptions['publicKey']);
@@ -212,18 +215,23 @@ final class SessionManager
         $expiresAt = new \DateTimeImmutable('@' . ($now + $idleLifespan));
         $absoluteExpiresAt = new \DateTimeImmutable('@' . ($now + $maxLifespan));
 
-        $record = $this->provider->create([
+        $session = [
             'userId' => $userId,
             'sessionId' => $sessionId,
-            ...($deviceId !== null && $deviceId !== '' ? ['deviceId' => $deviceId] : []),
             'origin' => $origin,
             'childId' => null,
             'type' => $tokenType,
             'status' => 'active',
-            ...(isset($options['metadata']) ? ['metadata' => $options['metadata']] : []),
             'expiresAt' => $expiresAt,
             'absoluteExpiresAt' => $absoluteExpiresAt,
-        ]);
+        ];
+        if ($deviceId !== null && $deviceId !== '') {
+            $session['deviceId'] = $deviceId;
+        }
+        if (isset($options['metadata'])) {
+            $session['metadata'] = $options['metadata'];
+        }
+        $record = $this->provider->create($session);
 
         $issuedAtSeconds = self::toTimestamp($record['createdAt'] ?? null);
         $expiresAtSeconds = self::toTimestamp($record['expiresAt']);
@@ -415,18 +423,23 @@ final class SessionManager
             $childSessionId = $this->generateSessionId();
             $childExpiresAt = new \DateTimeImmutable('@' . ($now + $idleLifespan));
 
-            $childRecord = $this->provider->create([
+            $childSession = [
                 'userId' => (string) $current['userId'],
                 'sessionId' => $childSessionId,
-                ...(!empty($current['deviceId']) ? ['deviceId' => $current['deviceId']] : []),
                 'origin' => $current['origin'],
                 'childId' => null,
                 'type' => $tokenType,
                 'status' => 'active',
-                ...(!empty($current['metadata']) ? ['metadata' => $current['metadata']] : []),
                 'expiresAt' => $childExpiresAt,
                 'absoluteExpiresAt' => !empty($current['absoluteExpiresAt']) ? $current['absoluteExpiresAt'] : new \DateTimeImmutable('@' . $absolute),
-            ]);
+            ];
+            if (!empty($current['deviceId'])) {
+                $childSession['deviceId'] = $current['deviceId'];
+            }
+            if (!empty($current['metadata'])) {
+                $childSession['metadata'] = $current['metadata'];
+            }
+            $childRecord = $this->provider->create($childSession);
 
             $payloadOut = [
                 'userId' => (string) $current['userId'],

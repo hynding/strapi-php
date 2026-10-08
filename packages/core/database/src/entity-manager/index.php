@@ -19,6 +19,7 @@ use Strapi\Database\Utils\Types;
  * resolved to ids first.
  *
  * @phpstan-import-type Meta from \Strapi\Database\Metadata\Metadata
+ * @phpstan-type Assocs array{set?: list<array<string, mixed>>|null, connect?: list<array<string, mixed>>, disconnect?: list<array<string, mixed>>, options?: array{strict?: bool|null}}
  */
 final class EntityManager
 {
@@ -31,9 +32,20 @@ final class EntityManager
 
     // --- helpers -------------------------------------------------------------------------
 
+    /** @phpstan-assert-if-true int|string $value */
     private static function isValidId(mixed $value): bool
     {
         return is_string($value) || is_int($value);
+    }
+
+    /**
+     * A relation input object: `{ id, __pivot?, position?, __type?, ... }`.
+     *
+     * @phpstan-assert-if-true array<string, mixed> $value
+     */
+    private static function isIdObject(mixed $value): bool
+    {
+        return is_array($value) && array_key_exists('id', $value) && self::isValidId($value['id']);
     }
 
     private static function toId(mixed $value): int|string
@@ -60,7 +72,7 @@ final class EntityManager
     }
 
     /**
-     * @return list<array{id: int|string, __pivot?: array<string, mixed>}>
+     * @return list<array<string, mixed>>
      */
     private static function toIdArray(mixed $data): array
     {
@@ -76,7 +88,7 @@ final class EntityManager
                 continue;
             }
 
-            if (!is_array($datum) || !array_key_exists('id', $datum) || !self::isValidId($datum['id'])) {
+            if (!self::isIdObject($datum)) {
                 throw new \InvalidArgumentException('Invalid id, expected a string or integer, got ' . json_encode($datum));
             }
 
@@ -96,7 +108,7 @@ final class EntityManager
     /**
      * Normalises the relation input into `{ set }` or `{ connect, disconnect, options }`.
      *
-     * @return array{set?: list<array<string, mixed>>|null, connect?: list<array<string, mixed>>, disconnect?: list<array<string, mixed>>, options?: array{strict?: bool|null}}
+     * @return Assocs
      */
     private function toAssocs(mixed $data, ?string $targetUid = null, string $typeField = '__type'): array
     {
@@ -324,7 +336,11 @@ final class EntityManager
 
     // --- read -----------------------------------------------------------------------------
 
-    /** @param array<string, mixed> $params  @return array<string, mixed>|null */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function findOne(string $uid, array $params = []): ?array
     {
         $props = ['params' => $params];
@@ -338,7 +354,11 @@ final class EntityManager
         return $result;
     }
 
-    /** @param array<string, mixed> $params  @return list<array<string, mixed>> */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
     public function findMany(string $uid, array $params = []): array
     {
         $props = ['params' => $params];
@@ -374,7 +394,11 @@ final class EntityManager
 
     // --- write ----------------------------------------------------------------------------
 
-    /** @param array<string, mixed> $params  @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>
+     */
     public function create(string $uid, array $params = []): array
     {
         $props = ['params' => $params];
@@ -417,7 +441,11 @@ final class EntityManager
         return $result ?? [];
     }
 
-    /** @param array<string, mixed> $params  @return array{count: int, ids: list<int|string>} */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array{count: int, ids: list<int|string>}
+     */
     public function createMany(string $uid, array $params = []): array
     {
         $props = ['params' => $params];
@@ -462,7 +490,11 @@ final class EntityManager
         return $result;
     }
 
-    /** @param array<string, mixed> $params  @return array<string, mixed>|null */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function update(string $uid, array $params = []): ?array
     {
         $props = ['params' => $params];
@@ -518,7 +550,11 @@ final class EntityManager
         return $result;
     }
 
-    /** @param array<string, mixed> $params  @return array{count: int} */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array{count: int}
+     */
     public function updateMany(string $uid, array $params = []): array
     {
         $props = ['params' => $params];
@@ -545,7 +581,11 @@ final class EntityManager
         return $result;
     }
 
-    /** @param array<string, mixed> $params  @return array<string, mixed>|null */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>|null
+     */
     public function delete(string $uid, array $params = []): ?array
     {
         $props = ['params' => $params];
@@ -589,7 +629,11 @@ final class EntityManager
         return $entity;
     }
 
-    /** @param array<string, mixed> $params  @return array{count: int} */
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array{count: int}
+     */
     public function deleteMany(string $uid, array $params = []): array
     {
         $props = ['params' => $params];
@@ -922,7 +966,8 @@ final class EntityManager
                     $typeColumn = $joinTable['morphColumn']['typeColumn'];
 
                     $hasSet = !empty($cleanRelationData['set']);
-                    $hasConnect = !empty($cleanRelationData['connect']);
+                    $connect = $cleanRelationData['connect'] ?? [];
+                    $hasConnect = $connect !== [];
                     $hasDisconnect = !empty($cleanRelationData['disconnect']);
 
                     // for connect/disconnect without a set, only modify those relations
@@ -954,7 +999,7 @@ final class EntityManager
                             $startOrder = (float) ($start['max'] ?? 0);
 
                             $rows = [];
-                            foreach ($cleanRelationData['connect'] ?? [] as $idx => $datum) {
+                            foreach ($connect as $idx => $datum) {
                                 $rows[] = [
                                     $joinColumn['name'] => $datum['id'],
                                     $idColumn['name'] => $id,
@@ -981,7 +1026,7 @@ final class EntityManager
 
                     if ($hasSet) {
                         $rows = [];
-                        foreach ($cleanRelationData['set'] as $idx => $datum) {
+                        foreach ($cleanRelationData['set'] ?? [] as $idx => $datum) {
                             $rows[] = [
                                 $joinColumn['name'] => $datum['id'],
                                 $idColumn['name'] => $id,
@@ -1045,7 +1090,7 @@ final class EntityManager
 
     /**
      * @param array<string, mixed> $attribute
-     * @param array<string, mixed> $cleanRelationData
+     * @param Assocs $cleanRelationData
      */
     private function updateMorphToManyRelation(string $uid, int|string $id, string $attributeName, array $attribute, array $cleanRelationData, mixed $trx): void
     {
@@ -1057,7 +1102,8 @@ final class EntityManager
         $typeField = $morphColumn['typeField'] ?? '__type';
 
         $hasSet = !empty($cleanRelationData['set']);
-        $hasConnect = !empty($cleanRelationData['connect']);
+        $connect = $cleanRelationData['connect'] ?? [];
+        $hasConnect = $connect !== [];
         $hasDisconnect = !empty($cleanRelationData['disconnect']);
 
         // for connect/disconnect without a set, only modify those relations
@@ -1084,6 +1130,7 @@ final class EntityManager
                 }
             }
 
+            /** @var list<array<string, mixed>> $adjacentRelations */
             $adjacentRelations = $this->createQueryBuilder($joinTable['name'])
                 ->where(['$or' => [
                     [$joinColumn['name'] => $id, $idColumn['name'] => ['$in' => $anchorIds]],
@@ -1111,7 +1158,7 @@ final class EntityManager
             }
 
             if ($hasConnect) {
-                $dataset = $cleanRelationData['connect'];
+                $dataset = $connect;
 
                 $rows = [];
                 foreach ($dataset as $datum) {
@@ -1157,7 +1204,7 @@ final class EntityManager
 
         if ($hasSet) {
             $rows = [];
-            foreach ($cleanRelationData['set'] as $idx => $datum) {
+            foreach ($cleanRelationData['set'] ?? [] as $idx => $datum) {
                 $rows[] = [
                     $joinColumn['name'] => $id,
                     $idColumn['name'] => $datum['id'],
@@ -1177,7 +1224,7 @@ final class EntityManager
 
     /**
      * @param array<string, mixed> $attribute
-     * @param array<string, mixed> $cleanRelationData
+     * @param Assocs $cleanRelationData
      */
     private function updateJoinTableRelation(string $uid, int|string $id, array $attribute, array $cleanRelationData, mixed $trx): void
     {
@@ -1290,8 +1337,7 @@ final class EntityManager
 
             $this->insertJoinTableRows($joinTable['name'], $insert, $trx, [
                 'onConflict' => $joinTable['pivotColumns'],
-                'merge' => Relations::hasOrderColumn($attribute) ? [$orderColumnName] : null,
-                'ignore' => !Relations::hasOrderColumn($attribute),
+                ...(Relations::hasOrderColumn($attribute) ? ['merge' => [$orderColumnName]] : ['ignore' => true]),
             ]);
 
             // remove gap between orders
@@ -1343,8 +1389,7 @@ final class EntityManager
 
             $this->insertJoinTableRows($joinTable['name'], $insert, $trx, [
                 'onConflict' => $joinTable['pivotColumns'],
-                'merge' => Relations::hasOrderColumn($attribute) ? [$orderColumnName] : null,
-                'ignore' => !Relations::hasOrderColumn($attribute),
+                ...(Relations::hasOrderColumn($attribute) ? ['merge' => [$orderColumnName]] : ['ignore' => true]),
             ]);
         }
 
@@ -1487,7 +1532,7 @@ final class EntityManager
             ->whereIn($inverseJoinColumn['name'], $ids)
             ->where($joinTable['on'] ?? [])
             ->groupBy([$inverseJoinColumn['name']])
-            ->run();
+            ->rows();
 
         $maxMap = [];
         foreach ($rows as $res) {
@@ -1582,7 +1627,11 @@ final class EntityManager
         }
     }
 
-    /** @param array<string, mixed> $entity  @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $entity
+     *
+     * @return array<string, mixed>
+     */
     public function populate(string $uid, array $entity, mixed $populate): array
     {
         $entry = $this->findOne($uid, ['select' => ['id'], 'where' => ['id' => $entity['id']], 'populate' => $populate]);
@@ -1633,7 +1682,11 @@ final class EntityManager
         return $this->repoMap[$uid] ??= new EntityRepository($uid, $this->db);
     }
 
-    /** @param list<array<string, mixed>> $items  @return list<array<string, mixed>> */
+    /**
+     * @param list<array<string, mixed>> $items
+     *
+     * @return list<array<string, mixed>>
+     */
     private static function uniqById(array $items): array
     {
         $seen = [];

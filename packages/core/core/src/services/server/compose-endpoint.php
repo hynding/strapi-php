@@ -100,7 +100,7 @@ final class ComposeEndpoint
                 Policy::createPoliciesMiddleware($route, $this->strapi),
                 ...$middlewares,
                 self::returnBodyMiddleware(),
-                ...(is_array($action) ? $action : [$action]),
+                ...$action,
             ]);
 
             $router->add($method, $path, $routeHandler, $route);
@@ -143,10 +143,13 @@ final class ComposeEndpoint
     }
 
     /**
+     * The route's handler(s): a `controller.action` string resolves to one action, a callable
+     * (closure, invokable or `[$object, 'method']`) is used as is, a list of callables is chained.
+     *
      * @param array<string, mixed> $route
-     * @return callable|list<callable>
+     * @return list<callable>
      */
-    private function getAction(array $route): callable|array
+    private function getAction(array $route): array
     {
         $handler = $route['handler'];
         $info = $route['info'] ?? [];
@@ -154,9 +157,20 @@ final class ComposeEndpoint
         $apiName = $info['apiName'] ?? null;
         $type = $info['type'] ?? null;
 
-        if (!is_string($handler) && (is_callable($handler) || is_array($handler))) {
-            /** @var callable|list<callable> $handler */
-            return $handler;
+        if (!is_string($handler) && is_callable($handler)) {
+            return [$handler];
+        }
+
+        if (is_array($handler)) {
+            $handlers = [];
+            foreach ($handler as $item) {
+                if (!is_callable($item)) {
+                    throw new \RuntimeException('Invalid route handler: expected a controller action name, a callable or a list of callables');
+                }
+                $handlers[] = $item;
+            }
+
+            return $handlers;
         }
 
         ['controllerName' => $controllerName, 'actionName' => $actionName] = self::extractHandlerParts(trim((string) $handler));
@@ -173,7 +187,7 @@ final class ComposeEndpoint
 
         $action = ActionMap::action($controller, $actionName);
 
-        return static fn (Context $ctx, callable $next): mixed => $action($ctx, $next);
+        return [static fn (Context $ctx, callable $next): mixed => $action($ctx, $next)];
     }
 
     private function controllerUid(string $controllerName, ?string $pluginName, ?string $apiName): string

@@ -25,7 +25,7 @@ final class HttpServer
 {
     private ?Process $process = null;
 
-    public function __construct(private readonly Strapi $strapi, private readonly Server $server)
+    public function __construct(private readonly Strapi $strapi, public readonly Server $server)
     {
     }
 

@@ -449,7 +449,11 @@ final class SchemaFactory
         return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $name) === 1 ? $name : LodashWords::kebabCase($name);
     }
 
-    /** The built-in models every Strapi database has (admin users, upload files, core store). */
+    /**
+     * The built-in models every Strapi database has (admin users, upload files, core store).
+     *
+     * @return array<string, Schema>
+     */
     public static function builtinSchemas(): array
     {
         $adminUser = self::contentType([
@@ -568,7 +572,11 @@ final class SchemaFactory
         ];
     }
 
-    /** The core store model (packages/core/core/src/services/core-store.ts), a raw model, not a schema. @return Model */
+    /**
+     * The core store model (packages/core/core/src/services/core-store.ts), a raw model, not a schema.
+     *
+     * @return Model
+     */
     public static function coreStoreModel(): array
     {
         return [

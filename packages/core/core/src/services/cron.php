@@ -131,7 +131,11 @@ final class Cron implements CronService
         return new CronExpression(implode(' ', $fields));
     }
 
-    /** node-schedule RecurrenceSpecObjLit → cron (second minute hour date month dayOfWeek). @param array<string, mixed> $spec */
+    /**
+     * node-schedule RecurrenceSpecObjLit → cron (second minute hour date month dayOfWeek).
+     *
+     * @param array<string, mixed> $spec
+     */
     private static function recurrenceToCron(array $spec): string
     {
         $segment = static function (mixed $value, string $fallback = '*', int $offset = 0) use (&$segment): string {

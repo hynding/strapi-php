@@ -94,7 +94,10 @@ final class Repository implements RepositoryContract
         }
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private static function checkStatus(array $params, bool $strict): array
     {
         if (!$strict) {
@@ -136,7 +139,10 @@ final class Repository implements RepositoryContract
         return $value;
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private static function checkLocale(array $params, bool $strict): array
     {
         if (!$strict) {
@@ -180,7 +186,7 @@ final class Repository implements RepositoryContract
             return null;
         }
         $num = is_numeric($value) ? $value + 0 : NAN;
-        $valid = is_int($num) || (is_float($num) && floor($num) === $num && is_finite($num));
+        $valid = is_int($num) || (floor($num) === $num && is_finite($num));
         $valid = $valid && ((int) $num >= $spec['min'] || (($spec['allowMinusOne'] ?? false) && (int) $num === -1));
         if (!$valid && $strict) {
             $expected = ($spec['allowMinusOne'] ?? false) ? "integer >= {$spec['min']} or -1" : "integer >= {$spec['min']}";
@@ -207,7 +213,10 @@ final class Repository implements RepositoryContract
         throw new ValidationError("Invalid parameter at 'withCount'. Expected a boolean, received: " . get_debug_type($value));
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private static function checkPagination(array $params, bool $strict): array
     {
         if (!$strict) {
@@ -246,7 +255,10 @@ final class Repository implements RepositoryContract
         return $result;
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private static function checkUnrecognizedRootParams(array $params, bool $strict): array
     {
         if (!$strict) {
@@ -313,31 +325,46 @@ final class Repository implements RepositoryContract
 
     // --- pipeline helpers --------------------------------------------------------------------
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private function defaultLocale(array $params): array
     {
         return Internationalization::defaultLocale($this->strapi, $this->contentType, $params);
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private function localeToLookup(array $params): array
     {
         return Internationalization::localeToLookup($this->strapi, $this->contentType, $params);
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private function multiLocaleToLookup(array $params): array
     {
         return Internationalization::multiLocaleToLookup($this->strapi, $this->contentType, $params);
     }
 
-    /** @param array<string, mixed> $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
     private function transformParamsDocumentId(array $params): array
     {
         return IdTransform::transformParamsDocumentId($this->strapi, $this->uid, $params);
     }
 
-    /** @param array<string, mixed>|null $params @return array<string, mixed> */
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<string, mixed>
+     */
     private function transformParamsToQuery(?array $params): array
     {
         return Query::transformParamsToQuery($this->strapi, $this->uid, $params);
@@ -470,7 +497,10 @@ final class Repository implements RepositoryContract
         });
     }
 
-    /** @param array<string, mixed> $params @return array{documentId: string|null, entries: list<array<string, mixed>>} */
+    /**
+     * @param array<string, mixed> $params
+     * @return array{documentId: string|null, entries: list<array<string, mixed>>}
+     */
     public function clone(array $params = []): array
     {
         return $this->wrap(function () use ($params): array {
@@ -579,7 +609,7 @@ final class Repository implements RepositoryContract
                 }
             }
 
-            if ($this->hasDraftAndPublish && $updatedDraft !== null && ($params['status'] ?? null) === 'published') {
+            if ($this->hasDraftAndPublish && $updatedDraft !== null && $documentId !== null && ($params['status'] ?? null) === 'published') {
                 $published = $this->publish([...$params, 'documentId' => $documentId]);
 
                 return $published['entries'][0] ?? $updatedDraft;

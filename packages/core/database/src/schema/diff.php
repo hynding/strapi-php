@@ -10,7 +10,7 @@ use Strapi\Database\Database;
  * Port of packages/core/database/src/schema/diff.ts: a 3-way diff between the previously stored
  * schema, the live database schema and the schema built from metadata.
  *
- * @phpstan-import-type Schema as SchemaArray from Types
+ * @phpstan-import-type SchemaArray from Types
  * @phpstan-import-type Table from Types
  * @phpstan-import-type Column from Types
  * @phpstan-import-type Index from Types
@@ -103,7 +103,10 @@ final class Diff
             if (!$isInUserSchema && $wasTracked && !$isReserved) {
                 $dependencies = [];
                 foreach ($persistedTables as $persisted) {
-                    $dependsOn = is_array($persisted) ? ($persisted['dependsOn'] ?? null) : null;
+                    if (!is_array($persisted)) {
+                        continue;
+                    }
+                    $dependsOn = $persisted['dependsOn'] ?? null;
                     if (!is_array($dependsOn)) {
                         continue;
                     }
@@ -166,7 +169,12 @@ final class Diff
         ];
     }
 
-    /** @param Index $oldIndex  @param Index $index  @return array{status: string, diff: array{name: string, object: Index}} */
+    /**
+     * @param Index $oldIndex
+     * @param Index $index
+     *
+     * @return array{status: string, diff: array{name: string, object: Index}}
+     */
     public function diffIndexes(array $oldIndex, array $index): array
     {
         $changes = [];
@@ -186,7 +194,12 @@ final class Diff
         ];
     }
 
-    /** @param ForeignKey $oldForeignKey  @param ForeignKey $foreignKey  @return array{status: string, diff: array{name: string, object: ForeignKey}} */
+    /**
+     * @param ForeignKey $oldForeignKey
+     * @param ForeignKey $foreignKey
+     *
+     * @return array{status: string, diff: array{name: string, object: ForeignKey}}
+     */
     public function diffForeignKeys(array $oldForeignKey, array $foreignKey): array
     {
         $changes = [];
@@ -221,13 +234,16 @@ final class Diff
         ];
     }
 
-    /** @param Column $oldColumn  @param Column $column */
+    /**
+     * @param Column $oldColumn
+     * @param Column $column
+     */
     public function diffDefault(array $oldColumn, array $column): bool
     {
         $oldDefaultTo = $oldColumn['defaultTo'] ?? null;
         $defaultTo = $column['defaultTo'] ?? null;
 
-        $lower = static fn (mixed $v): string => strtolower(is_scalar($v) ? (string) $v : (is_array($v) ? json_encode($v) : ''));
+        $lower = static fn (mixed $v): string => strtolower(is_scalar($v) ? (string) $v : (is_array($v) ? json_encode($v, JSON_THROW_ON_ERROR) : ''));
 
         if ($oldDefaultTo === null || $lower($oldDefaultTo) === 'null') {
             return $defaultTo === null || $lower($defaultTo) === 'null';
@@ -237,7 +253,12 @@ final class Diff
             || $lower($oldDefaultTo) === $lower("'" . (is_scalar($defaultTo) ? (string) $defaultTo : '') . "'");
     }
 
-    /** @param Column $oldColumn  @param Column $column  @return array{status: string, diff: array{name: string, object: Column}} */
+    /**
+     * @param Column $oldColumn
+     * @param Column $column
+     *
+     * @return array{status: string, diff: array{name: string, object: Column}}
+     */
     public function diffColumns(array $oldColumn, array $column): array
     {
         $changes = [];
@@ -268,7 +289,13 @@ final class Diff
         ];
     }
 
-    /** @param Table|null $previousTable  @param Table $databaseTable  @param Table $userSchemaTable  @return array{status: string, diff: ColumnsDiff} */
+    /**
+     * @param Table|null $previousTable
+     * @param Table $databaseTable
+     * @param Table $userSchemaTable
+     *
+     * @return array{status: string, diff: ColumnsDiff}
+     */
     public function diffTableColumns(?array $previousTable, array $databaseTable, array $userSchemaTable): array
     {
         $added = [];
@@ -307,7 +334,13 @@ final class Diff
         ];
     }
 
-    /** @param Table|null $previousTable  @param Table $databaseTable  @param Table $userSchemaTable  @return array{status: string, diff: IndexesDiff} */
+    /**
+     * @param Table|null $previousTable
+     * @param Table $databaseTable
+     * @param Table $userSchemaTable
+     *
+     * @return array{status: string, diff: IndexesDiff}
+     */
     public function diffTableIndexes(?array $previousTable, array $databaseTable, array $userSchemaTable): array
     {
         $added = [];
@@ -345,7 +378,13 @@ final class Diff
         ];
     }
 
-    /** @param Table|null $previousTable  @param Table $databaseTable  @param Table $userSchemaTable  @return array{status: string, diff: ForeignKeysDiff} */
+    /**
+     * @param Table|null $previousTable
+     * @param Table $databaseTable
+     * @param Table $userSchemaTable
+     *
+     * @return array{status: string, diff: ForeignKeysDiff}
+     */
     public function diffTableForeignKeys(?array $previousTable, array $databaseTable, array $userSchemaTable): array
     {
         $added = [];
@@ -396,7 +435,11 @@ final class Diff
         return self::findTable($schema, $tableName) !== null;
     }
 
-    /** @param SchemaArray $schema  @return Table|null */
+    /**
+     * @param SchemaArray $schema
+     *
+     * @return Table|null
+     */
     public static function findTable(array $schema, string $tableName): ?array
     {
         foreach ($schema['tables'] as $table) {
@@ -409,14 +452,16 @@ final class Diff
     }
 
     /**
-     * @param list<array<string, mixed>> $items
+     * @template T of array{name: string}
      *
-     * @return array<string, mixed>|null
+     * @param list<T> $items
+     *
+     * @return T|null
      */
     private static function findByName(array $items, string $name): ?array
     {
         foreach ($items as $item) {
-            if (($item['name'] ?? null) === $name) {
+            if ($item['name'] === $name) {
                 return $item;
             }
         }

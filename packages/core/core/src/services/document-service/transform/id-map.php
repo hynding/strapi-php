@@ -70,7 +70,11 @@ final class IdMap
         return is_scalar($value) ? (string) $value : (string) json_encode($value);
     }
 
-    /** Register a new document id and its corresponding entity id. @param KeyFields $keyFields */
+    /**
+     * Register a new document id and its corresponding entity id.
+     *
+     * @param KeyFields $keyFields
+     */
     public function add(array $keyFields): void
     {
         $key = $this->encodeKey(['status' => 'published', 'locale' => null, ...$keyFields]);
@@ -137,7 +141,11 @@ final class IdMap
         $this->toLoadIds = [];
     }
 
-    /** Get the entity id for a given document id. @param KeyFields $keys */
+    /**
+     * Get the entity id for a given document id.
+     *
+     * @param KeyFields $keys
+     */
     public function get(array $keys): string|int|null
     {
         $key = $this->encodeKey(['status' => 'published', 'locale' => null, ...$keys]);

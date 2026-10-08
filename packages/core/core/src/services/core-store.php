@@ -44,7 +44,10 @@ final class CoreStore implements CoreStoreContract
         return $this->scoped($defaultParams);
     }
 
-    /** @param Params $params @return array{key: string, environment: string|null, tag: string|null} */
+    /**
+     * @param Params $params
+     * @return array{key: string, environment: string|null, tag: string|null}
+     */
     private static function where(array $params): array
     {
         $type = $params['type'] ?? 'core';
@@ -112,9 +115,6 @@ final class CoreStore implements CoreStoreContract
     private static function stringify(mixed $value): string
     {
         if ($value instanceof \JsonSerializable || is_array($value) || is_scalar($value) || $value === null) {
-            if ($value instanceof \Closure) {
-                return '';
-            }
             $json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
             return $json === false ? '' : $json;
