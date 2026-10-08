@@ -151,6 +151,14 @@ final class Router
 
         $result = $dispatcher->dispatch($lookup, rawurldecode($path));
 
+        // @koa/router routes are not strict: `/api/articles/` matches `/api/articles`
+        if ($result[0] !== Dispatcher::FOUND && strlen($path) > 1 && str_ends_with($path, '/')) {
+            $trimmed = $dispatcher->dispatch($lookup, rawurldecode(rtrim($path, '/')));
+            if ($trimmed[0] === Dispatcher::FOUND) {
+                $result = $trimmed;
+            }
+        }
+
         if ($result[0] === Dispatcher::FOUND) {
             $entry = $this->stack[$result[1]];
             $params = [];

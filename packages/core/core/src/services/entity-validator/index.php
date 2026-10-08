@@ -10,6 +10,13 @@ use Strapi\Utils\ContentTypes;
 use Strapi\Utils\Errors\ValidationError;
 use Strapi\Utils\Errors\YupValidationError;
 use Strapi\Utils\Relations;
+use Strapi\Utils\Validators as UtilsValidators;
+use Strapi\Utils\Yup\TestContext;
+use Strapi\Utils\Yup\YupArray;
+use Strapi\Utils\Yup\Undefined;
+use Strapi\Utils\Yup\Yup;
+use Strapi\Utils\Yup\YupError;
+use Strapi\Utils\Yup\YupObject;
 
 /**
  * Port of packages/core/core/src/services/entity-validator/index.ts: validates input data for
@@ -88,10 +95,10 @@ final class EntityValidator
                 return $validator->default([]);
             }
 
-            return array_key_exists('default', $attr) ? $validator->default($attr['default']) : $validator;
+            return $validator->default(array_key_exists('default', $attr) ? $attr['default'] : Undefined::value());
         }
 
-        return $validator;
+        return $validator->default(Undefined::value());
     }
 
     private static function preventCast(Yup $validator): Yup
@@ -447,7 +454,7 @@ final class EntityValidator
             ->required();
 
         /** @var array<string, mixed> $result */
-        $result = $validator->validate($data, ['strict' => false, 'abortEarly' => false]);
+        $result = UtilsValidators::validateYupSchema($validator, ['strict' => false, 'abortEarly' => false])($data);
 
         return $result;
     }

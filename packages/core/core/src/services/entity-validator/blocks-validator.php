@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Services\EntityValidator;
 
+use Strapi\Utils\Yup\Yup;
+use Strapi\Utils\Yup\YupArray;
+use Strapi\Utils\Yup\YupLazy;
+use Strapi\Utils\Yup\YupObject;
+
 /** Port of packages/core/core/src/services/entity-validator/blocks-validator.ts. */
 final class BlocksValidator
 {

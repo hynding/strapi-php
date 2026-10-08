@@ -7,20 +7,25 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/core": "self.version"
+        "strapi/core": "self.version",
+        "strapi/utils": "self.version",
+        "strapi/permissions": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/admin",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "in-progress",
+            "compatibleWith": "5.x",
+            "namespace": "Strapi\\Admin"
         }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
         "classmap": [
-            "server/src/"
+            "server/src/",
+            "shared/"
         ]
     },
     "autoload-dev": {

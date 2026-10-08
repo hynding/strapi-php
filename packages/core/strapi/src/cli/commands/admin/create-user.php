@@ -13,8 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Port of packages/core/strapi/src/cli/commands/admin/create-user.ts: `$ strapi admin:create-user`.
  *
- * STUB: needs the admin package (`strapi.admin.services.user` / `role`), which is not ported yet.
- * The options are validated like upstream, then the command explains why it cannot proceed.
+ * The options are validated like upstream, then the super admin is created through the admin
+ * package's `admin::user` / `admin::role` services. Without `strapi/admin` installed the command
+ * explains why it cannot proceed.
  */
 final class CreateUser extends StrapiCommand
 {
@@ -58,17 +59,49 @@ final class CreateUser extends StrapiCommand
 
         $app = $this->createStrapi()->load();
         $admin = $app->admin();
-        $app->destroy();
 
         if (!is_array($admin) || !isset($admin['services']['user'])) {
-            $output->writeln('<error>admin:create-user needs the admin package (strapi/admin), which is not ported yet.</error>');
+            $app->destroy();
+            $output->writeln('<error>admin:create-user needs the admin package (strapi/admin), which is not installed.</error>');
 
             return Command::FAILURE;
         }
 
-        $output->writeln('<error>admin:create-user is not implemented in this edition.</error>');
+        try {
+            $userService = $app->service('admin::user');
+            $roleService = $app->service('admin::role');
+            $exists = [$userService, 'exists'];
+            $create = [$userService, 'create'];
+            $getSuperAdmin = [$roleService, 'getSuperAdmin'];
+            if (!is_callable($exists) || !is_callable($create) || !is_callable($getSuperAdmin)) {
+                throw new \RuntimeException('The admin user and role services are incomplete');
+            }
 
-        return Command::FAILURE;
+            $user = $exists(['email' => $email]);
+
+            if ($user) {
+                $output->writeln("<error>User with email \"{$email}\" already exists</error>");
+
+                return Command::FAILURE;
+            }
+
+            $superAdminRole = $getSuperAdmin();
+
+            $create([
+                'email' => $email,
+                'firstname' => $firstname,
+                'lastname' => $input->getOption('lastname'),
+                'isActive' => true,
+                'roles' => [is_array($superAdminRole) ? ($superAdminRole['id'] ?? null) : null],
+                ...(is_string($password) && $password !== '' ? ['password' => $password, 'registrationToken' => null] : []),
+            ]);
+        } finally {
+            $app->destroy();
+        }
+
+        $output->writeln('Successfully created new admin');
+
+        return Command::SUCCESS;
     }
 
     /** the `passwordValidator` of upstream create-user.ts */

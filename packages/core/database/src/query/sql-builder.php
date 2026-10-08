@@ -275,7 +275,8 @@ final class SqlBuilder
     /** @param (callable(SqlBuilder): void)|string|array<string, mixed> $column */
     private function addWhere(string $bool, callable|string|array $column, mixed ...$args): self
     {
-        if (is_callable($column)) {
+        // a string column is never a callback, even when it names a PHP function (`key`, `count`...)
+        if (!is_string($column) && is_callable($column)) {
             $sub = $this->sub();
             $column($sub);
             $compiled = $sub->compileWheres();
@@ -756,8 +757,8 @@ final class SqlBuilder
             $sql = $this->platform()->modifyLimitQuery($sql, $this->limit, $this->offset ?? 0);
         }
 
-        // DBAL 4 has no `getForUpdateSQL()`; SQLite is the only supported platform without row locks
-        if ($this->forUpdate && !$this->platform() instanceof SQLitePlatform) {
+        // knex: `forUpdate()` is omitted on SQLite (single writer, no row locks) and MSSQL (table hints)
+        if ($this->forUpdate && !$this->platform() instanceof \Doctrine\DBAL\Platforms\SQLitePlatform && !$this->platform() instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform) {
             $sql .= ' FOR UPDATE';
         }
 
@@ -805,7 +806,12 @@ final class SqlBuilder
         if ($this->onConflict !== null && $this->ignore && $client === 'mysql') {
             $sql = 'INSERT IGNORE ';
         }
-        $sql .= "INTO {$table} ({$quotedColumns}) VALUES " . implode(', ', $valueGroups);
+        if ($columns === []) {
+            // rows without columns: insert the column defaults, as knex does for `insert({})`
+            $sql .= $client === 'mysql' ? "INTO {$table} () VALUES ()" : "INTO {$table} DEFAULT VALUES";
+        } else {
+            $sql .= "INTO {$table} ({$quotedColumns}) VALUES " . implode(', ', $valueGroups);
+        }
 
         if ($this->onConflict !== null) {
             if ($client === 'mysql') {

@@ -35,7 +35,7 @@ final class Context implements ContextContract
 
     private bool $bodyParsed = false;
 
-    /** @var array<string, UploadedFileInterface> */
+    /** @var array<string, UploadedFileInterface|list<UploadedFileInterface>> */
     private array $files = [];
 
     private mixed $body = null;
@@ -53,7 +53,13 @@ final class Context implements ContextContract
 
     private ServerRequestInterface $request;
 
-    public function __construct(ServerRequestInterface $request)
+    private ?Cookies $cookies = null;
+
+    /**
+     * @param array{proxy?: bool, keys?: list<string>|null} $options Koa app settings: `proxy`
+     *        (`server.proxy.koa`, trust `X-Forwarded-*`) and `keys` (`server.app.keys`, cookie signing)
+     */
+    public function __construct(ServerRequestInterface $request, private readonly array $options = [])
     {
         $this->request = $request;
         $this->state = new State();
@@ -135,7 +141,7 @@ final class Context implements ContextContract
         return $this->files;
     }
 
-    /** @param array<string, UploadedFileInterface> $files */
+    /** @param array<string, UploadedFileInterface|list<UploadedFileInterface>> $files a list when the field is repeated (koa-body) */
     public function setFiles(array $files): void
     {
         $this->files = $files;
@@ -194,6 +200,46 @@ final class Context implements ContextContract
         $server = $this->request->getServerParams();
 
         return (string) ($this->request->getAttribute('ip') ?? $server['REMOTE_ADDR'] ?? '');
+    }
+
+    /**
+     * Koa `request.protocol`: `https` for a TLS connection; behind a trusted proxy
+     * (`server.proxy.koa`) the first `X-Forwarded-Proto` value; `http` otherwise.
+     */
+    public function protocol(): string
+    {
+        $server = $this->request->getServerParams();
+        $https = $server['HTTPS'] ?? null;
+        if ($this->request->getUri()->getScheme() === 'https' || (is_string($https) && $https !== '' && strtolower($https) !== 'off')) {
+            return 'https';
+        }
+
+        if (($this->options['proxy'] ?? false) !== true) {
+            return 'http';
+        }
+
+        $proto = $this->request->getHeaderLine('X-Forwarded-Proto');
+        if ($proto === '') {
+            return 'http';
+        }
+
+        return trim(explode(',', $proto, 2)[0]);
+    }
+
+    public function secure(): bool
+    {
+        return $this->protocol() === 'https';
+    }
+
+    public function cookies(): Cookies
+    {
+        if ($this->cookies === null) {
+            $keys = $this->options['keys'] ?? null;
+            $keys = is_array($keys) && $keys !== [] ? array_values(array_map('strval', $keys)) : null;
+            $this->cookies = new Cookies($this, $keys, $this->secure());
+        }
+
+        return $this->cookies;
     }
 
     public function is(string ...$types): bool

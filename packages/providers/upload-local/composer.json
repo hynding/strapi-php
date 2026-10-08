@@ -7,14 +7,16 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/upload": "self.version",
-        "league/flysystem": "^3.29"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/provider-upload-local",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "provider",
+            "main": "Strapi\\Provider\\UploadLocal\\UploadLocal"
         }
     },
     "minimum-stability": "stable",

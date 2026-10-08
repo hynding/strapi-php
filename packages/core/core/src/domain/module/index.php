@@ -33,6 +33,12 @@ final class Module implements ModuleContract
     /** @var RawModule */
     private array $rawModule;
 
+    /**
+     * Upstream modules are plain objects that plugins may assign to: the upload plugin sets
+     * `strapi.plugin('upload').provider` in its register phase (read by the admin, users-permissions…).
+     */
+    public mixed $provider = null;
+
     /** @param RawModule $rawModule */
     private function __construct(private readonly string $namespace, array $rawModule, private readonly Strapi $strapi)
     {

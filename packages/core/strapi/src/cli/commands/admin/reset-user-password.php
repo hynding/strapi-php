@@ -13,7 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Port of packages/core/strapi/src/cli/commands/admin/reset-user-password.ts: `$ strapi admin:reset-user-password`.
  *
- * STUB: needs the admin package (`strapi.admin.services.user.resetPasswordByEmail`), not ported yet.
+ * Resets the password through the admin package's `admin::user` service (`resetPasswordByEmail`).
+ * Without `strapi/admin` installed the command explains why it cannot proceed.
  */
 final class ResetUserPassword extends StrapiCommand
 {
@@ -46,16 +47,30 @@ final class ResetUserPassword extends StrapiCommand
 
         $app = $this->createStrapi()->load();
         $admin = $app->admin();
-        $app->destroy();
 
         if (!is_array($admin) || !isset($admin['services']['user'])) {
-            $output->writeln('<error>admin:reset-user-password needs the admin package (strapi/admin), which is not ported yet.</error>');
+            $app->destroy();
+            $output->writeln('<error>admin:reset-user-password needs the admin package (strapi/admin), which is not installed.</error>');
 
             return Command::FAILURE;
         }
 
-        $output->writeln('<error>admin:reset-user-password is not implemented in this edition.</error>');
+        try {
+            $resetPasswordByEmail = [$app->service('admin::user'), 'resetPasswordByEmail'];
+            if (!is_callable($resetPasswordByEmail)) {
+                throw new \RuntimeException('The admin user service has no resetPasswordByEmail()');
+            }
+            $resetPasswordByEmail($email, $password);
+        } catch (\Throwable $error) {
+            $output->writeln('<error>' . $error->getMessage() . '</error>');
 
-        return Command::FAILURE;
+            return Command::FAILURE;
+        } finally {
+            $app->destroy();
+        }
+
+        $output->writeln("Successfully reset user's password");
+
+        return Command::SUCCESS;
     }
 }

@@ -105,7 +105,8 @@ final class CliTest extends TestCase
 
         $output = new BufferedOutput();
         self::assertSame(0, $application->run(new ArrayInput(['command' => 'cron:run']), $output));
-        self::assertStringContainsString('Ran 0 cron job(s)', $output->fetch());
+        // the upload plugin registers its weekly metrics job (`uploadWeekly`), scheduled 15s from boot
+        self::assertMatchesRegularExpression('/Ran [01] cron job\(s\)/', $output->fetch());
 
         $output = new BufferedOutput();
         self::assertSame(0, $application->run(new ArrayInput(['command' => 'migrations:run']), $output));
@@ -127,28 +128,37 @@ final class CliTest extends TestCase
         self::assertSame(0, $code, $text);
         self::assertStringContainsString('Successfully imported configuration with replace strategy. Statistics: 1 created, 0 replaced.', $text);
 
-        // each command boots its own in-memory database, so the dump of a fresh instance is empty
+        // each command boots its own in-memory database, so the dump of a fresh instance does not
+        // hold the restored key (only what plugins store at bootstrap: upload settings, CM configurations)
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'configuration:dump']), $output);
         self::assertSame(0, $code);
-        self::assertSame("[]\n", $output->fetch());
+        $dump = json_decode($output->fetch(), true);
+        self::assertIsArray($dump);
+        self::assertNotContains('plugin_test_setting', array_column($dump, 'key'));
 
         unlink($file);
     }
 
-    public function testAdminCommandsAreStubs(): void
+    public function testAdminCommands(): void
     {
         $application = Cli::createCLI([], self::$appDir);
+        $application->setAutoExit(false);
 
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:create-user', '--email' => 'not-an-email']), $output);
         self::assertSame(1, $code);
         self::assertStringContainsString('Invalid email address', $output->fetch());
 
+        // each command boots its own instance on an in-memory database
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:create-user', '--email' => 'a@b.co', '--password' => 'Passw0rd', '--firstname' => 'A']), $output);
+        self::assertSame(0, $code, $output->fetch());
+
+        $output = new BufferedOutput();
+        $code = $application->run(new ArrayInput(['command' => 'admin:reset-user-password', '--email' => 'a@b.co', '--password' => 'Passw0rd2']), $output);
         self::assertSame(1, $code);
-        self::assertStringContainsString('not ported yet', $output->fetch());
+        self::assertStringContainsString('User not found for email: a@b.co', $output->fetch());
 
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'admin:reset-user-password', '--email' => 'a@b.co', '--password' => 'weak']), $output);

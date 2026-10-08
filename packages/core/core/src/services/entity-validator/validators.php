@@ -6,6 +6,12 @@ namespace Strapi\Core\Services\EntityValidator;
 
 use Strapi\Core\Strapi;
 use Strapi\Utils\ContentTypes;
+use Strapi\Utils\Yup\Undefined;
+use Strapi\Utils\Yup\Yup;
+use Strapi\Utils\Yup\YupArray;
+use Strapi\Utils\Yup\YupBoolean;
+use Strapi\Utils\Yup\YupNumber;
+use Strapi\Utils\Yup\YupString;
 
 /**
  * Port of packages/core/core/src/services/entity-validator/validators.ts: per-type validators.

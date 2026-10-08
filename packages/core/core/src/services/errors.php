@@ -29,6 +29,12 @@ final class Errors
         [NotImplementedError::class, 501],
     ];
 
+    /** `details` is an object upstream (`{}` by default): an empty PHP array is sent as `{}`. */
+    private static function details(mixed $details): mixed
+    {
+        return $details === [] ? new \stdClass() : $details;
+    }
+
     /** @return Envelope */
     public static function formatApplicationError(ApplicationError $error): array
     {
@@ -44,7 +50,7 @@ final class Errors
             'status' => $status,
             'body' => [
                 'data' => null,
-                'error' => ['status' => $status, 'name' => $error->name, 'message' => $error->getMessage(), 'details' => $error->details],
+                'error' => ['status' => $status, 'name' => $error->name, 'message' => $error->getMessage(), 'details' => self::details($error->details)],
             ],
         ];
     }
@@ -56,7 +62,7 @@ final class Errors
             'status' => $error->status,
             'body' => [
                 'data' => null,
-                'error' => ['status' => $error->status, 'name' => $error->name, 'message' => $error->getMessage(), 'details' => $error->details],
+                'error' => ['status' => $error->status, 'name' => $error->name, 'message' => $error->getMessage(), 'details' => self::details($error->details)],
             ],
         ];
     }

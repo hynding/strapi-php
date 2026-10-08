@@ -9,6 +9,19 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Koa-style request context handed to middlewares, policies and controllers.
  * Mirrors what upstream reads off Koa's ctx: request, params, query, state, body, status.
+ *
+ * The response helpers core's server adds to Koa's context (services/server/koa.ts) are
+ * available on the implementation:
+ *
+ * @method void badRequest(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void unauthorized(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void forbidden(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void notFound(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void internalServerError(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void notImplemented(string|array<string, mixed>|null $response = null, mixed $details = [])
+ * @method void send(mixed $data, int $status = 200)
+ * @method void created(mixed $data = null)
+ * @method void deleted(mixed $data = null)
  */
 interface Context
 {
@@ -28,7 +41,7 @@ interface Context
     /** @return mixed parsed request body (JSON object as array, multipart as ['data' => ..., 'files' => ...]) */
     public function requestBody(): mixed;
 
-    /** @return array<string, \Psr\Http\Message\UploadedFileInterface> */
+    /** @return array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>> a list when the multipart field is repeated (koa-body) */
     public function files(): array;
 
     public function method(): string;
@@ -40,6 +53,12 @@ interface Context
     public function header(string $name): ?string;
 
     public function ip(): string;
+
+    /** Koa `ctx.request.secure`: the protocol is https (honouring `X-Forwarded-Proto` when `server.proxy.koa` is on). */
+    public function secure(): bool;
+
+    /** Koa `ctx.cookies`. */
+    public function cookies(): Cookies;
 
     /** Response body to serialize (array → JSON). */
     public function body(): mixed;

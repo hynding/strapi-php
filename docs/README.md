@@ -19,8 +19,17 @@ cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 
 ## Next milestones
 
-1. `strapi/admin` server: admin users, roles, permissions, API tokens, auth routes the
-   upstream admin bundle calls on boot (`/admin/init`, `/admin/project-settings`, ...).
-2. `strapi/content-manager`, `strapi/content-type-builder`, `strapi/upload` server halves —
-   the first version worth tagging `5.56.0-beta.1`.
-3. `strapi/plugin-users-permissions`, `strapi/plugin-i18n`, then `data-transfer` and `graphql`.
+1. ~~`strapi/admin` server~~ and ~~`strapi/content-manager`, `strapi/content-type-builder`,
+   `strapi/upload` server halves~~: done (milestone 1); see the status table in the root
+   README for the upstream API suite results.
+2. `strapi/plugin-i18n` and `strapi/plugin-users-permissions` (most remaining API-suite
+   failures in core and the content manager need them), `strapi/email` + providers, the other
+   upload providers. Then tag `5.56.0-beta.1`.
+3. `data-transfer`, `graphql`, `documentation` + `openapi`, `content-releases`, `generators`,
+   `create-strapi-app`, `upgrade`, `sentry`, `color-picker`.
+
+Known gaps worth their own fix:
+- Request bodies: JSON `{}` and `[]` both decode to a PHP `[]`, so validation that must tell
+  an object from an array (components) can't (about a dozen API tests).
+- Yup array validation on large `min`/`max` component sets is slow enough to hit PHP's time
+  limit (tests/api disables it).

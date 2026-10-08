@@ -330,7 +330,7 @@ final class Builder
         }
 
         return new DbalTable(
-            $table['name'],
+            self::quoteName($table['name']),
             $columns,
             $indexes,
             [],
@@ -357,7 +357,17 @@ final class Builder
             throw new \InvalidArgumentException(sprintf('Index "%s" has no columns', $index['name']));
         }
 
-        return new Index($index['name'], $index['columns'], $type === 'unique', $type === 'primary');
+        return new Index(self::quoteName($index['name']), $index['columns'], $type === 'unique', $type === 'primary');
+    }
+
+    /**
+     * knex quotes every identifier; DBAL only quotes the names given quoted. A name that is not a
+     * plain identifier (`dogs-collection`, a collectionName the content-type builder accepts) is
+     * passed quoted so the generated DDL stays valid.
+     */
+    public static function quoteName(string $name): string
+    {
+        return preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name) === 1 ? $name : '"' . str_replace('"', '""', $name) . '"';
     }
 
     /** @param ForeignKeyArray $foreignKey */
@@ -377,9 +387,9 @@ final class Builder
 
         return new ForeignKeyConstraint(
             $foreignKey['columns'],
-            $foreignKey['referencedTable'],
+            self::quoteName($foreignKey['referencedTable']),
             $foreignKey['referencedColumns'],
-            $foreignKey['name'],
+            self::quoteName($foreignKey['name']),
             $options,
         );
     }

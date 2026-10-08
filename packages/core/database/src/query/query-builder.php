@@ -421,7 +421,7 @@ class QueryBuilder
         $this->state['orderBy'] = OrderBy::processOrderBy($this->state['orderBy'], $this, $this->uid);
 
         if ($this->state['filters'] !== null) {
-            if (is_callable($this->state['filters'])) {
+            if (!is_string($this->state['filters']) && is_callable($this->state['filters'])) {
                 $filters = ($this->state['filters'])(['qb' => $this, 'uid' => $this->uid, 'meta' => $this->meta, 'db' => $this->db]);
                 if ($filters !== null) {
                     $this->state['where'][] = $filters;

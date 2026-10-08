@@ -40,8 +40,16 @@ final class Components
                     throw new \RuntimeException("Component {$key} is missing a \"collectionName\" property.\nVerify file {$filePath}.");
                 }
 
+                $filename = $schema['__filename__'] ?? "{$key}.json";
                 unset($schema['__filename__']);
                 $uid = "{$category}.{$key}";
+                // upstream: Object.assign(schema, { __schema__: cloneDeep(schema), ... }) and the
+                // `__filename__` loadFiles() defines; kept in config for the content-type-builder
+                $schema['config'] = [
+                    ...(is_array($schema['config'] ?? null) ? $schema['config'] : []),
+                    '__schema__' => $schema,
+                    '__filename__' => $filename,
+                ];
                 $components[$uid] = SchemaFactory::component($schema, $uid);
             }
         }

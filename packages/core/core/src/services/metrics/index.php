@@ -38,9 +38,16 @@ final class Metrics
         return true;
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * Upstream posts the event to Strapi's telemetry endpoint. The PHP port sends nothing: it
+     * records the event at debug level and returns false, as upstream does when telemetry is off.
+     *
+     * @param array<string, mixed> $payload
+     */
     public function send(string $event, array $payload = []): bool
     {
+        $this->strapi->log()->debug("Telemetry is disabled: event {$event} was not sent");
+
         return false;
     }
 }

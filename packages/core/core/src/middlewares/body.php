@@ -95,8 +95,10 @@ final class Body
                 $fields = is_array($parsed) ? $parsed : [];
                 $files = [];
 
-                if ($parsed === null && $uploaded === []) {
-                    // not pre-parsed by the SAPI (tests / FrankenPHP worker): parse the raw body
+                if ($uploaded === [] && ($parsed === null || $parsed === [])) {
+                    // not pre-parsed by the SAPI (`enable_post_data_reading=Off`, FrankenPHP worker,
+                    // tests): parse the raw body. PHP's own parser keeps only the last of repeated
+                    // fields (`files` sent several times), koa-body keeps them all.
                     $boundary = null;
                     if (preg_match('/boundary="?([^";]+)"?/i', $request->getHeaderLine('Content-Type'), $m) === 1) {
                         $boundary = $m[1];
@@ -108,7 +110,7 @@ final class Body
                     $files = self::flattenUploads($uploaded);
                 }
 
-                foreach ($files as $file) {
+                foreach (self::allFiles($files) as $file) {
                     if ($file->getSize() !== null && $file->getSize() > $maxFileSize) {
                         $ctx->payloadTooLarge('FileTooBig');
 
@@ -140,7 +142,7 @@ final class Body
             $next();
 
             // clean any file that was uploaded
-            foreach ($ctx->files() as $file) {
+            foreach (self::allFiles($ctx->files()) as $file) {
                 try {
                     $stream = $file->getStream();
                     $uri = $stream->getMetadata('uri');
@@ -171,8 +173,26 @@ final class Body
     }
 
     /**
+     * @param array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>> $files
+     * @return list<\Psr\Http\Message\UploadedFileInterface>
+     */
+    private static function allFiles(array $files): array
+    {
+        $out = [];
+        foreach ($files as $file) {
+            foreach (is_array($file) ? $file : [$file] as $one) {
+                $out[] = $one;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * `files[]` (a list) stays a list under `files`, as formidable does with repeated fields.
+     *
      * @param array<string, mixed> $uploaded
-     * @return array<string, \Psr\Http\Message\UploadedFileInterface>
+     * @return array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>>
      */
     private static function flattenUploads(array $uploaded, string $prefix = ''): array
     {
@@ -181,6 +201,9 @@ final class Body
             $name = $prefix === '' ? (string) $key : "{$prefix}[{$key}]";
             if ($value instanceof \Psr\Http\Message\UploadedFileInterface) {
                 $out[$name] = $value;
+            } elseif (is_array($value) && $value !== [] && array_is_list($value) && array_filter($value, static fn (mixed $v): bool => !$v instanceof \Psr\Http\Message\UploadedFileInterface) === []) {
+                /** @var list<\Psr\Http\Message\UploadedFileInterface> $value */
+                $out[$name] = count($value) === 1 ? $value[0] : $value;
             } elseif (is_array($value)) {
                 $out = [...$out, ...self::flattenUploads($value, $name)];
             }
@@ -192,7 +215,7 @@ final class Body
     /**
      * Minimal multipart/form-data parser (RFC 7578) for bodies PHP did not pre-parse.
      *
-     * @return array{0: array<string, mixed>, 1: array<string, \Psr\Http\Message\UploadedFileInterface>}
+     * @return array{0: array<string, mixed>, 1: array<string, \Psr\Http\Message\UploadedFileInterface|list<\Psr\Http\Message\UploadedFileInterface>>}
      */
     public static function parseMultipart(string $body, string $boundary): array
     {
@@ -229,7 +252,14 @@ final class Body
                     continue;
                 }
                 file_put_contents($tmp, $content);
-                $files[$name] = new \Nyholm\Psr7\UploadedFile($tmp, strlen($content), UPLOAD_ERR_OK, $filename, $mime);
+                $file = new \Nyholm\Psr7\UploadedFile($tmp, strlen($content), UPLOAD_ERR_OK, $filename, $mime);
+                // formidable: a repeated file field becomes a list
+                $name = str_ends_with($name, '[]') ? substr($name, 0, -2) : $name;
+                if (!array_key_exists($name, $files)) {
+                    $files[$name] = $file;
+                } else {
+                    $files[$name] = [...(is_array($files[$name]) ? $files[$name] : [$files[$name]]), $file];
+                }
                 continue;
             }
             // qs-style nested names (data[title])

@@ -239,7 +239,9 @@ final class EntityManager
                 if (!array_key_exists($attributeName, $data)) {
                     if (array_key_exists('default', $attribute) && $withDefaults) {
                         $default = $attribute['default'];
-                        $obj[$attributeName] = is_callable($default) && !is_string($default) ? $default() : $default;
+                        $default = is_callable($default) && !is_string($default) ? $default() : $default;
+                        // knex serializes a JSON default (`{}`, `[]`) when binding; PDO needs the string
+                        $obj[$attributeName] = $field instanceof \Strapi\Database\Fields\JsonField && $default !== null ? $field->toDB($default) : $default;
                     }
                     continue;
                 }
@@ -412,7 +414,8 @@ final class EntityManager
 
         $dataToInsert = $this->processData($metadata, $data, true);
 
-        $res = $this->createQueryBuilder($uid)->insert($dataToInsert)->execute();
+        // a row without any column (e.g. a component made of relations only) is still one row: knex inserts its defaults
+        $res = $this->createQueryBuilder($uid)->insert($dataToInsert === [] ? [[]] : $dataToInsert)->execute();
         $id = is_array($res[0] ?? null) ? $res[0]['id'] : ($res[0] ?? null);
 
         $trx = $this->db->transaction();

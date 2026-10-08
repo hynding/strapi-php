@@ -93,7 +93,8 @@ final class GetEnabledPlugins
         }
 
         $packages = [];
-        foreach ([$root . '/vendor', dirname(__DIR__, 5) . '/vendor'] as $vendorDir) {
+        // the project's vendor, then this monorepo's (packages/core/core/src/loaders/plugins → repository root)
+        foreach (array_unique([$root . '/vendor', dirname(__DIR__, 5) . '/vendor', dirname(__DIR__, 6) . '/vendor']) as $vendorDir) {
             $file = $vendorDir . '/composer/installed.json';
             if (!is_file($file)) {
                 continue;

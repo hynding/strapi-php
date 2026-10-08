@@ -6,12 +6,14 @@
     "version": "5.56.0",
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.3",
+        "strapi/core": "self.version",
+        "strapi/utils": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/api-tests",
-            "status": "planned",
+            "status": "foundation",
             "compatibleWith": "5.x"
         }
     },
