@@ -737,8 +737,9 @@ final class SqlBuilder
             $sql = $this->platform()->modifyLimitQuery($sql, $this->limit, $this->offset ?? 0);
         }
 
-        if ($this->forUpdate) {
-            $sql .= ' ' . $this->platform()->getForUpdateSQL();
+        // knex: `forUpdate()` is omitted on SQLite (single writer, no row locks) and MSSQL (table hints)
+        if ($this->forUpdate && !$this->platform() instanceof \Doctrine\DBAL\Platforms\SQLitePlatform && !$this->platform() instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform) {
+            $sql .= ' FOR UPDATE';
         }
 
         return ['sql' => $sql, 'bindings' => $bindings];

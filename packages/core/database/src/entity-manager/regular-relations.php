@@ -158,7 +158,7 @@ final class RegularRelations
                     ->execute();
 
                 $done = count($batchToDelete) < $batchSize;
-                $last = $batchToDelete[array_key_last($batchToDelete)] ?? null;
+                $last = $batchToDelete === [] ? null : $batchToDelete[array_key_last($batchToDelete)];
                 $lastId = $last['id'] ?? 0;
 
                 $batchIds = array_map(static fn (array $r): mixed => $r[$inverseJoinColumn['name']], $batchToDelete);

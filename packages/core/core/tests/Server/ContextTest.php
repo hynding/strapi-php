@@ -45,7 +45,8 @@ final class ContextTest extends TestCase
         $ctx = self::ctx();
         $ctx->notFound();
         self::assertSame(404, $ctx->status());
-        self::assertSame(['data' => null, 'error' => ['status' => 404, 'name' => 'NotFoundError', 'message' => 'Not Found', 'details' => []]], $ctx->body());
+        // details defaults to an empty object: `{}` on the wire
+        self::assertSame('{"data":null,"error":{"status":404,"name":"NotFoundError","message":"Not Found","details":{}}}', json_encode($ctx->body()));
 
         $ctx = self::ctx();
         $ctx->badRequest('Bad things', ['field' => 'x']);

@@ -227,7 +227,9 @@ final class EntityManager
                 if (!array_key_exists($attributeName, $data)) {
                     if (array_key_exists('default', $attribute) && $withDefaults) {
                         $default = $attribute['default'];
-                        $obj[$attributeName] = is_callable($default) && !is_string($default) ? $default() : $default;
+                        $default = is_callable($default) && !is_string($default) ? $default() : $default;
+                        // knex serializes a JSON default (`{}`, `[]`) when binding; PDO needs the string
+                        $obj[$attributeName] = $field instanceof \Strapi\Database\Fields\JsonField && $default !== null ? $field->toDB($default) : $default;
                     }
                     continue;
                 }
