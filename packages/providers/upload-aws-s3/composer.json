@@ -7,14 +7,16 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/upload": "self.version",
-        "league/flysystem-aws-s3-v3": "^3.29"
+        "strapi/utils": "self.version",
+        "strapi/types": "self.version"
     },
     "extra": {
         "strapi": {
             "upstream": "@strapi/provider-upload-aws-s3",
-            "status": "planned",
-            "compatibleWith": "5.x"
+            "status": "ported",
+            "compatibleWith": "5.x",
+            "kind": "provider",
+            "main": "Strapi\\Provider\\UploadAwsS3\\UploadAwsS3"
         }
     },
     "minimum-stability": "stable",
