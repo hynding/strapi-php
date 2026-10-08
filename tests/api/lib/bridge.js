@@ -12,6 +12,7 @@
  * Values that must be known synchronously (the HTTP server address) come from `local`.
  */
 const http = require('http');
+const { execFileSync } = require('child_process');
 
 const CHAIN = Symbol('chain');
 
@@ -71,6 +72,28 @@ const toError = (error) => {
 };
 
 /**
+ * Synchronous variant of `post`, for values upstream reads synchronously in-process and then
+ * uses as primitives (a proxy coerced to a string or number, e.g. a column name taken from
+ * `strapi.db.metadata.get(uid)` and used as a property key). Runs the request in a child process.
+ */
+const postSync = (url, body) => {
+  const script = `
+    const http = require('http');
+    let input = '';
+    process.stdin.on('data', (c) => (input += c)).on('end', () => {
+      const data = Buffer.from(input);
+      const req = http.request(process.argv[1], { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': data.length } }, (res) => {
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c)).on('end', () => process.stdout.write(Buffer.concat(chunks)));
+      });
+      req.on('error', (e) => { process.stderr.write(String(e)); process.exit(1); });
+      req.end(data);
+    });`;
+  const text = execFileSync(process.execPath, ['-e', script, url], { input: JSON.stringify(body) }).toString('utf8');
+  return JSON.parse(text);
+};
+
+/**
  * @param {string} rpcUrl  e.g. http://127.0.0.1:41234/__api-tests/rpc
  * @param {object} local   synchronous values that override the remote chain at the root
  */
@@ -78,6 +101,14 @@ const createRemote = (rpcUrl, local = {}) => {
   const run = async (steps) => {
     const response = await post(rpcUrl, { steps });
     if (response.error) throw toError(response.error);
+    if (response.null) return null;
+    return response.result === null ? undefined : response.result;
+  };
+
+  const runSync = (steps) => {
+    const response = postSync(rpcUrl, { steps });
+    if (response.error) throw toError(response.error);
+    if (response.null) return null;
     return response.result === null ? undefined : response.result;
   };
 
@@ -96,6 +127,13 @@ const createRemote = (rpcUrl, local = {}) => {
           const promise = run(steps);
           return promise[prop].bind(promise);
         }
+        if (prop === Symbol.toPrimitive) {
+          // used as a primitive (property key, template string, arithmetic): resolve it now
+          return () => {
+            const value = runSync(steps);
+            return value !== null && typeof value === 'object' ? JSON.stringify(value) : value;
+          };
+        }
         if (typeof prop === 'symbol') return undefined;
         if (steps.length === 0 && Object.prototype.hasOwnProperty.call(local, prop)) {
           return local[prop];
@@ -111,7 +149,9 @@ const createRemote = (rpcUrl, local = {}) => {
   const root = make([]);
   /** A PHP class upstream's helpers require() directly: `classRef('Strapi\\Core\\...').method(...)`. */
   const classRef = (fqcn) => make([{ class: fqcn }]);
-  return { root, classRef };
+  /** Replays steps synchronously (for APIs upstream exposes synchronously, like `strapi.config`). */
+  const callSync = (steps) => runSync(steps.map((step) => (step.call ? { call: step.call.map(encodeArg) } : step)));
+  return { root, classRef, callSync };
 };
 
 module.exports = { createRemote };

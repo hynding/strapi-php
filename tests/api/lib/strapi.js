@@ -5,16 +5,22 @@
  * the instance is the PHP test app running under FrankenPHP and `strapi` is a bridge proxy
  * (lib/bridge.js): `await strapi.db.query(uid).findMany()` runs in the PHP worker.
  *
+ * The `register` / `bootstrap` callbacks run where upstream runs them: the worker pauses before
+ * `register()` and again before the modules' bootstrap (STRAPI_API_TESTS_PHASES, see the app's
+ * public/index.php) and serves bridge calls until the harness posts the next phase.
+ *
  * Differences from upstream, all forced by the process boundary:
- * - `bootstrap` / `register` callbacks run after the instance has loaded (they mostly call
- *   `strapi.config.set`, which the worker keeps for the requests that follow);
  * - `strapi.server.httpServer` is the server's base URL (supertest accepts it), with an
  *   `address()` that returns `{ address, port }`;
+ * - `strapi.config.get/set/has` are synchronous like upstream's (a blocking request per call);
+ * - a `strapi.log.warn` replaced by the bootstrap callback receives the warnings the worker
+ *   logged while bootstrapping, once loading is done (they cannot be streamed back live);
  * - `logLevel` is ignored (the app logs warnings to its FrankenPHP log under .tmp/app/.tmp/).
  */
 const _ = require('lodash');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
 const { createRemote } = require('./bridge');
 const { startServer } = require('./server');
 const { appDir, repoRoot } = require('./paths');
@@ -27,6 +33,42 @@ const superAdminCredentials = {
 };
 
 const superAdminLoginInfo = _.pick(superAdminCredentials, ['email', 'password']);
+
+const postJson = (url, body) =>
+  new Promise((resolve, reject) => {
+    const data = Buffer.from(JSON.stringify(body));
+    const req = http.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': data.length } }, (res) => {
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.end(data);
+  });
+
+/** Lets the paused worker go on to the next phase of `load()` (see the app's public/index.php). */
+const postPhase = (url, phase) =>
+  new Promise((resolve, reject) => {
+    const data = Buffer.from(JSON.stringify({ phase }));
+    const req = http.request(
+      `${url}/__api-tests/phase`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': data.length } },
+      (res) => {
+        res.resume();
+        res.on('end', () =>
+          res.statusCode === 200 ? resolve() : reject(new Error(`api-tests: worker refused phase ${phase} (${res.statusCode})`))
+        );
+      }
+    );
+    req.on('error', reject);
+    req.end(data);
+  });
 
 const createStrapiInstance = async ({
   ensureSuperAdmin = true,
@@ -44,7 +86,9 @@ const createStrapiInstance = async ({
       ...env,
       STRAPI_API_TESTS_BYPASS_AUTH: bypassAuth ? '1' : '0',
       STRAPI_API_TESTS_AUTOLOAD: path.join(repoRoot, 'vendor', 'autoload.php'),
-      NODE_ENV: 'test',
+      // upstream tests switch process.env.NODE_ENV (e.g. to 'production') before creating the instance
+      NODE_ENV: process.env.NODE_ENV || 'test',
+      STRAPI_API_TESTS_PHASES: '1',
       STRAPI_DISABLE_EE: '1',
       STRAPI_TELEMETRY_DISABLED: 'true',
     },
@@ -71,8 +115,14 @@ const createStrapiInstance = async ({
     __url: server.url,
     __logFile: server.logFile,
   };
-  const { root, classRef } = createRemote(`${server.url}/__api-tests/rpc`, local);
+  const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local);
   local.__class = classRef;
+  // strapi.config is synchronous upstream (`jwt.verify(token, strapi.config.get('admin.auth.secret'))`)
+  local.config = {
+    get: (...args) => callSync([{ get: 'config' }, { get: 'get' }, { call: args }]),
+    set: (...args) => callSync([{ get: 'config' }, { get: 'set' }, { call: args }]),
+    has: (...args) => callSync([{ get: 'config' }, { get: 'has' }, { call: args }]),
+  };
   instance = root;
 
   if (!skipDefaultSessionConfig) {
@@ -87,7 +137,13 @@ const createStrapiInstance = async ({
   }
 
   if (register) await register({ strapi: instance });
+  await postPhase(server.url, 'register');
   if (bootstrap) await bootstrap({ strapi: instance });
+  await postPhase(server.url, 'bootstrap');
+
+  // warnings logged while bootstrapping, for a `strapi.log.warn` spy installed by the callback
+  const { warnings = [] } = await postJson(`${server.url}/__api-tests/warnings`, {});
+  warnings.forEach((message) => instance.log.warn(message));
 
   global.strapi = instance;
 

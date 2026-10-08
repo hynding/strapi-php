@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Strapi\ApiTests;
 
 use Strapi\Core\Strapi;
+use Strapi\Database\Database;
+use Strapi\Database\Query\SqlBuilder;
 use Strapi\Utils\Errors\ApplicationError;
 
 /**
@@ -30,14 +32,26 @@ use Strapi\Utils\Errors\ApplicationError;
  *   `require()` directly (api-tests/models.js uses document-service/components): static methods
  *   are called statically, instance methods on `new Class($strapi)`.
  *
+ * - `strapi.db.getConnection()` (a knex instance upstream) is the database's knex-like
+ *   {@see SqlBuilder} (`$db->sql()`), so `getConnection().from(t).where(...).update(...)` replays;
+ *   awaiting a builder runs it.
+ *
  * Only enabled when the worker script mounts it (tests/api/app/public/index.php); never in an app.
  */
 final class Bridge
 {
     public const string PATH = '/__api-tests/rpc';
 
+    /** Whether the last replayed call returns a nullable type, so its `null` is a value (JS `null`, not `undefined`). */
+    private bool $nullIsValue = false;
+
     public function __construct(private readonly Strapi $strapi)
     {
+    }
+
+    private function lastCallReturnsNullable(): bool
+    {
+        return $this->nullIsValue;
     }
 
     /**
@@ -47,9 +61,16 @@ final class Bridge
     public function handle(array $payload): array
     {
         try {
+            $this->nullIsValue = false;
             $value = $this->replay($payload['steps'] ?? []);
 
-            return ['status' => 200, 'body' => ['result' => self::export($value)]];
+            // a knex query builder is a thenable: awaiting it runs the query
+            if ($value instanceof SqlBuilder) {
+                $value = $value->run();
+            }
+
+            // `null` from a method declared `?Type` (findOne...) is JS `null`; any other null is `undefined`
+            return ['status' => 200, 'body' => ['result' => self::export($value), ...($value === null && $this->lastCallReturnsNullable() ? ['null' => true] : [])]];
         } catch (\Throwable $e) {
             $error = [
                 'name' => $e instanceof ApplicationError ? $e->name : (new \ReflectionClass($e))->getShortName(),
@@ -84,6 +105,7 @@ final class Bridge
 
         for (; $i < $count; $i++) {
             $step = $steps[$i];
+            $this->nullIsValue = false;
             if (!array_key_exists('get', $step)) {
                 // a bare call: the current value is a callable
                 $value = self::invoke($value, $this->args($step['call'] ?? []));
@@ -132,8 +154,14 @@ final class Bridge
             return $target->call($name, $args);
         }
 
+        if ($target instanceof Database && $name === 'getConnection' && $args === []) {
+            return $target->sql();
+        }
+
         if (is_object($target) && method_exists($target, $name)) {
             $method = new \ReflectionMethod($target, $name);
+            $returnType = $method->getReturnType();
+            $this->nullIsValue = $returnType instanceof \ReflectionNamedType && $returnType->allowsNull() && !in_array($returnType->getName(), ['mixed', 'null', 'void'], true);
             if ($method->isPublic()) {
                 if ($args !== [] && $method->getNumberOfParameters() === 0) {
                     $result = $target->{$name}();
@@ -182,6 +210,11 @@ final class Bridge
                 $method = new \ReflectionMethod($target, $name);
                 if ($method->isPublic() && $method->getNumberOfRequiredParameters() === 0) {
                     return $target->{$name}();
+                }
+                // JS reads the property (`strapi.db.metadata.get(uid)`): a public property of the
+                // same name wins over a method that needs arguments
+                if (property_exists($target, $name) && (new \ReflectionProperty($target, $name))->isPublic()) {
+                    return $target->{$name};
                 }
                 // a method that needs arguments, read without calling: hand back a callable
                 return $target->{$name}(...);
