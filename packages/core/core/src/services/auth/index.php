@@ -13,12 +13,6 @@ use Strapi\Utils\Errors\UnauthorizedError;
  * A strategy is an array `['name' => string, 'authenticate' => callable(Context): array, 'verify' => ?callable(array $auth, mixed $config): void]`
  * where `authenticate` returns `['authenticated' => bool, 'credentials' => mixed, 'ability' => mixed, 'error' => ?string]`.
  *
- * PHP-port note: when the content API has NO registered strategy at all (users-permissions is not
- * ported yet), its requests are treated as public instead of being rejected with 401, so the
- * content API is usable; registering any strategy restores upstream's behaviour. Admin routes get
- * no such fallback: without the admin package nobody can authenticate, so they answer 401 like
- * upstream does for an anonymous request (plugin admin routes rely on this).
- *
  * @phpstan-type Strategy array{name: string, authenticate: callable, verify?: callable}
  * @phpstan-type AuthenticationInfo array{strategy: Strategy, credentials: mixed, ability: mixed}
  */
@@ -96,13 +90,6 @@ final class Auth
             }
         }
 
-        // PHP port: no strategy registered for the content API → public access (see class doc)
-        if ($strategiesToUse === [] && $routeStrategies === [] && $routeType === 'content-api') {
-            $next();
-
-            return;
-        }
-
         foreach ($strategiesToUse as $strategy) {
             $result = ($strategy['authenticate'])($ctx);
             $result = is_array($result) ? $result : [];
@@ -135,18 +122,13 @@ final class Auth
      * @param AuthenticationInfo|array<string, mixed>|null $auth
      * @param mixed $config the route `config.auth` (`false`, `['scope' => [...]]`)
      */
-    public function verify(?array $auth, mixed $config = [], ?string $routeType = null): mixed
+    public function verify(?array $auth, mixed $config = []): mixed
     {
         if ($config === false) {
             return null;
         }
 
         if ($auth === null || $auth === []) {
-            // PHP port: no strategy registered for the content API → public access (see class doc)
-            if ($routeType === 'content-api' && ($this->strategies[$routeType] ?? []) === []) {
-                return null;
-            }
-
             throw new UnauthorizedError();
         }
 

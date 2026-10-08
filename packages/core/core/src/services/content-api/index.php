@@ -171,7 +171,9 @@ final class ContentApi
                     continue;
                 }
                 $body = $route['request']['body'] ?? [];
-                $shape = $body['application/json']['shape'] ?? [];
+                $existing = $body['application/json'] ?? null;
+                // a route's own body schema is a ZodObject (e.g. plugin::email's POST /email)
+                $shape = $existing instanceof \Strapi\Utils\Zod\ZodObject ? $existing->shape() : (is_array($existing) ? ($existing['shape'] ?? []) : []);
                 if (array_key_exists($param, $shape)) {
                     throw new \RuntimeException("contentAPI.addInputParams: param \"{$param}\" already exists on route {$route['method']} {$route['path']}");
                 }

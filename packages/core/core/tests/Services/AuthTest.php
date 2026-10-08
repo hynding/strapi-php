@@ -22,8 +22,10 @@ final class AuthTest extends TestCase
         return $ctx;
     }
 
-    public function testContentApiIsPublicWhenNoStrategyIsRegistered(): void
+    public function testContentApiIs401WhenNoStrategyIsRegistered(): void
     {
+        // upstream has no public fallback: without a strategy (users-permissions' public role,
+        // an API token...) nobody can authenticate on the content API
         $ctx = self::ctx(['info' => ['type' => 'content-api'], 'config' => []]);
         $called = false;
 
@@ -31,8 +33,12 @@ final class AuthTest extends TestCase
             $called = true;
         });
 
-        self::assertTrue($called);
-        self::assertNull(Auth::createAuthentication()->verify(null, [], 'content-api'));
+        self::assertFalse($called);
+        self::assertSame(401, $ctx->status());
+        self::assertSame('UnauthorizedError', $ctx->body()['error']['name'] ?? null);
+
+        $this->expectException(UnauthorizedError::class);
+        Auth::createAuthentication()->verify(null, []);
     }
 
     public function testAdminRoutesAre401WhenNoStrategyIsRegistered(): void
@@ -49,7 +55,7 @@ final class AuthTest extends TestCase
         self::assertSame('UnauthorizedError', $ctx->body()['error']['name'] ?? null);
 
         $this->expectException(UnauthorizedError::class);
-        Auth::createAuthentication()->verify(null, [], 'admin');
+        Auth::createAuthentication()->verify(null, []);
     }
 
     public function testAuthFalseIsAlwaysPublic(): void

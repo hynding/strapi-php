@@ -82,6 +82,22 @@ class ProviderFactory
         return $this;
     }
 
+    /**
+     * Not upstream: writes back an item a caller changed. Upstream mutates the objects returned by
+     * `values()` / `get()` in place (they are references); PHP arrays are copies. No hook runs.
+     *
+     * @param T $item
+     * @return $this
+     */
+    public function replace(string $key, mixed $item): static
+    {
+        if ($this->has($key)) {
+            $this->registry[$key] = $item;
+        }
+
+        return $this;
+    }
+
     /** @return T|null */
     public function get(string $key): mixed
     {
