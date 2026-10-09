@@ -89,8 +89,8 @@ final class PackageJsonTest extends TestCase
         self::assertSame(['description', 'type', 'require', 'scripts', 'config', 'minimum-stability', 'prefer-stable'], array_keys($composer));
         self::assertSame('project', $composer['type']);
         self::assertSame(['php', 'ext-pdo_sqlite'], array_slice(array_keys($composer['require']), 0, 2));
-        self::assertSame('5.57.0-beta.2', $composer['require']['strapi/strapi']);
-        self::assertSame('5.57.0-beta.2', $composer['require']['strapi/plugin-users-permissions']);
+        self::assertSame(['php', 'ext-pdo_sqlite', 'hynding/strapi-php'], array_keys($composer['require']));
+        self::assertSame('5.57.0-beta.2', $composer['require']['hynding/strapi-php']);
         self::assertSame('beta', $composer['minimum-stability']);
         self::assertTrue($composer['prefer-stable']);
         self::assertSame(0, $composer['config']['process-timeout']);
@@ -102,6 +102,6 @@ final class PackageJsonTest extends TestCase
         $composer = json_decode((string) file_get_contents($this->dir . '/composer.json'), true);
         self::assertIsArray($composer);
         self::assertArrayNotHasKey('minimum-stability', $composer);
-        self::assertSame('^5.56', $composer['require']['strapi/strapi']);
+        self::assertSame('^5.56', $composer['require']['hynding/strapi-php']);
     }
 }

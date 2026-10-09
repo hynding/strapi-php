@@ -1,6 +1,6 @@
 {
-    "name": "strapi/create-strapi-app",
-    "description": "Generate a new Strapi application: `composer create-project strapi/create-strapi-app my-project` (port of create-strapi-app)",
+    "name": "hynding/create-strapi-app",
+    "description": "Generate a new Strapi application: `composer create-project hynding/create-strapi-app my-project` (port of create-strapi-app)",
     "type": "library",
     "keywords": [
         "create-strapi-app",

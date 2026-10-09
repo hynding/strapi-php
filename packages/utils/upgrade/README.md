@@ -16,15 +16,16 @@ repository root for the naming rules. The CLI is `bin/strapi-upgrade`, the count
 ## Usage
 
 ```sh
-composer global require strapi/upgrade      # like npx: the newest codemods, outside the project
-strapi-upgrade --help
+php vendor/bin/strapi-upgrade --help       # installed with hynding/strapi-php
+strapi-upgrade --help                      # or `composer global require hynding/strapi-php`, like npx
 strapi-upgrade minor --dry                  # simulate
 strapi-upgrade to 5.57.0 -p path/to/app     # a specific version
 strapi-upgrade codemods ls
 strapi-upgrade codemods run 5.0.0-entity-service-document-service-code
 ```
 
-(`composer require --dev strapi/upgrade` and `vendor/bin/strapi-upgrade` work too.)
+The tool ships inside `hynding/strapi-php` (the package that `replace`s every `strapi/*` one), so
+every project has `vendor/bin/strapi-upgrade`.
 
 Upstream's commands and options, unchanged:
 
@@ -49,17 +50,17 @@ and `latest` asks before crossing a major.
 
 What differs is what a version is (VERSIONING.md):
 
-- **Current version**: `composer.json`'s `strapi/strapi` requirement (`5.56.0`,
+- **Current version**: `composer.json`'s `hynding/strapi-php` requirement (`5.56.0`,
   `5.56.0-beta.1`, `5.56.0.1`), or the installed one (`vendor/composer/installed.json`) when it is a
   constraint. Upstream reads `package.json`'s `@strapi/strapi`.
-- **Targets**: the `strapi/strapi` versions on Packagist (Composer v2 `p2` metadata) whose
+- **Targets**: the `hynding/strapi-php` versions on Packagist (Composer v2 `p2` metadata) whose
   upstream release (`5.57.0-beta.1` → `5.57.0`) is published as `@strapi/strapi` on npm. Release
   types (`minor`…) pick stable versions only — `x.y.z` and `x.y.z.N` — as upstream picks `x.y.z`;
   `to` reaches pre-releases. The Packagist repository is `PACKAGIST_URL`, else the first `composer`
   repository in the project's composer.json, else repo.packagist.org (`file://` works: a mirror,
   or a fake one for testing); npm's is `NPM_REGISTRY_URL`, else the package manager's
   configuration, else registry.npmjs.org, as upstream. `HTTP_PROXY`/`HTTPS_PROXY` are honoured.
-- **Dependencies, in lockstep**: composer.json `strapi/*` requirements on the current version move
+- **Dependencies, in lockstep**: composer.json `hynding/strapi-php` (and any `strapi/*`) requirements on the current version move
   to the target; package.json `@strapi/*` dependencies on the current *upstream* release move to
   the target's (unchanged for `5.56.0-beta.1` → `5.56.0`). A pre-release target lowers
   `minimum-stability` to match, with `prefer-stable`.

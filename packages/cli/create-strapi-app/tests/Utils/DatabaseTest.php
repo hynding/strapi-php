@@ -96,6 +96,6 @@ final class DatabaseTest extends TestCase
         $scope = Database::addDatabaseDependencies(ScopeFactory::scope(['database' => ['client' => 'postgres', 'connection' => []]]));
 
         self::assertSame('*', $scope['composerDependencies']['ext-pdo_pgsql']);
-        self::assertSame('^5.56', $scope['composerDependencies']['strapi/strapi']);
+        self::assertSame('^5.56', $scope['composerDependencies']['hynding/strapi-php']);
     }
 }

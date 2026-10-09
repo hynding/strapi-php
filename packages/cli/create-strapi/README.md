@@ -1,6 +1,6 @@
-# strapi/create-strapi
+# hynding/create-strapi
 
-Alias of [`strapi/create-strapi-app`](../create-strapi-app/README.md): generate a new Strapi
+Alias of [`hynding/create-strapi-app`](../create-strapi-app/README.md): generate a new Strapi
 application (PHP edition).
 
 | | |
@@ -9,11 +9,8 @@ application (PHP edition).
 | Status | `ported` |
 | Version | tracks Strapi `5.56.0` |
 
-```sh
-composer create-project strapi/create-strapi my-project     # add --stability=beta during a beta
-# or, installed globally
-composer global require strapi/create-strapi && create-strapi my-project --quickstart
-```
+Not published: it exists for parity with upstream's `create-strapi`. Use
+`composer create-project hynding/create-strapi-app my-project`, which takes the same options.
 
 Like upstream's `bin/index.js` (`require('create-strapi-app/bin')`), `bin/create-strapi` runs
 `create-strapi-app`; every option is documented there. With `composer create-project` the

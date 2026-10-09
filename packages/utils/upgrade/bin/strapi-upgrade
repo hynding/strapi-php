@@ -6,13 +6,13 @@ declare(strict_types=1);
 // `strapi-upgrade`: port of @strapi/upgrade's bin/upgrade.js (`npx @strapi/upgrade`)
 
 $autoloaders = [
-    __DIR__ . '/../vendor/autoload.php',          // this package installed on its own
-    __DIR__ . '/../../../autoload.php',           // vendor/strapi/upgrade/bin
+    $GLOBALS['_composer_autoload_path'] ?? null,  // run through vendor/bin/strapi-upgrade (Composer 2.2+)
+    __DIR__ . '/../../../../../../autoload.php',  // in the bundle: vendor/hynding/strapi-php/packages/utils/upgrade/bin
     __DIR__ . '/../../../../vendor/autoload.php', // the strapi-php monorepo
 ];
 
 foreach ($autoloaders as $autoload) {
-    if (is_file($autoload)) {
+    if (is_string($autoload) && is_file($autoload)) {
         require $autoload;
         break;
     }

@@ -40,7 +40,7 @@ use Symfony\Component\Console\SingleCommandApplication;
 final class CreateStrapiApp
 {
     /** Package names whose `composer create-project` directory `--in-place` may take over. */
-    public const BOOTSTRAPPER_PACKAGES = ['strapi/create-strapi-app', 'strapi/create-strapi'];
+    public const BOOTSTRAPPER_PACKAGES = ['hynding/create-strapi-app', 'hynding/create-strapi'];
 
     public const ARGS_ENV = 'CREATE_STRAPI_APP_ARGS';
 
@@ -57,8 +57,8 @@ final class CreateStrapiApp
         $json = is_file($composer) ? json_decode((string) file_get_contents($composer), true) : null;
         $version = is_array($json) && is_string($json['version'] ?? null) ? $json['version'] : null;
 
-        if ($version === null && class_exists(\Composer\InstalledVersions::class) && \Composer\InstalledVersions::isInstalled('strapi/create-strapi-app')) {
-            $version = \Composer\InstalledVersions::getPrettyVersion('strapi/create-strapi-app');
+        if ($version === null && class_exists(\Composer\InstalledVersions::class) && \Composer\InstalledVersions::isInstalled('hynding/create-strapi-app')) {
+            $version = \Composer\InstalledVersions::getPrettyVersion('hynding/create-strapi-app');
         }
 
         return self::$version = $version ?? '0.0.0';

@@ -4,7 +4,7 @@
 declare(strict_types=1);
 
 /**
- * Project-local `strapi` CLI: delegates to the strapi/strapi package with this project as root.
+ * Project-local `strapi` CLI: delegates to the strapi CLI (hynding/strapi-php) with this project as root.
  * Works from the monorepo (vendor at the repository root) and from a standalone install (vendor here).
  */
 $root = dirname(__DIR__);
@@ -16,7 +16,7 @@ foreach ($autoloads as $autoload) {
     }
 }
 if (!class_exists(\Strapi\Cli\Cli\Cli::class)) {
-    fwrite(STDERR, "strapi/strapi is not installed. Run `composer install` first.\n");
+    fwrite(STDERR, "hynding/strapi-php is not installed. Run `composer install` first.\n");
     exit(1);
 }
 

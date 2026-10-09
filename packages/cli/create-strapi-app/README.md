@@ -15,11 +15,11 @@ at the repository root for the naming rules.
 ## Usage
 
 ```sh
-composer create-project strapi/create-strapi-app my-project          # add --stability=beta during a beta
+composer create-project hynding/create-strapi-app my-project         # add --stability=beta during a beta
 CREATE_STRAPI_APP_ARGS="--quickstart --dbclient=postgres ..." \
-  composer create-project strapi/create-strapi-app my-project -n     # flags for the create-project run
+  composer create-project hynding/create-strapi-app my-project -n    # flags for the create-project run
 
-composer global require strapi/create-strapi-app
+composer global require hynding/create-strapi-app
 create-strapi-app my-project --quickstart                            # same flags as npx create-strapi-app
 ```
 
@@ -28,14 +28,17 @@ create-strapi-app my-project --quickstart                            # same flag
 temporary directory, the bootstrapper's files are removed (`vendor/` is kept and reconciled by the
 following `composer install`) and the project is moved in. Composer cannot forward flags to that
 script, hence `CREATE_STRAPI_APP_ARGS`. Without a terminal (CI, `-n`) nothing is prompted, like
-`--non-interactive`. `strapi/create-strapi` is the alias package (upstream's `create-strapi`).
+`--non-interactive`. `hynding/create-strapi` is the alias package (upstream's `create-strapi`; kept for parity,
+not published).
+
+This is the one strapi-php package published on its own: `composer create-project` uses a
+package's root as the new project, so the generator cannot live inside `hynding/strapi-php`.
 
 The generated project (both templates):
 
-- `composer.json` requiring `strapi/strapi`, `strapi/database`, `strapi/admin`, the internal
-  plugins (`content-manager`, `content-type-builder`, `upload`, `email`, `i18n`) and
-  `strapi/plugin-users-permissions` (what upstream's `@strapi/strapi` npm package brings in),
-  plus `ext-pdo_<client>` for the chosen database. Versions follow `VERSIONING.md`: a stable
+- `composer.json` requiring `hynding/strapi-php` (every strapi-php package in one: the CLI, the
+  admin API, the internal plugins, users-permissions, the providers, as upstream's
+  `@strapi/strapi` npm package brings in), plus `ext-pdo_<client>` for the chosen database. Versions follow `VERSIONING.md`: a stable
   `5.56.0` is required as `^5.56`; a pre-release is required exactly with
   `"minimum-stability": "beta", "prefer-stable": true`. Scripts `develop`, `start`, `build`,
   `console`, `strapi` (`composer develop`...), `process-timeout: 0`.

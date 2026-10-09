@@ -45,6 +45,12 @@ Rules:
 8. **Dependencies:** PSR-7/15/17 via `nyholm/psr7`, routing via `nikic/fast-route`,
    database via `doctrine/dbal`, logging via `monolog/monolog`, CLI via `symfony/console`.
    Prefer a small amount of our own code over a large framework.
+9. **One published package.** The root composer.json is `hynding/strapi-php`, which `replace`s
+   every `strapi/*` package and carries their requirements, classmaps and binaries. Those keys
+   are generated: after adding a package, a dependency or an autoload path to any
+   `packages/*/*/composer.json`, run `composer bundle:fix` (CI runs `composer bundle:check`).
+   Code that looks a package up at runtime goes through `GetEnabledPlugins::installedPackages()`,
+   which sees the `strapi/*` packages inside the bundle.
 
 ## Code style
 

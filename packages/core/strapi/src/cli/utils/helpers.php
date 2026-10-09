@@ -74,7 +74,8 @@ final class Helpers
 
     /**
      * Upstream checks `package.json` depends on `@strapi/strapi`; here a Strapi project is one whose
-     * `composer.json` requires `strapi/strapi` (or `strapi/core`).
+     * `composer.json` requires `hynding/strapi-php` (the published package), or `strapi/strapi` /
+     * `strapi/core` (the package names it replaces).
      */
     public static function isStrapiProject(string $cwd): bool
     {
@@ -88,7 +89,7 @@ final class Helpers
         }
         $deps = [...($json['require'] ?? []), ...($json['require-dev'] ?? [])];
 
-        return isset($deps['strapi/strapi']) || isset($deps['strapi/core']);
+        return isset($deps['hynding/strapi-php']) || isset($deps['strapi/strapi']) || isset($deps['strapi/core']);
     }
 
     public static function assertCwdContainsStrapiProject(string $name, string $cwd, OutputInterface $output): bool

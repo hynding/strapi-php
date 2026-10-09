@@ -8,7 +8,10 @@ namespace Strapi\Upgrade\Modules\Project;
  * Port of packages/utils/upgrade/src/modules/project/constants.ts.
  *
  * PHP-only additions: `composer.json` (the manifest a strapi-php project's version lives in),
- * PHP sources, the `strapi/*` Composer packages, and `vendor/` excluded like `node_modules/`.
+ * PHP sources, the strapi-php Composer packages, and `vendor/` excluded like `node_modules/`.
+ *
+ * strapi-php is published as one Composer package, `hynding/strapi-php`, which `replace`s every
+ * `strapi/*` package; a project requires it and its version is the project's Strapi version.
  */
 final class Constants
 {
@@ -46,5 +49,17 @@ final class Constants
 
     public const STRAPI_COMPOSER_PACKAGE_PREFIX = 'strapi/';
 
-    public const STRAPI_COMPOSER_DEPENDENCY_NAME = self::STRAPI_COMPOSER_PACKAGE_PREFIX . 'strapi';
+    /** the published strapi-php package: every `strapi/*` package in one (`replace`) */
+    public const STRAPI_COMPOSER_DEPENDENCY_NAME = 'hynding/strapi-php';
+
+    /** `hynding/strapi-php`, or a `strapi/*` package (a project or plugin may require those by name) */
+    public static function isStrapiComposerPackage(string $name): bool
+    {
+        return $name === self::STRAPI_COMPOSER_DEPENDENCY_NAME || str_starts_with($name, self::STRAPI_COMPOSER_PACKAGE_PREFIX);
+    }
+
+    public static function isScopedStrapiPackage(string $name): bool
+    {
+        return str_starts_with($name, self::SCOPED_STRAPI_PACKAGE_PREFIX);
+    }
 }

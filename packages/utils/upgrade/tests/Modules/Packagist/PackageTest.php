@@ -35,11 +35,11 @@ final class PackageTest extends TestCase
         $entries = [];
         foreach ($versions as $i => $version) {
             $entries[] = $i === 0
-                ? ['name' => 'strapi/strapi', 'description' => 'Strapi', 'version' => "v{$version}", 'require' => ['php' => '>=8.3']]
+                ? ['name' => 'hynding/strapi-php', 'description' => 'Strapi', 'version' => "v{$version}", 'require' => ['php' => '>=8.3']]
                 : ['version' => "v{$version}"];
         }
 
-        return (string) json_encode(['minified' => 'composer/2.0', 'packages' => ['strapi/strapi' => $entries]]);
+        return (string) json_encode(['minified' => 'composer/2.0', 'packages' => ['hynding/strapi-php' => $entries]]);
     }
 
     public function testExpandsTheMinifiedMetadata(): void
@@ -54,11 +54,11 @@ final class PackageTest extends TestCase
 
     public function testRefreshReadsTheP2DocumentFromPackagistUrl(): void
     {
-        $mirror = $this->volume(['p2' => ['strapi' => ['strapi.json' => self::p2('5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1')]]]);
+        $mirror = $this->volume(['p2' => ['hynding' => ['strapi-php.json' => self::p2('5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1')]]]);
         putenv("PACKAGIST_URL=file://{$mirror}");
         [$logger] = self::memoryLogger();
 
-        $package = Package::packagistPackageFactory('strapi/strapi', '/nowhere', $logger)->refresh();
+        $package = Package::packagistPackageFactory('hynding/strapi-php', '/nowhere', $logger)->refresh();
 
         self::assertSame(['5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1'], array_keys($package->getVersionsDict()));
         self::assertSame('Strapi', $package->getVersionsDict()['5.57.0-beta.1']['description']);
@@ -68,26 +68,26 @@ final class PackageTest extends TestCase
 
     public function testUsesTheProjectComposerRepository(): void
     {
-        $mirror = $this->volume(['p2' => ['strapi' => ['strapi.json' => self::p2('5.56.0')]]]);
+        $mirror = $this->volume(['p2' => ['hynding' => ['strapi-php.json' => self::p2('5.56.0')]]]);
         $cwd = $this->volume(['composer.json' => (string) json_encode(['repositories' => [['type' => 'path', 'url' => '../x'], ['type' => 'composer', 'url' => "file://{$mirror}/"]]])]);
         [$logger] = self::memoryLogger();
 
-        self::assertTrue(Package::packagistPackageFactory('strapi/strapi', $cwd, $logger)->refresh()->isLoaded());
+        self::assertTrue(Package::packagistPackageFactory('hynding/strapi-php', $cwd, $logger)->refresh()->isLoaded());
     }
 
     public function testUnreachableRepositoriesThrow(): void
     {
         [$logger] = self::memoryLogger();
-        $package = new Package('strapi/strapi', '/nowhere', $logger, static fn (string $url): array => ['ok' => false, 'status' => 0, 'body' => '']);
+        $package = new Package('hynding/strapi-php', '/nowhere', $logger, static fn (string $url): array => ['ok' => false, 'status' => 0, 'body' => '']);
 
-        $this->expectExceptionMessage('Request failed for https://repo.packagist.org/p2/strapi/strapi.json');
+        $this->expectExceptionMessage('Request failed for https://repo.packagist.org/p2/hynding/strapi-php.json');
         $package->refresh();
     }
 
     public function testStrapiPackageKeepsVersionsWhoseUpstreamReleaseIsOnNpm(): void
     {
         [$logger] = self::memoryLogger();
-        $composer = new Package('strapi/strapi', '/nowhere', $logger, static fn (string $url): array => ['ok' => true, 'status' => 200, 'body' => self::p2('5.55.0', '5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1', '5.58.0')]);
+        $composer = new Package('hynding/strapi-php', '/nowhere', $logger, static fn (string $url): array => ['ok' => true, 'status' => 200, 'body' => self::p2('5.55.0', '5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1', '5.58.0')]);
         $npm = new NpmPackage('@strapi/strapi', '/nowhere', $logger, [
             'fetch' => static fn (string $url): array => ['ok' => true, 'status' => 200, 'body' => (string) json_encode(['versions' => ['5.56.0' => ['version' => '5.56.0'], '5.57.0' => ['version' => '5.57.0']]])],
             'getPreferred' => static fn (): ?string => null,
@@ -95,7 +95,7 @@ final class PackageTest extends TestCase
 
         $package = (new StrapiPackage($composer, $npm))->refresh();
 
-        self::assertSame('strapi/strapi', $package->name());
+        self::assertSame('hynding/strapi-php', $package->name());
         self::assertSame(['5.56.0-beta.1', '5.56.0', '5.56.0.1', '5.57.0-beta.1'], array_keys($package->getVersionsDict()));
         self::assertSame('5.57.0', $package->getVersionsDict()['5.57.0-beta.1']['upstream']);
         self::assertSame(['5.56.0', '5.56.0.1'], array_map(NpmPackage::versionOf(...), $package->findVersionsInRange(new Range('>5.56.0-beta.1 <6.0.0'))));

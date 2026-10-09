@@ -12,7 +12,7 @@ use Strapi\Upgrade\Tests\TestCase;
 
 /**
  * Port of src/modules/project/__tests__/project.test.ts. A strapi-php application's version is
- * its `strapi/strapi` Composer requirement; its files include PHP sources and composer.json.
+ * its `hynding/strapi-php` Composer requirement; its files include PHP sources and composer.json.
  */
 final class ProjectTest extends TestCase
 {
@@ -74,7 +74,7 @@ final class ProjectTest extends TestCase
     {
         $cwd = $this->volume(['package.json' => '{ "name": "test", "version": "1.2.3" }', 'composer.json' => '{ "name": "acme/test", "require": {} }', 'src' => self::DEFAULT_FILES]);
 
-        $this->expectExceptionMessage('No version of strapi/strapi was found in acme/test. Are you in a valid Strapi project?');
+        $this->expectExceptionMessage('No version of hynding/strapi-php was found in acme/test. Are you in a valid Strapi project?');
         Project::projectFactory($cwd);
     }
 
@@ -82,13 +82,13 @@ final class ProjectTest extends TestCase
     {
         $cwd = $this->volume(self::appTree('^5.56', extra: ['src' => self::DEFAULT_FILES]));
 
-        $this->expectExceptionMessage("Cannot resolve package \"strapi/strapi\" from paths [{$cwd}]");
+        $this->expectExceptionMessage("Cannot resolve package \"hynding/strapi-php\" from paths [{$cwd}]");
         Project::projectFactory($cwd);
     }
 
     public function testInstalledVersionFallbackSucceeds(): void
     {
-        $cwd = $this->volume(self::appTree('^5.56', extra: ['vendor' => ['composer' => ['installed.json' => '{"packages": [{"name": "strapi/strapi", "version": "v5.56.0-beta.1"}]}']]]));
+        $cwd = $this->volume(self::appTree('^5.56', extra: ['vendor' => ['composer' => ['installed.json' => '{"packages": [{"name": "hynding/strapi-php", "version": "v5.56.0-beta.1"}]}']]]));
 
         $project = Project::projectFactory($cwd);
 

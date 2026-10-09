@@ -30,12 +30,12 @@ use Symfony\Component\Process\Process;
  *
  * The version a strapi-php project upgrades is its `strapi/strapi` Composer version, and both
  * manifests move in lockstep (VERSIONING.md):
- * - composer.json: every `strapi/*` requirement on the current version is set to the target
+ * - composer.json: `hynding/strapi-php` (and any `strapi/*` requirement) on the current version is set to the target
  *   (`5.56.0-beta.1` → `5.57.0`), and a pre-release target lowers `minimum-stability`
  *   accordingly (with `prefer-stable`);
  * - package.json: every `@strapi/*` dependency on the current upstream release is set to the
  *   target's (`5.56.0` → `5.57.0`); unchanged when both mirror the same release.
- * Step 4 runs `composer update "strapi/*" --with-all-dependencies`, then the Node package
+ * Step 4 runs `composer update hynding/strapi-php "strapi/*" --with-all-dependencies`, then the Node package
  * manager's install, then (as upstream) offers to clear the admin's Vite cache.
  *
  * PHP-only seams (upstream's tests mock modules instead): `setCodemodRunnerFactory()` and
@@ -288,21 +288,21 @@ final class Upgrader
         $currentUpstream = Constants::upstreamVersion($current->raw);
         $targetUpstream = Constants::upstreamVersion($this->target->raw);
 
-        // composer.json: strapi/* on the current version → the target version
+        // composer.json: hynding/strapi-php (and any strapi/*) on the current version → the target version
         $composer = JSONTransformAPI::createJSONTransformAPI($this->project->composerJSON ?? []);
         $require = self::record($composer->get('require', []));
         $requireDev = self::record($composer->get('require-dev', []));
 
-        $composerProduction = self::scoped($require, ProjectConstants::STRAPI_COMPOSER_PACKAGE_PREFIX, $current->raw);
-        $composerDevelopment = self::scoped($requireDev, ProjectConstants::STRAPI_COMPOSER_PACKAGE_PREFIX, $current->raw);
+        $composerProduction = self::scoped($require, ProjectConstants::isStrapiComposerPackage(...), $current->raw);
+        $composerDevelopment = self::scoped($requireDev, ProjectConstants::isStrapiComposerPackage(...), $current->raw);
 
         // package.json: @strapi/* on the current upstream release → the target's
         $package = JSONTransformAPI::createJSONTransformAPI($this->project->packageJSON);
         $dependencies = self::record($package->get('dependencies', []));
         $devDependencies = self::record($package->get('devDependencies', []));
 
-        $npmProduction = self::scoped($dependencies, ProjectConstants::SCOPED_STRAPI_PACKAGE_PREFIX, $currentUpstream);
-        $npmDevelopment = self::scoped($devDependencies, ProjectConstants::SCOPED_STRAPI_PACKAGE_PREFIX, $currentUpstream);
+        $npmProduction = self::scoped($dependencies, ProjectConstants::isScopedStrapiPackage(...), $currentUpstream);
+        $npmDevelopment = self::scoped($devDependencies, ProjectConstants::isScopedStrapiPackage(...), $currentUpstream);
         $npmChanged = $currentUpstream !== $targetUpstream;
 
         $strapiPackagesToUpgradeCount = count($composerProduction) + count($composerDevelopment) + ($npmChanged ? count($npmProduction) + count($npmDevelopment) : 0);
@@ -390,17 +390,18 @@ final class Upgrader
     }
 
     /**
-     * Find all packages with the prefix matching the current version.
+     * Find all Strapi packages (upstream: the `@strapi/` prefix) on the current version.
      *
      * @param array<string, string> $dependencies
+     * @param \Closure(string): bool $isStrapiPackage
      * @return list<string>
      */
-    private static function scoped(array $dependencies, string $prefix, string $currentVersion): array
+    private static function scoped(array $dependencies, \Closure $isStrapiPackage, string $currentVersion): array
     {
         $names = [];
         foreach ($dependencies as $name => $version) {
             $name = (string) $name;
-            if (str_starts_with($name, $prefix) && Semver::isValidSemVer($version) && $version === $currentVersion) {
+            if ($isStrapiPackage($name) && Semver::isValidSemVer($version) && $version === $currentVersion) {
                 $names[] = $name;
             }
         }
@@ -441,7 +442,7 @@ final class Upgrader
         $this->clearStrapiAdminViteCacheAfterUpgrade();
     }
 
-    /** the default installer: `composer update "strapi/*" -W`, or `<pm> install` */
+    /** the default installer: `composer update hynding/strapi-php "strapi/*" -W`, or `<pm> install` */
     private static function defaultInstaller(string $tool, string $cwd, Upgrader $upgrader): void
     {
         $logger = $upgrader->logger;
@@ -455,7 +456,7 @@ final class Upgrader
         $binary = getenv('COMPOSER_BINARY') ?: 'composer';
         $command = str_ends_with($binary, '.phar') ? [PHP_BINARY, $binary] : [$binary];
 
-        $process = new Process([...$command, 'update', ProjectConstants::STRAPI_COMPOSER_PACKAGE_PREFIX . '*', '--with-all-dependencies', '--no-interaction'], $cwd, null, null, null);
+        $process = new Process([...$command, 'update', ProjectConstants::STRAPI_COMPOSER_DEPENDENCY_NAME, ProjectConstants::STRAPI_COMPOSER_PACKAGE_PREFIX . '*', '--with-all-dependencies', '--no-interaction'], $cwd, null, null, null);
         $process->run(static function (string $type, string $buffer) use ($logger): void {
             $stream = $type === Process::ERR ? $logger?->stderr() : $logger?->stdout();
             if ($stream !== null) {

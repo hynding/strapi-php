@@ -64,7 +64,7 @@ final class UpgraderTest extends TestCase
 
             public function name(): string
             {
-                return 'strapi/strapi';
+                return 'hynding/strapi-php';
             }
 
             public function isLoaded(): bool
@@ -220,7 +220,7 @@ final class UpgraderTest extends TestCase
         $report = $upgrader->upgrade();
 
         self::assertTrue($report['success']);
-        self::assertSame('5.9.0', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.9.0', $this->composerJson()['require']['hynding/strapi-php']);
         self::assertSame('5.9.0', $this->composerJson()['require']['strapi/plugin-graphql']);
         self::assertSame('>=8.3', $this->composerJson()['require']['php']);
         self::assertSame('5.9.0', $this->packageJson()['dependencies']['@strapi/strapi']);
@@ -234,7 +234,7 @@ final class UpgraderTest extends TestCase
 
         $this->prepare(Upgrader::upgraderFactory($project, new NodeSemVer('5.9.0'), self::npmPackageStub()))->upgrade();
 
-        self::assertSame('5.9.0', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.9.0', $this->composerJson()['require']['hynding/strapi-php']);
         self::assertSame('5.8.0', $this->composerJson()['require']['strapi/provider-upload-aws-s3']);
         self::assertSame('5.8.0', $this->packageJson()['dependencies']['@strapi/plugin-users-permissions']);
     }
@@ -246,7 +246,7 @@ final class UpgraderTest extends TestCase
 
         $this->prepare(Upgrader::upgraderFactory($project, new NodeSemVer('5.56.0'), self::npmPackageStub()))->upgrade();
 
-        self::assertSame('5.56.0', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.56.0', $this->composerJson()['require']['hynding/strapi-php']);
         self::assertSame($before, file_get_contents("{$this->cwd}/package.json"));
     }
 
@@ -256,7 +256,7 @@ final class UpgraderTest extends TestCase
 
         $this->prepare(Upgrader::upgraderFactory($project, new NodeSemVer('5.57.0-beta.1'), self::npmPackageStub()))->upgrade();
 
-        self::assertSame('5.57.0-beta.1', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.57.0-beta.1', $this->composerJson()['require']['hynding/strapi-php']);
         self::assertSame('beta', $this->composerJson()['minimum-stability']);
         self::assertTrue($this->composerJson()['prefer-stable']);
         self::assertSame('5.57.0', $this->packageJson()['dependencies']['@strapi/admin']);
@@ -325,7 +325,7 @@ final class UpgraderTest extends TestCase
 
         self::assertFalse($report['success']);
         self::assertStringContainsString('Working tree is dirty', $report['error']->getMessage());
-        self::assertSame('5.8.1', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.8.1', $this->composerJson()['require']['hynding/strapi-php']);
     }
 
     public function testOptionalRequirements(): void
@@ -344,7 +344,7 @@ final class UpgraderTest extends TestCase
         $report = $this->prepare(Upgrader::upgraderFactory($project, new NodeSemVer('5.9.0'), self::npmPackageStub()))
             ->addRequirement($failing)->onConfirm(static fn (): bool => true)->upgrade();
         self::assertTrue($report['success']);
-        self::assertSame('5.9.0', $this->composerJson()['require']['strapi/strapi']);
+        self::assertSame('5.9.0', $this->composerJson()['require']['hynding/strapi-php']);
     }
 
     public function testAdminViteCacheIsRemovedOnlyWhenConfirmed(): void

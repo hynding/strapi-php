@@ -14,7 +14,8 @@ use Strapi\Utils\Primitives\Strings;
  * npm packages become Composer packages: an installed plugin is a package in `vendor/composer/installed.json`
  * whose `composer.json` has `extra.strapi.kind = "plugin"`; `extra.strapi.name` is the plugin name and
  * `extra.strapi.server` (default `strapi-server.php`) its server entry file. Internal plugins are the
- * `strapi/plugin-*` packages listed in INTERNAL_PLUGINS when they are installed.
+ * `strapi/plugin-*` packages listed in INTERNAL_PLUGINS when they are installed. The `strapi/*` packages
+ * inside the published bundle (`hynding/strapi-php`) count as installed: see `bundledPackages()`.
  *
  * @phpstan-type PluginMeta array{enabled: bool, pathToPlugin?: string, info: array<string, mixed>, packageInfo?: array<string, mixed>}
  */
@@ -104,6 +105,7 @@ final class GetEnabledPlugins
             }
             $decoded = json_decode((string) file_get_contents($file), true);
             $list = is_array($decoded) ? ($decoded['packages'] ?? $decoded) : [];
+            $bundles = [];
             foreach ($list as $package) {
                 if (!is_array($package) || !isset($package['name'])) {
                     continue;
@@ -114,10 +116,57 @@ final class GetEnabledPlugins
                     continue;
                 }
                 $packages[$package['name']] ??= ['path' => $path, 'info' => $package];
+                $bundles[] = [$path, $package];
+            }
+
+            // the root package is not in installed.json (the strapi-php monorepo itself)
+            $rootComposer = dirname($vendorDir) . '/composer.json';
+            $rootInfo = is_file($rootComposer) ? json_decode((string) file_get_contents($rootComposer), true) : null;
+            if (is_array($rootInfo)) {
+                $bundles[] = [dirname($vendorDir), $rootInfo];
+            }
+
+            foreach ($bundles as [$path, $info]) {
+                foreach (self::bundledPackages($path, $info) as $name => $bundled) {
+                    $packages[$name] ??= $bundled;
+                }
             }
         }
 
         return $cache[$root] = $packages;
+    }
+
+    /**
+     * PHP-only: strapi-php is published as one Composer package (`hynding/strapi-php`) whose
+     * `replace` lists every `strapi/*` package it contains, each in `packages/<group>/<name>`.
+     * Composer installs it as a single package, so the plugins and providers inside are found
+     * here, as if each `strapi/*` package had been installed on its own.
+     *
+     * @param array<array-key, mixed> $info the package's composer.json / installed.json entry
+     * @return array<string, array{path: string, info: array<string, mixed>}>
+     */
+    public static function bundledPackages(string $path, array $info): array
+    {
+        $replace = $info['replace'] ?? null;
+        if (!is_array($replace) || $replace === [] || !is_dir($path . '/packages')) {
+            return [];
+        }
+
+        $bundled = [];
+        foreach (glob($path . '/packages/*/*/composer.json') ?: [] as $file) {
+            $composer = json_decode((string) file_get_contents($file), true);
+            $name = is_array($composer) ? ($composer['name'] ?? null) : null;
+            if (!is_string($name) || !array_key_exists($name, $replace)) {
+                continue;
+            }
+            $packagePath = realpath(dirname($file));
+            if ($packagePath !== false) {
+                /** @var array<string, mixed> $composer */
+                $bundled[$name] = ['path' => $packagePath, 'info' => $composer];
+            }
+        }
+
+        return $bundled;
     }
 
     /** @return array{path: string, info: array<string, mixed>}|null */
