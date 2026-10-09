@@ -1,8 +1,12 @@
-name: Split packages
+name: Publish create-strapi-app
 
-# Pushes each packages/*/* directory to its own read-only repository so Packagist can
-# serve strapi/<name> independently. Requires a SPLIT_TOKEN secret with repo scope and one
-# repository per package under the target organization.
+# strapi-php is published as one Composer package, hynding/strapi-php (the repository root,
+# which `replace`s every strapi/* package). The project generator is the exception:
+# `composer create-project` uses a package's root as the new project, so
+# hynding/create-strapi-app needs a repository of its own. This pushes packages/cli/create-strapi-app
+# to the read-only repository strapi-php-create-strapi-app on every release tag.
+#
+# Requires a SPLIT_TOKEN secret with repo scope and the target repository to exist.
 
 on:
   push:
@@ -12,35 +16,6 @@ on:
 jobs:
   split:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - { path: packages/core/types, repo: types }
-          - { path: packages/core/utils, repo: utils }
-          - { path: packages/utils/logger, repo: logger }
-          - { path: packages/core/permissions, repo: permissions }
-          - { path: packages/core/database, repo: database }
-          - { path: packages/core/core, repo: core }
-          - { path: packages/core/strapi, repo: strapi }
-          - { path: packages/core/admin, repo: admin }
-          - { path: packages/core/content-manager, repo: content-manager }
-          - { path: packages/core/content-type-builder, repo: content-type-builder }
-          - { path: packages/core/upload, repo: upload }
-          - { path: packages/core/email, repo: email }
-          - { path: packages/plugins/i18n, repo: i18n }
-          - { path: packages/plugins/users-permissions, repo: plugin-users-permissions }
-          - { path: packages/providers/upload-local, repo: provider-upload-local }
-          - { path: packages/providers/upload-aws-s3, repo: provider-upload-aws-s3 }
-          - { path: packages/providers/upload-cloudinary, repo: provider-upload-cloudinary }
-          - { path: packages/providers/email-sendmail, repo: provider-email-sendmail }
-          - { path: packages/providers/email-nodemailer, repo: provider-email-nodemailer }
-          - { path: packages/providers/email-amazon-ses, repo: provider-email-amazon-ses }
-          - { path: packages/providers/email-mailgun, repo: provider-email-mailgun }
-          - { path: packages/providers/email-sendgrid, repo: provider-email-sendgrid }
-          - { path: packages/utils/upgrade, repo: upgrade }
-          - { path: packages/cli/create-strapi-app, repo: create-strapi-app }
-          - { path: packages/cli/create-strapi, repo: create-strapi }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,9 +23,9 @@ jobs:
       - uses: symplify/monorepo-split-github-action@v2.3.0
         with:
           tag: ${{ github.ref_name }}
-          package_directory: ${{ matrix.package.path }}
+          package_directory: packages/cli/create-strapi-app
           repository_organization: ${{ github.repository_owner }}
-          repository_name: strapi-php-${{ matrix.package.repo }}
+          repository_name: strapi-php-create-strapi-app
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
         env:

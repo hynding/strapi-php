@@ -1,6 +1,6 @@
 {
-    "name": "strapi/create-strapi",
-    "description": "Generate a new Strapi application: `composer create-project strapi/create-strapi my-project` (port of create-strapi, an alias of strapi/create-strapi-app)",
+    "name": "hynding/create-strapi",
+    "description": "Generate a new Strapi application: `composer create-project hynding/create-strapi my-project` (port of create-strapi, an alias of hynding/create-strapi-app)",
     "type": "library",
     "keywords": [
         "create-strapi",
@@ -14,7 +14,7 @@
     "homepage": "https://github.com/hynding/strapi-php",
     "require": {
         "php": ">=8.3",
-        "strapi/create-strapi-app": "self.version"
+        "hynding/create-strapi-app": "self.version"
     },
     "extra": {
         "strapi": {
@@ -29,6 +29,6 @@
         "bin/create-strapi"
     ],
     "scripts": {
-        "post-create-project-cmd": "@php vendor/strapi/create-strapi-app/bin/create-strapi-app --in-place"
+        "post-create-project-cmd": "@php vendor/hynding/create-strapi-app/bin/create-strapi-app --in-place"
     }
 }

@@ -17,7 +17,7 @@ driven through symfony/process.
 ## Usage
 
 ```sh
-composer require strapi/strapi            # pulls strapi/core, database, utils...
+composer require hynding/strapi-php       # strapi-php in one package (this CLI, core, database, plugins...)
 php vendor/bin/strapi routes:list         # or a project-local bin/strapi delegating to Strapi\Cli\Cli\Cli::run($root)
 php bin/strapi start                      # built-in web server on server.host:server.port
 php bin/strapi build                      # admin panel with the upstream Node toolchain

@@ -19,7 +19,7 @@ final class UpgradeTest extends TestCase
     private function source(string ...$phpVersions): StrapiPackage
     {
         [$logger] = self::memoryLogger();
-        $composer = new PackagistPackage('strapi/strapi', '/x', $logger, static fn (): array => ['ok' => true, 'status' => 200, 'body' => PackagistPackageTest::p2(...$phpVersions)]);
+        $composer = new PackagistPackage('hynding/strapi-php', '/x', $logger, static fn (): array => ['ok' => true, 'status' => 200, 'body' => PackagistPackageTest::p2(...$phpVersions)]);
         $npm = new NpmPackage('@strapi/strapi', '/x', $logger, [
             'fetch' => static fn (): array => ['ok' => true, 'status' => 200, 'body' => (string) json_encode(['versions' => ['5.56.0' => ['version' => '5.56.0'], '5.57.0' => ['version' => '5.57.0'], '6.0.0' => ['version' => '6.0.0']]])],
             'getPreferred' => static fn (): ?string => null,
@@ -39,7 +39,7 @@ final class UpgradeTest extends TestCase
         $log = self::read($out) . self::read($err);
         self::assertStringContainsString('Upgrading from v5.56.0-beta.1 to v5.56.0', $log);
         self::assertStringContainsString('(4/4) Installing dependencies...', $log);
-        self::assertStringContainsString('- strapi/strapi (5.56.0-beta.1 -> 5.56.0)', $log);
+        self::assertStringContainsString('- hynding/strapi-php (5.56.0-beta.1 -> 5.56.0)', $log);
         self::assertMatchesRegularExpression('/Completed in \d+\.\d{3}s/', $log);
         self::assertSame($before, [file_get_contents("{$cwd}/composer.json"), file_get_contents("{$cwd}/package.json")]);
     }

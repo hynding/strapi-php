@@ -107,7 +107,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * A strapi-php application: composer.json requiring strapi/strapi, package.json pinning the
+     * A strapi-php application: composer.json requiring hynding/strapi-php, package.json pinning the
      * upstream admin packages.
      *
      * @param array<string, string> $require
@@ -120,7 +120,7 @@ abstract class TestCase extends BaseTestCase
         $npmVersion ??= preg_replace('/^(\d+\.\d+\.\d+).*$/', '$1', $phpVersion);
 
         return [
-            'composer.json' => json_encode(['name' => 'acme/app', 'require' => ['php' => '>=8.3', 'strapi/strapi' => $phpVersion, ...$require]], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n",
+            'composer.json' => json_encode(['name' => 'acme/app', 'require' => ['php' => '>=8.3', 'hynding/strapi-php' => $phpVersion, ...$require]], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n",
             'package.json' => json_encode(['name' => 'app', 'version' => '0.1.0', 'dependencies' => ['@strapi/admin' => $npmVersion, '@strapi/strapi' => $npmVersion, ...$dependencies]], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n",
             ...$extra,
         ];

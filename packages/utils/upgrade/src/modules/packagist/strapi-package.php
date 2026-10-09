@@ -13,7 +13,7 @@ use Strapi\Upgrade\Modules\Version\NodeSemver\SemVer as NodeSemVer;
 
 /**
  * PHP-only: the upgrade targets of a strapi-php project. A version is a target when
- * `strapi/strapi` has it on Packagist *and* the upstream release it mirrors (`5.57.0-beta.1` →
+ * `hynding/strapi-php` has it on Packagist *and* the upstream release it mirrors (`5.57.0-beta.1` →
  * `5.57.0`, VERSIONING.md) is published as `@strapi/strapi` on npm — the admin bundle the
  * project's package.json will be pinned to has to exist. Each version entry is the Composer
  * manifest plus `upstream`.

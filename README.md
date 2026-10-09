@@ -6,7 +6,23 @@ file names, same REST and admin API, same database schema. The React admin panel
 rewritten — a project installs the upstream `@strapi/admin` npm bundle and this backend
 serves it.
 
+## Install
+
+strapi-php is one Composer package, `hynding/strapi-php`. It holds every package in this
+repository and `replace`s their `strapi/*` names, so a plugin that requires `strapi/core` is
+satisfied by it:
+
+```sh
+composer create-project hynding/create-strapi-app my-project   # a new project (vanilla or --example)
+composer require hynding/strapi-php                            # or add it to an existing one
+```
+
+During a beta add `--stability=beta` to `create-project` (see `VERSIONING.md`).
+
 ## Status
+
+The package column is each part's name inside `hynding/strapi-php` (the directory under
+`packages/` it lives in mirrors upstream's).
 
 | Area | Package | State |
 | --- | --- | --- |
@@ -28,7 +44,7 @@ serves it.
 | Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers through `strapi transfer:serve`) | `strapi/data-transfer` | ported; 3/3 (+ admin push security 3/3) |
 | OpenAPI generator and the documentation plugin (Swagger UI) | `strapi/openapi`, `strapi/plugin-documentation` | ported; documents identical to Node's for the same app |
 | `strapi generate`, sentry, color-picker | `strapi/generators`, `strapi/plugin-sentry`, `strapi/plugin-color-picker` | ported |
-| Project generator: `composer create-project strapi/create-strapi-app my-project` (same prompts and flags as `npx create-strapi-app`, vanilla and example templates in PHP, fresh `.env` secrets, `composer install` + npm install of the pinned admin bundle) | `strapi/create-strapi-app`, `strapi/create-strapi` | ported (Strapi Cloud login not ported); 44 tests |
+| Project generator: `composer create-project hynding/create-strapi-app my-project` (same prompts and flags as `npx create-strapi-app`, vanilla and example templates in PHP, fresh `.env` secrets, `composer install` + npm install of the pinned admin bundle) | `hynding/create-strapi-app` (published on its own) | ported (Strapi Cloud login not ported); 44 tests |
 | Upgrade tool `strapi-upgrade` (upstream's `npx @strapi/upgrade` commands; composer.json and package.json upgraded in lockstep; PHP codemods, upstream's JS codemods via npx) | `strapi/upgrade` | ported; 186 tests |
 | content-releases, review-workflows | | not ported: the whole packages are Enterprise-licensed |
 
@@ -93,7 +109,7 @@ for running the test suites against a real server.
 ## Layout
 
 ```
-packages/core/*        ↔ strapi/strapi packages/core/*      (one Composer package each)
+packages/core/*        ↔ strapi/strapi packages/core/*      (each a strapi/* package; published together)
 packages/plugins/*     ↔ packages/plugins/*
 packages/providers/*   ↔ packages/providers/*
 examples/getstarted    ↔ examples/getstarted (PHP edition)
@@ -111,6 +127,7 @@ naming rules and `VERSIONING.md` for how releases track upstream.
 composer test            # phpunit, all suites
 composer analyse         # phpstan level 8
 composer version:check   # every package at the same version
+composer bundle:check    # root composer.json (hynding/strapi-php) in sync with packages/*
 composer parity          # regenerate parity.json (needs ../strapi checkout)
 ```
 

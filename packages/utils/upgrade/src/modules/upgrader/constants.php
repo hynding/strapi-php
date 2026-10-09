@@ -14,7 +14,8 @@ final class Constants
 {
     public const STRAPI_PACKAGE_NAME = '@strapi/strapi';
 
-    public const STRAPI_COMPOSER_PACKAGE_NAME = 'strapi/strapi';
+    /** the Packagist package whose versions are the upgrade targets */
+    public const STRAPI_COMPOSER_PACKAGE_NAME = 'hynding/strapi-php';
 
     public const UPGRADE_NPM_PACKAGE_NAME = '@strapi/upgrade';
 

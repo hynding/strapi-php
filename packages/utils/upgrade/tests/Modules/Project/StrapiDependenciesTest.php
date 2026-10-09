@@ -49,9 +49,9 @@ final class StrapiDependenciesTest extends TestCase
 
     public function testFindUnpinnedComposerStrapiDependencies(): void
     {
-        $unpinned = StrapiDependencies::findUnpinnedComposerStrapiDependencies(['php' => '>=8.3', 'strapi/strapi' => '^5.56', 'strapi/plugin-graphql' => '5.56.0-beta.1'], null);
+        $unpinned = StrapiDependencies::findUnpinnedComposerStrapiDependencies(['php' => '>=8.3', 'hynding/strapi-php' => '^5.56', 'strapi/plugin-graphql' => '5.56.0-beta.1'], null);
 
-        self::assertSame([['name' => 'strapi/strapi', 'declaredVersion' => '^5.56', 'section' => 'require']], $unpinned);
+        self::assertSame([['name' => 'hynding/strapi-php', 'declaredVersion' => '^5.56', 'section' => 'require']], $unpinned);
     }
 
     public function testPinStrapiDependenciesPinsOnlyTheListedPackages(): void
@@ -72,15 +72,15 @@ final class StrapiDependenciesTest extends TestCase
 
     public function testPinComposerStrapiDependenciesKeepsEmptySectionsObjects(): void
     {
-        $updated = StrapiDependencies::pinComposerStrapiDependencies(['require' => ['strapi/strapi' => '^5.56']], '5.56.0', [['name' => 'strapi/strapi', 'declaredVersion' => '^5.56', 'section' => 'require']]);
+        $updated = StrapiDependencies::pinComposerStrapiDependencies(['require' => ['hynding/strapi-php' => '^5.56']], '5.56.0', [['name' => 'hynding/strapi-php', 'declaredVersion' => '^5.56', 'section' => 'require']]);
 
-        self::assertSame(['strapi/strapi' => '5.56.0'], $updated['require']);
+        self::assertSame(['hynding/strapi-php' => '5.56.0'], $updated['require']);
         self::assertEquals(new \stdClass(), $updated['require-dev']);
     }
 
     public function testGetStrapiPinTargetVersionUsesTheDeclaredFloor(): void
     {
-        $cwd = $this->volume(self::appTree('^4.26.1', extra: ['vendor' => ['composer' => ['installed.json' => '[{"name": "strapi/strapi", "version": "4.26.2"}]']]]));
+        $cwd = $this->volume(self::appTree('^4.26.1', extra: ['vendor' => ['composer' => ['installed.json' => '[{"name": "hynding/strapi-php", "version": "4.26.2"}]']]]));
         $project = new AppProject($cwd);
 
         self::assertSame('4.26.2', $project->strapiVersion->raw);

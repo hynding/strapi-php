@@ -12,29 +12,19 @@ use Strapi\CreateStrapiApp\Types;
  *
  * Versions follow VERSIONING.md: a stable `5.56.0` (or `5.56.0.1`) is required as `^5.56`; a
  * pre-release `5.57.0-beta.1` is required exactly and the project gets
- * `"minimum-stability": "beta", "prefer-stable": true` (rule 3: the strapi/* packages require each
- * other at `self.version`, which a root `@beta` flag does not reach).
+ * `"minimum-stability": "beta", "prefer-stable": true` (rule 3: a `@beta` flag on the requirement
+ * would not reach the stability of the package's own dependencies).
  *
  * @phpstan-import-type Scope from Types
  */
 final class ComposerJson
 {
     /**
-     * What upstream's `@strapi/strapi` npm package pulls in. strapi/strapi (the PHP CLI) requires
-     * only strapi/core, data-transfer and generators; the admin API and the internal plugins
-     * (`GetEnabledPlugins::INTERNAL_PLUGINS`, loaded when installed) are listed explicitly.
+     * What a project requires: strapi-php is published as one Composer package that `replace`s
+     * every `strapi/*` package (the CLI, the admin API, the internal plugins, the providers), the
+     * counterpart of upstream's `@strapi/strapi`.
      */
-    public const STRAPI_PACKAGES = [
-        'strapi/strapi',
-        'strapi/database',
-        'strapi/admin',
-        'strapi/content-manager',
-        'strapi/content-type-builder',
-        'strapi/upload',
-        'strapi/email',
-        'strapi/i18n',
-        'strapi/plugin-users-permissions',
-    ];
+    public const STRAPI_PACKAGES = ['hynding/strapi-php'];
 
     private const KEY_ORDER = [
         'name', 'description', 'type', 'keywords', 'homepage', 'license', 'authors', 'version',

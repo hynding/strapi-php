@@ -8,20 +8,21 @@ declare(strict_types=1);
  * current working directory: `php vendor/bin/strapi routes:list`.
  */
 $autoloads = [
-    __DIR__ . '/../../../../autoload.php', // installed in a project: vendor/strapi/strapi/bin → vendor/autoload.php
+    $GLOBALS['_composer_autoload_path'] ?? null, // run through vendor/bin/strapi (Composer 2.2+)
+    __DIR__ . '/../../../../../../autoload.php', // in the bundle: vendor/hynding/strapi-php/packages/core/strapi/bin → vendor/autoload.php
     __DIR__ . '/../../../../vendor/autoload.php', // monorepo: packages/core/strapi/bin → <root>/vendor/autoload.php
     __DIR__ . '/../vendor/autoload.php',
     getcwd() . '/vendor/autoload.php',
 ];
 foreach ($autoloads as $autoload) {
-    if (is_file($autoload)) {
+    if (is_string($autoload) && is_file($autoload)) {
         require $autoload;
         break;
     }
 }
 
 if (!class_exists(\Strapi\Cli\Cli\Cli::class)) {
-    fwrite(STDERR, "strapi/strapi is not installed. Run `composer install` first.\n");
+    fwrite(STDERR, "hynding/strapi-php is not installed. Run `composer install` first.\n");
     exit(1);
 }
 

@@ -87,13 +87,13 @@ final class StrapiDependencies
     {
         return self::findUnpinned(
             ['dependencies' => $dependencies, 'devDependencies' => $devDependencies],
-            Constants::SCOPED_STRAPI_PACKAGE_PREFIX,
+            Constants::isScopedStrapiPackage(...),
             self::isPinnedSemVer(...)
         );
     }
 
     /**
-     * PHP-only: `strapi/*` Composer requirements that aren't exact versions.
+     * PHP-only: strapi-php Composer requirements (`hynding/strapi-php`, `strapi/*`) that aren't exact versions.
      *
      * @param array<string, string>|null $require
      * @param array<string, string>|null $requireDev
@@ -103,17 +103,18 @@ final class StrapiDependencies
     {
         return self::findUnpinned(
             ['require' => $require, 'require-dev' => $requireDev],
-            Constants::STRAPI_COMPOSER_PACKAGE_PREFIX,
+            Constants::isStrapiComposerPackage(...),
             self::isPinnedComposerVersion(...)
         );
     }
 
     /**
      * @param array<StrapiDependencySection, array<string, string>|null> $sections
+     * @param \Closure(string): bool $isStrapiPackage
      * @param \Closure(string): bool $isPinned
      * @return list<UnpinnedStrapiDependency>
      */
-    private static function findUnpinned(array $sections, string $prefix, \Closure $isPinned): array
+    private static function findUnpinned(array $sections, \Closure $isStrapiPackage, \Closure $isPinned): array
     {
         $unpinned = [];
 
@@ -124,7 +125,7 @@ final class StrapiDependencies
 
             foreach ($deps as $name => $version) {
                 $name = (string) $name;
-                if (str_starts_with($name, $prefix) && !$isPinned($version)) {
+                if ($isStrapiPackage($name) && !$isPinned($version)) {
                     $unpinned[] = ['name' => $name, 'declaredVersion' => $version, 'section' => $section];
                 }
             }
@@ -134,7 +135,7 @@ final class StrapiDependencies
     }
 
     /**
-     * The version to pin to: the declared `strapi/strapi` version when exact, else the floor of
+     * The version to pin to: the declared `hynding/strapi-php` version when exact, else the floor of
      * its constraint, else the installed version.
      */
     public static function getStrapiPinTargetVersion(AppProject $project): NodeSemVer

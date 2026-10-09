@@ -1,88 +1,111 @@
 {
-    "name": "strapi/strapi-monorepo",
-    "description": "PHP 8.3 port of Strapi \u2014 monorepo root",
-    "type": "project",
+    "name": "hynding/strapi-php",
+    "description": "Strapi 5 in PHP 8.3+: the headless CMS backend, its plugins and providers in one package (serves the upstream @strapi/admin panel)",
+    "type": "library",
+    "keywords": [
+        "strapi",
+        "cms",
+        "headless-cms",
+        "api",
+        "rest",
+        "graphql",
+        "php"
+    ],
+    "homepage": "https://github.com/hynding/strapi-php",
     "license": "MIT",
+    "version": "5.56.0-beta.1",
     "require": {
         "php": ">=8.3",
-        "strapi/strapi": "self.version",
-        "strapi/core": "self.version",
-        "strapi/database": "self.version",
-        "strapi/utils": "self.version",
-        "strapi/types": "self.version",
-        "strapi/permissions": "self.version",
-        "strapi/logger": "self.version",
+        "doctrine/dbal": "^4.2",
+        "dragonmantank/cron-expression": "^3.4",
+        "monolog/monolog": "^3.8",
+        "nikic/fast-route": "^1.3",
+        "nikic/php-parser": "^5.0",
+        "nyholm/psr7": "^1.8",
+        "nyholm/psr7-server": "^1.1",
+        "psr/http-message": "^2.0",
+        "psr/http-server-middleware": "^1.0",
+        "psr/log": "^3.0",
+        "symfony/console": "^7.2",
+        "symfony/mailer": "^7.2",
+        "symfony/process": "^7.2",
+        "symfony/yaml": "^7.2",
+        "vlucas/phpdotenv": "^5.6",
+        "webonyx/graphql-php": "^15.19"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5"
+    },
+    "replace": {
         "strapi/admin": "self.version",
         "strapi/content-manager": "self.version",
         "strapi/content-type-builder": "self.version",
-        "strapi/upload": "self.version",
-        "strapi/i18n": "self.version",
-        "strapi/plugin-users-permissions": "self.version",
-        "strapi/email": "self.version",
+        "strapi/core": "self.version",
         "strapi/data-transfer": "self.version",
-        "strapi/openapi": "self.version",
+        "strapi/database": "self.version",
+        "strapi/email": "self.version",
         "strapi/generators": "self.version",
-        "strapi/plugin-graphql": "self.version",
-        "strapi/plugin-documentation": "self.version",
-        "strapi/plugin-sentry": "self.version",
+        "strapi/i18n": "self.version",
+        "strapi/logger": "self.version",
+        "strapi/openapi": "self.version",
+        "strapi/permissions": "self.version",
         "strapi/plugin-color-picker": "self.version",
-        "strapi/provider-upload-local": "self.version"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^11.5",
-        "phpstan/phpstan": "^2.1",
-        "strapi/api-tests": "self.version",
+        "strapi/plugin-documentation": "self.version",
+        "strapi/plugin-graphql": "self.version",
+        "strapi/plugin-sentry": "self.version",
+        "strapi/plugin-users-permissions": "self.version",
         "strapi/provider-email-amazon-ses": "self.version",
         "strapi/provider-email-mailgun": "self.version",
         "strapi/provider-email-nodemailer": "self.version",
         "strapi/provider-email-sendgrid": "self.version",
+        "strapi/provider-email-sendmail": "self.version",
         "strapi/provider-upload-aws-s3": "self.version",
-        "strapi/provider-upload-cloudinary": "self.version"
+        "strapi/provider-upload-cloudinary": "self.version",
+        "strapi/provider-upload-local": "self.version",
+        "strapi/strapi": "self.version",
+        "strapi/types": "self.version",
+        "strapi/upgrade": "self.version",
+        "strapi/upload": "self.version",
+        "strapi/utils": "self.version"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "packages/core/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/plugins/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/providers/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/utils/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/generators/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/cli/*",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
+    "autoload": {
+        "classmap": [
+            "packages/core/admin/server/src/",
+            "packages/core/admin/shared/",
+            "packages/core/content-manager/server/src/",
+            "packages/core/content-type-builder/server/src/",
+            "packages/core/core/src/",
+            "packages/core/data-transfer/src/",
+            "packages/core/database/src/",
+            "packages/core/email/server/src/",
+            "packages/core/email/shared/",
+            "packages/core/openapi/src/",
+            "packages/core/permissions/src/",
+            "packages/core/strapi/src/",
+            "packages/core/types/src/",
+            "packages/core/upload/server/src/",
+            "packages/core/upload/shared/",
+            "packages/core/utils/src/",
+            "packages/generators/generators/src/",
+            "packages/plugins/color-picker/server/src/",
+            "packages/plugins/documentation/server/src/",
+            "packages/plugins/graphql/server/src/",
+            "packages/plugins/i18n/server/src/",
+            "packages/plugins/sentry/server/src/",
+            "packages/plugins/users-permissions/server/src/",
+            "packages/providers/email-amazon-ses/src/",
+            "packages/providers/email-mailgun/src/",
+            "packages/providers/email-nodemailer/src/",
+            "packages/providers/email-sendgrid/src/",
+            "packages/providers/email-sendmail/src/",
+            "packages/providers/upload-aws-s3/src/",
+            "packages/providers/upload-cloudinary/src/",
+            "packages/providers/upload-local/src/",
+            "packages/utils/logger/src/",
+            "packages/utils/upgrade/src/"
+        ]
+    },
     "autoload-dev": {
         "psr-4": {
             "Strapi\\Tests\\": "tests/php/",
@@ -101,11 +124,14 @@
         },
         "classmap": [
             "examples/plugins/announcements/server/src/",
-            "packages/core/email/shared/",
-            "packages/utils/upgrade/src/",
-            "packages/cli/create-strapi-app/src/"
+            "packages/cli/create-strapi-app/src/",
+            "packages/utils/api-tests/src/"
         ]
     },
+    "bin": [
+        "packages/core/strapi/bin/strapi",
+        "packages/utils/upgrade/bin/strapi-upgrade"
+    ],
     "scripts": {
         "test": "phpunit",
         "analyse": "phpstan analyse --memory-limit=1G",
@@ -113,7 +139,9 @@
         "lint:fix": "php-cs-fixer fix",
         "version:check": "php scripts/check-package-versions.php",
         "version:fix": "php scripts/check-package-versions.php --fix",
-        "parity": "php scripts/parity-map.php"
+        "parity": "php scripts/parity-map.php",
+        "bundle:check": "php scripts/sync-root-composer.php",
+        "bundle:fix": "php scripts/sync-root-composer.php --fix"
     },
     "config": {
         "sort-packages": true,
@@ -121,6 +149,5 @@
         "allow-plugins": false
     },
     "minimum-stability": "beta",
-    "prefer-stable": true,
-    "version": "5.56.0-beta.1"
+    "prefer-stable": true
 }

@@ -81,13 +81,12 @@ final class CreateStrapiAppTest extends TestCase
 
         $composer = self::json("{$root}/composer.json");
         $version = CreateStrapiApp::version();
-        foreach (['strapi/strapi', 'strapi/admin', 'strapi/content-manager', 'strapi/content-type-builder', 'strapi/upload', 'strapi/email', 'strapi/i18n', 'strapi/plugin-users-permissions'] as $package) {
-            self::assertArrayHasKey($package, $composer['require']);
-        }
+        // strapi-php is one package (it replaces every strapi/* package)
+        self::assertSame(['php', 'ext-pdo_sqlite', 'hynding/strapi-php'], array_keys($composer['require']));
         self::assertSame('*', $composer['require']['ext-pdo_sqlite']);
         self::assertSame('@php bin/strapi develop', $composer['scripts']['develop']);
         if (str_contains($version, '-')) {
-            self::assertSame($version, $composer['require']['strapi/strapi']);
+            self::assertSame($version, $composer['require']['hynding/strapi-php']);
             self::assertSame('beta', $composer['minimum-stability']);
             self::assertTrue($composer['prefer-stable']);
         }
@@ -232,11 +231,11 @@ final class CreateStrapiAppTest extends TestCase
 
     public function testInPlaceReplacesTheBootstrapper(): void
     {
-        // what `composer create-project strapi/create-strapi-app my-project` leaves behind
+        // what `composer create-project hynding/create-strapi-app my-project` leaves behind
         $root = $this->dir . '/my-project';
         mkdir($root . '/src', 0777, true);
         mkdir($root . '/vendor/acme', 0777, true);
-        file_put_contents($root . '/composer.json', json_encode(['name' => 'strapi/create-strapi-app']));
+        file_put_contents($root . '/composer.json', json_encode(['name' => 'hynding/create-strapi-app']));
         file_put_contents($root . '/composer.lock', '{}');
         file_put_contents($root . '/src/index.php', '<?php // bootstrapper');
         file_put_contents($root . '/vendor/acme/kept.txt', 'kept');
@@ -249,7 +248,7 @@ final class CreateStrapiAppTest extends TestCase
         self::assertFileExists($root . '/vendor/acme/kept.txt');
         self::assertStringContainsString("'bootstrap'", (string) file_get_contents($root . '/src/index.php'));
         self::assertSame('my-project', self::json($root . '/package.json')['name']);
-        self::assertArrayHasKey('strapi/strapi', self::json($root . '/composer.json')['require']);
+        self::assertArrayHasKey('hynding/strapi-php', self::json($root . '/composer.json')['require']);
     }
 
     public function testInPlaceOnlyRunsInABootstrapperDirectory(): void

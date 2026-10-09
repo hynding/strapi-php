@@ -6,24 +6,25 @@ declare(strict_types=1);
 /**
  * `create-strapi-app` (port of packages/cli/create-strapi-app/bin/index.js).
  *
- *   composer create-project strapi/create-strapi-app my-project   # runs this with --in-place
- *   composer global require strapi/create-strapi-app && create-strapi-app my-project --quickstart
+ *   composer create-project hynding/create-strapi-app my-project   # runs this with --in-place
+ *   composer global require hynding/create-strapi-app && create-strapi-app my-project --quickstart
  *   php vendor/bin/create-strapi-app my-project
  */
 $autoloads = [
+    $GLOBALS['_composer_autoload_path'] ?? null, // run through vendor/bin/create-strapi-app (Composer 2.2+)
     __DIR__ . '/../vendor/autoload.php', // `composer create-project` / a clone of this package
-    __DIR__ . '/../../../autoload.php', // installed: vendor/strapi/create-strapi-app/bin → vendor/autoload.php
+    __DIR__ . '/../../../autoload.php', // installed: vendor/hynding/create-strapi-app/bin → vendor/autoload.php
     __DIR__ . '/../../../../vendor/autoload.php', // monorepo: packages/cli/create-strapi-app/bin
 ];
 foreach ($autoloads as $autoload) {
-    if (is_file($autoload)) {
+    if (is_string($autoload) && is_file($autoload)) {
         require $autoload;
         break;
     }
 }
 
 if (!class_exists(\Strapi\CreateStrapiApp\CreateStrapiApp::class)) {
-    fwrite(STDERR, "strapi/create-strapi-app is not installed. Run `composer install` first.\n");
+    fwrite(STDERR, "hynding/create-strapi-app is not installed. Run `composer install` first.\n");
     exit(1);
 }
 

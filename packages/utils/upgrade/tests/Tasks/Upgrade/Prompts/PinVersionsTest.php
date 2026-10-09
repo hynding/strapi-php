@@ -22,9 +22,9 @@ final class PinVersionsTest extends TestCase
     private function createProject(string $composerVersion, array $dependencies, array $devDependencies = []): AppProject
     {
         $this->cwd = $this->volume([
-            'composer.json' => (string) json_encode(['name' => 'acme/test-app', 'require' => ['strapi/strapi' => $composerVersion]]),
+            'composer.json' => (string) json_encode(['name' => 'acme/test-app', 'require' => ['hynding/strapi-php' => $composerVersion]]),
             'package.json' => (string) json_encode(['name' => 'test-app', 'version' => '0.1.0', 'dependencies' => $dependencies, ...($devDependencies !== [] ? ['devDependencies' => $devDependencies] : [])]),
-            'vendor' => ['composer' => ['installed.json' => '{"packages": [{"name": "strapi/strapi", "version": "4.26.2"}]}']],
+            'vendor' => ['composer' => ['installed.json' => '{"packages": [{"name": "hynding/strapi-php", "version": "4.26.2"}]}']],
         ]);
 
         return new AppProject($this->cwd);
@@ -56,7 +56,7 @@ final class PinVersionsTest extends TestCase
         $packageJSON = self::readJson("{$this->cwd}/package.json");
         self::assertSame('4.26.1', $packageJSON['dependencies']['@strapi/strapi']);
         self::assertSame('4.26.1', $packageJSON['devDependencies']['@strapi/types']);
-        self::assertSame('4.26.1', self::readJson("{$this->cwd}/composer.json")['require']['strapi/strapi']);
+        self::assertSame('4.26.1', self::readJson("{$this->cwd}/composer.json")['require']['hynding/strapi-php']);
         self::assertSame('4.26.1', $project->strapiVersion->raw);
     }
 
@@ -68,7 +68,7 @@ final class PinVersionsTest extends TestCase
         PinVersions::pinVersions($project, ['logger' => $logger, 'target' => Types::MINOR]);
 
         self::assertSame('5.56.0', self::readJson("{$this->cwd}/package.json")['dependencies']['@strapi/admin']);
-        self::assertSame('5.56.0-beta.1', self::readJson("{$this->cwd}/composer.json")['require']['strapi/strapi']);
+        self::assertSame('5.56.0-beta.1', self::readJson("{$this->cwd}/composer.json")['require']['hynding/strapi-php']);
     }
 
     public function testAbortsWhenTheUserDeclinesPinning(): void
@@ -88,7 +88,7 @@ final class PinVersionsTest extends TestCase
         PinVersions::pinVersions($project, ['logger' => $logger, 'target' => Types::MINOR, 'confirm' => static fn (): bool => true, 'dry' => true]);
 
         self::assertSame('^4.26.1', self::readJson("{$this->cwd}/package.json")['dependencies']['@strapi/strapi']);
-        self::assertSame('^4.26.1', self::readJson("{$this->cwd}/composer.json")['require']['strapi/strapi']);
+        self::assertSame('^4.26.1', self::readJson("{$this->cwd}/composer.json")['require']['hynding/strapi-php']);
         self::assertSame('4.26.1', $project->strapiVersion->raw);
         self::assertSame('4.26.1', $project->packageJSON['dependencies']['@strapi/strapi']);
     }
