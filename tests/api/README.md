@@ -14,6 +14,24 @@ npm run jest -- .upstream/tests/api/core/admin -t 'login'   # Jest filters work 
 Environment: `STRAPI_UPSTREAM` (use an existing checkout), `FRANKENPHP_BIN` (an existing
 binary), `STRAPI_API_TESTS_TMP` (scratch dir, default `.tmp/`; give concurrent runs separate ones).
 
+## Whole-suite runs
+
+```sh
+npm test                                   # every directory except the Enterprise ones, 2 lanes (~35 min)
+npm test -- core/admin plugins/i18n        # some directories or files (relative to upstream's tests/api)
+npm test -- --name before-fix --lanes 3    # name the run (default: a timestamp)
+npm test -- --compare before-fix           # compare with that run (default: the previous one)
+node scripts/summary.js <run> --failures   # every failing test of a run, grouped by file
+node scripts/summary.js <run> --compare <other>
+```
+
+`scripts/run.js` gives each directory its own Jest process and scratch dir, so lanes never share
+an app or a database, and each test file still starts from a fresh database. Reports and logs go
+to `.results/<run>/` (`<dir>.json` is Jest's JSON report, `<dir>.log` its output); the latest
+run's apps, with their FrankenPHP logs, stay in `.tmp/runs/<run>/`. The summary counts
+passed / (passed + failed), leaving out upstream's skipped and todo tests, as the README's status
+table does.
+
 ## How it works
 
 - `app/` is create-strapi-app's vanilla template, PHP edition. Each run copies it to `.tmp/app`

@@ -53,7 +53,7 @@ scripts/parity-map.php` regenerates it.
 
 The numbers are upstream's own Jest API suite (`tests/api`, see its README) run unmodified
 against the PHP app, one package directory at a time, each test file on a fresh database:
-3,132 of 3,325 across all directories, `tests/api/core/strapi` (core's REST, document
+3,183 of 3,389 across all directories (`cd tests/api && npm test`), `tests/api/core/strapi` (core's REST, document
 service, relations, validation) at 1372/1497. What still fails is mostly Enterprise
 features and tests that replace functions inside the server from the Jest process, which
 can't cross into PHP.
