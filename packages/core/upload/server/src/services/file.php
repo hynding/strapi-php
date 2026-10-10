@@ -14,8 +14,8 @@ use Strapi\Utils\File as FileUtils;
 /**
  * Port of server/src/services/file.ts.
  *
- * `fetchUrlToInputFile` streams the response to disk with PHP's HTTP stream wrapper (honoring
- * `server.proxy.fetch` / `server.proxy.global` as `strapi.fetch` does) instead of `fetch()`.
+ * `fetchUrlToInputFile` streams the response to disk from `strapi.fetch()->open()`, the streaming
+ * twin of `strapi.fetch` (same proxy settings, same interception).
  *
  * @phpstan-type UrlFetchedFile array{filepath: string, originalFilename: string, mimetype: string, size: int, tmpWorkingDirectory?: string}
  * @phpstan-type UrlFetchProgress array{bytesWritten: int, totalBytes: int|null}
@@ -145,7 +145,8 @@ final class File
             throw new ApplicationError("URL resolves to a blocked address: {$url}");
         }
 
-        $handle = $this->open($url);
+        // use strapi.fetch so we can intercept requests and support proxy settings
+        $handle = $this->strapi->fetch()->open($url, ['timeout' => self::FETCH_TIMEOUT_MS / 1000]);
         $headers = $handle['headers'];
         $status = $handle['status'];
         $stream = $handle['stream'];
@@ -205,8 +206,9 @@ final class File
                             throw new ApplicationError('socket hang up');
                         }
                         if ($chunk === '') {
+                            // a buffered body (an intercepted `strapi.fetch`) has no `timed_out`
                             $meta = stream_get_meta_data($stream);
-                            if ($meta['timed_out']) {
+                            if (!empty($meta['timed_out'])) {
                                 throw new ApplicationError("Request timed out while fetching URL: {$url}");
                             }
                             continue;
@@ -278,89 +280,6 @@ final class File
         $ip = gethostbyname($hostname);
 
         return $ip !== $hostname ? $ip : null;
-    }
-
-    /**
-     * Opens the URL (following redirects) and reads the response head.
-     *
-     * @return array{stream: resource, status: int, statusText: string, headers: array<string, string>, url: string}
-     */
-    private function open(string $url)
-    {
-        $http = [
-            'method' => 'GET',
-            'timeout' => self::FETCH_TIMEOUT_MS / 1000,
-            'ignore_errors' => true,
-            'follow_location' => 1,
-            'max_redirects' => 20,
-        ];
-
-        // use the `strapi.fetch` proxy settings
-        $proxy = $this->strapi->config()->get('server.proxy.fetch') ?: $this->strapi->config()->get('server.proxy.global');
-        if (is_string($proxy) && $proxy !== '') {
-            $http['proxy'] = str_replace(['http://', 'https://'], 'tcp://', $proxy);
-            $http['request_fulluri'] = true;
-        }
-
-        $context = stream_context_create(['http' => $http, 'https' => $http]);
-        $stream = @fopen($url, 'rb', false, $context);
-        if ($stream === false) {
-            $error = error_get_last();
-            $message = $error['message'] ?? 'fetch failed';
-            if (str_contains($message, 'timed out')) {
-                throw new ApplicationError("Request timed out while fetching URL: {$url}");
-            }
-
-            throw new \RuntimeException('fetch failed: ' . preg_replace('/^fopen\([^)]*\): /', '', $message));
-        }
-
-        $meta = stream_get_meta_data($stream);
-        /** @var list<string> $lines */
-        $lines = is_array($meta['wrapper_data'] ?? null) ? $meta['wrapper_data'] : [];
-
-        $status = 0;
-        $statusText = '';
-        $headers = [];
-        $finalUrl = $url;
-        foreach ($lines as $line) {
-            if (preg_match('~^HTTP/\S+\s+(\d{3})\s*(.*)$~', $line, $m) === 1) {
-                $status = (int) $m[1];
-                $statusText = trim($m[2]);
-                $headers = [];
-                continue;
-            }
-            $pos = strpos($line, ':');
-            if ($pos !== false) {
-                $name = strtolower(trim(substr($line, 0, $pos)));
-                $value = trim(substr($line, $pos + 1));
-                $headers[$name] = $value;
-                if ($name === 'location' && $status >= 300 && $status < 400) {
-                    $finalUrl = self::resolveUrl($finalUrl, $value);
-                }
-            }
-        }
-
-        stream_set_timeout($stream, (int) (self::FETCH_TIMEOUT_MS / 1000));
-
-        return ['stream' => $stream, 'status' => $status, 'statusText' => $statusText, 'headers' => $headers, 'url' => $finalUrl];
-    }
-
-    private static function resolveUrl(string $base, string $location): string
-    {
-        if (preg_match('~^[a-z][a-z0-9+.-]*://~i', $location) === 1) {
-            return $location;
-        }
-        $parts = parse_url($base);
-        if (!is_array($parts) || !isset($parts['scheme'], $parts['host'])) {
-            return $location;
-        }
-        $origin = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
-        if (str_starts_with($location, '/')) {
-            return $origin . $location;
-        }
-        $dir = rtrim(dirname($parts['path'] ?? '/'), '/');
-
-        return "{$origin}{$dir}/{$location}";
     }
 
     public function getFolderPath(?int $folderId = null): string
