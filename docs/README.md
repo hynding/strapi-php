@@ -21,7 +21,7 @@ cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 
 Every non-Enterprise upstream package is ported (see the root README's table and
 `parity.json`). Upstream's API suite, run with `cd tests/api && npm test` (tests/api/README.md):
-3,351 of 3,403 tests pass (98.5%) at 5.56.0 (3,183 of 3,389 before the 2026-10 fixes below; three
+3,358 of 3,403 tests pass (98.7%) at 5.56.0 (3,183 of 3,389 before the 2026-10 fixes below; three
 suites that could not load now count).
 
 ## Open work
@@ -34,7 +34,7 @@ starting and after finishing (`/api-tests` in Claude Code).
   on packagist.org with their GitHub hooks (README "Install"; split.yml fills the second repo).
   Delete this item once done.
 
-**API suite failures (52 in the last full run; 9 since fixed, measured per suite), by cause**
+**API suite failures (45), by cause**
 1. **Test-process state the bridge cannot share (8).** The bridge now carries functions,
    zod schemas, transaction callbacks, synchronous calls from inside callbacks, knex, jest mocks
    on non-service objects and `withMockedFetch` (tests/api/README.md). What is left:
@@ -53,9 +53,9 @@ starting and after finishing (`/api-tests` in Claude Code).
    `mcp` 4), preview (2; its URL handler now reaches the worker, the feature itself is
    Enterprise) and the Content Releases actions in the admin permissions snapshot
    (`admin-permission`, 1). Leave unless the licensing decision changes.
-4. **Flaky, not bugs (1 in the last run):** `content-manager/api/basic-pagination` creates its rows
-   with parallel requests, so their order varies; `content-type-builder/schema` occasionally hits a
-   socket hang-up in a full run and passes alone.
+4. **Flaky, not bugs (3 in the last run):** `content-manager/api/basic-pagination` (2) creates its
+   rows with parallel requests, so their order varies; `content-type-builder/schema` (1)
+   occasionally hits a socket hang-up in a full run and passes alone.
 
 **Other gaps**
 - A JSON `{}` is read back as `{}` only for content `json` attributes (`api::` content types,
