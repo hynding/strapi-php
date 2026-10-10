@@ -82,6 +82,36 @@ const encodeArg = (value, hooks = null) => {
   return value;
 };
 
+/**
+ * knex's `schema.createTable(name, (t) => { ... })`: the table callback runs here against a
+ * recorder and the worker builds the table from its calls (Strapi\ApiTests\KnexSchema):
+ * `[{ method: 'integer', args: ['a'], chain: [['notNullable', []]] }, ...]`.
+ */
+const recordTable = (build) => {
+  const calls = [];
+  const table = new Proxy(
+    {},
+    {
+      get: (_, method) => (...args) => {
+        const call = { method, args, chain: [] };
+        calls.push(call);
+        const column = new Proxy(
+          {},
+          {
+            get: (__, modifier) => (...modifierArgs) => {
+              call.chain.push([modifier, modifierArgs]);
+              return column;
+            },
+          }
+        );
+        return column;
+      },
+    }
+  );
+  build(table);
+  return calls;
+};
+
 /** Whether an argument holds a function of this process (not a proxy), or a zod schema. */
 const holdsFunction = (value, seen = new Set()) => {
   if (!value || (typeof value !== 'object' && typeof value !== 'function') || value[CHAIN] || seen.has(value)) {
@@ -521,6 +551,9 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
               return middleware(ctx, (...rest) => next(...(rest.length > 0 ? rest : [ctx])));
             },
           ];
+        }
+        if (last && last.get === 'createTable' && prev && prev.get === 'schema' && typeof args[1] === 'function' && !args[1][CHAIN]) {
+          args = [args[0], recordTable(args[1])];
         }
         const callSteps = [...steps, { call: args.map(encode) }];
         // handing the instance a function (`strapi.eventHub.on(name, listener)`,

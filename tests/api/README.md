@@ -96,6 +96,12 @@ table does.
   test's zod (`Strapi\ApiTests\RemoteZod`), so transforms and defaults behave as upstream's; an
   object schema arrives as a PHP `z.object()` of such fields.
 
+- `strapi.db.connection` and `strapi.db.getConnection()` (knex upstream) are a knex-shaped facade
+  over the database's query builder (`Strapi\ApiTests\Knex`): `connection(table).where(...).first()`,
+  `getConnection().select('*').from(table)`, `connection.raw(sql)` (a SELECT's rows) and
+  `connection.schema.hasTable / dropTableIfExists / createTable(name, (t) => ...)`; the table
+  callback runs in the test process against a recorder and the worker builds the table from its calls.
+
 - A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)` and
   `strapi.dirs` (in `Core.StrapiDirectories`' shape) are answered synchronously;
   `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the

@@ -43,10 +43,11 @@ use Strapi\Utils\Errors\ApplicationError;
  *   is an `{"assign": {"prop", "methods", "values"}}` step: the property becomes a {@see RemoteObject}
  *   until a `{"restore": prop}` step puts the original back.
  *
- * - `strapi.db.getConnection()` (a knex instance upstream) is the database's knex-like
- *   {@see SqlBuilder} (`$db->sql()`), so `getConnection().from(t).where(...).update(...)` replays;
- *   awaiting a builder runs it. `strapi.db.connection(table)` (knex called with a table name) is
- *   that builder `from(table)`, wrapped in {@see KnexQuery} for knex's `select(a, b)`/`first()`.
+ * - `strapi.db.connection` and `strapi.db.getConnection()` (a knex instance upstream) are a
+ *   {@see Knex} over the database's knex-like {@see SqlBuilder}, so `getConnection().from(t).where(...).update(...)`,
+ *   `connection.raw(sql)` and `connection.schema.hasTable(t)` replay; awaiting a query runs it.
+ *   Called with a table name (`strapi.db.connection(table)`, `getConnection(table)`), it is a
+ *   {@see KnexQuery} on that table.
  *
  * Only enabled when the worker script mounts it (tests/api/app/public/index.php); never in an app.
  */
@@ -332,13 +333,15 @@ final class Bridge
             return $target->call($name, $args);
         }
 
-        if ($target instanceof Database && $name === 'getConnection' && $args === []) {
-            return $target->sql();
-        }
-
-        // `strapi.db.connection(table)`: knex called with a table name
-        if ($target instanceof Database && $name === 'connection' && count($args) === 1 && is_string($args[0])) {
-            return new KnexQuery($target->sql()->from($args[0]));
+        // knex, or knex called with a table name (`strapi.db.connection(table)`, `getConnection(table)`)
+        if ($target instanceof Database && ($name === 'getConnection' || $name === 'connection')) {
+            $knex = new Knex($target);
+            if ($args === []) {
+                return $knex;
+            }
+            if (count($args) === 1 && is_string($args[0])) {
+                return $knex($args[0]);
+            }
         }
 
         if (is_object($target) && method_exists($target, $name)) {
@@ -391,6 +394,10 @@ final class Bridge
         // `strapi.documents` read without a call is the factory (`strapi.documents.use(middleware)`)
         if ($target instanceof Strapi && $name === 'documents') {
             return $target->documentService();
+        }
+        // `strapi.db.connection` is knex
+        if ($target instanceof Database && $name === 'connection') {
+            return new Knex($target);
         }
         if (is_object($target)) {
             if (method_exists($target, $name)) {

@@ -7,9 +7,10 @@ namespace Strapi\ApiTests;
 use Strapi\Database\Query\SqlBuilder;
 
 /**
- * `strapi.db.connection(table)` in upstream tests: a knex query builder on `table`. Wraps the
- * database's knex-like {@see SqlBuilder} with the knex spellings it lacks (`select('a', 'b')`,
- * `first()`, `del()`); awaiting the chain runs it (see {@see Bridge::handle()}).
+ * `strapi.db.connection(table)` in upstream tests: a knex query builder on `table` (see {@see Knex}).
+ * Wraps the database's knex-like {@see SqlBuilder} with the knex spellings it lacks
+ * (`select('a', 'b')`, `first()`, `del()`, `transacting(trx)`); awaiting the chain runs it (see
+ * {@see Bridge::handle()}).
  */
 final class KnexQuery
 {
@@ -19,10 +20,18 @@ final class KnexQuery
     {
     }
 
-    public function select(string ...$columns): self
+    /** @param string|list<string> ...$columns `select('a', 'b')` or `select(['a', 'b'])` */
+    public function select(string|array ...$columns): self
     {
-        $this->builder = $this->builder->select($columns === [] ? '*' : array_values($columns));
+        $flat = array_values(array_merge(...array_map(static fn (string|array $c): array => (array) $c, $columns)));
+        $this->builder = $this->builder->select($flat === [] ? '*' : $flat);
 
+        return $this;
+    }
+
+    /** The worker has one connection, the transaction is the current one: nothing to switch to. */
+    public function transacting(mixed $trx = null): self
+    {
         return $this;
     }
 
