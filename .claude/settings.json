@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer test:*)",
+      "Bash(composer analyse:*)",
+      "Bash(composer lint:*)",
+      "Bash(composer bundle:check)",
+      "Bash(composer bundle:fix)",
+      "Bash(composer version:check)",
+      "Bash(composer parity)",
+      "Bash(composer dump-autoload:*)",
+      "Bash(composer install:*)",
+      "Bash(vendor/bin/phpunit:*)",
+      "Bash(vendor/bin/phpstan:*)",
+      "Bash(php scripts/sync-root-composer.php:*)",
+      "Bash(php scripts/check-package-versions.php)",
+      "Bash(php scripts/parity-map.php:*)",
+      "Bash(php examples/getstarted/bin/strapi routes:list:*)",
+      "Bash(php tests/php/smoke.php)",
+      "Bash(npm test:*)",
+      "Bash(node scripts/summary.js:*)",
+      "Bash(tests/api/scripts/setup.sh)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)"
+    ]
+  }
+}

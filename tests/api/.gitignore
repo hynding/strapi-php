@@ -2,3 +2,4 @@
 /.bin/
 /.upstream/
 /node_modules/
+/.results/

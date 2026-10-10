@@ -71,8 +71,11 @@ Rules:
 - `examples/getstarted` — the upstream example project, PHP edition.
 - `examples/plugins/announcements` — a third-party plugin that runs on both Strapi and strapi-php from
   one JSON spec (generated types, `.ts`/`.php` parity check, shared conformance fixtures).
-- `tests/api` — upstream's Jest HTTP suite, run against this backend.
+- `tests/api` — upstream's Jest HTTP suite, run against this backend (`cd tests/api && npm test`).
 - `scripts/check-package-versions.php` — all packages share one version.
 - `scripts/strapi-release-watch.php` — polls npm for a new upstream version.
 - `scripts/parity-map.php` — maps upstream server files to ours (`parity.json`).
-- `docs/` — porting notes per package.
+- `docs/` — porting notes per package; `docs/README.md` "Open work" is the to-do list, ordered.
+- `.claude/commands/` — Claude Code commands: `/upstream-release <version>` (the VERSIONING.md
+  loop), `/api-tests [dirs]` (run upstream's suite, explain changes), `/port-file <upstream path>`.
+  `.claude/settings.json` pre-approves the routine composer/phpunit/test commands.
