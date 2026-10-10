@@ -408,6 +408,17 @@ final class EntityManagerTest extends TestCase
         }
         self::assertSame(['commit', 'rollback'], $events);
 
+        // the callback finishes the transaction itself: no second finalisation (upstream's isTransactorComplete)
+        $db->transaction(static function (array $ctx) use ($tags): void {
+            $tags->create(['data' => ['name' => 'rolled-back']]);
+            $ctx['trx']->rollBack();
+        });
+        $db->transaction(static function (array $ctx): void {
+            ($ctx['rollback'])();
+        });
+        self::assertSame(0, $tags->count(['where' => ['name' => 'rolled-back']]));
+        self::assertNull(\Strapi\Database\TransactionContext::get());
+
         $trx = $db->transaction();
         $tags->create(['data' => ['name' => 'manual']]);
         $trx->rollback();

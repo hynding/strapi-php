@@ -71,9 +71,7 @@ final class TransactionContext
     public static function commit(Connection $trx): void
     {
         $idx = array_key_last(self::$stack);
-        if ($idx !== null && self::$stack[$idx]['completed']) {
-            self::$stack[$idx]['trx'] = null;
-
+        if (self::isComplete($idx, $trx)) {
             return;
         }
 
@@ -98,9 +96,7 @@ final class TransactionContext
     public static function rollback(Connection $trx): void
     {
         $idx = array_key_last(self::$stack);
-        if ($idx !== null && self::$stack[$idx]['completed']) {
-            self::$stack[$idx]['trx'] = null;
-
+        if (self::isComplete($idx, $trx)) {
             return;
         }
 
@@ -122,6 +118,27 @@ final class TransactionContext
         foreach ($callbacks as $cb) {
             $cb();
         }
+    }
+
+    /**
+     * upstream's `isTransactorComplete`: the transaction was finished already, through this context
+     * or on the connection itself (`trx.rollback()` inside the callback, then the automatic commit).
+     * A second finalisation would fail ("There is no active transaction"): clear the store instead.
+     */
+    private static function isComplete(?int $idx, Connection $trx): bool
+    {
+        $completed = $idx !== null && self::$stack[$idx]['completed'];
+        if (!$completed && $trx->isTransactionActive()) {
+            return false;
+        }
+        if ($idx !== null) {
+            self::$stack[$idx]['trx'] = null;
+            if (!$completed && !empty(self::$stack[$idx]['manual'])) {
+                array_pop(self::$stack);
+            }
+        }
+
+        return true;
     }
 
     public static function onCommit(callable $cb): void
