@@ -112,6 +112,7 @@ const createStrapiInstance = async ({
     const httpServer = new String(server.url); // eslint-disable-line no-new-wrappers
     // the transfer proxy's port: the worker's for every request but the transfer WebSockets
     httpServer.address = () => ({ address: '127.0.0.1', family: 'IPv4', port: transfer.port });
+    httpServer.listening = true;
 
     let instance;
     const local = {
@@ -172,6 +173,15 @@ const createStrapiInstance = async ({
     await postPhase(server.url, 'register');
     if (bootstrap) await bootstrap({ strapi: instance });
     await postPhase(server.url, 'bootstrap');
+
+    // a suite that jest.mock()s the local upload provider module expects Strapi to load the mock
+    // (lib/provider-upload-local.js): its init() result becomes the worker's upload provider
+    const uploadProvider = require('@strapi/provider-upload-local');
+    if (!uploadProvider.__apiTestsStandIn && typeof uploadProvider.init === 'function') {
+      const providerInstance = uploadProvider.init({}) ?? {};
+      const methods = Object.fromEntries(Object.entries(providerInstance).filter(([, v]) => typeof v === 'function'));
+      callSync([{ class: 'Strapi\\ApiTests\\UploadProviderMock' }, { get: 'install' }, { call: [{ $ref: [] }, methods] }]);
+    }
 
     // warnings logged while bootstrapping, for a `strapi.log.warn` spy installed by the callback
     const { warnings = [] } = await postJson(`${server.url}/__api-tests/warnings`, {});

@@ -66,8 +66,22 @@ if (compare === null && fs.existsSync(resultsDir)) {
 }
 
 fs.mkdirSync(runDir, { recursive: true });
-// scratch apps of earlier runs (this run's stay for its FrankenPHP logs: .tmp/runs/<run>/<dir>/app/.tmp)
-fs.rmSync(path.join(apiTestsDir, '.tmp', 'runs'), { recursive: true, force: true });
+// scratch apps of earlier runs (this run's stay for its FrankenPHP logs: .tmp/runs/<run>/<dir>/app/.tmp),
+// except those of a run still in progress (its .pid names a live process)
+const runsTmp = path.join(apiTestsDir, '.tmp', 'runs');
+const isRunning = (dir) => {
+  try {
+    process.kill(Number(fs.readFileSync(path.join(dir, '.pid'), 'utf8')), 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+for (const run of fs.existsSync(runsTmp) ? fs.readdirSync(runsTmp) : []) {
+  if (!isRunning(path.join(runsTmp, run))) fs.rmSync(path.join(runsTmp, run), { recursive: true, force: true });
+}
+fs.mkdirSync(path.join(runsTmp, name), { recursive: true });
+fs.writeFileSync(path.join(runsTmp, name, '.pid'), String(process.pid));
 
 const runOne = (target) =>
   new Promise((resolve) => {

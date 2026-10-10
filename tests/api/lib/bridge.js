@@ -422,6 +422,20 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   const hooks = callbacks ? { callback: toCallback, zod: toZod } : null;
   const encode = (value) => encodeArg(value, hooks);
 
+  // a value upstream reads synchronously in place (`strapi.contentTypes[uid].pluginOptions`): its
+  // data, fetched at once, behind a proxy that still passes as a reference to the worker's own
+  // value (`formatContentType(strapi.contentTypes[uid])` gets the Schema, not a copy)
+  const snapshot = (value, steps) => {
+    if (value === null || typeof value !== 'object') return value;
+    return new Proxy(value, {
+      get(target, prop, receiver) {
+        if (prop === CHAIN) return steps;
+        const v = Reflect.get(target, prop, receiver);
+        return typeof prop === 'string' && Object.prototype.hasOwnProperty.call(target, prop) ? snapshot(v, [...steps, { get: prop }]) : v;
+      },
+    });
+  };
+
   const make = (steps, callableTarget = null, settled = false) => {
     // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args).
     // A chain that ends in a call is a result, not a callable: an object target keeps
@@ -521,6 +535,15 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         // directly); awaiting it still works since it returns the value itself
         if (prop === 'config' && steps.length === 2 && steps[0].get === 'plugin' && steps[1].call) {
           return (...args) => callSync([...steps, { get: 'config' }, { call: args }]);
+        }
+        // `strapi.contentTypes` / `strapi.components` are plain objects upstream, read in place
+        // (`strapi.contentTypes[uid].pluginOptions?.i18n?.localized`)
+        if (steps.length === 0 && (prop === 'contentTypes' || prop === 'components')) {
+          return snapshot(callSync([{ get: prop }]), [{ get: prop }]);
+        }
+        // `strapi.sessionManager.generateSessionId()` is synchronous upstream (its result is compared as is)
+        if (prop === 'generateSessionId' && steps.length === 1 && steps[0].get === 'sessionManager') {
+          return (...args) => callSync([...steps, { get: prop }, { call: args }]);
         }
         // `strapi.db.metadata.get(uid)` is synchronous upstream too (tests read
         // `.attributes.createdBy.joinColumn.name` off it and use it as a property key)

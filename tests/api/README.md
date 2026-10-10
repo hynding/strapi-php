@@ -28,7 +28,8 @@ node scripts/summary.js <run> --compare <other>
 `scripts/run.js` gives each directory its own Jest process and scratch dir, so lanes never share
 an app or a database, and each test file still starts from a fresh database. Reports and logs go
 to `.results/<run>/` (`<dir>.json` is Jest's JSON report, `<dir>.log` its output); the latest
-run's apps, with their FrankenPHP logs, stay in `.tmp/runs/<run>/`. The summary counts
+run's apps, with their FrankenPHP logs, stay in `.tmp/runs/<run>/` (a run removes those of earlier
+runs, not of one still in progress, so runs may overlap). The summary counts
 passed / (passed + failed), leaving out upstream's skipped and todo tests, as the README's status
 table does.
 
@@ -107,8 +108,17 @@ table does.
   `connection.schema.hasTable / dropTableIfExists / createTable(name, (t) => ...)`; the table
   callback runs in the test process against a recorder and the worker builds the table from its calls.
 
-- A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)` and
-  `strapi.dirs` (in `Core.StrapiDirectories`' shape) are answered synchronously;
+- Packages upstream suites import directly are mapped to stand-ins in `lib/` (jest.config.js):
+  `@strapi/database` (`isKnexQuery`), `@strapi/openapi` (`generate()` runs in the worker),
+  `@strapi/provider-upload-local` (a suite that `jest.mock()`s it gets its mock's `init()` installed
+  as the worker's upload provider, `Strapi\ApiTests\UploadProviderMock`) and the built
+  `createStrapi()` of `@strapi/strapi` (lib/create-strapi.js: the suite's `config/*.js` become the
+  app's `config/*.php`). As in upstream's jest.config.api.js, only `.ts` files are transformed.
+
+- A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)`,
+  `strapi.sessionManager.generateSessionId()`, `strapi.contentTypes` / `strapi.components` (data
+  that still passes as a reference to the worker's objects) and `strapi.dirs` (in
+  `Core.StrapiDirectories`' shape) are answered synchronously;
   `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the
   test process (`Strapi\ApiTests\Callback`) and returns a working unsubscribe function; an object
   with methods assigned to a remote property (`strapi.plugin('upload').provider = { ...provider,
