@@ -116,7 +116,8 @@ table does.
   app's `config/*.php`). As in upstream's jest.config.api.js, only `.ts` files are transformed.
 
 - A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)`,
-  `strapi.sessionManager.generateSessionId()`, `strapi.contentTypes` / `strapi.components` (data
+  `strapi.sessionManager.generateSessionId()`, the content-type builder services'
+  `formatContentType()` / `formatComponent()`, `strapi.contentTypes` / `strapi.components` (data
   that still passes as a reference to the worker's objects) and `strapi.dirs` (in
   `Core.StrapiDirectories`' shape) are answered synchronously;
   `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the

@@ -541,6 +541,11 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         if (steps.length === 0 && (prop === 'contentTypes' || prop === 'components')) {
           return snapshot(callSync([{ get: prop }]), [{ get: prop }]);
         }
+        // the content-type builder's `formatContentType(ct)` / `formatComponent(c)` are synchronous
+        // upstream: api-tests/models.js reads their result after destroying the instance it used
+        if ((prop === 'formatContentType' || prop === 'formatComponent') && steps.some((step) => step.get === 'service')) {
+          return (...args) => callSync([...steps, { get: prop }, { call: args }]);
+        }
         // `strapi.sessionManager.generateSessionId()` is synchronous upstream (its result is compared as is)
         if (prop === 'generateSessionId' && steps.length === 1 && steps[0].get === 'sessionManager') {
           return (...args) => callSync([...steps, { get: prop }, { call: args }]);
