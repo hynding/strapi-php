@@ -34,20 +34,13 @@ starting and after finishing (`/api-tests` in Claude Code).
   on packagist.org with their GitHub hooks (README "Install"; split.yml fills the second repo).
   Delete this item once done.
 
-**API suite failures (52), by cause**
-1. **Test-process state the bridge cannot share (17).** The bridge now carries functions,
-   zod schemas, transaction callbacks, synchronous calls from inside callbacks and knex
-   (tests/api/README.md). What is left:
-   - `admin-api-token-crud` (7) assigns `jest.fn()` to
-     `strapi.contentAPI.permissions.providers.action.keys`: a method of a provider that is not a
-     registered service, so `Strapi\ApiTests\Spy` cannot stand in for it (it sits in the readonly
-     `Permissions::$providers` and in the permission engine).
+**API suite failures (52 in the last full run; 9 since fixed, measured per suite), by cause**
+1. **Test-process state the bridge cannot share (8).** The bridge now carries functions,
+   zod schemas, transaction callbacks, synchronous calls from inside callbacks, knex, jest mocks
+   on non-service objects and `withMockedFetch` (tests/api/README.md). What is left:
    - `api/validate/validate-query` (2) and `validate-with-exported-zod` (2):
      `contentAPI.applyExtraParamsToRoutes([route])` mutates the test's route object in place and is
      not awaited; `Object.keys(strapi.apis)` enumerates a registry synchronously.
-   - `upload/admin/file-upload-and-url-import` size limit (2): `withMockedFetch` swaps
-     `globalThis.fetch` in the test process; the worker's `strapi.fetch` makes the real request.
-     The fetch service could call back into the test while a mock is installed.
    - `document-service/clone` "non existing document" (1) expects `documentId: undefined` inside a
      result (JSON has no `undefined`); `dp/basic-no-dp` (1) expects `strapi.documents(uid).publish`
      to be `undefined` for a type without draft & publish.
@@ -65,9 +58,6 @@ starting and after finishing (`/api-tests` in Claude Code).
    socket hang-up in a full run and passes alone.
 
 **Other gaps**
-- create-strapi-app: `--dbclient sqlite` without `--dbfile` writes an empty `DATABASE_FILENAME`
-  and SQLite cannot open it (upstream does the same; the templates' `config/database.php` could
-  treat an empty value as `.tmp/data.db`).
 - A JSON `{}` is read back as `{}` only for content `json` attributes (`api::` content types,
   components). Internal JSON columns (admin permissions, history versions...) still read it as `[]`.
 - v4 → v5 data migrations run as no-ops under their upstream names:
@@ -78,6 +68,13 @@ starting and after finishing (`/api-tests` in Claude Code).
   (FrankenPHP worker mode is the recommended setup).
 
 ## Fixed gaps
+
+- create-strapi-app: `--dbclient sqlite` without `--dbfile` writes an empty `DATABASE_FILENAME`
+  (as upstream does), which joined onto the project root made a path SQLite cannot open. The
+  templates' `config/database.php` now treat an empty value as `.tmp/data.db`.
+- The upload plugin's URL import fetched with its own stream-wrapper code; it now goes through
+  `strapi.fetch()->open()` like upstream's `strapi.fetch`, so `Fetch::intercept()` (tests) and the
+  proxy settings apply to it.
 
 - Found while working through the API suite failures (2026-10):
   - Document-service events never reached `strapi.eventHub` listeners or webhooks: a nested
