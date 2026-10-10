@@ -128,6 +128,15 @@ final class QueryPopulateTest extends TestCase
         self::assertTrue(QueryPopulate::isQsArrayLimitPopulateObject($populate));
         self::assertFalse(QueryPopulate::isQsArrayLimitPopulateObject(array_slice($populate, 0, 100)));
 
+        // parsed with a higher `arrayLimit` (strapi::query config), the list is a real array
+        QueryPopulate::setQsArrayLimit(150);
+        try {
+            self::assertFalse(QueryPopulate::isQsArrayLimitPopulateObject($populate));
+            self::assertTrue(QueryPopulate::isQsArrayLimitPopulateObject(array_map(static fn (int $i): string => "field{$i}", range(0, 150))));
+        } finally {
+            QueryPopulate::setQsArrayLimit(QueryPopulate::DEFAULT_QS_ARRAY_LIMIT);
+        }
+
         $this->expectExceptionMessage('Too many populate entries (101)');
         QueryPopulate::traverse(static fn () => null, ['schema' => self::schema(), 'getModel' => static fn (): array => self::schema()], $populate);
     }
