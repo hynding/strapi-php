@@ -33,17 +33,21 @@ use Strapi\Utils\Errors\ApplicationError;
  *   are called statically, instance methods on `new Class($strapi)`.
  *
  * - a function of the test process is sent as `{"$callback": {"url", "id"}}` and arrives as a
- *   {@see Callback} (`strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })`). A chain ending
- *   with `{"keep": true}` keeps its value in the worker and answers `{"$handle": n}`; a chain that
- *   starts with `{"handle": n}` continues from that value (the unsubscribe function).
+ *   {@see Callback} (`strapi.eventHub.on(name, listener)`, a condition handler, a document-service
+ *   middleware); it may call the instance back while it runs, and the closures and services among
+ *   its arguments reach it as handles ({@see exportArgs()}). A zod schema built by the test is sent
+ *   as `{"$zod": ...}` and arrives as a {@see RemoteZod}. A chain ending with `{"keep": true}` keeps
+ *   its value in the worker and answers `{"$handle": n}`; a chain that starts with `{"handle": n}`
+ *   continues from that value (the unsubscribe function, a middleware's `next`).
  * - an object with functions assigned to a property (`plugin.provider = { ...provider, uploadStream() {} }`)
  *   is an `{"assign": {"prop", "methods", "values"}}` step: the property becomes a {@see RemoteObject}
  *   until a `{"restore": prop}` step puts the original back.
  *
- * - `strapi.db.getConnection()` (a knex instance upstream) is the database's knex-like
- *   {@see SqlBuilder} (`$db->sql()`), so `getConnection().from(t).where(...).update(...)` replays;
- *   awaiting a builder runs it. `strapi.db.connection(table)` (knex called with a table name) is
- *   that builder `from(table)`, wrapped in {@see KnexQuery} for knex's `select(a, b)`/`first()`.
+ * - `strapi.db.connection` and `strapi.db.getConnection()` (a knex instance upstream) are a
+ *   {@see Knex} over the database's knex-like {@see SqlBuilder}, so `getConnection().from(t).where(...).update(...)`,
+ *   `connection.raw(sql)` and `connection.schema.hasTable(t)` replay; awaiting a query runs it.
+ *   Called with a table name (`strapi.db.connection(table)`, `getConnection(table)`), it is a
+ *   {@see KnexQuery} on that table.
  *
  * Only enabled when the worker script mounts it (tests/api/app/public/index.php); never in an app.
  */
@@ -84,6 +88,14 @@ final class Bridge
                 $value = $value->run();
             }
 
+            // an object without a data form (a transaction object, a closure) stays here: the test
+            // gets a proxy on it (`const trx = await strapi.db.transaction(); await trx.commit()`)
+            if (is_object($value) && !$value instanceof Strapi && self::isOpaque($value)) {
+                $this->handles[] = $value;
+
+                return ['status' => 200, 'body' => ['handle' => array_key_last($this->handles)]];
+            }
+
             // `null` from a method declared `?Type` (findOne...) is JS `null`; any other null is `undefined`
             return ['status' => 200, 'body' => ['result' => self::export($value), ...($value === null && $this->lastCallReturnsNullable() ? ['null' => true] : [])]];
         } catch (\Throwable $e) {
@@ -97,9 +109,62 @@ final class Bridge
                 $error['details'] = $e->details;
                 $error['status'] = $e->status;
             }
+            // what a function of the test threw: the test rethrows that very value
+            $token = CallbackError::in($e)?->token;
+            if ($token !== null) {
+                $error['token'] = $token;
+            }
 
             return ['status' => 500, 'body' => ['error' => $error]];
         }
+    }
+
+    /**
+     * {@see handle()} for a call the test process makes from inside a {@see Callback} (the worker is
+     * busy with the call that invoked it): keeps the outer call's state.
+     *
+     * @param array{steps?: list<array<string, mixed>>} $payload
+     * @return array{status: int, body: array<string, mixed>}
+     */
+    public function handleNested(array $payload): array
+    {
+        $nullIsValue = $this->nullIsValue;
+        try {
+            return $this->handle($payload);
+        } finally {
+            $this->nullIsValue = $nullIsValue;
+        }
+    }
+
+    /**
+     * {@see export()} for the arguments of a {@see Callback}: a value without a data form (a closure,
+     * the Strapi instance, a service object) stays in the worker and is sent as `{"$handle": n}`, which
+     * the test process turns into a proxy it can call (`next()` in a document-service middleware).
+     */
+    public function exportArgs(mixed $value, int $depth = 0): mixed
+    {
+        if ($depth > 64) {
+            return null;
+        }
+        if (is_array($value)) {
+            return array_map(fn (mixed $v): mixed => $this->exportArgs($v, $depth + 1), $value);
+        }
+        // the database too: its public properties are its state, not data (`db.metadata.get(uid)`)
+        if ($value instanceof \Closure || $value instanceof Strapi || $value instanceof Database || (is_object($value) && self::isOpaque($value))) {
+            $this->handles[] = $value;
+
+            return ['$handle' => array_key_last($this->handles)];
+        }
+
+        return self::export($value, $depth);
+    }
+
+    /** An object {@see export()} would turn into an empty array: no data form, only behaviour. */
+    private static function isOpaque(object $value): bool
+    {
+        return !$value instanceof \JsonSerializable && !$value instanceof \ArrayObject && !$value instanceof \ArrayAccess
+            && !$value instanceof \DateTimeInterface && !$value instanceof \UnitEnum && !$value instanceof \stdClass
+            && !method_exists($value, 'toArray') && get_object_vars($value) === [];
     }
 
     /** @param list<array<string, mixed>> $steps */
@@ -265,8 +330,11 @@ final class Bridge
         if (array_keys($value) === ['$mcpTool'] && is_array($value['$mcpTool'])) {
             return McpDefinition::fromTest($this->resolveRefs($value['$mcpTool']));
         }
+        if (array_keys($value) === ['$zod'] && is_array($value['$zod'])) {
+            return RemoteZod::fromTest($this->resolveRefs($value['$zod']));
+        }
         if (array_keys($value) === ['$callback'] && is_array($value['$callback'])) {
-            return new Callback((string) ($value['$callback']['url'] ?? ''), (int) ($value['$callback']['id'] ?? 0));
+            return new Callback((string) ($value['$callback']['url'] ?? ''), (int) ($value['$callback']['id'] ?? 0), $this);
         }
 
         return array_map(fn (mixed $v): mixed => $this->resolveRefs($v), $value);
@@ -279,13 +347,15 @@ final class Bridge
             return $target->call($name, $args);
         }
 
-        if ($target instanceof Database && $name === 'getConnection' && $args === []) {
-            return $target->sql();
-        }
-
-        // `strapi.db.connection(table)`: knex called with a table name
-        if ($target instanceof Database && $name === 'connection' && count($args) === 1 && is_string($args[0])) {
-            return new KnexQuery($target->sql()->from($args[0]));
+        // knex, or knex called with a table name (`strapi.db.connection(table)`, `getConnection(table)`)
+        if ($target instanceof Database && ($name === 'getConnection' || $name === 'connection')) {
+            $knex = new Knex($target);
+            if ($args === []) {
+                return $knex;
+            }
+            if (count($args) === 1 && is_string($args[0])) {
+                return $knex($args[0]);
+            }
         }
 
         if (is_object($target) && method_exists($target, $name)) {
@@ -334,6 +404,14 @@ final class Bridge
         }
         if ($target instanceof \ArrayAccess && $target->offsetExists($name)) {
             return $target[$name];
+        }
+        // `strapi.documents` read without a call is the factory (`strapi.documents.use(middleware)`)
+        if ($target instanceof Strapi && $name === 'documents') {
+            return $target->documentService();
+        }
+        // `strapi.db.connection` is knex
+        if ($target instanceof Database && $name === 'connection') {
+            return new Knex($target);
         }
         if (is_object($target)) {
             if (method_exists($target, $name)) {

@@ -21,11 +21,19 @@ module.exports = {
     '^api-tests/(.*)$': `${helpersDir}/$1`,
     // the local Strapi providers of packages/core/data-transfer, run in the worker
     '^@strapi/data-transfer$': path.join(apiTestsDir, 'lib', 'data-transfer.js'),
+    // what suites import from packages that run in the worker here (see each module)
+    '^@strapi/database$': path.join(apiTestsDir, 'lib', 'database.js'),
+    '^@strapi/openapi$': path.join(apiTestsDir, 'lib', 'openapi.js'),
+    '^@strapi/provider-upload-local$': path.join(apiTestsDir, 'lib', 'provider-upload-local.js'),
+    // `createStrapi` from @strapi/strapi's build (plugins/graphql/cors)
+    '^(\\.\\./)+packages/core/strapi/dist/index\\.js$': path.join(apiTestsDir, 'lib', 'create-strapi.js'),
   },
   // upstream files live outside rootDir: resolve their imports from our node_modules
   modulePaths: [path.join(apiTestsDir, 'node_modules')],
+  // as upstream's jest.config.api.js: only TypeScript is transformed. Its .js suites run as they
+  // are (a `jest.mock()` inside `beforeAll` must not be hoisted above the variables it uses)
   transform: {
-    '^.+\\.(t|j)s$': ['@swc/jest'],
+    '^.+\\.ts$': ['@swc/jest'],
   },
   // upstream's api-tests helpers are CommonJS that babel-jest leaves alone (a module-level arrow's
   // `this` is module.exports, which builder/action-registry.js relies on); SWC would turn it into undefined

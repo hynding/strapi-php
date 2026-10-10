@@ -57,7 +57,8 @@ final class ConfigLoader
             return;
         }
 
-        fwrite(STDERR, $message . PHP_EOL);
+        // the STDERR constant only exists under the CLI SAPI (not in a FrankenPHP or FPM worker)
+        file_put_contents('php://stderr', $message . PHP_EOL);
     }
 
     /** @return array<string, mixed> */

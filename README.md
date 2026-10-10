@@ -33,14 +33,14 @@ The package column is each part's name inside `hynding/strapi-php` (the director
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (MCP server with content-manager/upload tools; AI providers stubbed); MCP API 140/144 |
 | CLI: `strapi start / develop / build / console / routes:list / *:list / report / cron:run / migrations:run` | `strapi/strapi` | ported |
-| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 313/333 |
+| Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 324/333 |
 | Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 760/781 |
 | Content-Type Builder | `strapi/content-type-builder` | ported; 62/63 |
-| Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 182/193 |
+| Upload + local, AWS S3, Cloudinary providers (GD instead of sharp; no vendor SDKs) | `strapi/upload`, `strapi/provider-upload-*` | ported; 189/193 |
 | Email + sendmail, nodemailer, Amazon SES, Mailgun, SendGrid providers | `strapi/email`, `strapi/provider-email-*` | ported |
-| Internationalization | `strapi/i18n` | ported; 56/64 |
+| Internationalization | `strapi/i18n` | ported; 57/64 |
 | Users & Permissions: end users, roles, JWT / refresh sessions, OAuth providers | `strapi/plugin-users-permissions` | ported; 125/125 |
-| GraphQL (webonyx/graphql-php; nexus, Apollo Server 4 behaviour ported) | `strapi/plugin-graphql` | ported; 119/122 |
+| GraphQL (webonyx/graphql-php; nexus, Apollo Server 4 behaviour ported) | `strapi/plugin-graphql` | ported; 128/128 |
 | Data transfer: `strapi export / import / transfer` (archives byte-compatible with Node Strapi; remote transfers through `strapi transfer:serve`) | `strapi/data-transfer` | ported; 3/3 (+ admin push security 3/3) |
 | OpenAPI generator and the documentation plugin (Swagger UI) | `strapi/openapi`, `strapi/plugin-documentation` | ported; documents identical to Node's for the same app |
 | `strapi generate`, sentry, color-picker | `strapi/generators`, `strapi/plugin-sentry`, `strapi/plugin-color-picker` | ported |
@@ -53,10 +53,10 @@ scripts/parity-map.php` regenerates it.
 
 The numbers are upstream's own Jest API suite (`tests/api`, see its README) run unmodified
 against the PHP app, one package directory at a time, each test file on a fresh database:
-3,183 of 3,389 across all directories (`cd tests/api && npm test`), `tests/api/core/strapi` (core's REST, document
-service, relations, validation) at 1372/1497. What still fails is mostly Enterprise
-features and tests that replace functions inside the server from the Jest process, which
-can't cross into PHP.
+3,351 of 3,403 across all directories (`cd tests/api && npm test`), `tests/api/core/strapi` (core's REST, document
+service, relations, validation) at 1492/1498. What still fails is mostly Enterprise
+features, and tests that rely on state of the Jest process the bridge can't share with the
+PHP worker (docs/README.md, "Open work").
 
 ## Try it
 

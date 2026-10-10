@@ -28,7 +28,8 @@ node scripts/summary.js <run> --compare <other>
 `scripts/run.js` gives each directory its own Jest process and scratch dir, so lanes never share
 an app or a database, and each test file still starts from a fresh database. Reports and logs go
 to `.results/<run>/` (`<dir>.json` is Jest's JSON report, `<dir>.log` its output); the latest
-run's apps, with their FrankenPHP logs, stay in `.tmp/runs/<run>/`. The summary counts
+run's apps, with their FrankenPHP logs, stay in `.tmp/runs/<run>/` (a run removes those of earlier
+runs, not of one still in progress, so runs may overlap). The summary counts
 passed / (passed + failed), leaving out upstream's skipped and todo tests, as the README's status
 table does.
 
@@ -79,8 +80,46 @@ table does.
 - `@strapi/data-transfer` (imported by `core/data-transfer`) is lib/data-transfer.js: its local
   Strapi providers run in the worker (`Strapi\ApiTests\DataTransfer`), one bridge call per stage.
 
-- A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)` and
-  `strapi.dirs` (in `Core.StrapiDirectories`' shape) are answered synchronously;
+- A function of the test passed to the instance (`strapi.eventHub.on('entry.create', listener)`,
+  custom admin condition handlers, `strapi.documents.use(middleware)`, GraphQL resolvers given to
+  `extension.use()`) runs in the test process: the worker gets a `Strapi\ApiTests\Callback` that
+  calls it back. While it runs, the worker waits for it, so the calls it makes to the instance
+  (`next()`, `strapi.documents(uid).findFirst()`) travel back over that same callback request and
+  are replayed by the waiting worker (`CallSession` in lib/bridge.js); closures and services among
+  its arguments arrive as proxies. A call that hands over a function, and the event hub's synchronous
+  methods (`on`, `off`, `removeAllListeners`...), are sent at once unless awaited, since upstream
+  tests call them without `await`. A document-service middleware gets `ctx` as JSON and its
+  `next()` passes the changed `ctx` on. The callback server runs in a worker thread
+  (lib/callback-thread.js), so synchronous calls (`strapi.db.metadata.get(uid)`, a proxy used as a
+  string) work inside such a function too: the test's thread blocks until the reply arrives.
+  `strapi.db.transaction(cb)` is one of these: `cb` runs inside the worker's transaction (commit,
+  rollback, `onCommit`), and what it throws reaches the caller as that very value
+  (`wrapInTransaction` throws a Symbol and catches it). An object without a data form returned by
+  a call (`await strapi.db.transaction()`, a closure) comes back as a proxy on it.
+
+- A zod schema built by a test (`route.request.query = { search: z.string() }`,
+  `contentAPI.addQueryParams({ x: { schema: z.string() } })`) parses in the test process with the
+  test's zod (`Strapi\ApiTests\RemoteZod`), so transforms and defaults behave as upstream's; an
+  object schema arrives as a PHP `z.object()` of such fields.
+
+- `strapi.db.connection` and `strapi.db.getConnection()` (knex upstream) are a knex-shaped facade
+  over the database's query builder (`Strapi\ApiTests\Knex`): `connection(table).where(...).first()`,
+  `getConnection().select('*').from(table)`, `connection.raw(sql)` (a SELECT's rows) and
+  `connection.schema.hasTable / dropTableIfExists / createTable(name, (t) => ...)`; the table
+  callback runs in the test process against a recorder and the worker builds the table from its calls.
+
+- Packages upstream suites import directly are mapped to stand-ins in `lib/` (jest.config.js):
+  `@strapi/database` (`isKnexQuery`), `@strapi/openapi` (`generate()` runs in the worker),
+  `@strapi/provider-upload-local` (a suite that `jest.mock()`s it gets its mock's `init()` installed
+  as the worker's upload provider, `Strapi\ApiTests\UploadProviderMock`) and the built
+  `createStrapi()` of `@strapi/strapi` (lib/create-strapi.js: the suite's `config/*.js` become the
+  app's `config/*.php`). As in upstream's jest.config.api.js, only `.ts` files are transformed.
+
+- A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)`,
+  `strapi.sessionManager.generateSessionId()`, the content-type builder services'
+  `formatContentType()` / `formatComponent()`, `strapi.contentTypes` / `strapi.components` (data
+  that still passes as a reference to the worker's objects) and `strapi.dirs` (in
+  `Core.StrapiDirectories`' shape) are answered synchronously;
   `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the
   test process (`Strapi\ApiTests\Callback`) and returns a working unsubscribe function; an object
   with methods assigned to a remote property (`strapi.plugin('upload').provider = { ...provider,

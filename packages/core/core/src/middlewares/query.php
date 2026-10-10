@@ -7,6 +7,7 @@ namespace Strapi\Core\Middlewares;
 use Strapi\Core\Services\Server\Context;
 use Strapi\Core\Strapi;
 use Strapi\Utils\Qs;
+use Strapi\Utils\Traverse\QueryPopulate;
 
 /**
  * Port of packages/core/core/src/middlewares/query.ts: parse the query string with `qs`
@@ -20,6 +21,8 @@ final class Query
     public function __invoke(array $config, Strapi $strapi): callable
     {
         $settings = [...self::DEFAULTS, ...$config];
+        // a populate list up to this limit is an array, not a qs overflow object (PHP can't tell them apart)
+        QueryPopulate::setQsArrayLimit((int) $settings['arrayLimit']);
 
         return static function (Context $ctx, callable $next) use ($settings): void {
             $ctx->setQuery(Qs::parse($ctx->querystring(), $settings));

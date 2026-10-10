@@ -34,8 +34,7 @@ final class RemoteObject
         }
 
         $args = array_values($args);
-        $before = Bridge::export($args);
-        ['result' => $result, 'args' => $after] = $callback->call($args);
+        ['result' => $result, 'args' => $after, 'sent' => $before] = $callback->call($args);
 
         foreach ($args as $i => $arg) {
             if (!$arg instanceof \ArrayAccess || !is_array($after[$i] ?? null) || !is_array($before[$i] ?? null)) {

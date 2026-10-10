@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Strapi\Utils;
 
+use Strapi\Utils\Zod\ZodType;
+
 /**
  * Port of packages/core/utils/src/content-api-route-params.ts.
  *
  * Upstream derives extra query/input keys from a route's Zod request schema. Here a "route-like"
  * value is an array (or object with a `request` property) of the shape
  * `['request' => ['query' => ['search' => <validator>], 'body' => ['application/json' => ['shape' => ['clientMutationId' => <validator>]]]]]`.
- * A `<validator>` may be a `callable(mixed): mixed` returning the parsed value or throwing, a
+ * A `<validator>` may be a Zod schema (`Strapi\Utils\Zod\ZodType`, parsed with `safeParse` as upstream
+ * does), a `callable(mixed): mixed` returning the parsed value or throwing, a
  * `Strapi\Utils\ParamValidator`, or anything else (then only the key matters and no validation runs).
  *
  * @phpstan-type RouteLike array{request?: array{query?: array<string, mixed>, body?: array<string, mixed>}}|object|null
@@ -89,6 +92,11 @@ final class ContentApiRouteParams
      */
     public static function runValidator(mixed $validator, mixed $value): array
     {
+        if ($validator instanceof ZodType) {
+            $result = $validator->safeParse($value);
+
+            return $result['success'] ? [true, $result['data']] : [false, $result['error']?->getMessage() ?? 'Validation failed'];
+        }
         if ($validator instanceof ParamValidator) {
             return $validator->safeParse($value);
         }

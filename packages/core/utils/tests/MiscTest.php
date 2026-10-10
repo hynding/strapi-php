@@ -16,6 +16,7 @@ use Strapi\Utils\PublicationFilter;
 use Strapi\Utils\Relations;
 use Strapi\Utils\SetCreatorFields;
 use Strapi\Utils\Template;
+use Strapi\Utils\Zod\Z as z;
 
 /** Ports of the small upstream suites: async, model-cache, publication-filter, content-api-constants, policy, template... */
 final class MiscTest extends TestCase
@@ -80,6 +81,12 @@ final class MiscTest extends TestCase
         self::assertSame([], ContentApiRouteParams::getExtraQueryKeysFromRoute(null));
         self::assertSame([true, 'x'], ContentApiRouteParams::runValidator(null, 'x'));
         self::assertSame([false, 'bad'], ContentApiRouteParams::runValidator(static fn (): never => throw new \RuntimeException('bad'), 'x'));
+
+        // a Zod schema: safeParse, keeping its output (transforms, defaults)
+        self::assertSame([true, 'bar'], ContentApiRouteParams::runValidator(z::string()->trim(), '  bar  '));
+        self::assertSame([true, ['enabled' => true]], ContentApiRouteParams::runValidator(z::object(['enabled' => z::boolean()->default(true)]), []));
+        [$ok] = ContentApiRouteParams::runValidator(z::number(), 'not-a-number');
+        self::assertFalse($ok);
     }
 
     public function testPolicy(): void

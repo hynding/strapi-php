@@ -36,9 +36,21 @@ final class QueryPopulate
     }
 
     /**
+     * The `arrayLimit` the query string was parsed with (`strapi::query`'s config), set by that
+     * middleware: a list up to it is a real array, not a `qs` overflow object.
+     */
+    private static int $qsArrayLimit = self::DEFAULT_QS_ARRAY_LIMIT;
+
+    public static function setQsArrayLimit(int $arrayLimit): void
+    {
+        self::$qsArrayLimit = $arrayLimit;
+    }
+
+    /**
      * Detects objects with consecutive numeric string keys and string values — the shape `qs`
      * produces when indexed array notation exceeds `arrayLimit` (#25632). In PHP such a value is a
-     * plain list longer than the limit.
+     * plain list longer than the limit the query was parsed with; like upstream, it is rejected
+     * only past {@see DEFAULT_QS_ARRAY_LIMIT} entries.
      */
     public static function isQsArrayLimitPopulateObject(mixed $value): bool
     {
@@ -47,7 +59,7 @@ final class QueryPopulate
         }
 
         $keys = array_keys($value);
-        if (count($keys) <= self::DEFAULT_QS_ARRAY_LIMIT) {
+        if (count($keys) <= self::DEFAULT_QS_ARRAY_LIMIT || count($keys) <= self::$qsArrayLimit) {
             return false;
         }
 

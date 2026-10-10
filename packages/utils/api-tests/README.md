@@ -14,4 +14,7 @@ repository root for the naming rules.
 
 `src/bridge.php` replays the JS side's recorded `strapi.*` chains (see `tests/api/README.md`);
 `src/spy.php` (`Strapi\ApiTests\Spy`) stands in for a registered service while a test holds a
-`jest.spyOn()` on one of its methods, calling the jest mock back in the test process.
+`jest.spyOn()` on one of its methods, calling the jest mock back in the test process;
+`src/callback.php` is any other function of the test process (listeners, condition handlers,
+middlewares), which may call the instance back while it runs; `src/remote-zod.php` is a zod schema
+built by a test, parsed by the test's own zod.
