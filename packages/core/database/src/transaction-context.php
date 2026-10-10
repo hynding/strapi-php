@@ -34,7 +34,14 @@ final class TransactionContext
         try {
             return $cb();
         } finally {
-            array_pop(self::$stack);
+            $nested = array_pop(self::$stack);
+            // upstream's nested store shares the parent's callback arrays: what a nested transaction
+            // registers (`onCommit` of a document-service event) runs when the outer one commits
+            $parent = array_key_last(self::$stack);
+            if ($current !== null && $parent !== null && $nested !== null) {
+                self::$stack[$parent]['commitCallbacks'] = $nested['commitCallbacks'];
+                self::$stack[$parent]['rollbackCallbacks'] = $nested['rollbackCallbacks'];
+            }
         }
     }
 

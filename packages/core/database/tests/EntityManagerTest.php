@@ -383,6 +383,31 @@ final class EntityManagerTest extends TestCase
         self::assertSame(1, $tags->count(['where' => ['name' => 'in-trx']]));
         self::assertSame(['yes'], $committed);
 
+        // a nested transaction's callbacks run when the outer one ends (document-service events)
+        $events = [];
+        $db->transaction(static function () use ($db, &$events): void {
+            $db->transaction(static function (array $ctx) use (&$events): void {
+                $ctx['onCommit'](static function () use (&$events): void {
+                    $events[] = 'commit';
+                });
+            });
+            self::assertSame([], $events, 'not before the outer transaction commits');
+        });
+        self::assertSame(['commit'], $events);
+
+        try {
+            $db->transaction(static function () use ($db, &$events): void {
+                $db->transaction(static function (array $ctx) use (&$events): void {
+                    $ctx['onRollback'](static function () use (&$events): void {
+                        $events[] = 'rollback';
+                    });
+                });
+                throw new \RuntimeException('outer');
+            });
+        } catch (\RuntimeException) {
+        }
+        self::assertSame(['commit', 'rollback'], $events);
+
         $trx = $db->transaction();
         $tags->create(['data' => ['name' => 'manual']]);
         $trx->rollback();
