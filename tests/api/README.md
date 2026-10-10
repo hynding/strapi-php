@@ -88,8 +88,13 @@ table does.
   its arguments arrive as proxies. A call that hands over a function, and the event hub's synchronous
   methods (`on`, `off`, `removeAllListeners`...), are sent at once unless awaited, since upstream
   tests call them without `await`. A document-service middleware gets `ctx` as JSON and its
-  `next()` passes the changed `ctx` on. Synchronous reads (`strapi.config.get()`, a proxy used as a
-  string) cannot run from inside such a function: they throw.
+  `next()` passes the changed `ctx` on. The callback server runs in a worker thread
+  (lib/callback-thread.js), so synchronous calls (`strapi.db.metadata.get(uid)`, a proxy used as a
+  string) work inside such a function too: the test's thread blocks until the reply arrives.
+  `strapi.db.transaction(cb)` is one of these: `cb` runs inside the worker's transaction (commit,
+  rollback, `onCommit`), and what it throws reaches the caller as that very value
+  (`wrapInTransaction` throws a Symbol and catches it). An object without a data form returned by
+  a call (`await strapi.db.transaction()`, a closure) comes back as a proxy on it.
 
 - A zod schema built by a test (`route.request.query = { search: z.string() }`,
   `contentAPI.addQueryParams({ x: { schema: z.string() } })`) parses in the test process with the

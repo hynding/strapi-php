@@ -29,6 +29,31 @@ final class KnexQuery
         return $this;
     }
 
+    /** knex's `leftJoin(table, 'a.col', 'b.col')`: the table joined under its own name */
+    public function leftJoin(string $table, string $first, string $second): self
+    {
+        $this->builder = $this->builder->leftJoin($table, $table, static function (SqlBuilder $on) use ($first, $second): void {
+            $on->on($first, $second);
+        });
+
+        return $this;
+    }
+
+    /** knex's `innerJoin(table, 'a.col', 'b.col')` / `join(...)` */
+    public function innerJoin(string $table, string $first, string $second): self
+    {
+        $this->builder = $this->builder->innerJoin($table, $table, static function (SqlBuilder $on) use ($first, $second): void {
+            $on->on($first, $second);
+        });
+
+        return $this;
+    }
+
+    public function join(string $table, string $first, string $second): self
+    {
+        return $this->innerJoin($table, $first, $second);
+    }
+
     /** The worker has one connection, the transaction is the current one: nothing to switch to. */
     public function transacting(mixed $trx = null): self
     {

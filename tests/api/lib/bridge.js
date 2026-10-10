@@ -12,8 +12,10 @@
  * Values that must be known synchronously (the HTTP server address) come from `local`.
  */
 const http = require('http');
+const path = require('path');
 const { execFileSync } = require('child_process');
 const { AsyncLocalStorage } = require('async_hooks');
+const { Worker } = require('worker_threads');
 
 const CHAIN = Symbol('chain');
 /** the event hub's methods that are synchronous upstream (`emit` is not) */
@@ -180,136 +182,146 @@ const postSync = (url, body) => {
 /**
  * One call of a function of this process by the worker. While the function runs, the worker waits
  * for its answer, so a call the function makes to the instance (`next()`, `strapi.documents(uid)`)
- * cannot go to the worker over HTTP: it is queued here and handed to the worker as the answer to its
- * pending request (`{ session, steps }`); the worker replays it and posts the result back
- * (`{ session, reply }`), until the function settles (`{ result, args }` or `{ error }`).
+ * cannot go to the worker over HTTP: lib/callback-thread.js queues it and hands it to the worker as
+ * the answer to its pending request, in order. A synchronous call (`strapi.db.metadata.get(uid)`)
+ * blocks this thread until the callback thread writes its reply to the shared buffer.
  */
 class CallSession {
-  constructor(id) {
+  constructor(id, thread, shared) {
     this.id = id;
-    this.requests = []; // calls waiting for the worker: { steps, resolve }
-    this.current = null; // the call the worker is replaying
-    this.outcome = null; // the function's result or error
-    this.wake = null;
+    this.thread = thread;
+    this.shared = shared;
+    this.outcome = null; // the function's result or error, once it settled
+    this.pending = new Map(); // reqId → resolve
+    this.nextReq = 1;
   }
 
   /** a call to the instance from inside the function: resolves with the bridge's response body */
   rpc(steps) {
     if (this.outcome) return null; // settled: the worker no longer listens
+    const reqId = this.nextReq++;
     return new Promise((resolve) => {
-      this.requests.push({ steps, resolve });
-      this.notify();
+      this.pending.set(reqId, resolve);
+      this.thread.postMessage({ type: 'rpc', session: this.id, reqId, steps, sync: false });
     });
   }
 
+  /** the same, blocking this thread: the bridge's response body, or null once the call is over */
+  rpcSync(steps) {
+    if (this.outcome) return null;
+    const { state, bytes } = this.shared;
+    Atomics.store(state, 0, 0);
+    this.thread.postMessage({ type: 'rpc', session: this.id, reqId: this.nextReq++, steps, sync: true });
+    if (Atomics.wait(state, 0, 0, 120000) === 'timed-out') {
+      throw new Error('api-tests bridge: no answer from the worker to a synchronous call');
+    }
+    return JSON.parse(Buffer.from(bytes.slice(0, Atomics.load(state, 1))).toString('utf8'));
+  }
+
+  answer(reqId, reply) {
+    const resolve = this.pending.get(reqId);
+    this.pending.delete(reqId);
+    if (resolve) resolve(reply);
+  }
+
   settle(outcome) {
-    this.outcome = outcome;
-    this.notify();
-  }
-
-  answer(reply) {
-    const current = this.current;
-    this.current = null;
-    if (current) current.resolve(reply);
-  }
-
-  notify() {
-    if (this.wake) {
-      const wake = this.wake;
-      this.wake = null;
-      wake();
+    let message;
+    try {
+      // JSON, as the worker reads it: proxies on values the worker handed over go back as their handle
+      message = JSON.parse(JSON.stringify(outcome));
+    } catch (error) {
+      message = { error: { name: 'Error', message: `api-tests bridge: the function's result cannot be sent (${error.message})` } };
     }
-  }
-
-  /** what to tell the worker next: a call to replay, or the outcome once no call is pending */
-  async next() {
-    for (;;) {
-      if (this.current === null && this.requests.length > 0) {
-        this.current = this.requests.shift();
-        return { session: this.id, steps: this.current.steps };
-      }
-      if (this.current === null && this.outcome) return this.outcome;
-      await new Promise((resolve) => {
-        this.wake = resolve;
-      });
-    }
+    this.outcome = message;
+    this.thread.postMessage({ type: 'settle', session: this.id, outcome: message });
   }
 }
 
 /**
- * A local HTTP server the PHP worker calls back while it serves a request: a function of this
- * process passed to the instance (a listener, a condition handler, a document-service middleware),
- * or a jest mock installed on a remote object (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`,
- * Strapi\ApiTests\Spy), runs here, in the test process, when the PHP code calls it. The worker waits
- * for the answer; Node is free to serve it because the test is awaiting the worker's HTTP response.
- * Calls the function makes to the instance meanwhile go through the same request ({@link CallSession}).
+ * The callback server the PHP worker calls back while it serves a request (lib/callback-thread.js,
+ * in a worker thread): a function of this process passed to the instance (a listener, a condition
+ * handler, a document-service middleware, a transaction callback), or a jest mock installed on a
+ * remote object (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`, Strapi\ApiTests\Spy),
+ * runs here, in the test process, when the PHP code calls it. The worker waits for the answer; Node
+ * is free to run it because the test is awaiting the worker's HTTP response. Calls the function
+ * makes to the instance meanwhile go through the same request ({@link CallSession}).
  */
 const startCallbackServer = () =>
   new Promise((resolve, reject) => {
+    const buffer = new SharedArrayBuffer(8 + 32 * 1024 * 1024);
+    const shared = { state: new Int32Array(buffer, 0, 2), bytes: new Uint8Array(buffer, 8) };
+    const thread = new Worker(path.join(__dirname, 'callback-thread.js'), { workerData: { buffer } });
+    thread.unref();
+
     const callbacks = new Map();
     const sessions = new Map();
+    // what functions threw, by token: the error that reaches the test is that very value
+    const thrown = new Map();
     const context = new AsyncLocalStorage();
     let nextId = 1;
-    let nextSession = 1;
-    const server = http.createServer((req, res) => {
-      const chunks = [];
-      req.on('data', (c) => chunks.push(c));
-      req.on('end', async () => {
-        const reply = (body) => {
-          const data = Buffer.from(JSON.stringify(body));
-          res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': data.length });
-          res.end(data);
-        };
-        let session = null;
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-          if (body.session !== undefined) {
-            session = sessions.get(body.session);
-            if (!session) throw new Error(`api-tests bridge: unknown callback session ${body.session}`);
-            session.answer(body.reply);
-          } else {
-            const { id, args = [] } = body;
-            const fn = callbacks.get(id);
-            if (!fn) throw new Error(`api-tests bridge: unknown callback ${id}`);
-            session = new CallSession(nextSession++);
-            sessions.set(session.id, session);
-            const current = session;
-            context
-              .run(current, () => Promise.resolve().then(() => fn(...args)))
-              .then(
-                // the arguments as the function left them: Strapi\ApiTests\RemoteObject copies the
-                // changes back (`file.url = ...` in a replaced upload provider)
-                (result) => current.settle({ result: result === undefined ? null : result, args }),
-                (error) => current.settle({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } })
-              );
-          }
-          const out = await session.next();
-          if (!out.steps) sessions.delete(session.id);
-          reply(out);
-        } catch (error) {
-          if (session) sessions.delete(session.id);
-          reply({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } });
-        }
-      });
-    });
-    server.on('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      server.unref();
-      const { port } = server.address();
-      resolve({
-        url: `http://127.0.0.1:${port}/`,
-        register(fn) {
-          const id = nextId++;
-          callbacks.set(id, fn);
-          return id;
-        },
-        /** the call of a function of this process the current code runs in, if any */
-        session: () => {
-          const session = context.getStore();
-          return session && !session.outcome ? session : null;
-        },
-        close: () => new Promise((r) => server.close(() => r())),
-      });
+    let nextToken = 1;
+
+    thread.on('error', reject);
+    thread.on('message', (message) => {
+      if (message.type === 'listening') {
+        resolve({
+          url: message.url,
+          register(fn) {
+            const id = nextId++;
+            callbacks.set(id, fn);
+            return id;
+          },
+          /** the value a function threw, for the token of an error that came back through the worker */
+          thrown: (token) => {
+            const has = thrown.has(token);
+            const value = thrown.get(token);
+            thrown.delete(token);
+            return { has, value };
+          },
+          /** the call of a function of this process the current code runs in, if any */
+          session: () => {
+            const session = context.getStore();
+            return session && !session.outcome ? session : null;
+          },
+          close: () => thread.terminate(),
+        });
+        return;
+      }
+
+      if (message.type === 'reply') {
+        const session = sessions.get(message.session);
+        if (!session) return;
+        session.answer(message.reqId, message.reply);
+        if (session.outcome && session.pending.size === 0) sessions.delete(session.id);
+        return;
+      }
+
+      if (message.type === 'call') {
+        const session = new CallSession(message.session, thread, shared);
+        sessions.set(session.id, session);
+        const fn = callbacks.get(message.id);
+        const args = message.args;
+        context
+          .run(session, () =>
+            Promise.resolve().then(() => {
+              if (!fn) throw new Error(`api-tests bridge: unknown callback ${message.id}`);
+              return fn(...args);
+            })
+          )
+          .then(
+            // the arguments as the function left them: Strapi\ApiTests\RemoteObject copies the
+            // changes back (`file.url = ...` in a replaced upload provider)
+            (result) => session.settle({ result: result === undefined ? null : result, args }),
+            (error) => {
+              const token = nextToken++;
+              thrown.set(token, error);
+              session.settle({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error), token } });
+            }
+          )
+          .finally(() => {
+            if (session.pending.size === 0) sessions.delete(session.id);
+          });
+      }
     });
   });
 
@@ -325,17 +337,29 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   const run = async (steps, owner = null) => {
     const session = owner && !owner.outcome ? owner : callbacks?.session();
     const response = (session && (await session.rpc(steps))) || (await post(rpcUrl, { steps }));
-    if (response.error) throw toError(response.error);
+    if (response.error) throw fromWorkerError(response.error);
+    // an object without a data form (a transaction object, a closure): a proxy on it, which awaiting
+    // does not resolve again
+    if (response.handle !== undefined) return make([{ handle: response.handle }], function remote() {}, true);
     if (response.null) return null;
     return response.result === null ? undefined : response.result;
   };
 
-  const runSync = (steps) => {
-    if (callbacks?.session()) {
-      throw new Error('api-tests bridge: a synchronous call cannot reach the instance from a function it is calling (the worker waits for that function)');
+  // an error a function of this process threw comes back as that very value (`wrapInTransaction`
+  // throws a Symbol through `strapi.db.transaction()` and catches it by identity)
+  const fromWorkerError = (error) => {
+    if (callbacks && error.token !== undefined) {
+      const { has, value } = callbacks.thrown(error.token);
+      if (has) return value;
     }
-    const response = postSync(rpcUrl, { steps });
-    if (response.error) throw toError(response.error);
+    return toError(error);
+  };
+
+  const runSync = (steps) => {
+    // inside a function the worker is calling, through that call (lib/callback-thread.js)
+    const session = callbacks?.session();
+    const response = (session && session.rpcSync(steps)) || postSync(rpcUrl, { steps });
+    if (response.error) throw fromWorkerError(response.error);
     if (response.null) return null;
     return response.result === null ? undefined : response.result;
   };
@@ -356,7 +380,7 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       });
     } else if (value && typeof value === 'object') {
       const keys = Object.keys(value);
-      if (keys.length === 1 && keys[0] === '$handle') return make([{ handle: value.$handle }], function remote() {});
+      if (keys.length === 1 && keys[0] === '$handle') return make([{ handle: value.$handle }], function remote() {}, true);
       keys.forEach((k) => {
         value[k] = fromWorker(value[k]);
       });
@@ -398,7 +422,7 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   const hooks = callbacks ? { callback: toCallback, zod: toZod } : null;
   const encode = (value) => encodeArg(value, hooks);
 
-  const make = (steps, callableTarget = null) => {
+  const make = (steps, callableTarget = null, settled = false) => {
     // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args).
     // A chain that ends in a call is a result, not a callable: an object target keeps
     // `typeof` at 'object', so Jest's `expect(strapi.documents(uid).findMany(..)).rejects`
@@ -468,7 +492,8 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         if (prop === STARTED) return pending !== null;
         if (typeof prop === 'string' && spies.has(spyKey(steps, prop))) return spies.get(spyKey(steps, prop));
         if (prop === 'then' || prop === 'catch' || prop === 'finally') {
-          if (steps.length === 0) return undefined; // the root itself is not a thenable
+          // the root itself is not a thenable, nor a value the worker handed back
+          if (steps.length === 0 || (settled && steps.length === 1)) return undefined;
           // one request per proxy: Jest reads `then` to check for a promise and again to await
           // it; a second request would leave the first one's rejection unhandled
           if (!pending) {
@@ -505,16 +530,8 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         return make([...steps, { get: prop }]);
       },
       apply(_, __, args) {
-        // `strapi.db.transaction(cb)`: a JS callback cannot run in the PHP worker. Run it here,
-        // without a database transaction (no rollback: what the callback writes is kept).
         const last = steps[steps.length - 1];
         const prev = steps[steps.length - 2];
-        if (typeof args[0] === 'function' && last && last.get === 'transaction' && prev && prev.get === 'db') {
-          const noop = () => {};
-          return Promise.resolve().then(() =>
-            args[0]({ trx: undefined, commit: noop, rollback: noop, onCommit: noop, onRollback: noop })
-          );
-        }
         // `strapi.ai.mcp.registerTool(definition)` (synchronous, not awaited upstream): the Zod schemas cross as JSON Schema (rebuilt as
         // PHP Zod by Strapi\ApiTests\McpDefinition) and the handler runs here, called back with the
         // JSON params (`{ args, extra }`); `createHandler` gets no strapi/context of the worker
@@ -575,6 +592,15 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
           const result = make(callSteps, eventHub ? function remote() {} : null);
           queueMicrotask(() => {
             if (result[STARTED]) return; // awaited: it runs (and may call back) like any other call
+            // inside a function the worker is calling: send it through that call, ahead of the
+            // function's later calls (`onCommit(() => ...)` in a transaction callback)
+            if (callbacks.session()) {
+              result.then(
+                () => {},
+                () => {}
+              );
+              return;
+            }
             try {
               const { $handle } = runSync([...callSteps, { keep: true }]);
               result[REBASE] = [{ handle: $handle }];

@@ -88,6 +88,14 @@ final class Bridge
                 $value = $value->run();
             }
 
+            // an object without a data form (a transaction object, a closure) stays here: the test
+            // gets a proxy on it (`const trx = await strapi.db.transaction(); await trx.commit()`)
+            if (is_object($value) && !$value instanceof Strapi && self::isOpaque($value)) {
+                $this->handles[] = $value;
+
+                return ['status' => 200, 'body' => ['handle' => array_key_last($this->handles)]];
+            }
+
             // `null` from a method declared `?Type` (findOne...) is JS `null`; any other null is `undefined`
             return ['status' => 200, 'body' => ['result' => self::export($value), ...($value === null && $this->lastCallReturnsNullable() ? ['null' => true] : [])]];
         } catch (\Throwable $e) {
@@ -100,6 +108,11 @@ final class Bridge
             if ($e instanceof ApplicationError) {
                 $error['details'] = $e->details;
                 $error['status'] = $e->status;
+            }
+            // what a function of the test threw: the test rethrows that very value
+            $token = CallbackError::in($e)?->token;
+            if ($token !== null) {
+                $error['token'] = $token;
             }
 
             return ['status' => 500, 'body' => ['error' => $error]];
@@ -136,7 +149,8 @@ final class Bridge
         if (is_array($value)) {
             return array_map(fn (mixed $v): mixed => $this->exportArgs($v, $depth + 1), $value);
         }
-        if ($value instanceof \Closure || $value instanceof Strapi || (is_object($value) && self::isOpaque($value))) {
+        // the database too: its public properties are its state, not data (`db.metadata.get(uid)`)
+        if ($value instanceof \Closure || $value instanceof Strapi || $value instanceof Database || (is_object($value) && self::isOpaque($value))) {
             $this->handles[] = $value;
 
             return ['$handle' => array_key_last($this->handles)];

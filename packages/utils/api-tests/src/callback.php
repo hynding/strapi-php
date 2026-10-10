@@ -9,7 +9,7 @@ namespace Strapi\ApiTests;
  * {@see Bridge}): a listener (`strapi.eventHub.on('entry.create', fn)`), a condition handler, a
  * document-service middleware. Calling it POSTs its JSON-exported arguments to the test's callback
  * server (lib/bridge.js) and returns the function's result, or throws its rejection as a
- * \RuntimeException.
+ * {@see CallbackError}.
  *
  * The function may call the instance back while it runs (`next()`, `strapi.documents(uid).findMany()`
  * in a GraphQL resolver). The worker is busy with the call that invoked it, so the callback server
@@ -48,7 +48,9 @@ final readonly class Callback
         }
 
         if (isset($decoded['error']) && is_array($decoded['error'])) {
-            throw new \RuntimeException((string) ($decoded['error']['message'] ?? 'Error'));
+            $token = $decoded['error']['token'] ?? null;
+
+            throw new CallbackError((string) ($decoded['error']['message'] ?? 'Error'), is_int($token) ? $token : null);
         }
 
         $after = is_array($decoded['args'] ?? null) ? array_values($decoded['args']) : [];
