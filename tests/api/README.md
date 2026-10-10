@@ -79,6 +79,23 @@ table does.
 - `@strapi/data-transfer` (imported by `core/data-transfer`) is lib/data-transfer.js: its local
   Strapi providers run in the worker (`Strapi\ApiTests\DataTransfer`), one bridge call per stage.
 
+- A function of the test passed to the instance (`strapi.eventHub.on('entry.create', listener)`,
+  custom admin condition handlers, `strapi.documents.use(middleware)`, GraphQL resolvers given to
+  `extension.use()`) runs in the test process: the worker gets a `Strapi\ApiTests\Callback` that
+  calls it back. While it runs, the worker waits for it, so the calls it makes to the instance
+  (`next()`, `strapi.documents(uid).findFirst()`) travel back over that same callback request and
+  are replayed by the waiting worker (`CallSession` in lib/bridge.js); closures and services among
+  its arguments arrive as proxies. A call that hands over a function, and the event hub's synchronous
+  methods (`on`, `off`, `removeAllListeners`...), are sent at once unless awaited, since upstream
+  tests call them without `await`. A document-service middleware gets `ctx` as JSON and its
+  `next()` passes the changed `ctx` on. Synchronous reads (`strapi.config.get()`, a proxy used as a
+  string) cannot run from inside such a function: they throw.
+
+- A zod schema built by a test (`route.request.query = { search: z.string() }`,
+  `contentAPI.addQueryParams({ x: { schema: z.string() } })`) parses in the test process with the
+  test's zod (`Strapi\ApiTests\RemoteZod`), so transforms and defaults behave as upstream's; an
+  object schema arrives as a PHP `z.object()` of such fields.
+
 - A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)` and
   `strapi.dirs` (in `Core.StrapiDirectories`' shape) are answered synchronously;
   `strapi.db.lifecycles.subscribe({ afterCreate: jest.fn() })` subscribes callbacks that run in the

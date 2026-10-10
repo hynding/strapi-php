@@ -13,8 +13,18 @@
  */
 const http = require('http');
 const { execFileSync } = require('child_process');
+const { AsyncLocalStorage } = require('async_hooks');
 
 const CHAIN = Symbol('chain');
+/** the event hub's methods that are synchronous upstream (`emit` is not) */
+const EVENT_HUB_SYNC = new Set([
+  'on', 'once', 'off', 'addListener', 'removeListener', 'removeAllListeners',
+  'subscribe', 'unsubscribe', 'removeAllSubscribers', 'destroy',
+]);
+/** whether a chain ending in a call was sent already (awaited, or dispatched at once) */
+const STARTED = Symbol('started');
+/** assigning it a list of steps moves a proxy onto them (a call dispatched and kept as a handle) */
+const REBASE = Symbol('rebase');
 
 const post = (url, body) =>
   new Promise((resolve, reject) => {
@@ -42,23 +52,45 @@ const post = (url, body) =>
     req.end(data);
   });
 
-const encodeArg = (value) => {
+/** A schema built with zod v4 (`z` of @strapi/utils or `zod/v4`). */
+const isZodSchema = (value) =>
+  value !== null && typeof value === 'object' && !value[CHAIN] && typeof value._zod === 'object' && typeof value.safeParse === 'function';
+
+/**
+ * JSON form of an argument. With `hooks` (a callback server), a function of this process becomes
+ * `{ "$callback": { url, id } }` (a Strapi\ApiTests\Callback in the worker, calling it back here)
+ * and a zod schema `{ "$zod": ... }` (a Strapi\ApiTests\RemoteZod, parsing here).
+ */
+const encodeArg = (value, hooks = null) => {
   if (value && (typeof value === 'object' || typeof value === 'function') && value[CHAIN]) {
     return { $ref: value[CHAIN] };
   }
-  if (Array.isArray(value)) return value.map(encodeArg);
+  if (Array.isArray(value)) return value.map((v) => encodeArg(v, hooks));
   if (value instanceof Date) return value.toISOString();
+  if (hooks && isZodSchema(value)) return hooks.zod(value);
   if (typeof value === 'function') {
-    throw new Error('api-tests bridge: functions cannot be sent to the PHP instance');
+    if (!hooks) throw new Error('api-tests bridge: functions cannot be sent to the PHP instance');
+    return hooks.callback(value);
   }
   if (value && typeof value === 'object') {
     return Object.fromEntries(
       Object.entries(value)
         .filter(([, v]) => v !== undefined)
-        .map(([k, v]) => [k, encodeArg(v)])
+        .map(([k, v]) => [k, encodeArg(v, hooks)])
     );
   }
   return value;
+};
+
+/** Whether an argument holds a function of this process (not a proxy), or a zod schema. */
+const holdsFunction = (value, seen = new Set()) => {
+  if (!value || (typeof value !== 'object' && typeof value !== 'function') || value[CHAIN] || seen.has(value)) {
+    return false;
+  }
+  if (typeof value === 'function' || isZodSchema(value)) return true;
+  if (value instanceof Date) return false;
+  seen.add(value);
+  return Object.values(value).some((v) => holdsFunction(v, seen));
 };
 
 // upstream tests check error classes (`rejects.toThrow(errors.ValidationError)`): rebuild a PHP
@@ -116,15 +148,79 @@ const postSync = (url, body) => {
 };
 
 /**
- * A local HTTP server the PHP worker calls back while it serves a request: a jest mock installed
- * on a remote object (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`) runs here, in
- * the test process, when the PHP code calls that method (Strapi\\ApiTests\\Spy). The worker waits
+ * One call of a function of this process by the worker. While the function runs, the worker waits
+ * for its answer, so a call the function makes to the instance (`next()`, `strapi.documents(uid)`)
+ * cannot go to the worker over HTTP: it is queued here and handed to the worker as the answer to its
+ * pending request (`{ session, steps }`); the worker replays it and posts the result back
+ * (`{ session, reply }`), until the function settles (`{ result, args }` or `{ error }`).
+ */
+class CallSession {
+  constructor(id) {
+    this.id = id;
+    this.requests = []; // calls waiting for the worker: { steps, resolve }
+    this.current = null; // the call the worker is replaying
+    this.outcome = null; // the function's result or error
+    this.wake = null;
+  }
+
+  /** a call to the instance from inside the function: resolves with the bridge's response body */
+  rpc(steps) {
+    if (this.outcome) return null; // settled: the worker no longer listens
+    return new Promise((resolve) => {
+      this.requests.push({ steps, resolve });
+      this.notify();
+    });
+  }
+
+  settle(outcome) {
+    this.outcome = outcome;
+    this.notify();
+  }
+
+  answer(reply) {
+    const current = this.current;
+    this.current = null;
+    if (current) current.resolve(reply);
+  }
+
+  notify() {
+    if (this.wake) {
+      const wake = this.wake;
+      this.wake = null;
+      wake();
+    }
+  }
+
+  /** what to tell the worker next: a call to replay, or the outcome once no call is pending */
+  async next() {
+    for (;;) {
+      if (this.current === null && this.requests.length > 0) {
+        this.current = this.requests.shift();
+        return { session: this.id, steps: this.current.steps };
+      }
+      if (this.current === null && this.outcome) return this.outcome;
+      await new Promise((resolve) => {
+        this.wake = resolve;
+      });
+    }
+  }
+}
+
+/**
+ * A local HTTP server the PHP worker calls back while it serves a request: a function of this
+ * process passed to the instance (a listener, a condition handler, a document-service middleware),
+ * or a jest mock installed on a remote object (`jest.spyOn(strapi.plugin('email').service('email'), 'send')`,
+ * Strapi\ApiTests\Spy), runs here, in the test process, when the PHP code calls it. The worker waits
  * for the answer; Node is free to serve it because the test is awaiting the worker's HTTP response.
+ * Calls the function makes to the instance meanwhile go through the same request ({@link CallSession}).
  */
 const startCallbackServer = () =>
   new Promise((resolve, reject) => {
     const callbacks = new Map();
+    const sessions = new Map();
+    const context = new AsyncLocalStorage();
     let nextId = 1;
+    let nextSession = 1;
     const server = http.createServer((req, res) => {
       const chunks = [];
       req.on('data', (c) => chunks.push(c));
@@ -134,15 +230,34 @@ const startCallbackServer = () =>
           res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': data.length });
           res.end(data);
         };
+        let session = null;
         try {
-          const { id, args = [] } = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-          const fn = callbacks.get(id);
-          if (!fn) throw new Error(`api-tests bridge: unknown callback ${id}`);
-          const result = await fn(...args);
-          // the arguments as the function left them: Strapi\ApiTests\RemoteObject copies the
-          // changes back (`file.url = ...` in a replaced upload provider)
-          reply({ result: result === undefined ? null : result, args });
+          const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          if (body.session !== undefined) {
+            session = sessions.get(body.session);
+            if (!session) throw new Error(`api-tests bridge: unknown callback session ${body.session}`);
+            session.answer(body.reply);
+          } else {
+            const { id, args = [] } = body;
+            const fn = callbacks.get(id);
+            if (!fn) throw new Error(`api-tests bridge: unknown callback ${id}`);
+            session = new CallSession(nextSession++);
+            sessions.set(session.id, session);
+            const current = session;
+            context
+              .run(current, () => Promise.resolve().then(() => fn(...args)))
+              .then(
+                // the arguments as the function left them: Strapi\ApiTests\RemoteObject copies the
+                // changes back (`file.url = ...` in a replaced upload provider)
+                (result) => current.settle({ result: result === undefined ? null : result, args }),
+                (error) => current.settle({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } })
+              );
+          }
+          const out = await session.next();
+          if (!out.steps) sessions.delete(session.id);
+          reply(out);
         } catch (error) {
+          if (session) sessions.delete(session.id);
           reply({ error: { name: error?.name ?? 'Error', message: error?.message ?? String(error) } });
         }
       });
@@ -158,6 +273,11 @@ const startCallbackServer = () =>
           callbacks.set(id, fn);
           return id;
         },
+        /** the call of a function of this process the current code runs in, if any */
+        session: () => {
+          const session = context.getStore();
+          return session && !session.outcome ? session : null;
+        },
         close: () => new Promise((r) => server.close(() => r())),
       });
     });
@@ -169,14 +289,21 @@ const startCallbackServer = () =>
  * @param {object} [callbacks] a {@link startCallbackServer} result, for jest spies on remote methods
  */
 const createRemote = (rpcUrl, local = {}, callbacks = null) => {
-  const run = async (steps) => {
-    const response = await post(rpcUrl, { steps });
+  // a call made by a function the worker is calling goes back through that call (CallSession): the
+  // worker is busy with it. `owner` is the call a proxy was created in (its continuations may run
+  // after the context is gone, e.g. a thenable returned by the function and awaited by the server)
+  const run = async (steps, owner = null) => {
+    const session = owner && !owner.outcome ? owner : callbacks?.session();
+    const response = (session && (await session.rpc(steps))) || (await post(rpcUrl, { steps }));
     if (response.error) throw toError(response.error);
     if (response.null) return null;
     return response.result === null ? undefined : response.result;
   };
 
   const runSync = (steps) => {
+    if (callbacks?.session()) {
+      throw new Error('api-tests bridge: a synchronous call cannot reach the instance from a function it is calling (the worker waits for that function)');
+    }
     const response = postSync(rpcUrl, { steps });
     if (response.error) throw toError(response.error);
     if (response.null) return null;
@@ -189,18 +316,71 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   // remote properties replaced by an object of this process (`plugin.provider = { uploadStream() {} }`)
   const assigned = new Set();
 
-  const make = (steps) => {
+  // the worker's arguments to a function of this process: `{ $handle }` (a closure, a service) is
+  // a proxy on the value the worker keeps (`next()`); replaced in place, so the reply's `args` are
+  // the function's own (Strapi\ApiTests\RemoteObject copies their changes back)
+  const fromWorker = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        value[i] = fromWorker(v);
+      });
+    } else if (value && typeof value === 'object') {
+      const keys = Object.keys(value);
+      if (keys.length === 1 && keys[0] === '$handle') return make([{ handle: value.$handle }], function remote() {});
+      keys.forEach((k) => {
+        value[k] = fromWorker(value[k]);
+      });
+    }
+    return value;
+  };
+  const toCallback = (fn) => ({ $callback: { url: callbacks.url, id: callbacks.register((...args) => fn(...fromWorker(args))) } });
+  // a zod schema parses here, with the test's zod (Strapi\ApiTests\RemoteZod); an object schema
+  // goes as its shape, so the instance can extend it (`contentAPI.addInputParams`)
+  const toZod = (schema) => {
+    const { def, optin, optout } = schema._zod;
+    if (def.type === 'object' && schema.shape) {
+      return { $zod: { type: 'object', shape: Object.fromEntries(Object.entries(schema.shape).map(([k, v]) => [k, toZod(v)])) } };
+    }
+    let jsonSchema = {};
+    try {
+      jsonSchema = require('@strapi/utils').z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' });
+    } catch {
+      // not representable: the instance documents it as any value
+    }
+    const safeParse = (value, absent) => {
+      const result = schema.safeParse(absent ? undefined : value);
+      return result.success
+        ? { success: true, undefined: result.data === undefined, data: result.data === undefined ? null : result.data }
+        : { success: false, issues: result.error.issues };
+    };
+    return {
+      $zod: { type: def.type, optionalIn: optin === 'optional', optionalOut: optout === 'optional', jsonSchema, safeParse: toCallback(safeParse) },
+    };
+  };
+  const hooks = callbacks ? { callback: toCallback, zod: toZod } : null;
+  const encode = (value) => encodeArg(value, hooks);
+
+  const make = (steps, callableTarget = null) => {
     // a function target so the proxy is callable: strapi.service(uid)(...) / findUser(args).
     // A chain that ends in a call is a result, not a callable: an object target keeps
     // `typeof` at 'object', so Jest's `expect(strapi.documents(uid).findMany(..)).rejects`
     // awaits it instead of calling it (it calls any function it is given).
     let pending = null;
+    let failure = null;
+    const owner = callbacks?.session() ?? null;
     const last = steps[steps.length - 1];
-    const target = last && Object.prototype.hasOwnProperty.call(last, 'call') && !Object.prototype.hasOwnProperty.call(last, 'get') ? {} : function remote() {};
+    const target =
+      callableTarget ??
+      (last && Object.prototype.hasOwnProperty.call(last, 'call') && !Object.prototype.hasOwnProperty.call(last, 'get') ? {} : function remote() {});
     return new Proxy(target, {
       // `jest.spyOn(remote, 'method')` assigns a mock function: the PHP object's method then calls
       // it back (see startCallbackServer); `mockRestore()` deletes it again
       set(target, prop, value) {
+        if (prop === REBASE) {
+          if (value instanceof Error) failure = value;
+          else steps = value;
+          return true;
+        }
         const local = () => Reflect.set(target, prop, value); // not reflected in PHP
         // an object with methods assigned to a remote property (a stub upload provider): the
         // property becomes a Strapi\ApiTests\RemoteObject whose methods call these back
@@ -247,16 +427,21 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       },
       get(_, prop) {
         if (prop === CHAIN) return steps;
+        if (prop === STARTED) return pending !== null;
         if (typeof prop === 'string' && spies.has(spyKey(steps, prop))) return spies.get(spyKey(steps, prop));
         if (prop === 'then' || prop === 'catch' || prop === 'finally') {
           if (steps.length === 0) return undefined; // the root itself is not a thenable
           // one request per proxy: Jest reads `then` to check for a promise and again to await
           // it; a second request would leave the first one's rejection unhandled
           if (!pending) {
-            pending = run(steps);
+            pending = failure ? Promise.reject(failure) : run(steps, owner);
             pending.catch(() => {}); // handled by whoever awaits it
           }
           return pending[prop].bind(pending);
+        }
+        // sent back to the worker as the value it handed over (CallSession reply `args`)
+        if (prop === 'toJSON' && steps.length === 1 && steps[0].handle !== undefined) {
+          return () => ({ $handle: steps[0].handle });
         }
         if (prop === Symbol.toPrimitive) {
           // used as a primitive (property key, template string, arithmetic): resolve it now
@@ -284,8 +469,7 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
       apply(_, __, args) {
         // `strapi.db.transaction(cb)`: a JS callback cannot run in the PHP worker. Run it here,
         // without a database transaction (no rollback: what the callback writes is kept).
-        let pending = null;
-    const last = steps[steps.length - 1];
+        const last = steps[steps.length - 1];
         const prev = steps[steps.length - 2];
         if (typeof args[0] === 'function' && last && last.get === 'transaction' && prev && prev.get === 'db') {
           const noop = () => {};
@@ -326,7 +510,40 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
           const handle = runSync([...steps, { call: [encodeArg(subscriber)] }, { keep: true }]);
           return () => runSync([{ handle: handle.$handle }, { call: [] }]);
         }
-        return make([...steps, { call: args.map(encodeArg) }]);
+        // a document-service middleware changes `ctx` in place and calls `next()`: the PHP stack
+        // takes the changed context as next's argument (Middlewares\MiddlewareManager). No params
+        // is PHP's `[]`, upstream's `{}` (`ctx.params.filters = ...` must survive the trip back)
+        if (last && last.get === 'use' && prev && prev.get === 'documents' && steps.length === 2 && typeof args[0] === 'function' && !args[0][CHAIN]) {
+          const middleware = args[0];
+          args = [
+            (ctx, next) => {
+              if (Array.isArray(ctx.params) && ctx.params.length === 0) ctx.params = {};
+              return middleware(ctx, (...rest) => next(...(rest.length > 0 ? rest : [ctx])));
+            },
+          ];
+        }
+        const callSteps = [...steps, { call: args.map(encode) }];
+        // handing the instance a function (`strapi.eventHub.on(name, listener)`,
+        // `strapi.documents.use(middleware)`) or calling one of the event hub's synchronous methods
+        // is synchronous upstream, and rarely awaited: unless the call is awaited right away, send
+        // it before anything else (the test's next request) and keep its result in the worker
+        const eventHub = prev && prev.get === 'eventHub' && EVENT_HUB_SYNC.has(last.get);
+        if (callbacks && (eventHub || args.some((a) => holdsFunction(a)))) {
+          // the event hub's `on`/`subscribe` return the unsubscribe function; any other result stays
+          // an object, which `expect(result).resolves` awaits instead of calling
+          const result = make(callSteps, eventHub ? function remote() {} : null);
+          queueMicrotask(() => {
+            if (result[STARTED]) return; // awaited: it runs (and may call back) like any other call
+            try {
+              const { $handle } = runSync([...callSteps, { keep: true }]);
+              result[REBASE] = [{ handle: $handle }];
+            } catch (error) {
+              result[REBASE] = error;
+            }
+          });
+          return result;
+        }
+        return make(callSteps);
       },
     });
   };
@@ -335,7 +552,7 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   /** A PHP class upstream's helpers require() directly: `classRef('Strapi\\Core\\...').method(...)`. */
   const classRef = (fqcn) => make([{ class: fqcn }]);
   /** Replays steps synchronously (for APIs upstream exposes synchronously, like `strapi.config`). */
-  const callSync = (steps) => runSync(steps.map((step) => (step.call ? { call: step.call.map(encodeArg) } : step)));
+  const callSync = (steps) => runSync(steps.map((step) => (step.call ? { call: step.call.map(encode) } : step)));
   return { root, classRef, callSync };
 };
 
