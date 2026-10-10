@@ -51,7 +51,8 @@ return static function (EnvHelper $env): array {
         'sqlite' => [
             'client' => 'sqlite',
             'connection' => [
-                'filename' => dirname(__DIR__) . '/' . $env('DATABASE_FILENAME', '.tmp/data.db'),
+                // `--dbclient sqlite` without `--dbfile` writes an empty DATABASE_FILENAME: use the default
+                'filename' => dirname(__DIR__) . '/' . ($env('DATABASE_FILENAME') ?: '.tmp/data.db'),
             ],
             'useNullAsDefault' => true,
         ],

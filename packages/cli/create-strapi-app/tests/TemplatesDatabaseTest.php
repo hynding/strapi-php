@@ -75,4 +75,16 @@ final class TemplatesDatabaseTest extends TestCase
         self::assertIsArray($config);
         self::assertSame('sqlite', $config['connection']['client'] ?? null);
     }
+
+    #[DataProvider('templateProvider')]
+    public function testAnEmptySqliteFilenameFallsBackToTheDefault(string $template): void
+    {
+        // `--dbclient sqlite` without `--dbfile` writes `DATABASE_FILENAME=` to the generated .env
+        $templateDir = CreateStrapi::templatesDir() . "/{$template}";
+        foreach (['' => '/.tmp/data.db', 'db/custom.db' => '/db/custom.db'] as $filename => $expected) {
+            $config = self::loadDatabaseConfig($template)(new EnvHelper(['DATABASE_CLIENT' => 'sqlite', 'DATABASE_FILENAME' => $filename]));
+
+            self::assertSame($templateDir . $expected, $config['connection']['connection']['filename']);
+        }
+    }
 }
