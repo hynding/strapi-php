@@ -190,6 +190,10 @@ final class Bridge
             $i = 1;
         }
 
+        // the plain reads since the last call, as [holder, key]: where a spy on a value that is not a
+        // registered service is written back (`strapi.contentAPI.permissions.providers.action`)
+        $trail = [];
+
         for (; $i < $count; $i++) {
             $step = $steps[$i];
             $this->nullIsValue = false;
@@ -203,11 +207,12 @@ final class Bridge
             }
             if (array_key_exists('spy', $step) || array_key_exists('unspy', $step)) {
                 // `jest.spyOn(remote, method)` / `mockRestore()` (lib/bridge.js): last step of the chain
-                return $this->toggleSpy($value, $step);
+                return $this->toggleSpy($value, $step, $trail);
             }
             if (!array_key_exists('get', $step)) {
                 // a bare call: the current value is a callable
                 $value = self::invoke($value, $this->args($step['call'] ?? []));
+                $trail = [];
                 continue;
             }
 
@@ -215,10 +220,12 @@ final class Bridge
             $next = $steps[$i + 1] ?? null;
             if (is_array($next) && array_key_exists('call', $next) && !array_key_exists('get', $next)) {
                 $value = $this->callMember($value, $name, $this->args($next['call']));
+                $trail = [];
                 $i++;
                 continue;
             }
 
+            $trail[] = [$value, $name];
             $value = self::read($value, $name);
         }
 
@@ -226,15 +233,20 @@ final class Bridge
     }
 
     /**
-     * Installs (`spy: { method, url, id }`) or removes (`unspy: method`) a jest mock on a service:
-     * the service registered under the object's uid is replaced by a {@see Spy} wrapping it.
+     * Installs (`spy: { method, url, id, mock }`) or removes (`unspy: method`) a jest mock on an
+     * object's method: a {@see Spy} wrapping it takes its place, as the service registered under its
+     * uid, or for any other object where the chain read it from (`$trail`, see {@see writeBack()}).
+     * The latter only for a jest mock (`mock`): another function may wrap the original method
+     * (`impl.apply(this, args)`, upload-concurrency), which cannot reach the worker while the Spy
+     * waits for it, and would put a Spy where the code checks the object's class.
      *
+     * @param list<array{0: mixed, 1: string}> $trail
      * @param array<string, mixed> $step
      */
-    private function toggleSpy(mixed $target, array $step): bool
+    private function toggleSpy(mixed $target, array $step, array $trail): bool
     {
         if (!is_object($target)) {
-            throw new \InvalidArgumentException('Only methods of a service object can be spied on, got ' . get_debug_type($target));
+            throw new \InvalidArgumentException('Only methods of an object can be spied on, got ' . get_debug_type($target));
         }
 
         $services = $this->strapi->get('services');
@@ -245,23 +257,81 @@ final class Bridge
                 break;
             }
         }
-        if ($uid === null) {
-            throw new \InvalidArgumentException('Only methods of a registered service can be spied on, got ' . get_debug_type($target));
-        }
+        $replace = $uid !== null
+            ? static function (object $replacement) use ($services, $uid): bool {
+                $services->set($uid, $replacement);
+
+                return true;
+            }
+            : fn (object $replacement): bool => $this->writeBack($trail, $replacement);
 
         if (isset($step['spy']) && is_array($step['spy'])) {
+            if (!$target instanceof Spy && $uid === null && ($step['spy']['mock'] ?? false) !== true) {
+                throw new \InvalidArgumentException('Only jest mocks can replace a method of an object that is not a registered service, got ' . get_debug_type($target));
+            }
             $spy = $target instanceof Spy ? $target : new Spy($target);
             $spy->spy((string) $step['spy']['method'], (string) $step['spy']['url'], (int) $step['spy']['id']);
-            $services->set($uid, $spy);
+            if ($spy !== $target && !$replace($spy)) {
+                throw new \InvalidArgumentException('Only methods of a registered service or of an object held in a writable property can be spied on, got ' . get_debug_type($target));
+            }
 
             return true;
         }
 
         if ($target instanceof Spy && !$target->unspy((string) $step['unspy'])) {
-            $services->set($uid, $target->original);
+            $replace($target->original);
         }
 
         return true;
+    }
+
+    /**
+     * Puts `$value` where the plain reads of `$trail` found the current one: the nearest object on the
+     * way gets its public, writable property set, through the array keys read after it
+     * (`$permissions->providers['action'] = $value`). False when there is no such property.
+     *
+     * @param list<array{0: mixed, 1: string}> $trail
+     */
+    private function writeBack(array $trail, mixed $value): bool
+    {
+        $keys = [];
+        for ($i = count($trail) - 1; $i >= 0; $i--) {
+            [$holder, $key] = $trail[$i];
+            if (is_array($holder)) {
+                array_unshift($keys, $key);
+                continue;
+            }
+            if (!is_object($holder) || !property_exists($holder, $key)) {
+                return false;
+            }
+            $property = new \ReflectionProperty($holder, $key);
+            if (!$property->isPublic() || $property->isReadOnly() || $property->isStatic()) {
+                return false;
+            }
+            if ($keys === []) {
+                $holder->{$key} = $value;
+
+                return true;
+            }
+            $array = $holder->{$key};
+            if (!is_array($array)) {
+                return false;
+            }
+            $slot = &$array;
+            foreach ($keys as $k) {
+                if (!is_array($slot) || !array_key_exists($k, $slot)) {
+                    return false;
+                }
+                $slot = &$slot[$k];
+            }
+            $slot = $value;
+            unset($slot);
+            $holder->{$key} = $array;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

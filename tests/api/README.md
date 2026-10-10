@@ -60,8 +60,10 @@ table does.
 - `jest.spyOn(<remote service>, 'method')` (e.g. `strapi.plugin('email').service('email')`)
   works across the process boundary: the bridge replaces the registered service in the worker by
   a `Strapi\ApiTests\Spy` whose spied method calls the jest mock back over HTTP (a callback
-  server in the test process, lib/bridge.js); `mockRestore()` puts the service back. Assigning a
-  mock to any other remote object stays local to the test process, as before.
+  server in the test process, lib/bridge.js); `mockRestore()` puts the service back. A mock on a
+  method of another object (`strapi.contentAPI.permissions.providers.action.keys = jest.fn()`)
+  puts the Spy where the chain read that object from (a public writable property, or an array in
+  one). A mock the worker has nowhere to put stays local to the test process, as before.
 
 - `strapi.plugin(name).config(path)` is answered synchronously (a blocking request), like
   `strapi.config.get()`: upstream reads it synchronously (`expect(strapi.plugin('graphql').config('maxLimit')).toBe(...)`).
@@ -116,7 +118,8 @@ table does.
   app's `config/*.php`). As in upstream's jest.config.api.js, only `.ts` files are transformed.
 
 - A few more synchronous or callback APIs cross the bridge: `strapi.db.metadata.get(uid)`,
-  `strapi.sessionManager.generateSessionId()`, the content-type builder services'
+  `strapi.sessionManager.generateSessionId()`, `strapi.service('admin::encryption').encrypt/decrypt()`,
+  the content-type builder services'
   `formatContentType()` / `formatComponent()`, `strapi.contentTypes` / `strapi.components` (data
   that still passes as a reference to the worker's objects) and `strapi.dirs` (in
   `Core.StrapiDirectories`' shape) are answered synchronously;

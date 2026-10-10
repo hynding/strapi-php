@@ -485,9 +485,11 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         }
         try {
           const id = callbacks.register(value);
-          runSync([...steps, { spy: { method: prop, url: callbacks.url, id } }]);
+          // a jest mock (`jest.fn(() => [...])`) answers by itself; any other function may wrap the
+          // original (`impl.apply(this, args)`), which the worker cannot run while it waits on it
+          runSync([...steps, { spy: { method: prop, url: callbacks.url, id, mock: value._isMockFunction === true } }]);
         } catch {
-          // only methods of registered services can be replaced in PHP
+          // only methods of registered services, and jest mocks of other objects, are replaced in PHP
           return local();
         }
         spies.set(spyKey(steps, prop), value);
@@ -544,6 +546,14 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         // the content-type builder's `formatContentType(ct)` / `formatComponent(c)` are synchronous
         // upstream: api-tests/models.js reads their result after destroying the instance it used
         if ((prop === 'formatContentType' || prop === 'formatComponent') && steps.some((step) => step.get === 'service')) {
+          return (...args) => callSync([...steps, { get: prop }, { call: args }]);
+        }
+        // `strapi.service('admin::encryption').encrypt/decrypt(value)` are synchronous upstream (the
+        // test compares the result as is)
+        if (
+          (prop === 'encrypt' || prop === 'decrypt') && steps.length === 2 && steps[0].get === 'service' &&
+          steps[1].call && steps[1].call[0] === 'admin::encryption'
+        ) {
           return (...args) => callSync([...steps, { get: prop }, { call: args }]);
         }
         // `strapi.sessionManager.generateSessionId()` is synchronous upstream (its result is compared as is)

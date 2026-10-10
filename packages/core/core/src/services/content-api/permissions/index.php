@@ -22,8 +22,13 @@ final class Permissions
 {
     public readonly PermissionsEngine $engine;
 
-    /** @var array{action: Action, condition: Condition} */
-    public readonly array $providers;
+    /**
+     * Writable, like the property of upstream's plain object (a test replaces a provider's method:
+     * `strapi.contentAPI.permissions.providers.action.keys = jest.fn()`).
+     *
+     * @var array{action: Action, condition: Condition}
+     */
+    public array $providers;
 
     /** @var array<string, array<string, list<string>>> controllerUid => actionName => route types */
     private array $boundActions = [];
