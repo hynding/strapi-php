@@ -137,6 +137,8 @@ const createStrapiInstance = async ({
     };
     const { root, classRef, callSync } = createRemote(`${server.url}/__api-tests/rpc`, local, callbacks);
     local.__class = classRef;
+    // synchronous replays for modules that stand in for upstream packages (lib/openapi.js)
+    local.__callSync = callSync;
     // strapi.config is synchronous upstream (`jwt.verify(token, strapi.config.get('admin.auth.secret'))`)
     local.config = {
       get: (...args) => callSync([{ get: 'config' }, { get: 'get' }, { call: args }]),

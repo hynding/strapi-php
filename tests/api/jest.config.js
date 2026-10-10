@@ -21,6 +21,11 @@ module.exports = {
     '^api-tests/(.*)$': `${helpersDir}/$1`,
     // the local Strapi providers of packages/core/data-transfer, run in the worker
     '^@strapi/data-transfer$': path.join(apiTestsDir, 'lib', 'data-transfer.js'),
+    // what suites import from packages that run in the worker here (see each module)
+    '^@strapi/database$': path.join(apiTestsDir, 'lib', 'database.js'),
+    '^@strapi/openapi$': path.join(apiTestsDir, 'lib', 'openapi.js'),
+    // `createStrapi` from @strapi/strapi's build (plugins/graphql/cors)
+    '^(\\.\\./)+packages/core/strapi/dist/index\\.js$': path.join(apiTestsDir, 'lib', 'create-strapi.js'),
   },
   // upstream files live outside rootDir: resolve their imports from our node_modules
   modulePaths: [path.join(apiTestsDir, 'node_modules')],

@@ -384,7 +384,15 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
         : { success: false, issues: result.error.issues };
     };
     return {
-      $zod: { type: def.type, optionalIn: optin === 'optional', optionalOut: optout === 'optional', jsonSchema, safeParse: toCallback(safeParse) },
+      $zod: {
+        type: def.type,
+        optionalIn: optin === 'optional',
+        optionalOut: optout === 'optional',
+        optional: schema.safeParse(undefined).success,
+        nullable: schema.safeParse(null).success,
+        jsonSchema,
+        safeParse: toCallback(safeParse),
+      },
     };
   };
   const hooks = callbacks ? { callback: toCallback, zod: toZod } : null;
@@ -589,4 +597,7 @@ const createRemote = (rpcUrl, local = {}, callbacks = null) => {
   return { root, classRef, callSync };
 };
 
-module.exports = { createRemote, startCallbackServer };
+/** The recorded steps of a proxy (`undefined` for any other value). */
+const chainOf = (value) => (value && (typeof value === 'object' || typeof value === 'function') ? value[CHAIN] : undefined);
+
+module.exports = { createRemote, startCallbackServer, chainOf };

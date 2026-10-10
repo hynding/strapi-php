@@ -8,16 +8,20 @@ use Strapi\Utils\Zod\ParsePayload;
 use Strapi\Utils\Zod\Undefined;
 use Strapi\Utils\Zod\Z as z;
 use Strapi\Utils\Zod\ZodType;
+use Strapi\Utils\Zod\ZodUnknown;
 
 /**
  * A Zod schema built by a test and handed to the instance (`route.request.query = { search: z.string() }`,
  * `contentAPI.addInputParams({ ... })`, see lib/bridge.js): it parses in the test process, with the
- * test's own zod (`{ "$zod": { type, safeParse, optionalIn, optionalOut, jsonSchema } }`, `safeParse`
- * a {@see Callback}), so transforms, defaults and refinements behave as upstream's. An object schema
+ * test's own zod (`{ "$zod": { type, safeParse, optionalIn, optionalOut, optional, nullable, jsonSchema } }`,
+ * `safeParse` a {@see Callback}), so transforms, defaults and refinements behave as upstream's. What
+ * code inspects without parsing (optionality, JSON Schema) comes with it: the test process cannot
+ * answer a callback during a synchronous call (`generate()` of @strapi/openapi). It is a `z.unknown()`
+ * whose metadata is that JSON Schema, which is how `z.toJSONSchema()` renders it. An object schema
  * arrives as its shape (`{ type: "object", shape }`) and becomes a PHP `z.object()` of remote fields,
  * which code composing route schemas can extend.
  */
-final class RemoteZod extends ZodType
+final class RemoteZod extends ZodUnknown
 {
     /** @param array<string, mixed> $jsonSchema */
     private function __construct(
@@ -25,8 +29,12 @@ final class RemoteZod extends ZodType
         private readonly Callback $safeParse,
         private readonly bool $optionalIn,
         private readonly bool $optionalOut,
-        private readonly array $jsonSchema,
+        private readonly bool $optional,
+        private readonly bool $nullable,
+        array $jsonSchema,
     ) {
+        unset($jsonSchema['$schema']);
+        $this->metadata = $jsonSchema;
     }
 
     /** @param array<string, mixed> $zod the `$zod` payload, references resolved */
@@ -50,6 +58,8 @@ final class RemoteZod extends ZodType
             $zod['safeParse'],
             ($zod['optionalIn'] ?? false) === true,
             ($zod['optionalOut'] ?? false) === true,
+            ($zod['optional'] ?? false) === true,
+            ($zod['nullable'] ?? false) === true,
             is_array($zod['jsonSchema'] ?? null) ? $zod['jsonSchema'] : [],
         );
     }
@@ -67,6 +77,16 @@ final class RemoteZod extends ZodType
     public function isOptionalOut(): bool
     {
         return $this->optionalOut;
+    }
+
+    public function isOptional(): bool
+    {
+        return $this->optional;
+    }
+
+    public function isNullable(): bool
+    {
+        return $this->nullable;
     }
 
     protected function parseType(ParsePayload $payload): ParsePayload
@@ -90,11 +110,5 @@ final class RemoteZod extends ZodType
         }
 
         return $payload;
-    }
-
-    /** @param array<string, mixed> $params */
-    public function toJSONSchema(array $params = []): array
-    {
-        return $this->jsonSchema;
     }
 }
