@@ -81,18 +81,20 @@ final class Repository implements RepositoryContract
         return $this->hasDraftAndPublish;
     }
 
-    // --- param checks (strict mode) -----------------------------------------------------------
-
     /**
-     * Publication actions look up every row matching `documentId`. An empty value would match all rows
-     * whose document_id is NULL, so reject it outright.
+     * Upstream destructures `const { documentId, ...params } = opts` and puts `documentId` in the
+     * `where` clause as is. A missing one is `undefined`, which the string field casts to ''
+     * (lodash `toString`), so the lookup matches no row. PHP has no `undefined`: a missing key
+     * becomes '' here rather than null, which the query engine turns into `document_id IS NULL`.
+     *
+     * @param array<string, mixed> $params
      */
-    private static function assertDocumentIdProvided(mixed $documentId, string $action): void
+    private static function documentIdParam(array $params): mixed
     {
-        if (Params::isParamEmpty($documentId)) {
-            throw new ValidationError("Cannot {$action} a document without a documentId");
-        }
+        return array_key_exists('documentId', $params) ? $params['documentId'] : '';
     }
+
+    // --- param checks (strict mode) -----------------------------------------------------------
 
     /**
      * @param array<string, mixed> $params
@@ -416,7 +418,7 @@ final class Repository implements RepositoryContract
     public function findOne(array $params): ?array
     {
         return $this->wrap(function () use ($params): ?array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
 
             $query = $this->validateParams($params);
@@ -435,7 +437,7 @@ final class Repository implements RepositoryContract
     public function delete(array $params): array
     {
         return $this->wrap(function () use ($params): array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
 
             $lookupQuery = $this->validateParams($params);
@@ -504,7 +506,7 @@ final class Repository implements RepositoryContract
     public function clone(array $params = []): array
     {
         return $this->wrap(function () use ($params): array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
 
             $queryParams = $this->validateParams($params);
@@ -563,7 +565,7 @@ final class Repository implements RepositoryContract
     public function update(array $params): ?array
     {
         return $this->wrap(function () use ($params): ?array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
 
             $queryParams = $this->validateParams($params);
@@ -640,9 +642,8 @@ final class Repository implements RepositoryContract
         }
 
         return $this->wrap(function () use ($params): array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
-            self::assertDocumentIdProvided($documentId, 'publish');
 
             $queryParams = $this->validateParams($params);
             $queryParams = $this->defaultLocale($queryParams);
@@ -701,9 +702,8 @@ final class Repository implements RepositoryContract
         }
 
         return $this->wrap(function () use ($params): array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
-            self::assertDocumentIdProvided($documentId, 'unpublish');
 
             $query = $this->validateParams($params);
             $query = $this->defaultLocale($query);
@@ -732,9 +732,8 @@ final class Repository implements RepositoryContract
         }
 
         return $this->wrap(function () use ($params): array {
-            $documentId = $params['documentId'] ?? null;
+            $documentId = self::documentIdParam($params);
             unset($params['documentId']);
-            self::assertDocumentIdProvided($documentId, 'discard the draft of');
 
             $queryParams = $this->validateParams($params);
             $queryParams = $this->defaultLocale($queryParams);

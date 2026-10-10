@@ -416,4 +416,26 @@ final class ContentApiTest extends AppTestCase
         self::assertSame($created['documentId'], $deleted['documentId']);
         self::assertCount(2, $deleted['entries']);
     }
+
+    public function testDocumentServiceWithoutDocumentIdMatchesNoRow(): void
+    {
+        // upstream looks a missing documentId up as '' (the string field casts `undefined`), never as NULL
+        $connection = self::strapi()->db()->getConnection();
+        $connection->insert('categories', ['name' => 'No documentId', 'locale' => 'en']);
+        $orphanId = (int) $connection->lastInsertId();
+
+        $documents = self::strapi()->documents('api::category.category');
+        foreach (['publish', 'unpublish', 'discardDraft', 'delete', 'clone'] as $action) {
+            $result = $documents->{$action}([]);
+            self::assertSame([], $result['entries'], $action);
+        }
+        self::assertNull($documents->findOne([]));
+        self::assertNull($documents->update(['data' => ['name' => 'Updated']]));
+
+        $row = $connection->fetchAssociative('SELECT name, published_at FROM categories WHERE id = ?', [$orphanId]);
+        self::assertSame(['name' => 'No documentId', 'published_at' => null], $row);
+        self::assertSame(1, (int) $connection->fetchOne('SELECT COUNT(*) FROM categories WHERE document_id IS NULL'));
+
+        $connection->delete('categories', ['id' => $orphanId]);
+    }
 }
