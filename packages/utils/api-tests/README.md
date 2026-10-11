@@ -17,4 +17,5 @@ repository root for the naming rules.
 `jest.spyOn()` on one of its methods, calling the jest mock back in the test process;
 `src/callback.php` is any other function of the test process (listeners, condition handlers,
 middlewares), which may call the instance back while it runs; `src/remote-zod.php` is a zod schema
-built by a test, parsed by the test's own zod.
+built by a test, parsed by the test's own zod; `src/mock-fetch.php` is the worker's half of
+`withMockedFetch()`, the test's mock answering `strapi.fetch`.

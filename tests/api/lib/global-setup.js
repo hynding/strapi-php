@@ -40,6 +40,12 @@ module.exports = async () => {
   );
   // getModel() is synchronous in-process; across the bridge it has to be awaited
   patch(path.join(helpersDir, 'models.js'), 'const contentType = strapi.getModel(uid);', 'const contentType = await strapi.getModel(uid);');
+  // withMockedFetch() mocks the test process' fetch; the instance fetches from the PHP worker
+  patch(
+    path.join(helpersDir, 'mock-fetch.js'),
+    '    await fn();',
+    `    await require(${JSON.stringify(path.join(apiTestsDir, 'lib', 'mock-fetch.js'))}).intercept(mockFn, fn);`
+  );
 
   process.env.ENV_PATH = path.join(appDir, '.env');
 };
