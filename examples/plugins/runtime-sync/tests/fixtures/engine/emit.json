@@ -1,0 +1,41 @@
+[
+  {
+    "description": "every leaf kind, both languages, nested defaults",
+    "doc": {
+      "source": "config/custom.js",
+      "form": "function",
+      "value": {
+        "host": { "$env": "string", "key": "HOST", "default": "0.0.0.0" },
+        "port": { "$env": "int", "key": "PORT", "default": 1337 },
+        "ratio": { "$env": "float", "key": "RATIO", "default": 1.0 },
+        "flag": { "$env": "bool", "key": "FLAG" },
+        "keys": { "$env": "array", "key": "APP_KEYS", "default": [] },
+        "meta": { "$env": "json", "key": "META", "default": { "a": 1 } },
+        "mode": { "$env": "oneOf", "key": "MODE", "expected": ["fast", "slow"], "default": "fast" },
+        "when": { "$env": "date", "key": "WHEN" },
+        "title": { "$concat": ["It's ", { "$env": "string", "key": "NAME", "default": "x" }, " here"] },
+        "root": { "$root": true },
+        "sub": { "$concat": [{ "$root": true }, "/public/uploads"] },
+        "file": { "$concat": [{ "$root": true }, "/", { "$env": "string", "key": "DATABASE_FILENAME", "default": ".tmp/data.db" }] },
+        "odd": { "$concat": [{ "$root": true }, "-suffix"] },
+        "todo": { "$todo": "strtoupper($x)", "lang": "php" },
+        "list": [1, -2, 2.5, true, false, null, "s"],
+        "empty-object": {},
+        "emptyList": [],
+        "quote\"key": "it's \"quoted\"\nnext line"
+      },
+      "warnings": ["something to review"]
+    },
+    "targets": { "php": "config/custom.php", "js": "config/custom.js", "ts": "config/custom.ts" }
+  },
+  {
+    "description": "plain data in value form: no env parameter, no imports",
+    "doc": { "source": "config/api.php", "form": "value", "value": { "rest": { "defaultLimit": 25, "withCount": true }, "list": ["a", "b"] }, "warnings": [] },
+    "targets": { "php": "config/api.php", "js": "config/api.js", "ts": "config/api.ts" }
+  },
+  {
+    "description": "function form without env reads still takes the env parameter; deeper target path",
+    "doc": { "source": "config/env/production/server.js", "form": "function", "value": { "proxy": true, "dir": { "$root": true } }, "warnings": [] },
+    "targets": { "php": "config/env/production/server.php", "js": "config/env/production/server.js", "ts": "config/env/production/server.ts" }
+  }
+]

@@ -117,6 +117,13 @@ helper; `addSchema()`), `lifecycles/subscribers/index.ts` → `Lifecycles\Subscr
 - PHP has no SHAKE256, so `Identifiers\Hash` implements Keccak-f[1600]; verified against Node's
   `crypto.createHash('shake256')` and the upstream test vectors.
 - `TransactionContext` is a stack (no AsyncLocalStorage): the DBAL connection is the transaction.
+- **Sharing a database with Node Strapi.** `Schema\Storage::hashSchema()` orders tables the way
+  upstream's `localeCompare` does (ICU collation through ext-intl, with an ASCII fallback) so both
+  runtimes store the same hash for the same schema and neither re-syncs after the other booted. A
+  user migration counts as executed under either runtime's spelling of its name
+  (`Migrations\Runner`: `name.js`/`.ts` logged by Node covers `name.php`, and the reverse), so a
+  migration that ran on one runtime does not run again on the other; `.sql` migrations are the same
+  file on both. See `examples/plugins/runtime-sync`.
   `db.transaction()` without a callback pushes a frame that `commit()`/`rollback()` pop.
 - `Diff` reads `persisted_tables` through an injectable provider instead of the global `strapi.store`.
 - `Lifecycles::run()` takes `$properties` by reference so the timestamps subscriber can mutate `params.data`

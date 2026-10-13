@@ -1,0 +1,31 @@
+{
+  "description": "The admin status route reports this runtime, the database preflight of this boot, the recorded boots and the project, with the same shape on both runtimes",
+  "requires": ["admin"],
+  "steps": [
+    {
+      "auth": "admin",
+      "request": { "method": "GET", "path": "/runtime-sync/status" },
+      "expect": {
+        "status": 200,
+        "body": {
+          "data": {
+            "$keys": ["runtime", "database", "boots", "agreement", "project"],
+            "runtime": { "$keys": ["kind", "version", "packageVersion", "engine"] },
+            "database": {
+              "$keys": ["client", "schemaHash", "storedHash", "storedAt", "hashMatches", "status", "tables", "migrations", "storedBy"],
+              "client": "sqlite",
+              "status": "NEW",
+              "storedHash": null,
+              "hashMatches": null,
+              "tables": { "added": [], "updated": [], "removed": [] },
+              "migrations": { "$keys": ["pending", "twinsToLog", "executed"], "pending": [] },
+              "storedBy": null
+            },
+            "agreement": { "$keys": ["sameVersion", "sameSchema", "samePlugins", "pluginsNodeOnly", "pluginsPhpOnly"], "sameSchema": null, "pluginsNodeOnly": [], "pluginsPhpOnly": [] },
+            "project": { "$keys": ["root", "name", "runtimes", "versions", "counts", "files", "shared", "unsupported", "manifests", "env", "adminBuild", "plugins", "problems"] }
+          }
+        }
+      }
+    }
+  ]
+}

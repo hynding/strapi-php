@@ -2,3 +2,4 @@
 tests/php/app/.tmp/
 /dist/
 /node_modules/
+tests/php/app/.env

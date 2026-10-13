@@ -1,0 +1,44 @@
+{
+    "name": "strapi-plugin/runtime-sync",
+    "description": "One Strapi project on two runtimes: keeps a project runnable on Strapi (Node) and strapi-php, sharing one database",
+    "type": "library",
+    "license": "MIT",
+    "version": "5.56.0-beta.1",
+    "require": {
+        "php": ">=8.3",
+        "nikic/php-parser": "^5.0",
+        "strapi/core": "^5.56",
+        "strapi/database": "^5.56",
+        "strapi/utils": "^5.56",
+        "symfony/process": "^7.2"
+    },
+    "autoload": {
+        "classmap": [
+            "engine/",
+            "server/src/"
+        ],
+        "exclude-from-classmap": [
+            "engine/bin/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "StrapiPlugin\\RuntimeSync\\Tests\\": "tests/php/"
+        }
+    },
+    "bin": [
+        "bin/strapi-runtime-sync"
+    ],
+    "extra": {
+        "strapi": {
+            "kind": "plugin",
+            "name": "runtime-sync",
+            "displayName": "Runtime sync",
+            "description": "Keeps a project runnable on Strapi (Node) and strapi-php, sharing one database",
+            "server": "server/src/index.php",
+            "namespace": "StrapiPlugin\\RuntimeSync"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

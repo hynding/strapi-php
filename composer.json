@@ -120,12 +120,18 @@
             "Strapi\\Openapi\\Tests\\": "packages/core/openapi/tests/",
             "Strapi\\Plugin\\Documentation\\Tests\\": "packages/plugins/documentation/tests/",
             "Strapi\\Upgrade\\Tests\\": "packages/utils/upgrade/tests/",
-            "Strapi\\CreateStrapiApp\\Tests\\": "packages/cli/create-strapi-app/tests/"
+            "Strapi\\CreateStrapiApp\\Tests\\": "packages/cli/create-strapi-app/tests/",
+            "StrapiPlugin\\RuntimeSync\\Tests\\": "examples/plugins/runtime-sync/tests/php/"
         },
         "classmap": [
             "examples/plugins/announcements/server/src/",
+            "examples/plugins/runtime-sync/engine/",
+            "examples/plugins/runtime-sync/server/src/",
             "packages/cli/create-strapi-app/src/",
             "packages/utils/api-tests/src/"
+        ],
+        "exclude-from-classmap": [
+            "examples/plugins/runtime-sync/engine/bin/"
         ]
     },
     "bin": [

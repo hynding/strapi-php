@@ -60,5 +60,8 @@
   "symfony/yaml",
   "dragonmantank/cron-expression",
   "webmozarts/assert",
-  "ramsey/uuid"
+  "ramsey/uuid",
+  "symfony/mailer",
+  "webonyx/graphql-php",
+  "phpstan/phpstan"
 ]

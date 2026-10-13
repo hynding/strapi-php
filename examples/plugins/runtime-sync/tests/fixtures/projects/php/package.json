@@ -1,0 +1,22 @@
+{
+  "name": "shop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "php bin/strapi build",
+    "develop": "php bin/strapi develop",
+    "start": "php bin/strapi start",
+    "strapi": "php bin/strapi"
+  },
+  "dependencies": {
+    "@strapi/admin": "5.56.0",
+    "@strapi/strapi": "5.56.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
+  },
+  "strapi": {
+    "uuid": "fixture-shop"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "admin",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/status",
+      "handler": "status.find",
+      "config": {
+        "policies": ["admin::isAuthenticatedAdmin"]
+      }
+    }
+  ]
+}

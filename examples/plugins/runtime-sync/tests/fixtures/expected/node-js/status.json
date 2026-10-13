@@ -1,0 +1,247 @@
+{
+    "root": "<root>",
+    "name": "blog",
+    "runtimes": {
+        "node": {
+            "present": true,
+            "version": "5.56.0",
+            "upstreamVersion": "5.56.0",
+            "language": "js",
+            "installed": false
+        },
+        "php": {
+            "present": false,
+            "version": null,
+            "upstreamVersion": null,
+            "installed": false
+        }
+    },
+    "versions": {
+        "lockstep": null,
+        "upstream": "5.56.0"
+    },
+    "counts": {
+        "paired": 0,
+        "missingNode": 0,
+        "missingPhp": 22,
+        "shared": 7
+    },
+    "files": [
+        {
+            "facet": "config",
+            "stem": "config/admin",
+            "node": "config/admin.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/api",
+            "node": "config/api.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/custom",
+            "node": "config/custom.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/database",
+            "node": "config/database.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config-env",
+            "stem": "config/env/production/server",
+            "node": "config/env/production/server.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/flags",
+            "node": "config/flags.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/middlewares",
+            "node": "config/middlewares.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/plugins",
+            "node": "config/plugins.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "config",
+            "stem": "config/server",
+            "node": "config/server.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "migrations",
+            "stem": "database/migrations/2024.01.01T00.00.00.add-slug",
+            "node": "database/migrations/2024.01.01T00.00.00.add-slug.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-lifecycles",
+            "stem": "src/api/article/content-types/article/lifecycles",
+            "node": "src/api/article/content-types/article/lifecycles.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-controllers",
+            "stem": "src/api/article/controllers/article",
+            "node": "src/api/article/controllers/article.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-routes",
+            "stem": "src/api/article/routes/article",
+            "node": "src/api/article/routes/article.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-services",
+            "stem": "src/api/article/services/article",
+            "node": "src/api/article/services/article.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-controllers",
+            "stem": "src/api/review/controllers/review",
+            "node": "src/api/review/controllers/review.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-policies",
+            "stem": "src/api/review/policies/is-owner",
+            "node": "src/api/review/policies/is-owner.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-routes",
+            "stem": "src/api/review/routes/review",
+            "node": "src/api/review/routes/review.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "api-services",
+            "stem": "src/api/review/services/review",
+            "node": "src/api/review/services/review.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "extensions",
+            "stem": "src/extensions/users-permissions/strapi-server",
+            "node": "src/extensions/users-permissions/strapi-server.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "app",
+            "stem": "src/index",
+            "node": "src/index.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "middlewares",
+            "stem": "src/middlewares/timer",
+            "node": "src/middlewares/timer.js",
+            "php": null,
+            "state": "missing-php"
+        },
+        {
+            "facet": "policies",
+            "stem": "src/policies/is-admin",
+            "node": "src/policies/is-admin.js",
+            "php": null,
+            "state": "missing-php"
+        }
+    ],
+    "shared": {
+        "count": 7,
+        "byFacet": {
+            "admin": 1,
+            "components": 1,
+            "dotenv": 1,
+            "extension-schemas": 1,
+            "public": 1,
+            "schemas": 1,
+            "sql-migrations": 1
+        },
+        "missing": []
+    },
+    "unsupported": [],
+    "manifests": {
+        "node": {
+            "missingDependencies": [],
+            "missingFiles": []
+        },
+        "php": {
+            "missingDependencies": [
+                "@strapi/admin"
+            ],
+            "missingFiles": [
+                "composer.json",
+                "bin/strapi",
+                "public/index.php"
+            ]
+        }
+    },
+    "env": {
+        "present": true,
+        "missingKeys": [],
+        "databaseClient": "sqlite"
+    },
+    "adminBuild": {
+        "present": false,
+        "dir": null
+    },
+    "plugins": {
+        "node": [
+            "cloud",
+            "users-permissions"
+        ],
+        "php": [],
+        "nodeOnly": [
+            "users-permissions"
+        ],
+        "phpOnly": []
+    },
+    "problems": [
+        {
+            "level": "info",
+            "code": "php-files-missing",
+            "message": "22 file(s) have no strapi-php twin: `strapi-runtime-sync generate --to php`."
+        },
+        {
+            "level": "info",
+            "code": "admin-build",
+            "message": "No admin build: run `strapi build` on either runtime; both serve build/ (dist/build for a TypeScript project)."
+        }
+    ]
+}

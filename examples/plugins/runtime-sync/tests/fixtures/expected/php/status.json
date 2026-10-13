@@ -1,0 +1,228 @@
+{
+    "root": "<root>",
+    "name": "shop",
+    "runtimes": {
+        "node": {
+            "present": false,
+            "version": "5.56.0",
+            "upstreamVersion": "5.56.0",
+            "language": "js",
+            "installed": false
+        },
+        "php": {
+            "present": true,
+            "version": "5.56",
+            "upstreamVersion": "5.56",
+            "installed": false
+        }
+    },
+    "versions": {
+        "lockstep": true,
+        "upstream": "5.56.0"
+    },
+    "counts": {
+        "paired": 0,
+        "missingNode": 19,
+        "missingPhp": 0,
+        "shared": 5
+    },
+    "files": [
+        {
+            "facet": "config",
+            "stem": "config/admin",
+            "node": null,
+            "php": "config/admin.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/api",
+            "node": null,
+            "php": "config/api.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/custom",
+            "node": null,
+            "php": "config/custom.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/database",
+            "node": null,
+            "php": "config/database.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config-env",
+            "stem": "config/env/production/server",
+            "node": null,
+            "php": "config/env/production/server.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/flags",
+            "node": null,
+            "php": "config/flags.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/middlewares",
+            "node": null,
+            "php": "config/middlewares.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/plugins",
+            "node": null,
+            "php": "config/plugins.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "config",
+            "stem": "config/server",
+            "node": null,
+            "php": "config/server.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "migrations",
+            "stem": "database/migrations/2024.01.01T00.00.00.add-slug",
+            "node": null,
+            "php": "database/migrations/2024.01.01T00.00.00.add-slug.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-lifecycles",
+            "stem": "src/api/article/content-types/article/lifecycles",
+            "node": null,
+            "php": "src/api/article/content-types/article/lifecycles.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-controllers",
+            "stem": "src/api/article/controllers/article",
+            "node": null,
+            "php": "src/api/article/controllers/article.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-routes",
+            "stem": "src/api/article/routes/article",
+            "node": null,
+            "php": "src/api/article/routes/article.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-services",
+            "stem": "src/api/article/services/article",
+            "node": null,
+            "php": "src/api/article/services/article.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-controllers",
+            "stem": "src/api/review/controllers/review",
+            "node": null,
+            "php": "src/api/review/controllers/review.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "api-routes",
+            "stem": "src/api/review/routes/review",
+            "node": null,
+            "php": "src/api/review/routes/review.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "app",
+            "stem": "src/index",
+            "node": null,
+            "php": "src/index.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "middlewares",
+            "stem": "src/middlewares/timer",
+            "node": null,
+            "php": "src/middlewares/timer.php",
+            "state": "missing-node"
+        },
+        {
+            "facet": "policies",
+            "stem": "src/policies/is-admin",
+            "node": null,
+            "php": "src/policies/is-admin.php",
+            "state": "missing-node"
+        }
+    ],
+    "shared": {
+        "count": 5,
+        "byFacet": {
+            "components": 1,
+            "dotenv": 1,
+            "public": 1,
+            "schemas": 1,
+            "sql-migrations": 1
+        },
+        "missing": []
+    },
+    "unsupported": [],
+    "manifests": {
+        "node": {
+            "missingDependencies": [
+                "@strapi/plugin-users-permissions",
+                "better-sqlite3"
+            ],
+            "missingFiles": []
+        },
+        "php": {
+            "missingDependencies": [],
+            "missingFiles": []
+        }
+    },
+    "env": {
+        "present": true,
+        "missingKeys": [],
+        "databaseClient": "sqlite"
+    },
+    "adminBuild": {
+        "present": false,
+        "dir": null
+    },
+    "plugins": {
+        "node": [],
+        "php": [
+            "color-picker",
+            "documentation",
+            "graphql",
+            "sentry",
+            "users-permissions"
+        ],
+        "nodeOnly": [],
+        "phpOnly": [
+            "color-picker",
+            "documentation",
+            "graphql",
+            "sentry",
+            "users-permissions"
+        ]
+    },
+    "problems": [
+        {
+            "level": "info",
+            "code": "node-files-missing",
+            "message": "19 file(s) have no Node twin: `strapi-runtime-sync generate --to node`."
+        },
+        {
+            "level": "info",
+            "code": "admin-build",
+            "message": "No admin build: run `strapi build` on either runtime; both serve build/ (dist/build for a TypeScript project)."
+        }
+    ]
+}

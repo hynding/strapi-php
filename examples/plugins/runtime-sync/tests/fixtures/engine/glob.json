@@ -1,0 +1,18 @@
+[
+  { "pattern": "config/*", "path": "config/server", "expected": true },
+  { "pattern": "config/*", "path": "config/env/production/server", "expected": false },
+  { "pattern": "config/env/*/*", "path": "config/env/production/server", "expected": true },
+  { "pattern": "src/index", "path": "src/index", "expected": true },
+  { "pattern": "src/index", "path": "src/index/x", "expected": false },
+  { "pattern": "src/api/*/controllers/*", "path": "src/api/article/controllers/article", "expected": true },
+  { "pattern": "src/api/*/controllers/*", "path": "src/api/article/controllers/sub/article", "expected": false },
+  { "pattern": "src/admin/**", "path": "src/admin/app.tsx", "expected": true },
+  { "pattern": "src/admin/**", "path": "src/admin/extensions/logo.png", "expected": true },
+  { "pattern": "src/admin/**", "path": "src/adminx/app.tsx", "expected": false },
+  { "pattern": "src/plugins/*/**", "path": "src/plugins/local/server/index.js", "expected": true },
+  { "pattern": "src/plugins/*/**", "path": "src/plugins/local", "expected": false },
+  { "pattern": ".env", "path": ".env", "expected": true },
+  { "pattern": ".env", "path": ".env.example", "expected": false },
+  { "pattern": "database/migrations/*.sql", "path": "database/migrations/2024.01.01T00.00.00.x.sql", "expected": true },
+  { "pattern": "database/migrations/*.sql", "path": "database/migrations/2024.01.01T00.00.00.x.js", "expected": false }
+]

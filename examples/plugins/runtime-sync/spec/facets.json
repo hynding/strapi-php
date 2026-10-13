@@ -1,0 +1,251 @@
+{
+  "$comment": "The file-pairing rules of a dual-runtime project. Read as-is by engine/spec.js and engine/spec.php. A paired facet matches a path without its extension (the stem); the Node twin has one of extensions.node, the strapi-php twin one of extensions.php. Shared files are the same file on both runtimes.",
+  "extensions": {
+    "node": [
+      "js",
+      "ts",
+      "mjs",
+      "cjs"
+    ],
+    "php": [
+      "php"
+    ]
+  },
+  "ignore": [
+    ".git",
+    ".cache",
+    ".strapi",
+    ".tmp",
+    "build",
+    "dist",
+    "node_modules",
+    "public/uploads",
+    "types/generated",
+    "vendor"
+  ],
+  "paired": [
+    {
+      "id": "config",
+      "glob": "config/*",
+      "describe": "configuration",
+      "generator": "config"
+    },
+    {
+      "id": "config-env",
+      "glob": "config/env/*/*",
+      "describe": "environment configuration",
+      "generator": "config"
+    },
+    {
+      "id": "app",
+      "glob": "src/index",
+      "describe": "application lifecycle (register / bootstrap / destroy)",
+      "generator": "app-entry"
+    },
+    {
+      "id": "api-controllers",
+      "glob": "src/api/*/controllers/*",
+      "describe": "API controllers",
+      "generator": "core-factory",
+      "factory": "createCoreController"
+    },
+    {
+      "id": "api-services",
+      "glob": "src/api/*/services/*",
+      "describe": "API services",
+      "generator": "core-factory",
+      "factory": "createCoreService"
+    },
+    {
+      "id": "api-routes",
+      "glob": "src/api/*/routes/*",
+      "describe": "API routers",
+      "generator": "core-factory",
+      "factory": "createCoreRouter"
+    },
+    {
+      "id": "api-lifecycles",
+      "glob": "src/api/*/content-types/*/lifecycles",
+      "describe": "content-type lifecycles",
+      "generator": "stub",
+      "shape": "lifecycles"
+    },
+    {
+      "id": "api-policies",
+      "glob": "src/api/*/policies/*",
+      "describe": "API policies",
+      "generator": "stub",
+      "shape": "policy"
+    },
+    {
+      "id": "api-middlewares",
+      "glob": "src/api/*/middlewares/*",
+      "describe": "API middlewares",
+      "generator": "stub",
+      "shape": "middleware"
+    },
+    {
+      "id": "policies",
+      "glob": "src/policies/*",
+      "describe": "global policies",
+      "generator": "stub",
+      "shape": "policy"
+    },
+    {
+      "id": "middlewares",
+      "glob": "src/middlewares/*",
+      "describe": "global middlewares",
+      "generator": "stub",
+      "shape": "middleware"
+    },
+    {
+      "id": "extensions",
+      "glob": "src/extensions/*/strapi-server",
+      "describe": "plugin extensions",
+      "generator": "stub",
+      "shape": "extension"
+    },
+    {
+      "id": "migrations",
+      "glob": "database/migrations/*",
+      "describe": "database migrations (prefer .sql: one file for both runtimes)",
+      "generator": "stub",
+      "shape": "migration"
+    }
+  ],
+  "shared": [
+    {
+      "id": "schemas",
+      "glob": "src/api/*/content-types/*/schema.json",
+      "describe": "content-type schemas"
+    },
+    {
+      "id": "components",
+      "glob": "src/components/*/*.json",
+      "describe": "components"
+    },
+    {
+      "id": "extension-schemas",
+      "glob": "src/extensions/*/content-types/*/schema.json",
+      "describe": "content-type extensions"
+    },
+    {
+      "id": "config-json",
+      "glob": "config/*.json",
+      "describe": "JSON configuration"
+    },
+    {
+      "id": "sql-migrations",
+      "glob": "database/migrations/*.sql",
+      "describe": "SQL migrations"
+    },
+    {
+      "id": "admin",
+      "glob": "src/admin/**",
+      "describe": "admin panel customisation"
+    },
+    {
+      "id": "public",
+      "glob": "public/**",
+      "describe": "public files"
+    },
+    {
+      "id": "dotenv",
+      "glob": ".env",
+      "describe": "environment variables",
+      "required": true
+    },
+    {
+      "id": "favicon",
+      "glob": "favicon.png",
+      "describe": "favicon"
+    }
+  ],
+  "unsupported": [
+    {
+      "id": "local-plugins",
+      "glob": "src/plugins/*/**",
+      "describe": "local plugins: port by hand, as examples/plugins/announcements does"
+    }
+  ],
+  "manifests": {
+    "env": [
+      "APP_KEYS",
+      "API_TOKEN_SALT",
+      "ADMIN_JWT_SECRET",
+      "TRANSFER_TOKEN_SALT",
+      "JWT_SECRET",
+      "ENCRYPTION_KEY"
+    ],
+    "node": {
+      "files": [
+        "package.json"
+      ],
+      "dependencies": {
+        "@strapi/strapi": "<version>",
+        "@strapi/plugin-users-permissions": "<version>",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "react-router-dom": "^6.0.0",
+        "styled-components": "^6.0.0"
+      },
+      "databaseDrivers": {
+        "sqlite": "better-sqlite3",
+        "postgres": "pg",
+        "mysql": "mysql2"
+      },
+      "databaseDriverVersions": {
+        "better-sqlite3": "12.4.1",
+        "pg": "8.16.3",
+        "mysql2": "3.14.3"
+      },
+      "scripts": {
+        "build": "strapi build",
+        "develop": "strapi develop",
+        "start": "strapi start",
+        "strapi": "strapi"
+      },
+      "gitignore": [
+        "node_modules/",
+        ".strapi/",
+        "dist/",
+        "build/"
+      ]
+    },
+    "php": {
+      "files": [
+        "composer.json",
+        "bin/strapi",
+        "public/index.php"
+      ],
+      "dependencies": {
+        "@strapi/admin": "<version>",
+        "@strapi/strapi": "<version>",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "react-router-dom": "^6.0.0",
+        "styled-components": "^6.0.0"
+      },
+      "scripts": {
+        "build": "php bin/strapi build",
+        "develop": "php bin/strapi develop",
+        "start": "php bin/strapi start",
+        "strapi": "php bin/strapi"
+      },
+      "gitignore": [
+        "vendor/",
+        ".tmp/"
+      ],
+      "bundledPlugins": [
+        "color-picker",
+        "documentation",
+        "graphql",
+        "sentry",
+        "users-permissions"
+      ]
+    },
+    "pluginsNotCompared": [
+      "cloud"
+    ]
+  }
+}

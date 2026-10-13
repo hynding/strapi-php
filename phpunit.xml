@@ -37,7 +37,7 @@
         <testsuite name="upgrade"><directory>packages/utils/upgrade/tests</directory></testsuite>
         <testsuite name="create-strapi-app"><directory>packages/cli/create-strapi-app/tests</directory></testsuite>
         <testsuite name="integration"><directory>tests/php</directory></testsuite>
-        <testsuite name="example-plugins"><directory>examples/plugins/announcements/tests/php</directory></testsuite>
+        <testsuite name="example-plugins"><directory>examples/plugins/announcements/tests/php</directory><directory>examples/plugins/runtime-sync/tests/php</directory></testsuite>
     </testsuites>
     <source>
         <include>

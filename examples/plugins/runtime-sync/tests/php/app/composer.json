@@ -1,0 +1,13 @@
+{
+    "name": "strapi-plugin/runtime-sync-test-app",
+    "description": "Throwaway app the PHP tests boot with only the runtime-sync plugin",
+    "type": "project",
+    "require": {
+        "hynding/strapi-php": "^5.56"
+    },
+    "extra": {
+        "strapi": {
+            "uuid": "runtime-sync-tests"
+        }
+    }
+}

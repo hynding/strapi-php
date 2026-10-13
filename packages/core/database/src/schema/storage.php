@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Strapi\Database\Database;
-use Strapi\Database\Fields\Shared\Parsers;
 
 /**
  * Port of packages/core/database/src/schema/storage.ts: persists the last synced schema and its
@@ -81,9 +80,61 @@ final class Storage
     {
         // Sort tables by name for deterministic hashing regardless of insertion order
         $tables = $schema['tables'];
-        usort($tables, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
+        usort($tables, static fn (array $a, array $b): int => self::compareNames($a['name'], $b['name']));
 
         return hash('sha256', self::encode(['tables' => $tables] + $schema));
+    }
+
+    /**
+     * Upstream sorts with `String.prototype.localeCompare`, i.e. ICU collation, where `_` sorts
+     * before digits, digits before letters, and case only breaks ties (`up_2` < `up2`, `Up` after
+     * `up`). `strcmp` orders those differently, and a different order is a different hash: a Node
+     * Strapi and a strapi-php sharing one database would each re-sync the schema on every switch.
+     * ext-intl gives the exact ICU order; without it, the same rules are applied to ASCII names.
+     */
+    public static function compareNames(string $a, string $b, bool $useIntl = true): int
+    {
+        if ($useIntl && class_exists(\Collator::class)) {
+            static $collator = null;
+            $collator ??= new \Collator('root');
+
+            return $collator->compare($a, $b) ?: 0;
+        }
+
+        $primary = static function (string $name): array {
+            $keys = [];
+            foreach (str_split($name) as $char) {
+                $keys[] = match (true) {
+                    ctype_digit($char) => [1, $char],
+                    ctype_alpha($char) => [2, strtolower($char)],
+                    default => [0, $char],
+                };
+            }
+
+            return $keys;
+        };
+
+        $keysA = $primary($a);
+        $keysB = $primary($b);
+        $length = min(count($keysA), count($keysB));
+        for ($i = 0; $i < $length; $i++) {
+            $cmp = $keysA[$i] <=> $keysB[$i];
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+        }
+        if (count($keysA) !== count($keysB)) {
+            return count($keysA) <=> count($keysB);
+        }
+
+        // tertiary level: same letters, lowercase first
+        foreach (str_split($a) as $i => $char) {
+            if ($char !== $b[$i]) {
+                return ctype_lower($char) ? -1 : 1;
+            }
+        }
+
+        return 0;
     }
 
     /** @param SchemaArray $schema */

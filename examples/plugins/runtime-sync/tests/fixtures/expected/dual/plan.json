@@ -1,0 +1,61 @@
+{
+    "targets": [
+        "node",
+        "php"
+    ],
+    "actions": [
+        {
+            "path": "package.json",
+            "target": "node",
+            "generator": "manifest",
+            "source": null,
+            "action": "skip",
+            "review": false,
+            "notes": [
+                "up to date"
+            ]
+        },
+        {
+            "path": "src/api/review/policies/is-owner.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/api/review/policies/is-owner.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/review/services/review.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/review/services/review.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/extensions/users-permissions/strapi-server.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/extensions/users-permissions/strapi-server.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "package.json",
+            "target": "php",
+            "generator": "manifest",
+            "source": null,
+            "action": "skip",
+            "review": false,
+            "notes": [
+                "up to date"
+            ]
+        }
+    ]
+}

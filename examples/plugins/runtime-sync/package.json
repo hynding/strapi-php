@@ -1,0 +1,82 @@
+{
+  "name": "strapi-plugin-runtime-sync",
+  "version": "5.56.0",
+  "description": "One Strapi project on two runtimes: keeps a project runnable on Strapi (Node) and strapi-php, sharing one database",
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "strapi",
+    "strapi-plugin",
+    "strapi-php"
+  ],
+  "type": "commonjs",
+  "bin": {
+    "strapi-runtime-sync": "./bin/strapi-runtime-sync.js"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-admin": {
+      "types": "./dist/admin/src/index.d.ts",
+      "source": "./admin/src/index.ts",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.js",
+      "default": "./dist/admin/index.js"
+    },
+    "./strapi-server": {
+      "source": "./server/src/index.js",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "engine",
+    "server",
+    "spec"
+  ],
+  "scripts": {
+    "build": "strapi-plugin build",
+    "watch": "strapi-plugin watch",
+    "verify": "strapi-plugin verify",
+    "check": "node generator/check.mjs",
+    "test": "node --test tests/node/*.test.mjs",
+    "typecheck": "tsc -p admin/tsconfig.json --noEmit",
+    "test:conformance": "node conformance/run-strapi.mjs"
+  },
+  "devDependencies": {
+    "@strapi/design-system": "2.2.4",
+    "@strapi/icons": "2.2.4",
+    "@strapi/sdk-plugin": "6.1.1",
+    "@strapi/strapi": "5.56.0",
+    "@strapi/typescript-utils": "5.56.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "better-sqlite3": "^12.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "^6.1.13",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {
+    "@strapi/design-system": "^2.0.0",
+    "@strapi/icons": "^2.0.0",
+    "@strapi/sdk-plugin": "^6.0.0",
+    "@strapi/strapi": "^5.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
+  },
+  "strapi": {
+    "kind": "plugin",
+    "name": "runtime-sync",
+    "displayName": "Runtime sync",
+    "description": "Keeps a project runnable on Strapi (Node) and strapi-php, sharing one database"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

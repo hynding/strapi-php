@@ -1,0 +1,8 @@
+{
+  "name": "runtime-sync-test-app",
+  "private": true,
+  "dependencies": {
+    "@strapi/admin": "5.56.0",
+    "@strapi/strapi": "5.56.0"
+  }
+}
