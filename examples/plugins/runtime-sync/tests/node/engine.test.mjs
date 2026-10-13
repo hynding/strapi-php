@@ -5,7 +5,7 @@
  * must reproduce them byte for byte. Reading PHP config fixtures needs `php` on the PATH.
  */
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, existsSync, mkdtempSync, rmSync, cpSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdtempSync, rmSync, cpSync, copyFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -55,7 +55,18 @@ test('emit', () => {
   });
 });
 
-for (const project of readdirSync(path.join(fixtures, 'projects')).filter((d) => statSync(path.join(fixtures, 'projects', d)).isDirectory()).sort()) {
+const projects = readdirSync(path.join(fixtures, 'projects')).filter((d) => statSync(path.join(fixtures, 'projects', d)).isDirectory()).sort();
+
+// a sample project's .env is ignored like a real one's (its .gitignore is part of the fixture):
+// the goldens expect it, so it is written from the tracked .env.example
+for (const project of projects) {
+  const projectRoot = path.join(fixtures, 'projects', project);
+  if (!existsSync(path.join(projectRoot, '.env')) && existsSync(path.join(projectRoot, '.env.example'))) {
+    copyFileSync(path.join(projectRoot, '.env.example'), path.join(projectRoot, '.env'));
+  }
+}
+
+for (const project of projects) {
   test(`status and generate: ${project}`, async () => {
     const projectRoot = path.join(fixtures, 'projects', project);
 

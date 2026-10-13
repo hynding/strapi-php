@@ -32,6 +32,18 @@ final class EngineTest extends TestCase
         }
     }
 
+    public static function setUpBeforeClass(): void
+    {
+        // a sample project's .env is ignored like a real one's (its .gitignore is part of the
+        // fixture): the goldens expect it, so it is written from the tracked .env.example
+        foreach (self::projects() as [$project]) {
+            $root = self::FIXTURES . '/projects/' . $project;
+            if (!file_exists($root . '/.env') && is_file($root . '/.env.example')) {
+                copy($root . '/.env.example', $root . '/.env');
+            }
+        }
+    }
+
     public function testGlob(): void
     {
         foreach (self::json('engine/glob.json') as $case) {
