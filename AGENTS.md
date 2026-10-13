@@ -71,6 +71,9 @@ Rules:
 - `examples/getstarted` — the upstream example project, PHP edition.
 - `examples/plugins/announcements` — a third-party plugin that runs on both Strapi and strapi-php from
   one JSON spec (generated types, `.ts`/`.php` parity check, shared conformance fixtures).
+- `examples/plugins/runtime-sync` — the dual-runtime plugin that keeps one project runnable on both
+  runtimes on one database (`strapi-runtime-sync status / generate / db:check / handoff`, migration-log
+  reconciliation, boot markers, an admin page); its engine is a `.js`/`.php` pair tested against shared goldens.
 - `tests/api` — upstream's Jest HTTP suite, run against this backend (`cd tests/api && npm test`).
 - `scripts/check-package-versions.php` — all packages share one version.
 - `scripts/strapi-release-watch.php` — polls npm for a new upstream version.

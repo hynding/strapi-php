@@ -19,8 +19,10 @@ use StrapiPlugin\Announcements\Generated\RouteHandlers;
  */
 final class ConformanceTest extends TestCase
 {
-    /** Fixture `requires` this backend can satisfy. The admin API is not ported yet. */
-    private const array SUPPORTS = [];
+    /** Fixture `requires` this backend can satisfy (`admin`: a super-admin token, as the Node runner's). */
+    private const array SUPPORTS = ['admin'];
+
+    private static ?string $adminToken = null;
 
     private static ?Strapi $strapi = null;
 
@@ -79,6 +81,9 @@ final class ConformanceTest extends TestCase
         foreach ($fixture->steps as $i => $step) {
             $request = $factory->createServerRequest($step->request->method, 'http://localhost:1337' . $step->request->path)
                 ->withHeader('Accept', 'application/json');
+            if (($step->auth ?? null) === 'admin') {
+                $request = $request->withHeader('Authorization', 'Bearer ' . self::adminToken());
+            }
             parse_str((string) parse_url($step->request->path, PHP_URL_QUERY), $query);
             $request = $request->withQueryParams($query);
             if (isset($step->request->body)) {
@@ -103,6 +108,25 @@ final class ConformanceTest extends TestCase
         }
 
         self::assertSame([], $problems, $fixture->description);
+    }
+
+    /** Registers the first admin (as conformance/run-strapi.mjs does) and keeps its token. */
+    private static function adminToken(): string
+    {
+        if (self::$adminToken !== null) {
+            return self::$adminToken;
+        }
+        $factory = new Psr17Factory();
+        $request = $factory->createServerRequest('POST', 'http://localhost:1337/admin/register-admin')
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($factory->createStream((string) json_encode(['email' => 'admin@example.com', 'firstname' => 'Ad', 'lastname' => 'Min', 'password' => 'Conformance1!'])));
+        $body = json_decode((string) self::strapi()->server()->handle($request)->getBody(), true);
+        $token = $body['data']['accessToken'] ?? $body['data']['token'] ?? null;
+        if (!is_string($token)) {
+            throw new \RuntimeException('could not register an admin: ' . json_encode($body));
+        }
+
+        return self::$adminToken = $token;
     }
 
     /** The PHP side of the generated controller contract (TS checks it at compile time with `satisfies`). */

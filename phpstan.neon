@@ -42,9 +42,16 @@ parameters:
         - scripts
         - examples/plugins/announcements/server/src
         - examples/plugins/announcements/tests/php
+        - examples/plugins/runtime-sync/engine
+        - examples/plugins/runtime-sync/server/src
+        - examples/plugins/runtime-sync/tests/php
+        - examples/plugins/runtime-sync/bin/strapi-runtime-sync
     scanDirectories:
         - packages
     excludePaths:
         - packages/*/*/admin
+        - examples/plugins/runtime-sync/tests/fixtures
+        - examples/plugins/runtime-sync/tests/php/app
+        - examples/plugins/runtime-sync/engine/bin
         - packages/*/*/vendor
     treatPhpDocTypesAsCertain: false

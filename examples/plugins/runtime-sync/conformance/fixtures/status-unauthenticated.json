@@ -1,0 +1,9 @@
+{
+  "description": "The admin status route refuses anonymous requests with a 401",
+  "steps": [
+    {
+      "request": { "method": "GET", "path": "/runtime-sync/status" },
+      "expect": { "status": 401, "body": { "data": null, "error": { "status": 401, "name": "UnauthorizedError" } } }
+    }
+  ]
+}

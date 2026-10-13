@@ -1,0 +1,232 @@
+{
+    "targets": [
+        "node"
+    ],
+    "actions": [
+        {
+            "path": "config/admin.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/admin.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/api.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/api.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/custom.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/custom.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "could not translate: strtoupper((string) $env('MODE', 'fast'))"
+            ]
+        },
+        {
+            "path": "config/database.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/database.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/env/production/server.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/env/production/server.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "config/flags.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/flags.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "config/middlewares.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/middlewares.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/plugins.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/plugins.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/server.js",
+            "target": "node",
+            "generator": "config",
+            "source": "config/server.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "database/migrations/2024.01.01T00.00.00.add-slug.js",
+            "target": "node",
+            "generator": "stub",
+            "source": "database/migrations/2024.01.01T00.00.00.add-slug.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/article/content-types/article/lifecycles.js",
+            "target": "node",
+            "generator": "stub",
+            "source": "src/api/article/content-types/article/lifecycles.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/article/controllers/article.js",
+            "target": "node",
+            "generator": "core-factory",
+            "source": "src/api/article/controllers/article.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/article/routes/article.js",
+            "target": "node",
+            "generator": "core-factory",
+            "source": "src/api/article/routes/article.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/article/services/article.js",
+            "target": "node",
+            "generator": "core-factory",
+            "source": "src/api/article/services/article.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/review/controllers/review.js",
+            "target": "node",
+            "generator": "core-factory",
+            "source": "src/api/review/controllers/review.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "customised createCoreController: stub"
+            ]
+        },
+        {
+            "path": "src/api/review/routes/review.js",
+            "target": "node",
+            "generator": "core-factory",
+            "source": "src/api/review/routes/review.php",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "data file: translated"
+            ]
+        },
+        {
+            "path": "src/index.js",
+            "target": "node",
+            "generator": "app-entry",
+            "source": "src/index.php",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/middlewares/timer.js",
+            "target": "node",
+            "generator": "stub",
+            "source": "src/middlewares/timer.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/policies/is-admin.js",
+            "target": "node",
+            "generator": "stub",
+            "source": "src/policies/is-admin.php",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "package.json",
+            "target": "node",
+            "generator": "manifest",
+            "source": null,
+            "action": "merge",
+            "review": false,
+            "notes": [
+                "dependency @strapi/plugin-users-permissions@5.56.0",
+                "dependency better-sqlite3@12.4.1",
+                "script build:node",
+                "script develop:node",
+                "script start:node",
+                "script strapi:node"
+            ]
+        },
+        {
+            "path": ".gitignore",
+            "target": "node",
+            "generator": "manifest",
+            "source": null,
+            "action": "merge",
+            "review": false,
+            "notes": [
+                ".strapi/",
+                "dist/"
+            ]
+        }
+    ]
+}

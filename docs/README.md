@@ -67,6 +67,26 @@ starting and after finishing (`/api-tests` in Claude Code).
 - PHP-FPM boots Strapi per request; a compiled-container cache would make FPM viable in production
   (FrankenPHP worker mode is the recommended setup).
 
+## Moving a project between the runtimes
+
+`examples/plugins/runtime-sync` is the plugin for that: `strapi-runtime-sync status` lists what a
+project has for each runtime, `generate` writes the other runtime's files (config translated through
+a shared intermediate form, core-factory one-liners and data files translated, the rest stubbed with
+the original attached), `db:check` boots up to the schema sync and reports what a boot would alter
+without writing, `handoff --to <runtime>` is the go / no-go. Its server half reconciles the migration
+log between the two spellings of a migration and records each boot in the core store, so the admin
+page shows whether both runtimes agree on the schema. Found and fixed while building it:
+
+- `Schema\Storage::hashSchema()` sorted tables with `strcmp` where upstream uses `localeCompare`
+  (ICU: `_` before digits before letters), so the same schema could hash differently on the two
+  runtimes and each switch re-synced. Now ICU order (ext-intl, with an ASCII fallback), with
+  Node-generated vectors in `packages/core/database/tests/Schema/StorageTest.php`.
+- A user migration run by Node (`name.js`) ran again on PHP (`name.php`) on a shared database:
+  `Migrations\Runner` now treats the runtimes' spellings as one migration.
+- `scripts/dev-offline-manifest.php` failed on a root composer.json without `repositories` and lacked
+  the `symfony/mailer`, `webonyx/graphql-php` and `phpstan/phpstan` mirrors.
+- The announcements conformance test skipped its admin fixture as "admin auth not ported"; it runs it now.
+
 ## Fixed gaps
 
 - create-strapi-app: `--dbclient sqlite` without `--dbfile` writes an empty `DATABASE_FILENAME`

@@ -1,0 +1,26 @@
+[
+  {
+    "description": "a Node-run migration covers its PHP twin and the reverse; .sql is one file",
+    "executed": ["2024.01.01T00.00.00.first.js", "2024.01.02T00.00.00.second.php", "2024.01.04T00.00.00.fourth.sql"],
+    "files": ["2024.01.01T00.00.00.first.js", "2024.01.01T00.00.00.first.php", "2024.01.02T00.00.00.second.js", "2024.01.02T00.00.00.second.php", "2024.01.03T00.00.00.third.php", "2024.01.04T00.00.00.fourth.sql", "2024.01.05T00.00.00.fifth.sql", ".hidden.php"],
+    "twinsToLog": ["2024.01.01T00.00.00.first.php", "2024.01.02T00.00.00.second.js"],
+    "pending": [".hidden.php", "2024.01.03T00.00.00.third.php", "2024.01.05T00.00.00.fifth.sql"],
+    "discoverable": { "php": ["2024.01.01T00.00.00.first.php", "2024.01.02T00.00.00.second.php", "2024.01.03T00.00.00.third.php", "2024.01.04T00.00.00.fourth.sql", "2024.01.05T00.00.00.fifth.sql"], "node": ["2024.01.01T00.00.00.first.js", "2024.01.02T00.00.00.second.js", "2024.01.04T00.00.00.fourth.sql", "2024.01.05T00.00.00.fifth.sql"] }
+  },
+  {
+    "description": "nothing executed: everything pending, nothing to log",
+    "executed": [],
+    "files": ["a.js", "a.php"],
+    "twinsToLog": [],
+    "pending": ["a.js", "a.php"],
+    "discoverable": { "php": ["a.php"], "node": ["a.js"] }
+  },
+  {
+    "description": "TypeScript spellings count too",
+    "executed": ["a.ts"],
+    "files": ["a.php", "a.ts", "b.php"],
+    "twinsToLog": ["a.php"],
+    "pending": ["b.php"],
+    "discoverable": { "php": ["a.php", "b.php"], "node": [] }
+  }
+]

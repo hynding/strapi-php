@@ -63,6 +63,28 @@ final class MigrationsTest extends TestCase
         self::assertSame([['name' => 'b']], $runner->pending());
     }
 
+    /** A database shared with Node Strapi logs `name.js`; the `.php` twin must not run again (and the reverse). */
+    public function testRunnerCountsTheOtherRuntimesSpellingAsExecuted(): void
+    {
+        $db = GetstartedDatabase::create([], []);
+        $storage = new Storage($db, 'strapi_migrations_test');
+        self::assertSame([], $storage->executed()); // creates the log table
+        $storage->logMigration('2024.01.01T00.00.00.first.js');
+        $storage->logMigration('2024.01.02T00.00.00.second.ts');
+        $storage->logMigration('2024.01.04T00.00.00.fourth.sql');
+
+        $noop = static function (): void {};
+        $runner = new Runner($storage, static function (): void {}, static fn (): array => [
+            ['name' => '2024.01.01T00.00.00.first.php', 'up' => $noop, 'down' => $noop],
+            ['name' => '2024.01.02T00.00.00.second.php', 'up' => $noop, 'down' => $noop],
+            ['name' => '2024.01.03T00.00.00.third.php', 'up' => $noop, 'down' => $noop],
+            ['name' => '2024.01.04T00.00.00.fourth.sql', 'up' => $noop, 'down' => $noop],
+            ['name' => '2024.01.05T00.00.00.fifth.sql', 'up' => $noop, 'down' => $noop],
+        ]);
+
+        self::assertSame([['name' => '2024.01.03T00.00.00.third.php'], ['name' => '2024.01.05T00.00.00.fifth.sql']], $runner->pending());
+    }
+
     public function testRunnerWrapsErrors(): void
     {
         $db = GetstartedDatabase::create([], []);

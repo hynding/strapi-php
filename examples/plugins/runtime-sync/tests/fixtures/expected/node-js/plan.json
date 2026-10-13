@@ -1,0 +1,288 @@
+{
+    "targets": [
+        "php"
+    ],
+    "actions": [
+        {
+            "path": "config/admin.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/admin.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/api.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/api.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/custom.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/custom.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "1 env reference(s) did not reach the output: the file uses them in expressions (a comparison, a lookup, a condition); review the generated values"
+            ]
+        },
+        {
+            "path": "config/database.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/database.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/env/production/server.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/env/production/server.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "config/flags.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/flags.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "config/middlewares.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/middlewares.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/plugins.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/plugins.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "config/server.php",
+            "target": "php",
+            "generator": "config",
+            "source": "config/server.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "unchanged template: the other runtime's template"
+            ]
+        },
+        {
+            "path": "database/migrations/2024.01.01T00.00.00.add-slug.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "database/migrations/2024.01.01T00.00.00.add-slug.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/article/content-types/article/lifecycles.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/api/article/content-types/article/lifecycles.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/article/controllers/article.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/article/controllers/article.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/article/routes/article.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/article/routes/article.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/article/services/article.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/article/services/article.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/api/review/controllers/review.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/review/controllers/review.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "customised createCoreController: stub"
+            ]
+        },
+        {
+            "path": "src/api/review/policies/is-owner.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/api/review/policies/is-owner.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/api/review/routes/review.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/review/routes/review.js",
+            "action": "write",
+            "review": false,
+            "notes": [
+                "data file: translated"
+            ]
+        },
+        {
+            "path": "src/api/review/services/review.php",
+            "target": "php",
+            "generator": "core-factory",
+            "source": "src/api/review/services/review.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/extensions/users-permissions/strapi-server.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/extensions/users-permissions/strapi-server.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/index.php",
+            "target": "php",
+            "generator": "app-entry",
+            "source": "src/index.js",
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "src/middlewares/timer.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/middlewares/timer.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "src/policies/is-admin.php",
+            "target": "php",
+            "generator": "stub",
+            "source": "src/policies/is-admin.js",
+            "action": "write",
+            "review": true,
+            "notes": [
+                "stub: port by hand"
+            ]
+        },
+        {
+            "path": "composer.json",
+            "target": "php",
+            "generator": "manifest",
+            "source": null,
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "bin/strapi",
+            "target": "php",
+            "generator": "template",
+            "source": null,
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "public/index.php",
+            "target": "php",
+            "generator": "template",
+            "source": null,
+            "action": "write",
+            "review": false,
+            "notes": []
+        },
+        {
+            "path": "package.json",
+            "target": "php",
+            "generator": "manifest",
+            "source": null,
+            "action": "merge",
+            "review": false,
+            "notes": [
+                "dependency @strapi/admin@5.56.0",
+                "script build:php",
+                "script develop:php",
+                "script start:php",
+                "script strapi:php"
+            ]
+        },
+        {
+            "path": ".gitignore",
+            "target": "php",
+            "generator": "manifest",
+            "source": null,
+            "action": "merge",
+            "review": false,
+            "notes": [
+                "vendor/"
+            ]
+        }
+    ]
+}

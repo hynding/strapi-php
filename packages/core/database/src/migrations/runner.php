@@ -11,6 +11,9 @@ namespace Strapi\Database\Migrations;
  */
 final class Runner
 {
+    /** The spellings of one migration across runtimes: `name.php` here, `name.js` (or TypeScript) on Node Strapi. */
+    private const array RUNTIME_EXTENSIONS = ['php', 'js', 'ts', 'mjs', 'cjs'];
+
     /** @var callable(): list<RunnableMigration> */
     private $getMigrations;
 
@@ -87,7 +90,35 @@ final class Runner
     {
         $executed = array_flip($this->storage->executed());
 
-        return array_values(array_filter(($this->getMigrations)(), static fn (array $m): bool => !isset($executed[$m['name']])));
+        return array_values(array_filter(($this->getMigrations)(), static fn (array $m): bool => !self::isExecuted($executed, $m['name'])));
+    }
+
+    /**
+     * PHP port: a migration counts as executed under any runtime's spelling of its name. Node
+     * Strapi logs `2024.01.01T00.00.00.add-column.js` where this port logs `….php`; on a database
+     * both runtimes share, the twin that has already run on the other runtime must not run again.
+     *
+     * @param array<string, int> $executed logged names, as keys
+     */
+    private static function isExecuted(array $executed, string $name): bool
+    {
+        if (isset($executed[$name])) {
+            return true;
+        }
+
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+        if (!in_array($extension, self::RUNTIME_EXTENSIONS, true)) {
+            return false;
+        }
+
+        $stem = substr($name, 0, -strlen($extension));
+        foreach (self::RUNTIME_EXTENSIONS as $twin) {
+            if (isset($executed[$stem . $twin])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return list<RunnableMigration> */

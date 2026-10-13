@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * `strapi-runtime-sync` for a strapi-php project: `php vendor/bin/strapi-runtime-sync status`.
+ * The Node twin is bin/strapi-runtime-sync.js (`npx strapi-runtime-sync status`).
+ */
+$autoloads = [
+    $GLOBALS['_composer_autoload_path'] ?? null, // through vendor/bin (Composer 2.2+)
+    __DIR__ . '/../../../autoload.php', // vendor/strapi-plugin/runtime-sync/bin → vendor/autoload.php
+    __DIR__ . '/../../../../vendor/autoload.php', // the strapi-php monorepo: examples/plugins/runtime-sync/bin
+    getcwd() . '/vendor/autoload.php',
+];
+foreach ($autoloads as $autoload) {
+    if (is_string($autoload) && is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+if (!class_exists(\StrapiPlugin\RuntimeSync\Engine\Cli::class)) {
+    foreach (glob(__DIR__ . '/../engine/*.php') ?: [] as $file) {
+        require_once $file;
+    }
+}
+
+exit(\StrapiPlugin\RuntimeSync\Engine\Cli::run(array_slice($argv, 1), (string) getcwd()));

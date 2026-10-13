@@ -47,6 +47,7 @@ The package column is each part's name inside `hynding/strapi-php` (the director
 | Project generator: `composer create-project hynding/create-strapi-app my-project` (same prompts and flags as `npx create-strapi-app`, vanilla and example templates in PHP, fresh `.env` secrets, `composer install` + npm install of the pinned admin bundle) | `hynding/create-strapi-app` (published on its own) | ported (Strapi Cloud login not ported); 44 tests |
 | Upgrade tool `strapi-upgrade` (upstream's `npx @strapi/upgrade` commands; composer.json and package.json upgraded in lockstep; PHP codemods, upstream's JS codemods via npx) | `strapi/upgrade` | ported; 186 tests |
 | content-releases, review-workflows | | not ported: the whole packages are Enterprise-licensed |
+| Dual-runtime projects: `strapi-runtime-sync status / generate / db:check / handoff`, migration-log reconciliation, boot markers, admin page (a plugin for Strapi and strapi-php, `examples/plugins/runtime-sync`) | `strapi-plugin/runtime-sync` + `strapi-plugin-runtime-sync` | 13 PHP tests + 8 Node tests on shared goldens |
 
 `parity.json` lists every upstream server file and whether it is ported. `php
 scripts/parity-map.php` regenerates it.
@@ -113,6 +114,8 @@ packages/core/*        ↔ strapi/strapi packages/core/*      (each a strapi/* p
 packages/plugins/*     ↔ packages/plugins/*
 packages/providers/*   ↔ packages/providers/*
 examples/getstarted    ↔ examples/getstarted (PHP edition)
+examples/plugins/*     plugins that run on both Strapi and strapi-php (announcements: the pattern;
+                       runtime-sync: moves a project between the two runtimes on one database)
 tests/php              integration suite: boots the example, hits the content API over PSR-7
 scripts/               version sync, parity map, upstream release watch, offline dev manifest
 ```

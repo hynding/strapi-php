@@ -81,12 +81,13 @@ fixture that `requires` something a backend lacks is skipped there with a reason
 | --- | --- | --- |
 | Content API fixtures (4) | pass | pass |
 | Anonymous admin route → 401 | pass | pass |
-| Authenticated admin summary | pass | skipped: admin auth is not ported yet |
+| Authenticated admin summary | pass | pass |
 | Admin bundle | builds with `@strapi/sdk-plugin` | served from the same upstream bundle |
 
 Limits of this proof of concept:
 
 - The generator models scalar and enum attributes only. Relations, components, media and
   dynamic zones come out as `unknown`/`mixed`.
-- The generator lives in this example. Once a second plugin needs it, it belongs in its own
-  package (for example a `strapi-plugin-sync` bin) that both plugins depend on.
+- The generator lives in this example. The second dual plugin, [`../runtime-sync`](../runtime-sync),
+  has its own `generator/check.mjs` (parity, route handlers, manifests; no codegen); a package both
+  depend on is the next step once their needs overlap.
