@@ -4,22 +4,26 @@
 declare(strict_types=1);
 
 /**
- * Smoke test: boots examples/getstarted on an in-memory SQLite database and sends requests
- * through `strapi.server.handle()`: anonymously (the public role grants nothing, so 403 as
- * upstream), then with a full-access API token. Exit code 0 when everything matches, 1 otherwise.
+ * Smoke test: boots examples/getstarted on an in-memory SQLite database (or the server named by
+ * DATABASE_CLIENT) and sends requests through `strapi.server.handle()`: anonymously (the public
+ * role grants nothing, so 403 as upstream), then with a full-access API token. Exit code 0 when
+ * everything matches, 1 otherwise.
  *
  *     php tests/php/smoke.php
  */
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
-putenv('DATABASE_CLIENT=sqlite');
-putenv('DATABASE_FILENAME=:memory:');
+// DATABASE_CLIENT=mysql|postgres (with DATABASE_HOST, DATABASE_NAME...) runs it on that server instead
+if (in_array(getenv('DATABASE_CLIENT'), [false, '', 'sqlite'], true)) {
+    putenv('DATABASE_CLIENT=sqlite');
+    putenv('DATABASE_FILENAME=:memory:');
+    $_ENV['DATABASE_CLIENT'] = 'sqlite';
+    $_ENV['DATABASE_FILENAME'] = ':memory:';
+}
 putenv('STRAPI_NO_EXIT=1');
 putenv('LOG_LEVEL=error');
 $_ENV['LOG_LEVEL'] = 'error';
-$_ENV['DATABASE_CLIENT'] = 'sqlite';
-$_ENV['DATABASE_FILENAME'] = ':memory:';
 
 $appDir = dirname(__DIR__, 2) . '/examples/getstarted';
 

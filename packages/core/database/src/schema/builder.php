@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Database\Schema;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
@@ -37,13 +38,34 @@ final class Builder
     }
 
     /**
+     * PHP port: knex wraps schema changes in a transaction on every client. MySQL commits
+     * implicitly before and after each DDL statement, which knex never notices (its COMMIT is a
+     * plain query), but PDO does: `commit()` throws "There is no active transaction", so the first
+     * boot on an empty MySQL database (and any later schema change) failed after its tables were
+     * created. MySQL has no transactional DDL to lose, so run the callback without one there.
+     *
+     * @param \Closure(Connection): void $callback
+     */
+    private function transactional(\Closure $callback): void
+    {
+        $connection = $this->db->connection;
+        if ($connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            $callback($connection);
+
+            return;
+        }
+
+        $connection->transactional($callback);
+    }
+
+    /**
      * Creates schema in DB.
      *
      * @param SchemaArray $schema
      */
     public function createSchema(array $schema): void
     {
-        $this->db->connection->transactional(function (Connection $trx) use ($schema): void {
+        $this->transactional(function (Connection $trx) use ($schema): void {
             $this->createTables($schema['tables'], $trx);
         });
     }
@@ -72,7 +94,7 @@ final class Builder
             return;
         }
 
-        $this->db->connection->transactional(function (Connection $trx) use ($schema): void {
+        $this->transactional(function (Connection $trx) use ($schema): void {
             foreach (array_reverse($schema['tables']) as $table) {
                 $this->dropTable($trx, $table);
             }
@@ -100,7 +122,7 @@ final class Builder
         }
 
         try {
-            $this->db->connection->transactional(function (Connection $trx) use ($schemaDiff, $forceMigration, $existingMetadata): void {
+            $this->transactional(function (Connection $trx) use ($schemaDiff, $forceMigration, $existingMetadata): void {
                 $this->createTables($schemaDiff['tables']['added'], $trx);
 
                 if ($forceMigration) {
