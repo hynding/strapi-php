@@ -310,7 +310,7 @@ JSON;
         foreach ($all as $id => $cases) {
             foreach ($cases as $i => $case) {
                 $opts = $case['opts'] === [] ? 'defaults' : ($case['opts']['strict'] ? 'strict' : 'cast');
-                yield "{$id} #{$i} ({$opts}) " . json_encode($case['input']) => [$id, self::decode($case['input']), $case['opts'], self::knownDivergences($case)];
+                yield "{$id} #{$i} ({$opts}) " . json_encode($case['input']) => [$id, self::decode($case['input']), $case['opts'], $case];
             }
         }
     }
@@ -343,25 +343,6 @@ JSON;
 
         self::assertTrue($expected['ok'], 'expected an error: ' . ($expected['message'] ?? ''));
         self::assertSame(self::canonical($expected['value']), self::canonical(self::encode($result)));
-    }
-
-    /**
-     * Known, deliberate divergence: the `${values}` list of a oneOf/notOneOf message writes null as
-     * "null" (yup's `Array.join` writes an empty string), as the entity validator's enumeration
-     * message always has.
-     *
-     * @param array<string, mixed> $case
-     * @return array<string, mixed>
-     */
-    private static function knownDivergences(array $case): array
-    {
-        $json = (string) json_encode($case);
-        $json = str_replace('one of the following values: a, 1, "', 'one of the following values: a, 1, null"', $json);
-
-        /** @var array<string, mixed> $fixed */
-        $fixed = json_decode($json, true);
-
-        return $fixed;
     }
 
     private static function decode(mixed $value): mixed
