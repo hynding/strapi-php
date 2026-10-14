@@ -36,7 +36,8 @@ final class ReferenceSet
      */
     public function join(): string
     {
-        return implode(', ', array_map(static fn (mixed $v): string => $v instanceof Undefined ? '' : Yup::jsString($v), $this->toArray()));
+        // yup joins with `Array.prototype.join`, which writes null and undefined as empty strings
+        return implode(', ', array_map(static fn (mixed $v): string => $v === null || $v instanceof Undefined ? '' : Yup::jsString($v), $this->toArray()));
     }
 
     public function add(mixed $value): void

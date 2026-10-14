@@ -222,7 +222,7 @@ final class EntityValidatorTest extends BootedAppTestCase
         self::assertSame(['status' => 'a', 'email' => 'a@b.co', 'count' => 3], $validator->validateEntityCreation($model, ['status' => 'a', 'email' => 'a@b.co', 'count' => 3]));
 
         $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['status' => 'c']));
-        self::assertSame('status must be one of the following values: a, b, null', $error['message']);
+        self::assertSame('status must be one of the following values: a, b, ', $error['message']);
 
         $error = self::catchValidation(fn () => $validator->validateEntityCreation($model, ['email' => 'nope']));
         self::assertSame('email must be a valid email', $error['message']);
