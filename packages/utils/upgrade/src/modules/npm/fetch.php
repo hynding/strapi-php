@@ -48,8 +48,9 @@ final class Fetch
             return ['ok' => false, 'status' => 0, 'body' => ''];
         }
 
+        // PHP 8.4+ has a function for the response headers; PHP 8.5 deprecates naming `$http_response_header`
         /** @var list<string> $headers */
-        $headers = $http_response_header;
+        $headers = function_exists('http_get_last_response_headers') ? (http_get_last_response_headers() ?? []) : (get_defined_vars()['http_response_header'] ?? []);
         $status = 0;
         foreach ($headers as $line) {
             if (preg_match('~^HTTP/\S+\s+(\d{3})~', $line, $m) === 1) {

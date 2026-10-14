@@ -227,8 +227,8 @@ final class Template
         $body = @file_get_contents($url, false, $context);
         $status = 0;
         // after redirects the last status line wins
-        // `$http_response_header` is only defined when the server answered
-        $responseHeaders = get_defined_vars()['http_response_header'] ?? [];
+        // the response headers are only set when the server answered (a function from PHP 8.4)
+        $responseHeaders = function_exists('http_get_last_response_headers') ? (http_get_last_response_headers() ?? []) : (get_defined_vars()['http_response_header'] ?? []);
         foreach (is_array($responseHeaders) ? $responseHeaders : [] as $header) {
             if (is_string($header) && preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $m) === 1) {
                 $status = (int) $m[1];
