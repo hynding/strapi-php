@@ -91,12 +91,26 @@ final class EnsureAdminDependencies
         }
     }
 
+    /**
+     * Saves exact versions: package managers default to a `^` range, which `assertVersionsMatch()`
+     * then rejects on the next run for the `@strapi/*` packages.
+     *
+     * @param list<string> $specs
+     * @return list<string>
+     */
+    public static function installCommand(string $manager, array $specs): array
+    {
+        return $manager === 'npm'
+            ? ['npm', 'install', '--save-exact', ...$specs]
+            : [$manager, 'add', '--exact', ...$specs];
+    }
+
     /** @param list<array{name: string, wantedVersion: string}> $missing */
     private static function installAdminPeerDeps(array $missing, string $cwd, Logger $logger): void
     {
         $manager = is_file($cwd . '/yarn.lock') ? 'yarn' : (is_file($cwd . '/pnpm-lock.yaml') ? 'pnpm' : 'npm');
         $specs = array_map(static fn (array $m): string => "{$m['name']}@{$m['wantedVersion']}", $missing);
-        $command = $manager === 'npm' ? ['npm', 'install', ...$specs] : [$manager, 'add', ...$specs];
+        $command = self::installCommand($manager, $specs);
 
         $logger->debug('Running', implode(' ', $command));
         $process = new Process($command, $cwd, null, null, null);
