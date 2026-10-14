@@ -62,9 +62,10 @@ final class Connection
             return $params;
         }
 
-        foreach (['host', 'port', 'user', 'password', 'database', 'charset'] as $key) {
+        // knex's `database` is DBAL's `dbname`
+        foreach (['host' => 'host', 'port' => 'port', 'user' => 'user', 'password' => 'password', 'database' => 'dbname', 'charset' => 'charset'] as $key => $param) {
             if (isset($connection[$key]) && $connection[$key] !== '') {
-                $params[$key] = $key === 'port' ? (int) $connection[$key] : $connection[$key];
+                $params[$param] = $key === 'port' ? (int) $connection[$key] : $connection[$key];
             }
         }
         if (isset($connection['socketPath'])) {
