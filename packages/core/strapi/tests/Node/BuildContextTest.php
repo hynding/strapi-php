@@ -66,6 +66,15 @@ final class BuildContextTest extends TestCase
         EnsureAdminDependencies::assertVersionsMatch(['@strapi/admin' => '5.0.0']);
     }
 
+    public function testInstallingMissingAdminDependenciesSavesExactVersions(): void
+    {
+        $specs = ['@strapi/admin@' . Strapi::upstreamVersion(), 'react@latest'];
+
+        self::assertSame(['npm', 'install', '--save-exact', ...$specs], EnsureAdminDependencies::installCommand('npm', $specs));
+        self::assertSame(['yarn', 'add', '--exact', ...$specs], EnsureAdminDependencies::installCommand('yarn', $specs));
+        self::assertSame(['pnpm', 'add', '--exact', ...$specs], EnsureAdminDependencies::installCommand('pnpm', $specs));
+    }
+
     public function testExampleProjectPinsTheMatchingAdminVersion(): void
     {
         $packageJson = json_decode((string) file_get_contents(self::$appDir . '/package.json'), true);
