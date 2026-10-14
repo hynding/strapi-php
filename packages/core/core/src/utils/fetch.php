@@ -127,9 +127,10 @@ final class Fetch
             throw new \RuntimeException('fetch failed: ' . ($error['message'] ?? 'unknown error'));
         }
 
-        // populated by the http wrapper on every completed request
+        // populated by the http wrapper on every completed request; PHP 8.4+ has a function for it and
+        // PHP 8.5 deprecates naming the `$http_response_header` variable
         /** @var list<string> $responseHeaders */
-        $responseHeaders = $http_response_header;
+        $responseHeaders = function_exists('http_get_last_response_headers') ? (http_get_last_response_headers() ?? []) : (get_defined_vars()['http_response_header'] ?? []);
         $status = 0;
         $headers = [];
         foreach ($responseHeaders as $line) {
