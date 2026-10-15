@@ -12,8 +12,8 @@ use Strapi\Utils\Primitives\Strings;
 /**
  * Port of packages/core/core/src/configuration/index.ts (`loadConfiguration`).
  *
- * Reads `.env` (vlucas/phpdotenv, never overriding variables already in the environment, like
- * `dotenv.config()`), defaults `NODE_ENV` to `development`, loads `config/*.php` merged with
+ * Reads `.env` into the process environment (vlucas/phpdotenv, never overriding variables already in
+ * the environment, like `dotenv.config()` filling `process.env`), defaults `NODE_ENV` to `development`, loads `config/*.php` merged with
  * `config/env/<NODE_ENV>/*.php`, computes server/admin URLs and the project directories.
  *
  * @phpstan-type StrapiOptions array{appDir: string, distDir?: string, autoReload?: bool, serveAdminPanel?: bool}
@@ -51,7 +51,9 @@ final class Configuration
         $file = is_string($envPath) && $envPath !== '' ? $envPath : $appDir . '/.env';
 
         if (is_file($file)) {
-            Dotenv::createImmutable(dirname($file), basename($file))->safeLoad();
+            // "unsafe" adds putenv(): code reading getenv('NODE_ENV') must see .env values, as Node code
+            // reading process.env does. Without it a NODE_ENV=production in .env was replaced below.
+            Dotenv::createUnsafeImmutable(dirname($file), basename($file))->safeLoad();
         }
 
         if (!is_string(getenv('NODE_ENV')) || getenv('NODE_ENV') === '') {
