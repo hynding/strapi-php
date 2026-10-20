@@ -68,4 +68,34 @@ final class FetchTest extends BootedAppTestCase
 
         self::assertSame(1, $calls);
     }
+
+    public function testARealResponseCarriesItsStatusAndHeaders(): void
+    {
+        $router = tempnam(sys_get_temp_dir(), 'fetch-router');
+        file_put_contents($router, '<?php http_response_code(201); header("X-Probe: yes"); header("Content-Type: application/json"); echo "{\"ok\":true}";');
+        $probe = stream_socket_server('tcp://127.0.0.1:0');
+        self::assertNotFalse($probe);
+        $address = (string) stream_socket_get_name($probe, false);
+        fclose($probe);
+        $server = proc_open([PHP_BINARY, '-S', $address, $router], [1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']], $pipes);
+        self::assertIsResource($server);
+
+        try {
+            $response = null;
+            for ($attempt = 0; $attempt < 50 && $response === null; ++$attempt) {
+                try {
+                    $response = (self::strapi()->fetch())("http://{$address}/", ['method' => 'POST', 'body' => 'a=1', 'timeout' => 1]);
+                } catch (\RuntimeException) {
+                    usleep(100_000);
+                }
+            }
+
+            self::assertNotNull($response, 'the probe server did not start');
+            self::assertSame([true, 201, 'yes', '{"ok":true}'], [$response['ok'], $response['status'], $response['headers']['x-probe'] ?? null, $response['body']]);
+        } finally {
+            proc_terminate($server);
+            proc_close($server);
+            unlink($router);
+        }
+    }
 }
