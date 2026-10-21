@@ -120,17 +120,19 @@ final class Fetch
 
         $context = stream_context_create(['http' => $http, 'https' => $http]);
 
-        $body = @file_get_contents($url, false, $context);
-        if ($body === false) {
+        $stream = @fopen($url, 'rb', false, $context);
+        if ($stream === false) {
             $error = error_get_last();
 
-            throw new \RuntimeException('fetch failed: ' . ($error['message'] ?? 'unknown error'));
+            throw new \RuntimeException('fetch failed: ' . preg_replace('/^fopen\([^)]*\): /', '', $error['message'] ?? 'unknown error'));
         }
-
-        // populated by the http wrapper on every completed request; PHP 8.4+ has a function for it and
-        // PHP 8.5 deprecates naming the `$http_response_header` variable
+        $body = (string) stream_get_contents($stream);
+        // The response head is the wrapper's data: `$http_response_header` is only filled for a
+        // caller that names it, which PHP 8.5 deprecates, and get_defined_vars() never sees it.
+        $meta = stream_get_meta_data($stream);
+        fclose($stream);
         /** @var list<string> $responseHeaders */
-        $responseHeaders = function_exists('http_get_last_response_headers') ? (http_get_last_response_headers() ?? []) : (get_defined_vars()['http_response_header'] ?? []);
+        $responseHeaders = is_array($meta['wrapper_data'] ?? null) ? $meta['wrapper_data'] : [];
         $status = 0;
         $headers = [];
         foreach ($responseHeaders as $line) {
