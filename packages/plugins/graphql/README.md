@@ -69,6 +69,7 @@ users-permissions, i18n and upload packages extend the schema through it.
 | resolvers `(parent, args, context, info)` | `info` is webonyx's `ResolveInfo` (`path` is a list; the root field's key is `path[0]`) |
 | `strapi.plugin('graphql').destroy = () => server.stop()` set by `bootstrap` | the module's `destroy` lifecycle stops the server |
 | `isEmpty(schema)` check in `bootstrap` | not ported (a built schema is never empty) |
+| `bootstrap` builds the schema and starts the Apollo server | it does when artifacts are generated (`generateArtifacts`, on in development by default); otherwise (production) on the first request to the endpoint, so a PHP-FPM request that is not a GraphQL request does not build the schema (`Bootstrap::buildsEagerly()`). A schema error then surfaces on that first request instead of at boot |
 | filter operators `and`, `or`, `null` | classes `AndOperator`, `OrOperator`, `NullOperator` (reserved words) |
 
 ### Tests
