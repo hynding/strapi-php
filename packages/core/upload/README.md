@@ -68,6 +68,7 @@ objects. What is persisted is the JSON-serializable part (`Utils::toPlain()`).
 | --- | --- |
 | sharp image processing | GD: same output dimensions, formats, names (`thumbnail_<name>`, `<breakpoint>_<name>`), hashes and size fields; pixels are not byte-identical. PNG optimization is lossless (sharp palette-quantizes). TIFF (GD cannot decode it) and animated WebP keep their dimensions but get no formats and no optimization. AVIF is reported as `heif`, as sharp does. |
 | `concurrentUploadSize` batches, `Promise.all` | files are processed one after the other (PHP is synchronous) |
+| `ensureWeeklyStoredCronSchedule` reschedules (now + 15 s) at every start until metrics were sent once | a stored schedule is kept until it has run: under PHP-FPM every request starts, so the schedule moved on every request (a core store write each time) and never came due |
 | `uploadFromUrls` streams Server-Sent Events | the same events, sent as one `text/event-stream` body when the last URL is done |
 | `createAIMetadataJob` runs the job detached | it runs after the response (`register_shutdown_function`) |
 | `strapi.ai.admin` | read from the `ai.admin` container entry (registered by the admin package); AI metadata is unavailable without it |

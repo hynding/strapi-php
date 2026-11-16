@@ -136,7 +136,11 @@ final class WeeklyMetrics
         $nowMs = (int) floor(microtime(true) * 1000);
         $weeklySchedule = $currentSchedule;
 
-        if (!$weeklySchedule || !$lastWeeklyUpdate || (int) $lastWeeklyUpdate + self::ONE_WEEK < $nowMs) {
+        // PHP port: upstream also reschedules while no metrics were ever sent (`!lastWeeklyUpdate`),
+        // which in one long-lived process means "15 seconds after start". Under PHP-FPM every
+        // request starts, so the schedule moved on every request (a core store write each time)
+        // and never came due. A stored schedule is kept until it has run.
+        if (!$weeklySchedule || ($lastWeeklyUpdate && (int) $lastWeeklyUpdate + self::ONE_WEEK < $nowMs)) {
             $weeklySchedule = Cron::getWeeklyCronScheduleAt($now->modify('+15 seconds'));
             $this->setMetricsStoreValue([...$metricsInfoStored, 'weeklySchedule' => $weeklySchedule]);
 

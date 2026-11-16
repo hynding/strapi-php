@@ -75,6 +75,26 @@ final class Storage
         ];
     }
 
+    /**
+     * PHP port: the id and hash of the last synced schema, or null when there is none (no row, or
+     * no table yet). Unlike {@see read()} it never creates the table and skips the schema itself:
+     * one cheap query, for the bootstrap's check that the database is the one it last settled.
+     *
+     * @return array{id: int, hash: string}|null
+     */
+    public function latest(): ?array
+    {
+        $q = $this->db->connection->quoteSingleIdentifier(...);
+
+        try {
+            $row = $this->db->connection->fetchAssociative(sprintf('SELECT %s, %s FROM %s ORDER BY %s DESC LIMIT 1', $q('id'), $q('hash'), $q(self::TABLE_NAME), $q('time')));
+        } catch (\Doctrine\DBAL\Exception) {
+            return null;
+        }
+
+        return $row === false ? null : ['id' => (int) $row['id'], 'hash' => (string) $row['hash']];
+    }
+
     /** @param SchemaArray $schema */
     public function hashSchema(array $schema): string
     {

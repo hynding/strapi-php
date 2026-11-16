@@ -581,15 +581,101 @@ final class Strapi extends Container implements StrapiContract
         // PHP port: upstream boots one process. FrankenPHP and FPM boot several at once on the same
         // project, and bootstrap writes to the database (schema sync, migrations, the default
         // roles and permissions plugins create), so concurrent first boots race. Serialize them.
+        //
+        // Under PHP-FPM every request boots, and a lock held across the whole bootstrap would
+        // serialize every request. Once a bootstrap has completed for the same inputs (schemas,
+        // config, packages, migrations) on the same database, bootstrap's writes find nothing to
+        // change, so later boots skip the lock: the steady state is read-only and concurrent.
+        $fingerprint = $this->bootstrapFingerprint();
+        if ($fingerprint !== null && $this->isBootstrapSettled($fingerprint)) {
+            return $this->doBootstrap();
+        }
+
         $lock = $this->acquireBootstrapLock();
 
         try {
-            return $this->doBootstrap();
+            $this->doBootstrap();
+            if ($fingerprint !== null) {
+                $this->markBootstrapSettled($fingerprint);
+            }
+
+            return $this;
         } finally {
             if ($lock !== null) {
                 flock($lock, LOCK_UN);
                 fclose($lock);
             }
+        }
+    }
+
+    /**
+     * A hash of what bootstrap's database writes depend on: the Strapi version, the installed
+     * packages, the config, the content types, components and models, the user's migrations and
+     * `src/index.php` (whose bootstrap may seed). Null when it cannot be computed.
+     */
+    private function bootstrapFingerprint(): ?string
+    {
+        $root = $this->dirs()->root;
+        $migrations = @scandir($root . '/database/migrations') ?: [];
+        $index = is_file($root . '/src/index.php') ? (string) md5_file($root . '/src/index.php') : '';
+
+        $packages = [];
+        foreach (Loaders\Plugins\GetEnabledPlugins::installedPackages($this) as $name => $package) {
+            $packages[$name] = $package['info']['version'] ?? '';
+        }
+
+        // closures in config encode as `{}`: a change inside one is not seen, the rest is.
+        // `launchedAt` is this boot's timestamp, not an input.
+        $config = $this->config()->all();
+        unset($config['launchedAt']);
+
+        $inputs = json_encode([
+            'version' => Configuration::version(),
+            'packages' => $packages,
+            'config' => $config,
+            'contentTypes' => array_map(static fn (Schema $schema): array => $schema->toArray(), $this->contentTypes()),
+            'components' => array_map(static fn (Schema $schema): array => $schema->toArray(), $this->components()),
+            'models' => $this->get('models')->get(),
+            'migrations' => $migrations,
+            'index' => $index,
+        ], JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
+
+        return is_string($inputs) ? hash('sha256', $inputs) : null;
+    }
+
+    private function bootstrapSettledFile(): string
+    {
+        return $this->dirs()->root . '/.tmp/bootstrap.settled';
+    }
+
+    /**
+     * Whether the last completed bootstrap had the same inputs and ran on this database: its last
+     * synced schema row (id and hash) is still the latest, so the database was not reset or
+     * re-synced by another boot since.
+     */
+    private function isBootstrapSettled(string $fingerprint): bool
+    {
+        $recorded = @file_get_contents($this->bootstrapSettledFile());
+        if (!is_string($recorded) || $recorded === '') {
+            return false;
+        }
+
+        $latest = $this->db()->schema->schemaStorage->latest();
+
+        return $latest !== null && hash_equals($recorded, "{$fingerprint}:{$latest['id']}:{$latest['hash']}");
+    }
+
+    private function markBootstrapSettled(string $fingerprint): void
+    {
+        $latest = $this->db()->schema->schemaStorage->latest();
+        if ($latest === null) {
+            return;
+        }
+
+        $file = $this->bootstrapSettledFile();
+        $tmp = $file . '.' . getmypid();
+        if (@file_put_contents($tmp, "{$fingerprint}:{$latest['id']}:{$latest['hash']}") !== false) {
+            @rename($tmp, $file);
         }
     }
 
