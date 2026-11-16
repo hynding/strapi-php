@@ -55,6 +55,9 @@ final class ConfigurationTest extends TestCase
     #[RunInSeparateProcess]
     public function testProcessEnvironmentWinsOverDotEnv(): void
     {
+        // the separate process inherits the parent's superglobals: an app booted earlier in the run
+        // left NODE_ENV=development there, which would win over putenv() alone
+        unset($_ENV['NODE_ENV'], $_SERVER['NODE_ENV']);
         putenv('NODE_ENV=test');
         file_put_contents($this->dir . '/.env', "NODE_ENV=production\n");
 
