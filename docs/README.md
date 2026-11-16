@@ -13,9 +13,27 @@ deviations from upstream. This folder is for cross-cutting notes.
 Strapi (Node) boots once and keeps registries, metadata, cron, webhooks and the event hub
 in memory. The PHP port keeps that model: `Strapi\Core\Strapi::load()` builds everything,
 `public/index.php` boots once per FrankenPHP worker and reuses it across requests, and
-under PHP-FPM it boots per request (acceptable for development; a compiled-container cache
-for FPM is on the roadmap). Cron under FPM runs via `php bin/strapi cron:run` from system
-cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
+under PHP-FPM it boots per request. Cron under FPM runs via `php bin/strapi cron:run` from
+system cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
+
+What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
+
+- **The steady state is read-only and concurrent.** Bootstrap writes to the database (schema
+  sync, migrations, default roles, permission syncs), so it runs under a lock
+  (`.tmp/bootstrap.lock`). Once a bootstrap has completed, `.tmp/bootstrap.settled` records a
+  hash of its inputs (Strapi version, packages, config, content types, components, models,
+  `database/migrations`, `src/index.php`) and the database's latest schema row. A boot with the
+  same inputs on the same database skips the lock: its writes would change nothing, and
+  `CoreStore::set` skips updates that change nothing. A settled boot writes no row. A new deploy,
+  a config change or another database takes the lock again once.
+- **GraphQL builds on first use in production.** With artifacts off (`generateArtifacts`, off
+  outside development) the schema and the Apollo server are built on the first request to the
+  GraphQL endpoint; development keeps upstream's eager build.
+
+On `examples/getstarted` (SQLite, opcache), a production boot went from ~620 ms to ~250 ms,
+1,024 to 829 included files, 24 to 18 MB. What remains is mostly `register()` (~70 ms of
+config and `src/` loading), routing (~35 ms) and the admin and content-manager syncs: a boot
+cache (resolved config, schemas, routes) is the next step.
 
 ## Status
 
@@ -64,8 +82,24 @@ starting and after finishing (`/api-tests` in Claude Code).
   `5.0.0-discard-drafts`, `serialize-json-columns`, database internal migrations `5.0.0-01…06`.
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
-- PHP-FPM boots Strapi per request; a compiled-container cache would make FPM viable in production
-  (FrankenPHP worker mode is the recommended setup).
+- PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
+  ~250 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  Still to do, in order:
+  - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
+    resolved config, plugin list, API and component schemas, database metadata, the FastRoute
+    dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
+  - skip the admin, users-permissions and content-manager syncs on a settled boot (they read
+    every permission and configuration to find nothing to change, ~100 ms);
+  - rate limiting keeps hits in a `static` array (admin, users-permissions), so under FPM it
+    never limits: back it with APCu or a table;
+  - `cron:run` keeps the last run in memory and looks back one minute: persist it so a missed
+    minute catches up;
+  - AI metadata jobs run in a shutdown function after `destroy()`: `fastcgi_finish_request()`
+    first, or a table drained by `cron:run`;
+  - logs default to `php://stdout`, lost under FPM, and every request logs "Shutting down Strapi";
+  - an `.htaccess` for Apache hosts (rewrite to `index.php`, serve `build/` statically, deny the
+    rest), a `public_html` layout, a release bundle with `vendor/`, a requirements check;
+  - a `tests/api` lane that boots once per request, as FPM does.
 
 ## Moving a project between the runtimes
 
