@@ -24,7 +24,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 # Development php.ini: errors on screen, no opcache timestamps caching problems
 RUN cp "$PHP_INI_DIR/php-development.ini" "$PHP_INI_DIR/php.ini" \
-    && printf 'opcache.enable=1\nopcache.validate_timestamps=1\nopcache.revalidate_freq=0\nmemory_limit=512M\nupload_max_filesize=256M\npost_max_size=256M\n' > "$PHP_INI_DIR/conf.d/zz-strapi-dev.ini"
+    && printf 'opcache.enable=1\nopcache.validate_timestamps=1\nopcache.revalidate_freq=0\nmemory_limit=512M\nupload_max_filesize=256M\npost_max_size=256M\nenable_post_data_reading=Off\n' > "$PHP_INI_DIR/conf.d/zz-strapi-dev.ini"
 
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     SERVER_NAME=":1337" \
