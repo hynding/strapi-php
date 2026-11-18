@@ -39,6 +39,19 @@ final class HttpServer
         return $this->process !== null && $this->process->isRunning();
     }
 
+    /**
+     * The built-in server's command line. PHP's own multipart parser keeps only the last of a
+     * repeated field, so several `files` in one upload would arrive as one; koa-body keeps them
+     * all. With `enable_post_data_reading` off, strapi::body (middlewares/body.php) parses the raw
+     * body itself, repeated fields included, as it does under FrankenPHP and in tests/api.
+     *
+     * @return list<string>
+     */
+    public static function command(string $php, string $host, int $port, string $public, string $router): array
+    {
+        return [$php, '-d', 'enable_post_data_reading=0', '-S', "{$host}:{$port}", '-t', $public, $router];
+    }
+
     /** @param callable(): void|null $onListen */
     public function listen(string $host, int $port, ?callable $onListen = null): void
     {
@@ -54,8 +67,7 @@ final class HttpServer
             $this->strapi->stopWithError(new \RuntimeException("The port {$port} is already used by another application."));
         }
 
-        $php = PHP_BINARY;
-        $this->process = new Process([$php, '-S', "{$host}:{$port}", '-t', $public, $router], $root, [
+        $this->process = new Process(self::command(PHP_BINARY, $host, $port, $public, $router), $root, [
             ...array_filter(getenv(), 'is_string'),
             'STRAPI_APP_DIR' => $root,
             'PHP_CLI_SERVER_WORKERS' => (string) ((int) ($this->strapi->config()->get('server.http.workers', 4))),
