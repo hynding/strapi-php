@@ -60,4 +60,17 @@ final class BodyTest extends BootedAppTestCase
         self::assertInstanceOf(EmptyObject::class, $parsed['fileInfo']['meta']);
         self::assertSame(['fileInfo' => ['caption' => 'c', 'meta' => []]], $ctx->requestBody());
     }
+
+    public function testRepeatedMultipartFilesAreAllKept(): void
+    {
+        // koa-body (formidable) keeps every `files` part of an upload; PHP's own parser keeps the last
+        $boundary = 'XyZ';
+        $part = static fn (string $name, string $content): string => "--{$boundary}\r\n"
+            . "Content-Disposition: form-data; name=\"files\"; filename=\"{$name}\"\r\nContent-Type: image/png\r\n\r\n{$content}\r\n";
+        $ctx = self::parse("multipart/form-data; boundary={$boundary}", $part('a.png', 'one') . $part('b.png', 'two') . "--{$boundary}--\r\n");
+
+        $files = $ctx->files()['files'] ?? null;
+        self::assertIsArray($files);
+        self::assertSame(['a.png', 'b.png'], array_map(static fn ($f) => $f->getClientFilename(), $files));
+    }
 }
