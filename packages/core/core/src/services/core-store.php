@@ -98,6 +98,13 @@ final class CoreStore implements CoreStoreContract
         $payload = ['value' => self::stringify($value), 'type' => self::typeOf($value)];
 
         if ($data !== null) {
+            // PHP port: bootstrap re-sets the same values on every boot, which under PHP-FPM is every
+            // request. Upstream always updates; skipping an update that changes nothing is invisible
+            // (the table has no timestamps) and keeps a steady-state boot read-only.
+            if (($data['value'] ?? null) === $payload['value'] && ($data['type'] ?? null) === $payload['type']) {
+                return;
+            }
+
             $this->db->query('strapi::core-store')->update(['where' => ['id' => $data['id']], 'data' => $payload]);
 
             return;

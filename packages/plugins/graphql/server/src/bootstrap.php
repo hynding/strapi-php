@@ -160,14 +160,25 @@ final class Bootstrap
         return $prodLanding();
     }
 
+    /**
+     * PHP port: whether the schema and the Apollo server are built during bootstrap, as upstream
+     * does, or on the first request to the GraphQL endpoint. Building them is most of a boot (the
+     * whole content API schema), and under PHP-FPM every request boots, GraphQL or not. Eager
+     * whenever artifacts are generated (development, by default), so schema errors and
+     * `schema.graphql` still appear at startup there; lazy otherwise (production).
+     */
+    public static function buildsEagerly(Strapi $strapi): bool
+    {
+        return (bool) $strapi->plugin('graphql')->config('generateArtifacts', $strapi->config()->get('environment') === 'development');
+    }
+
     public static function bootstrap(Strapi $strapi): void
     {
         $graphql = $strapi->plugin('graphql');
 
-        // Generate the GraphQL schema for the content API
+        // Generate the GraphQL schema for the content API (now, or on the first request: see buildsEagerly())
         $contentApi = $graphql->service('content-api');
         \assert($contentApi instanceof ContentApi);
-        $schema = $contentApi->buildSchema();
 
         $path = (string) $graphql->config('endpoint');
         $configuredDepthLimit = $graphql->config('depthLimit');
@@ -213,8 +224,8 @@ final class Bootstrap
         ];
 
         $defaultServerConfig = [
-            // Schema
-            'schema' => $schema,
+            // Schema (built with the server, below)
+            'schema' => null,
 
             // Validation
             // Keep v5 compatibility: depthLimit is passed through unchanged, so an unset or invalid value
@@ -238,16 +249,36 @@ final class Bootstrap
         $apolloServerConfig = $graphql->config('apolloServer');
         $serverConfig = self::merge($defaultServerConfig, is_array($apolloServerConfig) ? $apolloServerConfig : []);
 
-        // Create a new Apollo server
-        $server = new ApolloServer($serverConfig);
+        $server = null;
+        $getServer = static function () use (&$server, $serverConfig, $contentApi, $strapi): ApolloServer {
+            if ($server !== null) {
+                return $server;
+            }
 
-        try {
-            // server.start() must be called before using server.applyMiddleware()
-            $server->start();
-        } catch (\Throwable $error) {
-            $strapi->log()->error('Failed to start the Apollo server', ['message' => $error->getMessage()]);
+            // a schema from the user's apolloServer config wins, as it does in upstream's merge
+            $serverConfig['schema'] ??= $contentApi->buildSchema();
 
-            throw $error;
+            // Create a new Apollo server
+            $server = new ApolloServer($serverConfig);
+
+            try {
+                // server.start() must be called before using server.applyMiddleware()
+                $server->start();
+            } catch (\Throwable $error) {
+                $strapi->log()->error('Failed to start the Apollo server', ['message' => $error->getMessage()]);
+
+                throw $error;
+            }
+
+            // Register destroy behavior
+            self::$servers ??= new \WeakMap();
+            self::$servers[$strapi] = $server;
+
+            return $server;
+        };
+
+        if (self::buildsEagerly($strapi)) {
+            $getServer();
         }
 
         // Create the route handlers for Strapi
@@ -303,10 +334,15 @@ final class Bootstrap
         };
 
         // add the graphql server for koa
-        $handler[] = KoaMiddleware::create($server, [
-            // Initialize loaders for this request.
-            'context' => static fn (array $params): GraphqlContext => new GraphqlContext($params['ctx']->state(), $params['ctx']),
-        ]);
+        $middleware = null;
+        $handler[] = static function (Context $ctx, callable $next) use (&$middleware, $getServer): void {
+            $middleware ??= KoaMiddleware::create($getServer(), [
+                // Initialize loaders for this request.
+                'context' => static fn (array $params): GraphqlContext => new GraphqlContext($params['ctx']->state(), $params['ctx']),
+            ]);
+
+            $middleware($ctx, $next);
+        };
 
         // now that handlers are set up, add the graphql route to our apollo server
         $strapi->server()->routes([
@@ -319,10 +355,6 @@ final class Bootstrap
                 ],
             ],
         ]);
-
-        // Register destroy behavior
-        self::$servers ??= new \WeakMap();
-        self::$servers[$strapi] = $server;
     }
 
     public static function destroy(Strapi $strapi): void

@@ -135,6 +135,11 @@ symfony/process.
 - **Custom fields**: `plugin::<p>.<name>` falls back to `global::<name>` when the plugin is not loaded.
 - **Cron**: `strapi.cron.runDue()` runs the due jobs once (`bin/strapi cron:run` from crontab under
   FPM); `loop()` is the long-running scheduler for worker mode.
+- **Bootstrap lock**: `bootstrap()` serializes boots on `.tmp/bootstrap.lock` (concurrent first
+  boots race on its writes) until one has completed; `.tmp/bootstrap.settled` then records the
+  inputs' fingerprint and the database's latest schema row, and boots with the same inputs on the
+  same database skip the lock (under PHP-FPM, every request). `CoreStore::set` skips an update that
+  changes nothing, so a settled boot writes no row. See docs/README.md "Runtime model".
 
 ## Tests
 
