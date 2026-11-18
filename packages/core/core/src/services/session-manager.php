@@ -13,7 +13,8 @@ use Strapi\Database\Database;
 
 /**
  * Port of packages/core/core/src/services/session-manager.ts on firebase/php-jwt, with the same
- * claims (`userId`, `sessionId`, `type: 'refresh'|'access'`, `iat`, `exp`) and the same
+ * claims (`userId`, `sessionId`, `type: 'refresh'|'access'`, `exp`, and `iat` on access tokens only,
+ * as upstream signs refresh tokens with `noTimestamp`) and the same
  * rotation/absolute-expiry rules. `$sessionManager('admin')` (or `->origin('admin')`) returns the
  * origin-bound {@see OriginSessionManager}.
  *
@@ -161,6 +162,11 @@ final class SessionManager
     {
         unset($jwtOptions['expiresIn'], $jwtOptions['privateKey'], $jwtOptions['publicKey']);
 
+        // jsonwebtoken's `noTimestamp` drops `iat`, even one set in the payload
+        if (($jwtOptions['noTimestamp'] ?? false) === true) {
+            unset($payload['iat']);
+        }
+
         return Jwt::encode([...self::optionClaims($jwtOptions), ...$payload], $key, $algorithm);
     }
 
@@ -237,7 +243,7 @@ final class SessionManager
         $expiresAtSeconds = self::toTimestamp($record['expiresAt']);
 
         $payload = ['userId' => $userId, 'sessionId' => $sessionId, 'type' => 'refresh', 'iat' => $issuedAtSeconds, 'exp' => $expiresAtSeconds];
-        $token = $this->sign($payload, $jwtKey, $algorithm, $config['jwtOptions'] ?? []);
+        $token = $this->sign($payload, $jwtKey, $algorithm, ['noTimestamp' => true, ...($config['jwtOptions'] ?? [])]);
 
         return ['token' => $token, 'sessionId' => $sessionId, 'absoluteExpiresAt' => self::iso($absoluteExpiresAt->getTimestamp())];
     }
@@ -396,7 +402,7 @@ final class SessionManager
                     ];
 
                     return [
-                        'token' => $this->sign($childPayload, $signKey, $algorithm, $jwtOptions),
+                        'token' => $this->sign($childPayload, $signKey, $algorithm, ['noTimestamp' => true, ...$jwtOptions]),
                         'sessionId' => (string) $child['sessionId'],
                         'absoluteExpiresAt' => !empty($child['absoluteExpiresAt']) ? self::iso(self::toTimestamp($child['absoluteExpiresAt'])) : self::iso(0),
                         'type' => $child['type'] ?? 'refresh',
@@ -449,7 +455,7 @@ final class SessionManager
                 'exp' => self::toTimestamp($childRecord['expiresAt']),
             ];
 
-            $childToken = $this->sign($payloadOut, $signKey, $algorithm, $jwtOptions);
+            $childToken = $this->sign($payloadOut, $signKey, $algorithm, ['noTimestamp' => true, ...$jwtOptions]);
 
             $this->provider->updateBySessionId((string) $current['sessionId'], ['status' => 'rotated', 'childId' => $childSessionId]);
 

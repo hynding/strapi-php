@@ -53,7 +53,9 @@ final class DataIds
         }
 
         if ($ids === [] && !($source['allowMissingId'] ?? false)) {
-            throw new ValidationError("Document with id \"{$relation['documentId']}\", locale \"{$targetLocale}\" not found");
+            // upstream interpolates a template literal, where a null locale reads "null"
+            $locale = $targetLocale ?? 'null';
+            throw new ValidationError("Document with id \"{$relation['documentId']}\", locale \"{$locale}\" not found");
         }
 
         return $ids;
