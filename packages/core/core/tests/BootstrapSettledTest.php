@@ -26,7 +26,7 @@ final class BootstrapSettledTest extends BootedAppTestCase
 
     private static function isSettled(string $fingerprint): bool
     {
-        return (bool) (new \ReflectionMethod(self::strapi(), 'isBootstrapSettled'))->invoke(self::strapi(), $fingerprint);
+        return (bool) (new \ReflectionMethod(self::strapi(), 'matchesSettledRecord'))->invoke(self::strapi(), $fingerprint);
     }
 
     public function testACompletedBootstrapRecordsItsInputsAndDatabase(): void

@@ -67,6 +67,8 @@ final class Strapi extends Container implements StrapiContract
 
     private bool $loaded = false;
 
+    private bool $bootstrapSettled = false;
+
     /** @var array<string, mixed> */
     public array $internal_config = [];
 
@@ -429,6 +431,18 @@ final class Strapi extends Container implements StrapiContract
         return $this->loaded;
     }
 
+    /**
+     * PHP port: whether this boot's bootstrap found its inputs settled (see bootstrap()): a
+     * bootstrap already completed for the same inputs on the same database. Under PHP-FPM every
+     * request boots; upstream syncs once per process start. Bootstrap code may skip a re-sync whose
+     * result depends only on those inputs (the content-manager configurations, the super admin's
+     * permissions), since the completed bootstrap already ran it.
+     */
+    public function bootstrapSettled(): bool
+    {
+        return $this->bootstrapSettled;
+    }
+
     // --- lifecycle ---------------------------------------------------------------------------
 
     public function start(): static
@@ -587,7 +601,8 @@ final class Strapi extends Container implements StrapiContract
         // config, packages, migrations) on the same database, bootstrap's writes find nothing to
         // change, so later boots skip the lock: the steady state is read-only and concurrent.
         $fingerprint = $this->bootstrapFingerprint();
-        if ($fingerprint !== null && $this->isBootstrapSettled($fingerprint)) {
+        $this->bootstrapSettled = $fingerprint !== null && $this->matchesSettledRecord($fingerprint);
+        if ($this->bootstrapSettled) {
             return $this->doBootstrap();
         }
 
@@ -653,7 +668,7 @@ final class Strapi extends Container implements StrapiContract
      * synced schema row (id and hash) is still the latest, so the database was not reset or
      * re-synced by another boot since.
      */
-    private function isBootstrapSettled(string $fingerprint): bool
+    private function matchesSettledRecord(string $fingerprint): bool
     {
         $recorded = @file_get_contents($this->bootstrapSettledFile());
         if (!is_string($recorded) || $recorded === '') {

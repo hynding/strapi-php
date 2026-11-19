@@ -195,11 +195,20 @@ final class Bootstrap
         $transferService = Utils::getService($strapi, 'transfer');
         $tokenService = Utils::getService($strapi, 'token');
 
+        // PHP port: on a settled boot (Strapi::bootstrapSettled(); under PHP-FPM, most requests) the
+        // completed bootstrap already re-granted the super admin every action and cleaned the
+        // permissions for the same content types and plugins: both find nothing to change
+        $settled = $strapi->bootstrapSettled();
+
         $roleService->createRolesIfNoneExist();
-        $roleService->resetSuperAdminPermissions();
+        if (!$settled) {
+            $roleService->resetSuperAdminPermissions();
+        }
         $roleService->displayWarningIfNoSuperAdmin();
 
-        $permissionService->cleanPermissionsInDatabase();
+        if (!$settled) {
+            $permissionService->cleanPermissionsInDatabase();
+        }
 
         $userService->displayWarningIfUsersDontHaveRole();
 
