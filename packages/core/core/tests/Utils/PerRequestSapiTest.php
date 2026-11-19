@@ -59,7 +59,7 @@ final class PerRequestSapiTest extends TestCase
     }
 
     /** @return array{0: string, 1: list<string>} the raw response and the error_log lines */
-    private function request(string $phpCgi, string $uri): array
+    private function request(string $phpCgi, string $uri, string $environment): array
     {
         $app = dirname(__DIR__, 5) . '/examples/getstarted';
         $env = [
@@ -69,7 +69,7 @@ final class PerRequestSapiTest extends TestCase
             'DATABASE_CLIENT' => 'sqlite', 'DATABASE_FILENAME' => "{$this->dir}/data.db", 'JWT_SECRET' => 'per-request-sapi-test',
             'LOG_LEVEL' => 'info', 'PATH' => (string) getenv('PATH'),
             // development never settles
-            'NODE_ENV' => 'production', 'APP_KEYS' => 'sapi-key-1,sapi-key-2', 'API_TOKEN_SALT' => 'sapi-api-token-salt',
+            'NODE_ENV' => $environment, 'APP_KEYS' => 'sapi-key-1,sapi-key-2', 'API_TOKEN_SALT' => 'sapi-api-token-salt',
             'ADMIN_JWT_SECRET' => 'sapi-admin-jwt-secret', 'TRANSFER_TOKEN_SALT' => 'sapi-transfer-token-salt',
             'ENCRYPTION_KEY' => 'sapi-encryption-key',
         ];
@@ -90,7 +90,16 @@ final class PerRequestSapiTest extends TestCase
         return [$response, $log === false ? [] : $log];
     }
 
-    public function testLogsGoToTheErrorLogAndASettledBootLogsOnlyTheRequest(): void
+    /** @return iterable<string, array{string}> */
+    public static function environments(): iterable
+    {
+        yield 'production' => ['production'];
+        // outside production the documentation plugin rewrites its spec at every boot
+        yield 'staging' => ['staging'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('environments')]
+    public function testLogsGoToTheErrorLogAndASettledBootLogsOnlyTheRequest(string $environment): void
     {
         $phpCgi = self::phpCgi();
         if ($phpCgi === null) {
@@ -99,13 +108,13 @@ final class PerRequestSapiTest extends TestCase
         $this->dir = sys_get_temp_dir() . '/strapi-per-request-' . bin2hex(random_bytes(6));
         mkdir($this->dir);
 
-        [$response, $log] = $this->request($phpCgi, '/_health');
+        [$response, $log] = $this->request($phpCgi, '/_health', $environment);
         // the CGI response starts with its headers: no log line in front of them
         self::assertStringStartsWith('Status: 204', $response);
         self::assertNotEmpty(preg_grep('/strapi\.INFO: Shutting down Strapi/', $log), 'an unsettled boot logs its lifecycle');
         $before = count($log);
 
-        [$response, $log] = $this->request($phpCgi, '/_health');
+        [$response, $log] = $this->request($phpCgi, '/_health', $environment);
         self::assertStringStartsWith('Status: 204', $response);
         $added = implode("\n", array_slice($log, $before));
         self::assertMatchesRegularExpression('/strapi\.INFO: GET \/_health \(\d+ ms\) 204/', $added);

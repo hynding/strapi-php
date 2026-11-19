@@ -115,6 +115,24 @@ final class BootstrapSettledTest extends BootedAppTestCase
         }
     }
 
+    public function testFilesBootstrapWritesAreNotInputs(): void
+    {
+        // outside production the documentation plugin rewrites its spec at every boot
+        $file = self::strapi()->dirs()->src . '/extensions/documentation/documentation/1.0.0/full_documentation.json';
+        self::assertFileExists($file);
+        $mtime = (int) filemtime($file);
+        $before = self::fingerprint();
+        touch($file, $mtime + 10);
+        clearstatcache();
+
+        try {
+            self::assertSame($before, self::fingerprint());
+        } finally {
+            touch($file, $mtime);
+            clearstatcache();
+        }
+    }
+
     public function testAnotherDatabaseIsNotSettled(): void
     {
         // the recorded schema row is not this database's latest one: a reset or another database

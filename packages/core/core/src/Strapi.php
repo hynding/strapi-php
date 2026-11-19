@@ -661,7 +661,7 @@ final class Strapi extends Container implements StrapiContract
      * A hash of what bootstrap's database writes depend on: the Strapi version, the installed
      * packages (version, source reference, the time of the last `composer install`), the config,
      * the content types, components and models, the user's migrations, and the size and time of
-     * every file under `src/` and `config/` (lifecycles, local plugins, a bootstrap that seeds).
+     * every PHP file under `src/` and `config/` (lifecycles, local plugins, a bootstrap that seeds).
      * Null when it cannot be computed, and in development, where code changes between requests in
      * ways no input here sees (a package under development, a closure's body): every boot there
      * takes the lock and runs the whole bootstrap, as upstream's restart on change does.
@@ -704,8 +704,10 @@ final class Strapi extends Container implements StrapiContract
     }
 
     /**
-     * `path => mtime:size` for every file under $dir (not under $skip), sorted: stats only, from
-     * PHP's stat cache, without reading the files.
+     * `path => mtime:size` for every PHP file under $dir (not under $skip or a `node_modules`),
+     * sorted: stats only, from PHP's stat cache, without reading the files. Code only: the schemas
+     * are inputs already, and other files may be bootstrap's own output (the documentation
+     * plugin rewrites its generated spec at every boot outside production).
      *
      * @return array<string, string>
      */
@@ -718,10 +720,11 @@ final class Strapi extends Container implements StrapiContract
         $stats = [];
         $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
             new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip,
+            static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip
+                && !($file->isDir() && $file->getFilename() === 'node_modules'),
         ));
         foreach ($files as $file) {
-            if ($file instanceof \SplFileInfo && $file->isFile()) {
+            if ($file instanceof \SplFileInfo && $file->isFile() && $file->getExtension() === 'php') {
                 $stats[$file->getPathname()] = $file->getMTime() . ':' . $file->getSize();
             }
         }
