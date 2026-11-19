@@ -141,6 +141,12 @@ YAML);
             self::assertEquals($first->registeredOverrides, $second->registeredOverrides);
             self::assertEquals(new \stdClass(), $second->registeredOverrides[0]['paths']['/cached']['get']['responses'][200]['example']);
 
+            // the second came from the cache: what the cache holds is what registers
+            file_put_contents($files[0], serialize(['paths' => ['/sentinel' => []]]));
+            $cached = new Override($strapi);
+            $cached->registerOverride($yaml);
+            self::assertSame([['paths' => ['/sentinel' => []]]], $cached->registeredOverrides);
+
             // an unreadable cache entry is parsed again
             file_put_contents($files[0], 'not serialized');
             $third = new Override($strapi);
