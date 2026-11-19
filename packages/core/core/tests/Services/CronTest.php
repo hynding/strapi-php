@@ -96,6 +96,17 @@ final class CronTest extends BootedAppTestCase
         self::assertSame(['12:00'], $this->fired);
     }
 
+    public function testAOneShotJobMovedToALaterDateRunsAgain(): void
+    {
+        // the job's date was changed and the project redeployed: upstream schedules the new date
+        self::assertSame(1, $this->call('12:01', self::at('12:00')));
+        self::assertSame(0, $this->call('12:30', self::at('12:00')));
+        self::assertSame(0, $this->call('13:59', self::at('14:00')));
+        self::assertSame(1, $this->call('14:01', self::at('14:00')));
+        self::assertSame(0, $this->call('14:02', self::at('14:00')));
+        self::assertSame(['12:00', '14:00'], $this->fired);
+    }
+
     public function testAJobKeepsItsLocalTimeAcrossADaylightSavingChange(): void
     {
         // no `tz`: the server's time zone, where 09:00 is +01:00 before the change and +02:00 after

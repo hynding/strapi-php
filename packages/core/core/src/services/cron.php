@@ -334,8 +334,9 @@ final class Cron implements CronService
 
         $fireDate = null;
         if ($spec['oneShot'] !== null) {
-            if ($lastRun !== null) {
-                // ran in an earlier process
+            if ($lastRun !== null && $lastRun >= $spec['oneShot']) {
+                // ran in an earlier process, at or after this date (a run before it was for an
+                // earlier date: the job was moved, as a restart reschedules it upstream)
                 $this->jobsSpecs[$index]['done'] = true;
             } elseif ($now >= $spec['oneShot']) {
                 $fireDate = $spec['oneShot'];
