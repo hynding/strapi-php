@@ -59,6 +59,12 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran). Checked on
   Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
   `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
+- **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
+  callbacks in the worker between requests), so `PerRequestLaneTest` (core) serves the example
+  app from PHP's built-in server in production, one boot per request: admin auth, API tokens,
+  the content API and GraphQL on settled boots, rate limits across requests, and one boot's logs
+  only. `PerRequestSapiTest` does the same through `php-cgi` (error log, CGI response) when it is
+  installed.
 
 - **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
   the result: a settled boot skips `schema->sync()` (the settled check already matched the
@@ -133,7 +139,6 @@ starting and after finishing (`/api-tests` in Claude Code).
   - admin assets are served by PHP (`build/` is outside `public/`), a boot each: serve them
     statically on Apache too; a release bundle with `vendor/` and `build/` for hosts without
     Composer or Node; a requirements check (extensions, writable `.tmp`);
-  - a `tests/api` lane that boots once per request, as FPM does.
 
 ## Moving a project between the runtimes
 
