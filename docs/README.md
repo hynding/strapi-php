@@ -28,7 +28,8 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   row.
   A boot with the same inputs on the same database skips the lock: its writes would change
   nothing, and `CoreStore::set` skips updates that change nothing. A settled boot writes no row.
-  A new deploy, a config change or another database takes the lock again once. Development never
+  A new deploy, a config change or another database (its schema row differs) takes the lock again
+  once; boots that waited on it then find the new record and settle. Development never
   settles: code changes there in ways these inputs do not see (a package under development, the
   body of a closure in config), so every boot runs the whole bootstrap. `NODE_ENV` defaults to
   `development`: a deployment sets `NODE_ENV=production` in `.env` (PHP-FPM's `clear_env` drops
@@ -41,7 +42,10 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   per process start). The admin's super admin permissions reset and permissions cleanup, and the
   content-manager's configuration syncs, are skipped then: they read every permission and
   configuration to find nothing to change. An orphaned permission (a role deleted by hand) waits
-  for the next unsettled boot, as it waits for a restart upstream.
+  for the next unsettled boot, as it waits for a restart upstream. `configuration:restore`,
+  `import` and `transfer` call `Strapi::unsettle()`, so the next boot re-syncs what they changed;
+  after restoring a database backup by hand, delete `.tmp/bootstrap.settled`: the per-request
+  equivalent of upstream's restart.
 - **Rate limits count across requests.** koa2-ratelimit's memory store lives as long as the
   process: the CLI and FrankenPHP worker mode keep it, but PHP-FPM, CGI, mod_php, LiteSpeed,
   the built-in server and FrankenPHP's classic mode start each request afresh, where it never

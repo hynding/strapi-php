@@ -143,6 +143,38 @@ final class BootstrapSettledTest extends BootedAppTestCase
         }
     }
 
+    public function testUnsettleMakesTheNextBootRunTheWholeBootstrap(): void
+    {
+        self::record(self::fingerprint());
+        self::assertTrue(self::isSettled(self::fingerprint()));
+
+        self::strapi()->unsettle();
+
+        self::assertFalse(self::isSettled(self::fingerprint()));
+    }
+
+    public function testADirectoryThatCannotBeOpenedIsSkipped(): void
+    {
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            self::markTestSkipped('root opens every directory');
+        }
+        $dir = sys_get_temp_dir() . '/strapi-file-stats-' . bin2hex(random_bytes(6));
+        mkdir("{$dir}/private", 0o777, true);
+        file_put_contents("{$dir}/index.php", '<?php');
+        chmod("{$dir}/private", 0);
+
+        try {
+            $stats = (new \ReflectionMethod(self::strapi(), 'fileStats'))->invoke(null, $dir);
+            self::assertSame(["{$dir}/index.php"], array_keys($stats));
+            self::assertSame([], (new \ReflectionMethod(self::strapi(), 'fileStats'))->invoke(null, "{$dir}/private"));
+        } finally {
+            chmod("{$dir}/private", 0o777);
+            rmdir("{$dir}/private");
+            unlink("{$dir}/index.php");
+            rmdir($dir);
+        }
+    }
+
     public function testAnotherDatabaseIsNotSettled(): void
     {
         // the recorded schema row is not this database's latest one: a reset or another database

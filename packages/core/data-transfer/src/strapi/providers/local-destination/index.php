@@ -136,6 +136,9 @@ final class LocalDestination implements IDestinationProvider
         $strapi = $this->requireStrapi();
         $this->transaction?->end();
         $strapi->db()->lifecycles->enable();
+        // PHP port: what was transferred (configurations, permissions) re-syncs at the next boot, as
+        // at upstream's next start
+        $strapi->unsettle();
         // Basically `!== false` but more deterministic
         if ($autoDestroy === null || $autoDestroy === true) {
             $strapi->destroy();

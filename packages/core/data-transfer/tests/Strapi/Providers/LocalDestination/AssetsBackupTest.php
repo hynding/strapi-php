@@ -37,4 +37,17 @@ final class AssetsBackupTest extends BootedAppTestCase
             @rmdir($backup);
         }
     }
+
+    public function testClosingAfterATransferUnsettlesTheNextBoot(): void
+    {
+        // what was transferred (configurations, permissions) re-syncs at the next boot
+        $settled = self::$appDir . '/.tmp/bootstrap.settled';
+        file_put_contents($settled, 'a settled record');
+
+        $provider = new LocalDestination(['autoDestroy' => false]);
+        $provider->strapi = self::strapi();
+        $provider->close();
+
+        self::assertFileDoesNotExist($settled);
+    }
 }

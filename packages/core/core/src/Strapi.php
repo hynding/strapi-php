@@ -445,6 +445,17 @@ final class Strapi extends Container implements StrapiContract
         return $this->bootstrapSettled;
     }
 
+    /**
+     * PHP port: the next boot runs the whole bootstrap, as upstream's next start does. For what
+     * changes the database outside a bootstrap and leaves its schema as it was (a configuration
+     * restore, an import): a settled boot would skip the re-syncs that repair it. Deleting
+     * `.tmp/bootstrap.settled` by hand does the same (after restoring a database backup).
+     */
+    public function unsettle(): void
+    {
+        @unlink($this->bootstrapSettledFile());
+    }
+
     // --- lifecycle ---------------------------------------------------------------------------
 
     public function start(): static
@@ -734,15 +745,21 @@ final class Strapi extends Container implements StrapiContract
         }
 
         $stats = [];
-        $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip
-                && !($file->isDir() && $file->getFilename() === 'node_modules'),
-        ));
-        foreach ($files as $file) {
-            if ($file instanceof \SplFileInfo && $file->isFile() && $file->getExtension() === 'php') {
-                $stats[$file->getPathname()] = $file->getMTime() . ':' . $file->getSize();
+        try {
+            // a directory PHP cannot open (another user's, mode 0700) is skipped, not fatal: no
+            // code under it can load either
+            $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+                static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip
+                    && !($file->isDir() && $file->getFilename() === 'node_modules'),
+            ), \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+            foreach ($files as $file) {
+                if ($file instanceof \SplFileInfo && $file->isFile() && $file->getExtension() === 'php') {
+                    $stats[$file->getPathname()] = $file->getMTime() . ':' . $file->getSize();
+                }
             }
+        } catch (\UnexpectedValueException) {
+            // $dir itself cannot be opened
         }
         ksort($stats);
 
