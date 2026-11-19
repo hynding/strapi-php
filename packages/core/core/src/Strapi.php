@@ -728,7 +728,10 @@ final class Strapi extends Container implements StrapiContract
 
         $this->hook('strapi::content-types.beforeSync')->call(['oldContentTypes' => $oldContentTypes, 'contentTypes' => $this->contentTypes()]);
 
-        $status = $db->schema->sync();
+        // PHP port: a settled boot (see bootstrap()) found this database's latest synced schema to
+        // be the one the completed bootstrap left, for the same content types, models and
+        // migrations: the sync's hash comparison and pending migrations would find nothing
+        $status = $this->bootstrapSettled ? \Strapi\Database\Schema\Types::UNCHANGED : $db->schema->sync();
 
         // if schemas have changed, run repairs
         if ($status === 'CHANGED') {
