@@ -75,6 +75,10 @@ final class ActionProvider
      */
     public static function validateRegisterProviderAction(mixed $actions, ?string $errorMessage = null): mixed
     {
-        return Validators::validateYupSchemaSync(self::registerProviderActionSchema())($actions, $errorMessage);
+        // PHP port: one schema for every call (upstream builds it once, at module load)
+        static $schema = null;
+        $schema ??= self::registerProviderActionSchema();
+
+        return Validators::validateYupSchemaSync($schema)($actions, $errorMessage);
     }
 }
