@@ -644,6 +644,19 @@ final class Strapi extends Container implements StrapiContract
 
         $lock = $this->acquireBootstrapLock();
 
+        // the bootstrap this boot waited for may have settled the same inputs: then this one is
+        // settled too, or every request arriving during a bootstrap would run its own, in turn
+        if ($fingerprint !== null && $this->matchesSettledRecord($fingerprint)) {
+            if ($lock !== null) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
+            $this->bootstrapSettled = true;
+            $this->doBootstrap();
+
+            return;
+        }
+
         try {
             // until this bootstrap completes, the record describes no database: one that dies midway
             // (a timeout, a deploy) must not leave a re-created database matching the old record
