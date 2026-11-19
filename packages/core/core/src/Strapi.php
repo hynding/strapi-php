@@ -69,6 +69,8 @@ final class Strapi extends Container implements StrapiContract
 
     private bool $bootstrapSettled = false;
 
+    private ?Utils\BootLogBuffer $bootLogBuffer = null;
+
     /** @var array<string, mixed> */
     public array $internal_config = [];
 
@@ -469,7 +471,22 @@ final class Strapi extends Container implements StrapiContract
             is_array($config->get('logger')) ? $config->get('logger') : [], // DEPRECATED
             is_array($config->get('server.logger.config')) ? $config->get('server.logger.config') : [],
         );
+        // PHP port: under PHP-FPM, CGI, mod_php and LiteSpeed stdout is no console (/dev/null, or
+        // under CGI the response itself): without configured transports, log to PHP's error_log
+        if (Utils\Sapi::hasNoConsole() && !isset($loggerConfig['transports']) && !isset($loggerConfig['stream'])) {
+            $errorLog = new \Monolog\Handler\ErrorLogHandler();
+            // error_log() adds the date and the line break: `strapi.WARNING: message`
+            $errorLog->setFormatter(new \Monolog\Formatter\LineFormatter('%channel%.%level_name%: %message% %context% %extra%', null, true, true));
+            $loggerConfig['transports'] = [$errorLog];
+        }
         $logger = Logger::createLogger($loggerConfig);
+
+        // PHP port: where every request boots, a settled boot's startup messages repeat the ones
+        // logged by the bootstrap that settled: held until the end of bootstrap (see bootstrap())
+        if (Utils\Sapi::isPerRequest()) {
+            $this->bootLogBuffer = new Utils\BootLogBuffer(array_values($logger->getHandlers()));
+            $logger->setHandlers([$this->bootLogBuffer]);
+        }
 
         ServerConfig::warnDeprecatedServerConfig($config, $logger);
 
@@ -600,10 +617,28 @@ final class Strapi extends Container implements StrapiContract
         // serialize every request. Once a bootstrap has completed for the same inputs (schemas,
         // config, packages, migrations) on the same database, bootstrap's writes find nothing to
         // change, so later boots skip the lock: the steady state is read-only and concurrent.
+        try {
+            $this->settleAndBootstrap();
+        } catch (\Throwable $error) {
+            $this->bootLogBuffer?->release(false);
+
+            throw $error;
+        }
+
+        // what a settled boot logged, the bootstrap that settled logged already (BootLogBuffer)
+        $this->bootLogBuffer?->release($this->bootstrapSettled);
+
+        return $this;
+    }
+
+    private function settleAndBootstrap(): void
+    {
         $fingerprint = $this->bootstrapFingerprint();
         $this->bootstrapSettled = $fingerprint !== null && $this->matchesSettledRecord($fingerprint);
         if ($this->bootstrapSettled) {
-            return $this->doBootstrap();
+            $this->doBootstrap();
+
+            return;
         }
 
         $lock = $this->acquireBootstrapLock();
@@ -613,8 +648,6 @@ final class Strapi extends Container implements StrapiContract
             if ($fingerprint !== null) {
                 $this->markBootstrapSettled($fingerprint);
             }
-
-            return $this;
         } finally {
             if ($lock !== null) {
                 flock($lock, LOCK_UN);
@@ -773,6 +806,12 @@ final class Strapi extends Container implements StrapiContract
 
     public function destroy(): void
     {
+        // PHP port: where every request boots, a settled boot's shutdown is every request's: its
+        // messages are held and dropped like its startup's (errors still log)
+        $quiet = $this->bootstrapSettled && $this->bootLogBuffer !== null;
+        if ($quiet) {
+            $this->bootLogBuffer->hold();
+        }
         $this->log()->info('Shutting down Strapi');
         $this->runPluginsLifecycles(Utils\Lifecycles::DESTROY);
 
@@ -794,6 +833,9 @@ final class Strapi extends Container implements StrapiContract
         AuthScope::setRegisteredContentTypes(null);
 
         $this->log()->info('Strapi has been shut down');
+        if ($quiet && $this->bootLogBuffer !== null) {
+            $this->bootLogBuffer->release(true);
+        }
     }
 
     private function runPluginsLifecycles(string $lifecycleName): void

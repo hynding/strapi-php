@@ -8,6 +8,7 @@ use Strapi\Admin\Middlewares\RateLimitStores\FileStore;
 use Strapi\Admin\Middlewares\RateLimitStores\MemoryStore;
 use Strapi\Admin\Middlewares\RateLimitStores\Store;
 use Strapi\Core\Strapi;
+use Strapi\Core\Utils\Sapi;
 use Strapi\Types\Core\Context;
 use Strapi\Utils\Errors\RateLimitError;
 
@@ -25,9 +26,6 @@ final class RateLimit
 {
     private static ?MemoryStore $memory = null;
 
-    /** The SAPIs where a request runs in a fresh PHP process state, statics included. */
-    private const array PER_REQUEST_SAPIS = ['fpm-fcgi', 'cgi-fcgi', 'apache2handler', 'litespeed', 'cli-server'];
-
     /**
      * koa2-ratelimit's default store is in memory, for the Node process's lifetime. In PHP that is
      * the process for the CLI and FrankenPHP worker mode, but one request for the SAPIs that start
@@ -35,7 +33,7 @@ final class RateLimit
      */
     public static function defaultStore(?Strapi $strapi, string $sapi = PHP_SAPI): Store
     {
-        if ($strapi !== null && in_array($sapi, self::PER_REQUEST_SAPIS, true)) {
+        if ($strapi !== null && Sapi::isPerRequest($sapi)) {
             return new FileStore($strapi->dirs()->root . '/.tmp/rate-limit');
         }
 

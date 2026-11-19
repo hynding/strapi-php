@@ -46,6 +46,13 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   ran at every call. `cron:run` keeps each job's last run in `.tmp/cron` (`Cron::persistState()`):
   a job runs once if its schedule matched since its last run (missed runs coalesce), and a job
   still running in another call is skipped (`flock`).
+- **Logs go to PHP's error log, once.** Under PHP-FPM, CGI, mod_php and LiteSpeed stdout is no
+  console: `/dev/null`, or under CGI the response itself (the log lines came before the headers,
+  so a CGI server failed every request). Without configured `transports`, Strapi logs there
+  through `error_log()` (`strapi.WARNING: message`), which shared hosts keep per account. And
+  where every request boots, a settled boot's startup and shutdown messages repeat what the
+  bootstrap that settled logged: `Utils\BootLogBuffer` holds them and drops them (errors log at
+  once), so a settled request logs only the request line.
 
 - **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
   the result: a settled boot skips `schema->sync()` (the settled check already matched the
@@ -114,9 +121,9 @@ starting and after finishing (`/api-tests` in Claude Code).
   - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
     resolved config, plugin list, API and component schemas, database metadata, the FastRoute
     dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
-  - AI metadata jobs run in a shutdown function after `destroy()`: `fastcgi_finish_request()`
-    first, or a table drained by `cron:run`;
-  - logs default to `php://stdout`, lost under FPM, and every request logs "Shutting down Strapi";
+  - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
+    shutdown function, after `destroy()` and before the response is finished; unreachable without
+    an Enterprise licence (no AI metadata provider), so left as is until AI is;
   - an `.htaccess` for Apache hosts (rewrite to `index.php`, serve `build/` statically, deny the
     rest), a `public_html` layout, a release bundle with `vendor/`, a requirements check;
   - a `tests/api` lane that boots once per request, as FPM does.
