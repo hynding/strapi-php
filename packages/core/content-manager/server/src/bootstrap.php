@@ -22,8 +22,12 @@ final class Bootstrap
         }
 
         Utils::getService($strapi, 'field-sizes')->setCustomFieldInputSizes();
-        Utils::getService($strapi, 'components')->syncConfigurations();
-        Utils::getService($strapi, 'content-types')->syncConfigurations();
+        // PHP port: on a settled boot (Strapi::bootstrapSettled(); under PHP-FPM, most requests) the
+        // completed bootstrap already synced the stored configurations with the same schemas
+        if (!$strapi->bootstrapSettled()) {
+            Utils::getService($strapi, 'components')->syncConfigurations();
+            Utils::getService($strapi, 'content-types')->syncConfigurations();
+        }
         Utils::getService($strapi, 'permission')->registerPermissions();
 
         RegisterContentManagerMcpTools::registerContentManagerMcpTools($strapi);

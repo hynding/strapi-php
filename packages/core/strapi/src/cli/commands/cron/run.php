@@ -17,8 +17,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  *     * * * * * php bin/strapi cron:run
  *
- * runs every task due since the previous minute. `--loop` keeps the process alive and polls
- * instead (worker-mode deployments / supervisors), `--list` prints the registered jobs.
+ * runs every task due since the previous call (`.tmp/cron` keeps each task's last run, so a
+ * crontab every 5 or 15 minutes, as shared hosts often allow, misses nothing: missed runs
+ * coalesce into one, and a task still running in another call is skipped). `--loop` keeps the
+ * process alive and polls instead (worker-mode deployments / supervisors), `--list` prints the
+ * registered jobs.
  */
 final class Run extends StrapiCommand
 {
@@ -47,6 +50,10 @@ final class Run extends StrapiCommand
 
             return Command::SUCCESS;
         }
+
+        // each call is a new process: the jobs' last runs are kept in .tmp/cron (missed runs
+        // catch up once, a job running in another call is skipped)
+        $cron->persistState($app->dirs()->root . '/.tmp/cron');
 
         if ($input->getOption('loop')) {
             $cron->loop(max(1, (int) $input->getOption('interval')));

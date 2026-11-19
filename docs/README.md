@@ -13,7 +13,8 @@ deviations from upstream. This folder is for cross-cutting notes.
 Strapi (Node) boots once and keeps registries, metadata, cron, webhooks and the event hub
 in memory. The PHP port keeps that model: `Strapi\Core\Strapi::load()` builds everything,
 `public/index.php` boots once per FrankenPHP worker and reuses it across requests, and
-under PHP-FPM it boots per request. Cron under FPM runs via `php bin/strapi cron:run` from
+under PHP-FPM (and FrankenPHP's classic mode, `php_server` without `worker`) it boots per
+request. Cron under FPM runs via `php bin/strapi cron:run` from
 system cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 
 What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
@@ -21,19 +22,89 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
 - **The steady state is read-only and concurrent.** Bootstrap writes to the database (schema
   sync, migrations, default roles, permission syncs), so it runs under a lock
   (`.tmp/bootstrap.lock`). Once a bootstrap has completed, `.tmp/bootstrap.settled` records a
-  hash of its inputs (Strapi version, packages, config, content types, components, models,
-  `database/migrations`, `src/index.php`) and the database's latest schema row. A boot with the
-  same inputs on the same database skips the lock: its writes would change nothing, and
-  `CoreStore::set` skips updates that change nothing. A settled boot writes no row. A new deploy,
-  a config change or another database takes the lock again once.
+  hash of its inputs (Strapi version, installed packages and the time of the last
+  `composer install`, config except `server.cron` (task dates are often computed at load),
+  content types, components, models, `database/migrations`, and the
+  size and time of every PHP file under `src/` and `config/`) and the database's latest schema
+  row.
+  A boot with the same inputs on the same database skips the lock: its writes would change
+  nothing, and `CoreStore::set` skips updates that change nothing. A settled boot writes no row.
+  A new deploy, a config change or another database (its schema row differs) takes the lock again
+  once; boots that waited on it then find the new record and settle. Development never
+  settles: code changes there in ways these inputs do not see (a package under development, the
+  body of a closure in config), so every boot runs the whole bootstrap. `NODE_ENV` defaults to
+  `development`: a deployment sets `NODE_ENV=production` in `.env` (PHP-FPM's `clear_env` drops
+  the server's environment).
 - **GraphQL builds on first use in production.** With artifacts off (`generateArtifacts`, off
   outside development) the schema and the Apollo server are built on the first request to the
   GraphQL endpoint; development keeps upstream's eager build.
+- **A settled boot skips the re-syncs.** `Strapi::bootstrapSettled()` tells bootstrap code that
+  a completed bootstrap already ran for the same inputs on the same database (upstream syncs once
+  per process start). The admin's super admin permissions reset and permissions cleanup, and the
+  content-manager's configuration syncs, are skipped then: they read every permission and
+  configuration to find nothing to change. An orphaned permission (a role deleted by hand) waits
+  for the next unsettled boot, as it waits for a restart upstream. `configuration:restore`,
+  `import` and `transfer` call `Strapi::unsettle()`, so the next boot re-syncs what they changed,
+  and so does runtime-sync when Node Strapi booted on the database since PHP's last bootstrap;
+  after restoring a database backup by hand, delete `.tmp/bootstrap.settled`: the per-request
+  equivalent of upstream's restart.
+- **Rate limits count across requests.** koa2-ratelimit's memory store lives as long as the
+  process: the CLI and FrankenPHP worker mode keep it, but PHP-FPM, CGI, mod_php, LiteSpeed,
+  the built-in server and FrankenPHP's classic mode start each request afresh, where it never
+  limited (six bad admin logins in a row all answered 400). Those count in `.tmp/rate-limit/`
+  instead (`FileStore`, one file per key under `flock`, spread over 256 subdirectories), so the
+  sixth answers 429. One server only, like the memory store. Where `.tmp/rate-limit` cannot be
+  written, Strapi warns and the limits are not enforced, rather than failing every login.
+- **Cron catches up.** `cron:run` from the system crontab is a new process every time; with the
+  last runs in memory it looked back one minute, so a crontab every 5 or 15 minutes (shared hosts
+  often allow no less) missed most jobs, two calls in a minute ran a job twice and a one-shot job
+  ran at every call. `cron:run` keeps each job's last run in `.tmp/cron` (`Cron::persistState()`):
+  a job runs once if its schedule matched since its last run (missed runs coalesce), and a job
+  still running in another call is skipped (`flock`).
+- **Logs go to PHP's error log, once.** Under PHP-FPM, CGI, mod_php and LiteSpeed stdout is no
+  console: `/dev/null`, or under CGI the response itself (the log lines came before the headers,
+  so a CGI server failed every request). Without configured `transports`, Strapi logs there
+  through `error_log()` (`strapi.WARNING: message`), which shared hosts keep per account. And
+  where every request boots, a settled boot's startup and shutdown messages repeat what the
+  bootstrap that settled logged: `Utils\BootLogBuffer` holds them and drops them (errors log at
+  once), so a settled request logs only the request line. The trade-off: a warning a settled
+  boot finds in the database (`Some users don't have any role`) is dropped too. The boot that
+  settled logged it, and the next unsettled boot (a deploy, a config change) logs it again.
+- **Apache.** `public/.htaccess` (example app and both create-strapi-app templates) routes
+  every request that is not a file to `index.php`, passes the `Authorization` header (Apache
+  drops it for PHP-FPM, FastCGI and CGI: every admin and API token answered 401), never runs
+  PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran, also as
+  `/uploads/x.php/anything`, in any case), and refuses `.user.ini`. `public/uploads/.htaccess`
+  denies the same files by name, in any case (`AddHandler` matches `.PHP` too), where the parent
+  rules are not read first; restoring assets (`strapi import`) keeps it. Checked on
+  Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
+  `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
+- **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
+  callbacks in the worker between requests), so `PerRequestLaneTest` (core) serves the example
+  app from PHP's built-in server in production, one boot per request: admin auth, API tokens,
+  the content API and GraphQL on settled boots, rate limits across requests, and one boot's logs
+  only. `PerRequestSapiTest` does the same through `php-cgi` (error log, CGI response) when it is
+  installed.
 
-On `examples/getstarted` (SQLite, opcache), a production boot went from ~620 ms to ~250 ms,
-1,024 to 829 included files, 24 to 18 MB. What remains is mostly `register()` (~70 ms of
-config and `src/` loading), routing (~35 ms) and the admin and content-manager syncs: a boot
-cache (resolved config, schemas, routes) is the next step.
+- **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
+  the result: a settled boot skips `schema->sync()` (the settled check already matched the
+  database's latest schema row and the inputs it is computed from); `Strings::transliterate()`
+  returns ASCII as is and builds its ICU transliterator once (it built one per call, ~0.1 ms, for
+  every snake/kebab/camel case: ~30 ms of a boot); the core routes of a content type share their
+  document, data and query-parameter schemas instead of building each five times; the admin's
+  action schema is built once and `registerMany()` validates a list once instead of once more per
+  action; the documentation plugin caches the parsed users-permissions YAML in `.tmp/cache`.
+
+Known PHP bug: PHP 8.3's function JIT (`opcache.jit=1235`) segfaults on some fresh boots of
+`examples/getstarted` (php-cgi exit code 139: no response, nothing logged), with or without the
+per-request work: 4 fresh boots in 10 on it, 1 in 15 before it, locally on 8.3.6 and on CI's
+8.3.36. `opcache.jit=disable`, `tracing` or `function` showed none in 15 boots each. Where the
+host lets you choose, use one of those.
+
+On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
+~65 ms, 1,024 to 795 included files, 24 to 10 MB. What remains is mostly routing (~18 ms) and
+the plugins' remaining bootstraps; a boot cache (resolved config, schemas, routes) would take
+most of the rest.
 
 ## Status
 
@@ -83,23 +154,17 @@ starting and after finishing (`/api-tests` in Claude Code).
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
 - PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~250 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  ~65 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
   Still to do, in order:
   - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
     resolved config, plugin list, API and component schemas, database metadata, the FastRoute
     dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
-  - skip the admin, users-permissions and content-manager syncs on a settled boot (they read
-    every permission and configuration to find nothing to change, ~100 ms);
-  - rate limiting keeps hits in a `static` array (admin, users-permissions), so under FPM it
-    never limits: back it with APCu or a table;
-  - `cron:run` keeps the last run in memory and looks back one minute: persist it so a missed
-    minute catches up;
-  - AI metadata jobs run in a shutdown function after `destroy()`: `fastcgi_finish_request()`
-    first, or a table drained by `cron:run`;
-  - logs default to `php://stdout`, lost under FPM, and every request logs "Shutting down Strapi";
-  - an `.htaccess` for Apache hosts (rewrite to `index.php`, serve `build/` statically, deny the
-    rest), a `public_html` layout, a release bundle with `vendor/`, a requirements check;
-  - a `tests/api` lane that boots once per request, as FPM does.
+  - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
+    shutdown function, after `destroy()` and before the response is finished; unreachable without
+    an Enterprise licence (no AI metadata provider), so left as is until AI is;
+  - admin assets are served by PHP (`build/` is outside `public/`), a boot each: serve them
+    statically on Apache too; a release bundle with `vendor/` and `build/` for hosts without
+    Composer or Node; a requirements check (extensions, writable `.tmp`);
 
 ## Moving a project between the runtimes
 

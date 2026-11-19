@@ -54,6 +54,8 @@ final class Restore extends StrapiCommand
             $importer->import(is_array($config) ? $config : []);
         }
 
+        // PHP port: the content-manager configurations re-sync at the next boot, as at upstream's next start
+        $app->unsettle();
         $output->writeln("Successfully imported configuration with {$strategy} strategy. Statistics: {$importer->printStatistics()}.");
 
         $app->destroy();

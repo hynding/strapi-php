@@ -118,4 +118,18 @@ final class StringsTest extends TestCase
         self::assertTrue(Strings::startsWithANumber('1abc'));
         self::assertFalse(Strings::startsWithANumber('abc'));
     }
+
+    public function testTransliterate(): void
+    {
+        // ASCII returns as is (the fast path); the replacements apply first, `&` included
+        self::assertSame('createdAt', Strings::transliterate('createdAt'));
+        self::assertSame("tab\there", Strings::transliterate("tab\there"));
+        self::assertSame('Tom  and  Jerry', Strings::transliterate('Tom & Jerry'));
+        // the rest goes through ICU's Any-Latin; Latin-ASCII, one transliterator for every call
+        self::assertSame('Creme brulee', Strings::transliterate('Crème brûlée'));
+        self::assertSame('Aeroskobing', Strings::transliterate('Ærøskøbing'));
+        self::assertSame('strasse', Strings::transliterate('straße'));
+        self::assertSame('Privet mir', Strings::transliterate('Привет мир'));
+        self::assertSame('naive_cafe', Strings::snakeCase('naïve café'));
+    }
 }

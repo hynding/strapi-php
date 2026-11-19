@@ -11,7 +11,7 @@ use Strapi\Utils\Errors\RateLimitError;
 
 /**
  * Port of server/src/middlewares/rateLimit.js. `koa2-ratelimit`'s `RateLimit.middleware` is the
- * admin package's port ({@see KoaRateLimit::middleware()}, in-memory store).
+ * admin package's port ({@see KoaRateLimit::middleware()} and its store).
  *
  * Not an upstream file: rateLimit.php must return the middleware factory (the registry
  * `require`s it), so the class with the exported helpers lives here.
@@ -195,7 +195,7 @@ final class RateLimit
             if ($rateLimitConfig['enabled'] === true) {
                 $loadConfig = self::buildRateLimitLoadConfig($ctx, $rateLimitConfig, $config);
 
-                return KoaRateLimit::middleware($loadConfig)($ctx, $next);
+                return KoaRateLimit::middleware($loadConfig, $strapi)($ctx, $next);
             }
 
             return $next();

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Strapi\Core\Core;
 use StrapiPlugin\RuntimeSync\Engine\Cli;
 use StrapiPlugin\RuntimeSync\PreflightAbort;
+use StrapiPlugin\RuntimeSync\Services\Preflight;
 use StrapiPlugin\RuntimeSync\Services\Status;
 
 /**
@@ -74,6 +75,62 @@ final class ServerTest extends TestCase
         self::assertSame([], $preflight['database']['migrations']['pending']);
         self::assertSame('php', $preflight['boots']['php']['runtime']);
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T/', (string) $preflight['database']['storedAt']);
+    }
+
+    public function testASettledBootWritesNoMarkerAndUnsettlesAfterTheOtherRuntimeBooted(): void
+    {
+        // strapi-php settles boots outside development (every PHP-FPM request boots)
+        $nodeEnv = [getenv('NODE_ENV'), $_ENV['NODE_ENV'] ?? null, $_SERVER['NODE_ENV'] ?? null];
+        putenv('NODE_ENV=production');
+        $_ENV['NODE_ENV'] = $_SERVER['NODE_ENV'] = 'production';
+        $settled = __DIR__ . '/app/.tmp/bootstrap.settled';
+
+        try {
+            Core::createStrapi(['appDir' => __DIR__ . '/app'])->load()->destroy();
+            $marker = $this->column("SELECT value FROM strapi_core_store_settings WHERE key = 'plugin_runtime-sync_boots'");
+
+            $strapi = Core::createStrapi(['appDir' => __DIR__ . '/app'])->load();
+            self::assertTrue($strapi->bootstrapSettled());
+            // the status page still has this boot's database report (captured when asked)
+            $status = $strapi->plugin('runtime-sync')->service('status');
+            \assert($status instanceof Status);
+            $report = $status->report();
+            self::assertSame('UNCHANGED', $report['database']['status'] ?? null);
+            self::assertTrue($report['database']['hashMatches'] ?? null);
+            $strapi->destroy();
+            self::assertSame($marker, $this->column("SELECT value FROM strapi_core_store_settings WHERE key = 'plugin_runtime-sync_boots'"), 'a settled boot writes no marker');
+            self::assertFileExists($settled);
+
+            // Node Strapi booted on this database since (its bootstrap re-synced as it runs)
+            $boots = json_decode((string) $marker[0], true);
+            self::assertIsArray($boots);
+            $boots['node'] = ['runtime' => 'node', 'time' => '2999-01-01T00:00:00.000Z'];
+            (new \PDO('sqlite:' . $this->db))->prepare("UPDATE strapi_core_store_settings SET value = ? WHERE key = 'plugin_runtime-sync_boots'")->execute([json_encode($boots)]);
+
+            $strapi = Core::createStrapi(['appDir' => __DIR__ . '/app'])->load();
+            self::assertTrue($strapi->bootstrapSettled());
+            $strapi->destroy();
+            self::assertFileDoesNotExist($settled, 'the next boot runs the whole bootstrap');
+        } finally {
+            putenv(is_string($nodeEnv[0]) ? "NODE_ENV={$nodeEnv[0]}" : 'NODE_ENV');
+            foreach ([[&$_ENV, $nodeEnv[1]], [&$_SERVER, $nodeEnv[2]]] as [&$globals, $value]) {
+                if ($value === null) {
+                    unset($globals['NODE_ENV']);
+                } else {
+                    $globals['NODE_ENV'] = $value;
+                }
+            }
+            @unlink($settled);
+        }
+    }
+
+    public function testBootedSinceComparesTheMarkersTimes(): void
+    {
+        $php = ['time' => '2026-03-02T12:00:00.500Z'];
+        self::assertFalse(Preflight::bootedSince(['php' => $php], 'php'));
+        self::assertFalse(Preflight::bootedSince(['php' => $php, 'node' => ['time' => '2026-03-02T12:00:00.499Z']], 'php'));
+        self::assertTrue(Preflight::bootedSince(['php' => $php, 'node' => ['time' => '2026-03-02T12:00:00.501Z']], 'php'));
+        self::assertTrue(Preflight::bootedSince(['node' => ['time' => '2026-03-02T12:00:00.000Z']], 'php'), 'php never booted');
     }
 
     public function testPreflightAbortCarriesTheReportAndWritesNothing(): void

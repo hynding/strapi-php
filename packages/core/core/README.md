@@ -133,13 +133,22 @@ symfony/process.
 - **Responses**: entities are flat (`id`, `documentId`, attributes); an empty `meta` serializes as
   `{}`; `delete` answers 204 even for an unknown document (upstream behaviour).
 - **Custom fields**: `plugin::<p>.<name>` falls back to `global::<name>` when the plugin is not loaded.
+- **Logging under per-request SAPIs** (`Utils\Sapi`: PHP-FPM, CGI, mod_php, LiteSpeed, the
+  built-in server): without configured `transports` or `stream`, the SAPIs without a console log
+  through `error_log()` instead of stdout; `Utils\BootLogBuffer` holds a boot's records below
+  `error` until bootstrap ends and drops them on a settled boot, and does the same for a settled
+  boot's shutdown. See docs/README.md "Runtime model".
 - **Cron**: `strapi.cron.runDue()` runs the due jobs once (`bin/strapi cron:run` from crontab under
-  FPM); `loop()` is the long-running scheduler for worker mode.
+  FPM); `loop()` is the long-running scheduler for worker mode. `cron:run` calls `persistState()`
+  first: each job's last run is kept in `.tmp/cron` (one file per job, locked while it runs), so a
+  job is due when its schedule matched since its last run, whatever the crontab's interval.
 - **Bootstrap lock**: `bootstrap()` serializes boots on `.tmp/bootstrap.lock` (concurrent first
   boots race on its writes) until one has completed; `.tmp/bootstrap.settled` then records the
   inputs' fingerprint and the database's latest schema row, and boots with the same inputs on the
   same database skip the lock (under PHP-FPM, every request). `CoreStore::set` skips an update that
-  changes nothing, so a settled boot writes no row. See docs/README.md "Runtime model".
+  changes nothing, so a settled boot writes no row. `bootstrapSettled()` tells bootstrap code a
+  boot is settled, so it can skip re-syncs the completed bootstrap already ran (admin,
+  content-manager); bootstrap itself skips `schema->sync()` then. See docs/README.md "Runtime model".
 
 ## Tests
 

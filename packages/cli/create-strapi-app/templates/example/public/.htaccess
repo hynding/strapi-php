@@ -1,0 +1,31 @@
+# Apache (shared hosting): point the document root at this directory. Existing files are served as
+# they are; every other request goes to index.php, as nginx's `try_files $uri /index.php` does.
+# PHP-FPM, FastCGI and CGI read .user.ini next to this file; mod_php reads the php_flag below.
+
+DirectoryIndex index.php
+Options -Indexes
+
+# PHP's settings for this directory (Apache only hides .ht* files)
+<Files ".user.ini">
+    Require all denied
+</Files>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Apache does not pass the Authorization header (admin and API tokens) to PHP-FPM, FastCGI or
+    # CGI: hand it over as HTTP_AUTHORIZATION (Strapi also reads REDIRECT_HTTP_AUTHORIZATION)
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # never run an uploaded file as PHP: uploads keep their extension. `(/|$)`: Apache also runs
+    # /uploads/x.php/anything (PATH_INFO); uploads/.htaccess denies the same files by name
+    RewriteRule ^uploads/.*\.(php[0-9]?|pht|phtm|phtml|phar|phps)(/|$) - [F,L,NC]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_php.c>
+    php_flag enable_post_data_reading Off
+</IfModule>

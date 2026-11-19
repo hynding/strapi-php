@@ -79,6 +79,7 @@ in their `register`.
 | `dist/src/extensions` in production | The PHP port has no build step: `src/extensions` in every environment. |
 | `immer`'s `produce` | Array copies; `mutateDocumentation` receives the draft by reference or returns the new document. |
 | `yaml` (npm, YAML 1.2) | symfony/yaml, with plain timestamps kept as strings (YAML 1.2 has no timestamp type) and `{}` as `\stdClass`. |
+| `registerOverride(yamlString)` parses at every call | the parsed override is cached in `.tmp/cache/documentation-override-<sha256>.ser`, keyed by the source: users-permissions registers its spec at every boot, and under PHP-FPM every request boots. Without a writable `.tmp` it parses every time. |
 | cheerio's `$('.error').text(...)` | The `.error` element's text is replaced in the template; cheerio also re-serializes the whole page (doctype, void elements, entities): the PHP page keeps the template's markup. |
 | `bcryptjs` | `password_hash(PASSWORD_BCRYPT, cost 10)` / `password_verify()`. |
 | koa-static | `Middlewares\Documentation::send()` (status 200, type by extension, `Cache-Control: max-age`, `Last-Modified`). |

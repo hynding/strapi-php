@@ -45,12 +45,18 @@ final class Preflight
     }
 
     /**
-     * The database part of this boot's report, captured by `beforeSync`; null before that.
+     * The database part of this boot's report, captured by `beforeSync`; null before that. A
+     * settled boot (strapi-php) skips the capture at boot and captures here, when asked: it only
+     * reads.
      *
      * @return DatabaseReport|null
      */
     public function database(): ?array
     {
+        if ($this->database === null && $this->strapi->bootstrapSettled()) {
+            $this->database = $this->capture();
+        }
+
         return $this->database;
     }
 
@@ -62,6 +68,12 @@ final class Preflight
     /** `strapi::content-types.beforeSync`: capture, reconcile the migration log, abort when asked. */
     public function beforeSync(): void
     {
+        // strapi-php: a settled boot (every PHP-FPM request once a bootstrap completed for the same
+        // inputs on this database) syncs nothing: the bootstrap that settled captured and reconciled
+        if ($this->strapi->bootstrapSettled() && !$this->isPreflight()) {
+            return;
+        }
+
         $report = $this->capture();
         $this->database = $report;
 
@@ -84,8 +96,21 @@ final class Preflight
         if ($this->strapi->plugin('runtime-sync')->config('recordBoots') !== true) {
             return;
         }
-        $db = $this->strapi->db();
         $boots = $this->boots();
+
+        // strapi-php: a settled boot writes nothing; the marker is the last bootstrap that settled.
+        // If the other runtime booted on this database since, its bootstrap may have changed what
+        // ours re-syncs (it cleans the permissions of plugins it does not run): the next boot here
+        // runs the whole bootstrap, as a restart does
+        if ($this->strapi->bootstrapSettled()) {
+            if (self::bootedSince($boots, 'php')) {
+                $this->strapi->unsettle();
+            }
+
+            return;
+        }
+
+        $db = $this->strapi->db();
         $boots['php'] = [
             ...$this->runtime(),
             'runtime' => 'php',
@@ -96,6 +121,24 @@ final class Preflight
         ];
         unset($boots['php']['kind']);
         $this->strapi->store()->set([...self::STORE, 'value' => $boots]);
+    }
+
+    /**
+     * Whether a runtime other than $runtime recorded a boot after $runtime's last one.
+     *
+     * @param array<string, array<string, mixed>> $boots
+     */
+    public static function bootedSince(array $boots, string $runtime): bool
+    {
+        // both runtimes write ISO 8601 UTC with milliseconds (toISOString()): they compare as strings
+        $own = (string) ($boots[$runtime]['time'] ?? '');
+        foreach ($boots as $other => $boot) {
+            if ($other !== $runtime && (string) ($boot['time'] ?? '') > $own) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

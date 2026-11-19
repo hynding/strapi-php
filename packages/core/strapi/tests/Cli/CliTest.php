@@ -180,11 +180,17 @@ final class CliTest extends TestCase
             ['key' => 'plugin_test_setting', 'value' => '{"a":1}', 'type' => 'object', 'environment' => null, 'tag' => null],
         ]));
 
+        // what the restore changes, the next boot re-syncs (as upstream's next start): it is not settled
+        $settled = self::$appDir . '/.tmp/bootstrap.settled';
+        @mkdir(dirname($settled), 0o777, true);
+        file_put_contents($settled, 'a settled record');
+
         $output = new BufferedOutput();
         $code = $application->run(new ArrayInput(['command' => 'configuration:restore', '--file' => $file, '--strategy' => 'replace']), $output);
         $text = $output->fetch();
         self::assertSame(0, $code, $text);
         self::assertStringContainsString('Successfully imported configuration with replace strategy. Statistics: 1 created, 0 replaced.', $text);
+        self::assertFileDoesNotExist($settled);
 
         // each command boots its own in-memory database, so the dump of a fresh instance does not
         // hold the restored key (only what plugins store at bootstrap: upload settings, CM configurations)

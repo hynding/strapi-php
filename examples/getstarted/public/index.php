@@ -43,9 +43,11 @@ $handle = static function () use ($server): void {
     HttpServer::emit($server->handle(HttpServer::requestFromGlobals()));
 };
 
-if (function_exists('frankenphp_handle_request')) {
-    // FrankenPHP worker mode: the application stays loaded across requests
-    $maxRequests = (int) (getenv('MAX_REQUESTS') ?: 0);
+// FrankenPHP puts FRANKENPHP_WORKER (and MAX_REQUESTS) in $_SERVER; getenv() sees them from 1.12.5 on
+if (function_exists('frankenphp_handle_request') && ($_SERVER['FRANKENPHP_WORKER'] ?? getenv('FRANKENPHP_WORKER')) === '1') {
+    // FrankenPHP worker mode: the application stays loaded across requests. FrankenPHP's classic
+    // mode (php_server without `worker`) has the function too, but it throws there: one request
+    $maxRequests = (int) ($_SERVER['MAX_REQUESTS'] ?? getenv('MAX_REQUESTS') ?: 0);
     $handled = 0;
 
     do {

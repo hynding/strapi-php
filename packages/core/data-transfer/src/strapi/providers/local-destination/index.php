@@ -136,6 +136,9 @@ final class LocalDestination implements IDestinationProvider
         $strapi = $this->requireStrapi();
         $this->transaction?->end();
         $strapi->db()->lifecycles->enable();
+        // PHP port: what was transferred (configurations, permissions) re-syncs at the next boot, as
+        // at upstream's next start
+        $strapi->unsettle();
         // Basically `!== false` but more deterministic
         if ($autoDestroy === null || $autoDestroy === true) {
             $strapi->destroy();
@@ -338,6 +341,10 @@ final class LocalDestination implements IDestinationProvider
                 }
                 // Create a .gitkeep file to ensure the directory is not empty
                 file_put_contents("{$assetsDirectory}/.gitkeep", '');
+                // PHP port: keep the directory's .htaccess (no uploaded file may run as PHP under Apache)
+                if (is_file("{$backupDirectory}/.htaccess")) {
+                    @copy("{$backupDirectory}/.htaccess", "{$assetsDirectory}/.htaccess");
+                }
                 $this->reportInfo("created assets backup directory {$backupDirectory}");
             } catch (\Throwable) {
                 throw new ProviderTransferError(

@@ -67,11 +67,21 @@ final class Provider
 
         ActionProviderValidation::validateRegisterProviderAction([$actionAttributes]);
 
+        $this->registerValidated($actionAttributes);
+
+        return $this;
+    }
+
+    /** @param array<string, mixed> $actionAttributes */
+    private function registerValidated(array $actionAttributes): void
+    {
+        if (($this->isLoaded)()) {
+            throw new \RuntimeException("You can't register new actions outside of the bootstrap function.");
+        }
+
         $action = Action::create($actionAttributes);
 
         $this->provider->register((string) $action['actionId'], $action);
-
-        return $this;
     }
 
     /**
@@ -82,8 +92,11 @@ final class Provider
     {
         ActionProviderValidation::validateRegisterProviderAction($actionsAttributes);
 
+        // PHP port: upstream's register() validates each action again, against the same schema
+        // the whole list just passed; most of a boot's action registration time (under PHP-FPM,
+        // every request), for the same outcome
         foreach ($actionsAttributes as $attributes) {
-            $this->register($attributes);
+            $this->registerValidated($attributes);
         }
 
         return $this;

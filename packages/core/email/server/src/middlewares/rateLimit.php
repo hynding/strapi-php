@@ -9,7 +9,7 @@ use Strapi\Utils\Errors\RateLimitError;
 
 /**
  * Port of server/src/middlewares/rateLimit.ts. `koa2-ratelimit`'s `RateLimit.middleware` (and its
- * in-process memory store) is the one the admin package ports (Strapi\Admin\Middlewares\RateLimit).
+ * store) is the one the admin package ports (Strapi\Admin\Middlewares\RateLimit).
  */
 return static fn (array $config, Strapi $strapi): callable => static function (Context $ctx, callable $next) use ($config, $strapi): mixed {
     $pluginConfig = $strapi->config()->get('plugin::email');
@@ -35,7 +35,7 @@ return static fn (array $config, Strapi $strapi): callable => static function (C
             ...$config,
         ];
 
-        return RateLimit::middleware($loadConfig)($ctx, $next);
+        return RateLimit::middleware($loadConfig, $strapi)($ctx, $next);
     }
 
     return $next();

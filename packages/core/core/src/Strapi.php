@@ -67,6 +67,10 @@ final class Strapi extends Container implements StrapiContract
 
     private bool $loaded = false;
 
+    private bool $bootstrapSettled = false;
+
+    private ?Utils\BootLogBuffer $bootLogBuffer = null;
+
     /** @var array<string, mixed> */
     public array $internal_config = [];
 
@@ -429,6 +433,29 @@ final class Strapi extends Container implements StrapiContract
         return $this->loaded;
     }
 
+    /**
+     * PHP port: whether this boot's bootstrap found its inputs settled (see bootstrap()): a
+     * bootstrap already completed for the same inputs on the same database. Under PHP-FPM every
+     * request boots; upstream syncs once per process start. Bootstrap code may skip a re-sync whose
+     * result depends only on those inputs (the content-manager configurations, the super admin's
+     * permissions), since the completed bootstrap already ran it.
+     */
+    public function bootstrapSettled(): bool
+    {
+        return $this->bootstrapSettled;
+    }
+
+    /**
+     * PHP port: the next boot runs the whole bootstrap, as upstream's next start does. For what
+     * changes the database outside a bootstrap and leaves its schema as it was (a configuration
+     * restore, an import): a settled boot would skip the re-syncs that repair it. Deleting
+     * `.tmp/bootstrap.settled` by hand does the same (after restoring a database backup).
+     */
+    public function unsettle(): void
+    {
+        @unlink($this->bootstrapSettledFile());
+    }
+
     // --- lifecycle ---------------------------------------------------------------------------
 
     public function start(): static
@@ -455,7 +482,22 @@ final class Strapi extends Container implements StrapiContract
             is_array($config->get('logger')) ? $config->get('logger') : [], // DEPRECATED
             is_array($config->get('server.logger.config')) ? $config->get('server.logger.config') : [],
         );
+        // PHP port: under PHP-FPM, CGI, mod_php and LiteSpeed stdout is no console (/dev/null, or
+        // under CGI the response itself): without configured transports, log to PHP's error_log
+        if (Utils\Sapi::hasNoConsole() && !isset($loggerConfig['transports']) && !isset($loggerConfig['stream'])) {
+            $errorLog = new \Monolog\Handler\ErrorLogHandler();
+            // error_log() adds the date and the line break: `strapi.WARNING: message`
+            $errorLog->setFormatter(new \Monolog\Formatter\LineFormatter('%channel%.%level_name%: %message% %context% %extra%', null, true, true));
+            $loggerConfig['transports'] = [$errorLog];
+        }
         $logger = Logger::createLogger($loggerConfig);
+
+        // PHP port: where every request boots, a settled boot's startup messages repeat the ones
+        // logged by the bootstrap that settled: held until the end of bootstrap (see bootstrap())
+        if (Utils\Sapi::isPerRequest()) {
+            $this->bootLogBuffer = new Utils\BootLogBuffer(array_values($logger->getHandlers()));
+            $logger->setHandlers([$this->bootLogBuffer]);
+        }
 
         ServerConfig::warnDeprecatedServerConfig($config, $logger);
 
@@ -585,21 +627,55 @@ final class Strapi extends Container implements StrapiContract
         // Under PHP-FPM every request boots, and a lock held across the whole bootstrap would
         // serialize every request. Once a bootstrap has completed for the same inputs (schemas,
         // config, packages, migrations) on the same database, bootstrap's writes find nothing to
-        // change, so later boots skip the lock: the steady state is read-only and concurrent.
+        // change, so later boots skip the lock: the steady state is read-only and concurrent
+        // (outside development, see bootstrapFingerprint()).
+        try {
+            $this->settleAndBootstrap();
+        } catch (\Throwable $error) {
+            $this->bootLogBuffer?->release(false);
+
+            throw $error;
+        }
+
+        // what a settled boot logged, the bootstrap that settled logged already (BootLogBuffer)
+        $this->bootLogBuffer?->release($this->bootstrapSettled);
+
+        return $this;
+    }
+
+    private function settleAndBootstrap(): void
+    {
         $fingerprint = $this->bootstrapFingerprint();
-        if ($fingerprint !== null && $this->isBootstrapSettled($fingerprint)) {
-            return $this->doBootstrap();
+        $this->bootstrapSettled = $fingerprint !== null && $this->matchesSettledRecord($fingerprint);
+        if ($this->bootstrapSettled) {
+            $this->doBootstrap();
+
+            return;
         }
 
         $lock = $this->acquireBootstrapLock();
 
+        // the bootstrap this boot waited for may have settled the same inputs: then this one is
+        // settled too, or every request arriving during a bootstrap would run its own, in turn
+        if ($fingerprint !== null && $this->matchesSettledRecord($fingerprint)) {
+            if ($lock !== null) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
+            $this->bootstrapSettled = true;
+            $this->doBootstrap();
+
+            return;
+        }
+
         try {
+            // until this bootstrap completes, the record describes no database: one that dies midway
+            // (a timeout, a deploy) must not leave a re-created database matching the old record
+            @unlink($this->bootstrapSettledFile());
             $this->doBootstrap();
             if ($fingerprint !== null) {
                 $this->markBootstrapSettled($fingerprint);
             }
-
-            return $this;
         } finally {
             if ($lock !== null) {
                 flock($lock, LOCK_UN);
@@ -610,24 +686,40 @@ final class Strapi extends Container implements StrapiContract
 
     /**
      * A hash of what bootstrap's database writes depend on: the Strapi version, the installed
-     * packages, the config, the content types, components and models, the user's migrations and
-     * `src/index.php` (whose bootstrap may seed). Null when it cannot be computed.
+     * packages (version, source reference, the time of the last `composer install`), the config,
+     * the content types, components and models, the user's migrations, and the size and time of
+     * every PHP file under `src/` and `config/` (lifecycles, local plugins, a bootstrap that seeds).
+     * Null when it cannot be computed, and in development, where code changes between requests in
+     * ways no input here sees (a package under development, a closure's body): every boot there
+     * takes the lock and runs the whole bootstrap, as upstream's restart on change does.
      */
     private function bootstrapFingerprint(): ?string
     {
+        if ($this->config()->get('environment') === 'development') {
+            return null;
+        }
+
         $root = $this->dirs()->root;
         $migrations = @scandir($root . '/database/migrations') ?: [];
-        $index = is_file($root . '/src/index.php') ? (string) md5_file($root . '/src/index.php') : '';
 
         $packages = [];
         foreach (Loaders\Plugins\GetEnabledPlugins::installedPackages($this) as $name => $package) {
-            $packages[$name] = $package['info']['version'] ?? '';
+            $info = $package['info'];
+            $reference = $info['dist']['reference'] ?? $info['source']['reference'] ?? '';
+            $packages[$name] = ($info['version'] ?? '') . '@' . (is_string($reference) ? $reference : '');
         }
+        $installed = $root . '/vendor/composer/installed.json';
+        $packages[''] = is_file($installed) ? filemtime($installed) . ':' . filesize($installed) : '';
 
         // closures in config encode as `{}`: a change inside one is not seen, the rest is.
         // `launchedAt` is this boot's timestamp, not an input.
         $config = $this->config()->all();
         unset($config['launchedAt']);
+        // cron tasks are scheduled at bootstrap but write nothing then, and Strapi's own examples
+        // compute their dates at load (`end: new Date(Date.now() + 6000)`): a new value every boot
+        if (is_array($config['server'] ?? null)) {
+            unset($config['server']['cron']);
+        }
 
         $inputs = json_encode([
             'version' => Configuration::version(),
@@ -637,10 +729,46 @@ final class Strapi extends Container implements StrapiContract
             'components' => array_map(static fn (Schema $schema): array => $schema->toArray(), $this->components()),
             'models' => $this->get('models')->get(),
             'migrations' => $migrations,
-            'index' => $index,
+            'files' => self::fileStats($this->dirs()->src, $this->dirs()->src . '/admin') + self::fileStats($root . '/config'),
         ], JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
 
         return is_string($inputs) ? hash('sha256', $inputs) : null;
+    }
+
+    /**
+     * `path => mtime:size` for every PHP file under $dir (not under $skip or a `node_modules`),
+     * sorted: stats only, from PHP's stat cache, without reading the files. Code only: the schemas
+     * are inputs already, and other files may be bootstrap's own output (the documentation
+     * plugin rewrites its generated spec at every boot outside production).
+     *
+     * @return array<string, string>
+     */
+    private static function fileStats(string $dir, ?string $skip = null): array
+    {
+        if (!is_dir($dir)) {
+            return [];
+        }
+
+        $stats = [];
+        try {
+            // a directory PHP cannot open (another user's, mode 0700) is skipped, not fatal: no
+            // code under it can load either
+            $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+                static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip
+                    && !($file->isDir() && $file->getFilename() === 'node_modules'),
+            ), \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+            foreach ($files as $file) {
+                if ($file instanceof \SplFileInfo && $file->isFile() && $file->getExtension() === 'php') {
+                    $stats[$file->getPathname()] = $file->getMTime() . ':' . $file->getSize();
+                }
+            }
+        } catch (\UnexpectedValueException) {
+            // $dir itself cannot be opened
+        }
+        ksort($stats);
+
+        return $stats;
     }
 
     private function bootstrapSettledFile(): string
@@ -650,10 +778,10 @@ final class Strapi extends Container implements StrapiContract
 
     /**
      * Whether the last completed bootstrap had the same inputs and ran on this database: its last
-     * synced schema row (id and hash) is still the latest, so the database was not reset or
+     * synced schema row (id, hash and time) is still the latest, so the database was not reset or
      * re-synced by another boot since.
      */
-    private function isBootstrapSettled(string $fingerprint): bool
+    private function matchesSettledRecord(string $fingerprint): bool
     {
         $recorded = @file_get_contents($this->bootstrapSettledFile());
         if (!is_string($recorded) || $recorded === '') {
@@ -662,7 +790,18 @@ final class Strapi extends Container implements StrapiContract
 
         $latest = $this->db()->schema->schemaStorage->latest();
 
-        return $latest !== null && hash_equals($recorded, "{$fingerprint}:{$latest['id']}:{$latest['hash']}");
+        return $latest !== null && hash_equals($recorded, self::settledRecord($fingerprint, $latest));
+    }
+
+    /**
+     * The inputs and the database's last synced schema row: its id and hash, and its time, which
+     * tells a database dropped and synced again apart from the one recorded.
+     *
+     * @param array{id: int, hash: string, time: string} $latest
+     */
+    private static function settledRecord(string $fingerprint, array $latest): string
+    {
+        return "{$fingerprint}:{$latest['id']}:{$latest['hash']}:{$latest['time']}";
     }
 
     private function markBootstrapSettled(string $fingerprint): void
@@ -674,7 +813,7 @@ final class Strapi extends Container implements StrapiContract
 
         $file = $this->bootstrapSettledFile();
         $tmp = $file . '.' . getmypid();
-        if (@file_put_contents($tmp, "{$fingerprint}:{$latest['id']}:{$latest['hash']}") !== false) {
+        if (@file_put_contents($tmp, self::settledRecord($fingerprint, $latest)) !== false) {
             @rename($tmp, $file);
         }
     }
@@ -713,7 +852,10 @@ final class Strapi extends Container implements StrapiContract
 
         $this->hook('strapi::content-types.beforeSync')->call(['oldContentTypes' => $oldContentTypes, 'contentTypes' => $this->contentTypes()]);
 
-        $status = $db->schema->sync();
+        // PHP port: a settled boot (see bootstrap()) found this database's latest synced schema to
+        // be the one the completed bootstrap left, for the same content types, models and
+        // migrations: the sync's hash comparison and pending migrations would find nothing
+        $status = $this->bootstrapSettled ? \Strapi\Database\Schema\Types::UNCHANGED : $db->schema->sync();
 
         // if schemas have changed, run repairs
         if ($status === 'CHANGED') {
@@ -755,6 +897,12 @@ final class Strapi extends Container implements StrapiContract
 
     public function destroy(): void
     {
+        // PHP port: where every request boots, a settled boot's shutdown is every request's: its
+        // messages are held and dropped like its startup's (errors still log)
+        $quiet = $this->bootstrapSettled && $this->bootLogBuffer !== null;
+        if ($quiet) {
+            $this->bootLogBuffer->hold();
+        }
         $this->log()->info('Shutting down Strapi');
         $this->runPluginsLifecycles(Utils\Lifecycles::DESTROY);
 
@@ -776,6 +924,9 @@ final class Strapi extends Container implements StrapiContract
         AuthScope::setRegisteredContentTypes(null);
 
         $this->log()->info('Strapi has been shut down');
+        if ($quiet && $this->bootLogBuffer !== null) {
+            $this->bootLogBuffer->release(true);
+        }
     }
 
     private function runPluginsLifecycles(string $lifecycleName): void

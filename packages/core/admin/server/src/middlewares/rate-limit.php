@@ -4,22 +4,52 @@ declare(strict_types=1);
 
 namespace Strapi\Admin\Middlewares;
 
+use Strapi\Admin\Middlewares\RateLimitStores\FileStore;
+use Strapi\Admin\Middlewares\RateLimitStores\MemoryStore;
+use Strapi\Admin\Middlewares\RateLimitStores\Store;
 use Strapi\Core\Strapi;
+use Strapi\Core\Utils\Sapi;
 use Strapi\Types\Core\Context;
 use Strapi\Utils\Errors\RateLimitError;
 
 /**
  * Port of server/src/middlewares/rateLimit.ts with the part of `koa2-ratelimit` it uses
  * (`RateLimit.middleware` + its default in-memory store). The store lives in the PHP process,
- * like koa2-ratelimit's MemoryStore lives in the Node process.
+ * like koa2-ratelimit's MemoryStore lives in the Node process, except where the PHP process
+ * starts afresh for each request (PHP-FPM, CGI, mod_php, the built-in server): there it would
+ * never limit, and the hits are kept in files instead ({@see self::defaultStore()}).
  *
  * Not an upstream file: rateLimit.php must return the middleware factory (the registry
  * `require`s it), so the class it delegates to lives here.
  */
 final class RateLimit
 {
-    /** @var array<string, array{counter: int, dateEnd: int}> key => hits and end of window (ms) */
-    private static array $hits = [];
+    private static ?MemoryStore $memory = null;
+
+    /**
+     * koa2-ratelimit's default store is in memory, for the Node process's lifetime. In PHP that is
+     * the process for the CLI and FrankenPHP worker mode, but one request for the SAPIs that start
+     * afresh, where memory would never limit: those count in `.tmp/rate-limit` of the project,
+     * or, when it cannot be written, in memory with a warning (the limits are not enforced then,
+     * but the admin can still log in).
+     */
+    public static function defaultStore(?Strapi $strapi, string $sapi = PHP_SAPI): Store
+    {
+        if ($strapi !== null && Sapi::isPerRequest($sapi)) {
+            $dir = $strapi->dirs()->root . '/.tmp/rate-limit';
+            if (self::isWritableDirectory($dir)) {
+                return new FileStore($dir);
+            }
+            $strapi->log()->warning("Rate limits are not enforced: {$dir} cannot be written");
+        }
+
+        return self::$memory ??= new MemoryStore();
+    }
+
+    private static function isWritableDirectory(string $dir): bool
+    {
+        return (is_dir($dir) || @mkdir($dir, 0o777, true) || is_dir($dir)) && is_writable($dir);
+    }
 
     /**
      * @param array<string, mixed> $config
@@ -59,7 +89,7 @@ final class RateLimit
                     ...$config,
                 ];
 
-                return self::middleware($loadConfig)($ctx, $next);
+                return self::middleware($loadConfig, $strapi)($ctx, $next);
             }
 
             return $next();
@@ -121,30 +151,27 @@ final class RateLimit
     }
 
     /**
-     * koa2-ratelimit `RateLimit.middleware(options)` with the memory store.
+     * koa2-ratelimit `RateLimit.middleware(options)`. Its `store` option takes a {@see Store}; by
+     * default {@see self::defaultStore()} for `$strapi`.
      *
      * @param array<string, mixed> $options
      * @return \Closure(Context, callable): mixed
      */
-    public static function middleware(array $options): \Closure
+    public static function middleware(array $options, ?Strapi $strapi = null): \Closure
     {
         $interval = self::intervalMs($options['interval'] ?? ['min' => 1]);
         $max = (int) ($options['max'] ?? 5);
         $prefixKey = (string) ($options['prefixKey'] ?? 'global');
         $handler = $options['handler'] ?? null;
         $headers = $options['headers'] ?? true;
+        $store = ($options['store'] ?? null) instanceof Store ? $options['store'] : self::defaultStore($strapi);
 
-        return static function (Context $ctx, callable $next) use ($interval, $max, $prefixKey, $handler, $headers): mixed {
+        return static function (Context $ctx, callable $next) use ($interval, $max, $prefixKey, $handler, $headers, $store): mixed {
             // keyGenerator: `${prefixKey}|${ctx.request.ip}`
             $key = "{$prefixKey}|{$ctx->ip()}";
             $now = (int) floor(microtime(true) * 1000);
 
-            $entry = self::$hits[$key] ?? null;
-            if ($entry === null || $entry['dateEnd'] <= $now) {
-                $entry = ['counter' => 0, 'dateEnd' => $now + $interval];
-            }
-            $entry['counter']++;
-            self::$hits[$key] = $entry;
+            $entry = $store->incr($key, $interval, $now);
 
             if ($headers) {
                 $ctx->setHeader('X-RateLimit-Limit', (string) $max);
@@ -170,6 +197,6 @@ final class RateLimit
     /** Clears the in-memory store (tests). */
     public static function reset(): void
     {
-        self::$hits = [];
+        self::$memory?->reset();
     }
 }
