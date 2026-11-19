@@ -97,7 +97,7 @@ final class HttpServerTest extends TestCase
         self::assertSame('Bearer b', HttpServer::authorizationFromServer(['REDIRECT_HTTP_AUTHORIZATION' => 'Bearer b']));
         self::assertSame('Bearer a', HttpServer::authorizationFromServer(['HTTP_AUTHORIZATION' => 'Bearer a', 'REDIRECT_HTTP_AUTHORIZATION' => 'Bearer b']));
         self::assertSame('Basic ' . base64_encode('ada:secret'), HttpServer::authorizationFromServer(['PHP_AUTH_USER' => 'ada', 'PHP_AUTH_PW' => 'secret']));
-        self::assertSame('Digest username="ada"', HttpServer::authorizationFromServer(['PHP_AUTH_DIGEST' => 'Digest username="ada"']));
+        self::assertSame('Digest username="ada"', HttpServer::authorizationFromServer(['PHP_AUTH_DIGEST' => 'username="ada"']));
         self::assertNull(HttpServer::authorizationFromServer(['HTTP_AUTHORIZATION' => '', 'HTTP_HOST' => 'localhost']));
     }
 

@@ -183,8 +183,9 @@ PHP;
 
             return 'Basic ' . base64_encode("{$server['PHP_AUTH_USER']}:{$password}");
         }
+        // PHP strips the scheme: `Digest username="ada", ...` arrives as `username="ada", ...`
         if (is_string($server['PHP_AUTH_DIGEST'] ?? null) && $server['PHP_AUTH_DIGEST'] !== '') {
-            return $server['PHP_AUTH_DIGEST'];
+            return 'Digest ' . $server['PHP_AUTH_DIGEST'];
         }
 
         return null;
