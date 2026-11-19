@@ -87,7 +87,9 @@ final class PerRequestLaneTest extends TestCase
         // the first request settles the bootstrap
         self::assertSame(204, $this->send('GET', '/_health')[0], $this->server?->getOutput() ?? '');
 
-        [$status, $body] = $this->send('POST', '/admin/register-admin', ['firstname' => 'Ada', 'lastname' => 'Admin', 'email' => 'ada@example.com', 'password' => 'Passw0rdPassw0rd']);
+        // registration is rate limited by email, and the counts outlive the run: an email of its own
+        $email = 'ada-' . bin2hex(random_bytes(4)) . '@example.com';
+        [$status, $body] = $this->send('POST', '/admin/register-admin', ['firstname' => 'Ada', 'lastname' => 'Admin', 'email' => $email, 'password' => 'Passw0rdPassw0rd']);
         self::assertSame(200, $status, (string) json_encode($body));
         $admin = (string) ($body['data']['token'] ?? '');
         self::assertSame(200, $this->send('GET', '/admin/users/me', token: $admin)[0]);
@@ -116,9 +118,11 @@ final class PerRequestLaneTest extends TestCase
 
     public function testRateLimitsCountAcrossRequests(): void
     {
+        // the counts outlive the run (.tmp/rate-limit, a 5-minute window): a key of this run's own
+        $email = 'nobody-' . bin2hex(random_bytes(4)) . '@example.com';
         $statuses = [];
         for ($i = 0; $i < 6; $i++) {
-            $statuses[] = $this->send('POST', '/admin/login', ['email' => 'nobody@example.com', 'password' => 'wrong'])[0];
+            $statuses[] = $this->send('POST', '/admin/login', ['email' => $email, 'password' => 'wrong'])[0];
         }
 
         self::assertSame([400, 400, 400, 400, 400, 429], $statuses);
