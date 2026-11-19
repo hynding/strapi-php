@@ -31,10 +31,13 @@ final class Sapi
         return in_array($sapi, self::PER_REQUEST, true);
     }
 
-    /** FrankenPHP sets `FRANKENPHP_WORKER=1` for worker scripts (worker.go). */
+    /**
+     * FrankenPHP sets `FRANKENPHP_WORKER=1` for worker scripts (worker.go), in `$_SERVER`; its
+     * `getenv()` sees it from 1.12.5 on.
+     */
     public static function isFrankenphpWorker(): bool
     {
-        return getenv('FRANKENPHP_WORKER') === '1';
+        return ($_SERVER['FRANKENPHP_WORKER'] ?? getenv('FRANKENPHP_WORKER')) === '1';
     }
 
     public static function hasNoConsole(string $sapi = PHP_SAPI): bool
