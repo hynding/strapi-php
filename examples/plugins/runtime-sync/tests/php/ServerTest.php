@@ -91,6 +91,12 @@ final class ServerTest extends TestCase
 
             $strapi = Core::createStrapi(['appDir' => __DIR__ . '/app'])->load();
             self::assertTrue($strapi->bootstrapSettled());
+            // the status page still has this boot's database report (captured when asked)
+            $status = $strapi->plugin('runtime-sync')->service('status');
+            \assert($status instanceof Status);
+            $report = $status->report();
+            self::assertSame('UNCHANGED', $report['database']['status'] ?? null);
+            self::assertTrue($report['database']['hashMatches'] ?? null);
             $strapi->destroy();
             self::assertSame($marker, $this->column("SELECT value FROM strapi_core_store_settings WHERE key = 'plugin_runtime-sync_boots'"), 'a settled boot writes no marker');
             self::assertFileExists($settled);

@@ -45,12 +45,18 @@ final class Preflight
     }
 
     /**
-     * The database part of this boot's report, captured by `beforeSync`; null before that.
+     * The database part of this boot's report, captured by `beforeSync`; null before that. A
+     * settled boot (strapi-php) skips the capture at boot and captures here, when asked: it only
+     * reads.
      *
      * @return DatabaseReport|null
      */
     public function database(): ?array
     {
+        if ($this->database === null && $this->strapi->bootstrapSettled()) {
+            $this->database = $this->capture();
+        }
+
         return $this->database;
     }
 
