@@ -92,7 +92,8 @@ final class PerRequestSapiTest extends TestCase
         self::assertIsResource($process);
         $response = (string) stream_get_contents($pipes[1]);
         $this->stderr = (string) stream_get_contents($pipes[2]);
-        proc_close($process);
+        $exitCode = proc_close($process);
+        $this->stderr .= "\n(php-cgi exit code {$exitCode})";
 
         $log = is_file("{$this->dir}/error.log") ? file("{$this->dir}/error.log", FILE_IGNORE_NEW_LINES) : [];
 

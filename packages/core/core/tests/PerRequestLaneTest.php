@@ -77,6 +77,7 @@ final class PerRequestLaneTest extends TestCase
     {
         $headers = $json !== null ? "Content-Type: application/json\r\n" : '';
         $headers .= $token !== null ? "Authorization: Bearer {$token}\r\n" : '';
+        $started = microtime(true);
         $body = @file_get_contents("http://127.0.0.1:{$this->port}{$path}", false, stream_context_create(['http' => [
             'method' => $method,
             'header' => $headers,
@@ -89,11 +90,18 @@ final class PerRequestLaneTest extends TestCase
         /** @var list<string> $responseHeaders */
         $responseHeaders = $http_response_header;
         if ($body === false && $responseHeaders === []) {
+            $error = error_get_last()['message'] ?? 'unknown error';
+            $elapsed = microtime(true) - $started;
+            // what the same request gets on a raw socket, and the server a moment later
+            $raw = $this->rawRequest($method, $path, $headers, $json !== null ? (string) json_encode($json) : '');
+            usleep(200_000);
             self::fail(sprintf(
-                "%s %s: no response (%s); server %s\n%s",
+                "%s %s: no response after %.2f s (%s); a raw retry got %s; server %s\n%s",
                 $method,
                 $path,
-                error_get_last()['message'] ?? 'unknown error',
+                $elapsed,
+                $error,
+                $raw,
                 $this->server?->isRunning() === true ? 'running' : 'exited with ' . var_export($this->server?->getExitCode(), true),
                 substr($this->serverOutput(), -4000),
             ));
@@ -101,6 +109,23 @@ final class PerRequestLaneTest extends TestCase
         preg_match('~^HTTP/\S+\s+(\d{3})~', $responseHeaders[0] ?? '', $m);
 
         return [(int) ($m[1] ?? 0), is_string($body) ? json_decode($body, true) : null];
+    }
+
+    /** For failure messages: the bytes a raw HTTP/1.0 request receives, with timing and errors. */
+    private function rawRequest(string $method, string $path, string $headers, string $content): string
+    {
+        $started = microtime(true);
+        $socket = @stream_socket_client("tcp://127.0.0.1:{$this->port}", $errno, $errstr, 5);
+        if ($socket === false) {
+            return "no connection ({$errno} {$errstr})";
+        }
+        stream_set_timeout($socket, 30);
+        fwrite($socket, "{$method} {$path} HTTP/1.0\r\nHost: 127.0.0.1\r\n{$headers}Content-Length: " . strlen($content) . "\r\n\r\n{$content}");
+        $received = (string) stream_get_contents($socket);
+        $timedOut = stream_get_meta_data($socket)['timed_out'];
+        fclose($socket);
+
+        return sprintf('%d bytes after %.2f s%s: %s', strlen($received), microtime(true) - $started, $timedOut ? ' (timed out)' : '', var_export(substr($received, 0, 300), true));
     }
 
     public function testSettledBootsServeAdminAuthTokensTheContentApiAndGraphql(): void
