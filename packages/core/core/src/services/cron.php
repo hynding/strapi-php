@@ -33,6 +33,8 @@ final class Cron implements CronService
 
     private ?string $stateDir = null;
 
+    private bool $stateWarned = false;
+
     public function __construct(private readonly Strapi $strapi)
     {
     }
@@ -374,7 +376,8 @@ final class Cron implements CronService
     }
 
     /**
-     * The job's state file, locked (persistState()); null without persisted state; false when
+     * The job's state file, locked (persistState()); null without persisted state, or when it
+     * cannot be written (the job runs as without persistState(), with a warning); false when
      * another process holds it (the job is running there).
      *
      * @return resource|false|null
@@ -385,12 +388,12 @@ final class Cron implements CronService
             return null;
         }
         if (!is_dir($this->stateDir) && !@mkdir($this->stateDir, 0o777, true) && !is_dir($this->stateDir)) {
-            throw new \RuntimeException("Cannot create the cron state directory {$this->stateDir}");
+            return $this->withoutState("{$this->stateDir} cannot be created");
         }
 
         $handle = @fopen($this->stateDir . '/' . hash('sha256', $key) . '.job', 'c+');
         if ($handle === false) {
-            throw new \RuntimeException("Cannot open the cron state of \"{$key}\" in {$this->stateDir}");
+            return $this->withoutState("the state of \"{$key}\" in {$this->stateDir} cannot be opened");
         }
         if (!flock($handle, LOCK_EX | LOCK_NB)) {
             fclose($handle);
@@ -399,6 +402,16 @@ final class Cron implements CronService
         }
 
         return $handle;
+    }
+
+    private function withoutState(string $reason): null
+    {
+        if (!$this->stateWarned) {
+            $this->stateWarned = true;
+            $this->strapi->log()->warning("Cron jobs run without their last runs: {$reason}");
+        }
+
+        return null;
     }
 
     private function readLastCheck(): ?\DateTimeImmutable
@@ -425,7 +438,9 @@ final class Cron implements CronService
         }
         $date = \DateTimeImmutable::createFromFormat(DATE_ATOM, $value);
 
-        return $date === false ? null : $date;
+        // in the server's time zone, as `now` is: a job without `tz` is scheduled in the time zone
+        // of the date it starts from, and a stored offset (+01:00) does not follow daylight saving
+        return $date === false ? null : $date->setTimezone(new \DateTimeZone(date_default_timezone_get()));
     }
 
     /**

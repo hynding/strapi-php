@@ -96,6 +96,55 @@ final class CronTest extends BootedAppTestCase
         self::assertSame(['12:00'], $this->fired);
     }
 
+    public function testAJobKeepsItsLocalTimeAcrossADaylightSavingChange(): void
+    {
+        // no `tz`: the server's time zone, where 09:00 is +01:00 before the change and +02:00 after
+        $default = date_default_timezone_get();
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $call = function (string $at): int {
+                $cron = Cron::createCronService(self::strapi())->persistState($this->dir);
+                $cron->add(['job' => [
+                    'task' => function (mixed $strapi, \DateTimeInterface $fireDate): void {
+                        $this->fired[] = $fireDate->format('Y-m-d H:i');
+                    },
+                    'options' => ['rule' => '0 9 * * *'],
+                ]]);
+
+                return $cron->runDue(new \DateTimeImmutable($at));
+            };
+
+            self::assertSame(1, $call('2026-03-28 09:00'));
+            // clocks went forward on 2026-03-29 at 02:00
+            self::assertSame(1, $call('2026-03-29 09:00'));
+            self::assertSame(1, $call('2026-03-30 09:00'));
+            self::assertSame(['2026-03-28 09:00', '2026-03-29 09:00', '2026-03-30 09:00'], $this->fired);
+        } finally {
+            date_default_timezone_set($default);
+        }
+    }
+
+    public function testAStateDirectoryThatCannotBeWrittenRunsJobsWithoutState(): void
+    {
+        // under a file: the directory cannot be created
+        touch($this->dir);
+        try {
+            $cron = Cron::createCronService(self::strapi())->persistState($this->dir . '/cron');
+            $cron->add(['job' => [
+                'task' => function (): void {
+                    $this->fired[] = 'ran';
+                },
+                'options' => ['rule' => '0 12 * * *', 'tz' => 'UTC'],
+            ]]);
+
+            self::assertSame(1, $cron->runDue(self::at('12:00')));
+            self::assertSame(['ran'], $this->fired);
+        } finally {
+            unlink($this->dir);
+        }
+    }
+
     public function testAJobRunningInAnotherCallIsSkipped(): void
     {
         $this->call('11:55');
