@@ -20,6 +20,9 @@ final class SettledBootTest extends TestCase
 
     private string $database = '';
 
+    /** @var array{0: string|false, 1: mixed, 2: mixed} NODE_ENV before the test: getenv(), $_ENV, $_SERVER */
+    private array $nodeEnv = [false, null, null];
+
     private static function appDir(): string
     {
         return dirname(__DIR__, 4) . '/examples/getstarted';
@@ -31,8 +34,6 @@ final class SettledBootTest extends TestCase
         $env = [
             'DATABASE_CLIENT' => 'sqlite',
             'DATABASE_FILENAME' => $this->database,
-            // development never settles (Strapi::bootstrapFingerprint())
-            'NODE_ENV' => 'production',
             'STRAPI_NO_EXIT' => '1',
             'LOG_LEVEL' => 'error',
             // set, so users-permissions does not generate one during the first bootstrap (which
@@ -43,13 +44,29 @@ final class SettledBootTest extends TestCase
             putenv("{$name}={$value}");
             $_ENV[$name] = $value;
         }
+
+        // development never settles (Strapi::bootstrapFingerprint()); an earlier boot in this
+        // process set NODE_ENV in all three places, and $_SERVER is read first
+        $this->nodeEnv = [getenv('NODE_ENV'), $_ENV['NODE_ENV'] ?? null, $_SERVER['NODE_ENV'] ?? null];
+        putenv('NODE_ENV=production');
+        $_ENV['NODE_ENV'] = $_SERVER['NODE_ENV'] = 'production';
     }
 
     protected function tearDown(): void
     {
-        foreach (['JWT_SECRET', 'NODE_ENV'] as $name) {
-            putenv($name);
-            unset($_ENV[$name]);
+        putenv('JWT_SECRET');
+        unset($_ENV['JWT_SECRET']);
+        [$getenv, $env, $server] = $this->nodeEnv;
+        putenv(is_string($getenv) ? "NODE_ENV={$getenv}" : 'NODE_ENV');
+        if ($env === null) {
+            unset($_ENV['NODE_ENV']);
+        } else {
+            $_ENV['NODE_ENV'] = $env;
+        }
+        if ($server === null) {
+            unset($_SERVER['NODE_ENV']);
+        } else {
+            $_SERVER['NODE_ENV'] = $server;
         }
         putenv('DATABASE_FILENAME=:memory:');
         $_ENV['DATABASE_FILENAME'] = ':memory:';

@@ -75,10 +75,13 @@ final class BootLogBufferTest extends TestCase
 
     public function testClosingLogsWhatIsStillHeld(): void
     {
-        $this->logger->warning('logged before a fatal error');
+        // a request that ends before bootstrap released the buffer (an exit() in a boot step):
+        // closing the logger, as Monolog does when the handler is destroyed, keeps what was held.
+        // A fatal error runs no destructor; what it reports goes to PHP's error log anyway.
+        $this->logger->warning('logged before the request ended');
         $this->logger->close();
 
-        self::assertSame(['WARNING: logged before a fatal error'], $this->logged());
+        self::assertSame(['WARNING: logged before the request ended'], $this->logged());
     }
 
     public function testRecordsTheInnerHandlersIgnoreAreNotHeld(): void

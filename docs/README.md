@@ -13,7 +13,8 @@ deviations from upstream. This folder is for cross-cutting notes.
 Strapi (Node) boots once and keeps registries, metadata, cron, webhooks and the event hub
 in memory. The PHP port keeps that model: `Strapi\Core\Strapi::load()` builds everything,
 `public/index.php` boots once per FrankenPHP worker and reuses it across requests, and
-under PHP-FPM it boots per request. Cron under FPM runs via `php bin/strapi cron:run` from
+under PHP-FPM (and FrankenPHP's classic mode, `php_server` without `worker`) it boots per
+request. Cron under FPM runs via `php bin/strapi cron:run` from
 system cron; under FrankenPHP `cron:run --loop` keeps a scheduler alive.
 
 What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
@@ -39,10 +40,12 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   configuration to find nothing to change. An orphaned permission (a role deleted by hand) waits
   for the next unsettled boot, as it waits for a restart upstream.
 - **Rate limits count across requests.** koa2-ratelimit's memory store lives as long as the
-  process: the CLI and FrankenPHP worker mode keep it, but PHP-FPM, CGI, mod_php and the built-in
-  server start each request afresh, where it never limited (six bad admin logins in a row all
-  answered 400). Those SAPIs count in `.tmp/rate-limit/` instead (`FileStore`, one file per key
-  under `flock`), so the sixth answers 429. One server only, like the memory store.
+  process: the CLI and FrankenPHP worker mode keep it, but PHP-FPM, CGI, mod_php, LiteSpeed,
+  the built-in server and FrankenPHP's classic mode start each request afresh, where it never
+  limited (six bad admin logins in a row all answered 400). Those count in `.tmp/rate-limit/`
+  instead (`FileStore`, one file per key under `flock`, spread over 256 subdirectories), so the
+  sixth answers 429. One server only, like the memory store. Where `.tmp/rate-limit` cannot be
+  written, Strapi warns and the limits are not enforced, rather than failing every login.
 - **Cron catches up.** `cron:run` from the system crontab is a new process every time; with the
   last runs in memory it looked back one minute, so a crontab every 5 or 15 minutes (shared hosts
   often allow no less) missed most jobs, two calls in a minute ran a job twice and a one-shot job
@@ -55,11 +58,15 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   through `error_log()` (`strapi.WARNING: message`), which shared hosts keep per account. And
   where every request boots, a settled boot's startup and shutdown messages repeat what the
   bootstrap that settled logged: `Utils\BootLogBuffer` holds them and drops them (errors log at
-  once), so a settled request logs only the request line.
+  once), so a settled request logs only the request line. The trade-off: a warning a settled
+  boot finds in the database (`Some users don't have any role`) is dropped too. The boot that
+  settled logged it, and the next unsettled boot (a deploy, a config change) logs it again.
 - **Apache.** `public/.htaccess` (example app and both create-strapi-app templates) routes
   every request that is not a file to `index.php`, passes the `Authorization` header (Apache
-  drops it for PHP-FPM, FastCGI and CGI: every admin and API token answered 401), and never runs
-  PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran). Checked on
+  drops it for PHP-FPM, FastCGI and CGI: every admin and API token answered 401), never runs
+  PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran, also as
+  `/uploads/x.php/anything`), and refuses `.user.ini`. `public/uploads/.htaccess` denies the same
+  files by name where the parent rules are not read first. Checked on
   Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
   `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
 - **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
