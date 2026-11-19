@@ -141,7 +141,7 @@ symfony/process.
   same database skip the lock (under PHP-FPM, every request). `CoreStore::set` skips an update that
   changes nothing, so a settled boot writes no row. `bootstrapSettled()` tells bootstrap code a
   boot is settled, so it can skip re-syncs the completed bootstrap already ran (admin,
-  content-manager). See docs/README.md "Runtime model".
+  content-manager); bootstrap itself skips `schema->sync()` then. See docs/README.md "Runtime model".
 
 ## Tests
 

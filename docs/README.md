@@ -41,10 +41,19 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   answered 400). Those SAPIs count in `.tmp/rate-limit/` instead (`FileStore`, one file per key
   under `flock`), so the sixth answers 429. One server only, like the memory store.
 
+- **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
+  the result: a settled boot skips `schema->sync()` (the settled check already matched the
+  database's latest schema row and the inputs it is computed from); `Strings::transliterate()`
+  returns ASCII as is and builds its ICU transliterator once (it built one per call, ~0.1 ms, for
+  every snake/kebab/camel case: ~30 ms of a boot); the core routes of a content type share their
+  document, data and query-parameter schemas instead of building each five times; the admin's
+  action schema is built once and `registerMany()` validates a list once instead of once more per
+  action; the documentation plugin caches the parsed users-permissions YAML in `.tmp/cache`.
+
 On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
-~130 ms, 1,024 to 804 included files, 24 to 14 MB. What remains is mostly `register()` (~55 ms
-of config, plugin and `src/` loading) and routing (~30 ms): a boot cache (resolved config,
-schemas, routes) is the next step.
+~65 ms, 1,024 to 795 included files, 24 to 10 MB. What remains is mostly routing (~18 ms) and
+the plugins' remaining bootstraps; a boot cache (resolved config, schemas, routes) would take
+most of the rest.
 
 ## Status
 
@@ -94,7 +103,7 @@ starting and after finishing (`/api-tests` in Claude Code).
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
 - PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~130 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  ~65 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
   Still to do, in order:
   - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
     resolved config, plugin list, API and component schemas, database metadata, the FastRoute
