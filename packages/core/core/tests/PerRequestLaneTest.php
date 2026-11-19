@@ -30,8 +30,11 @@ final class PerRequestLaneTest extends TestCase
 
         $app = dirname(__DIR__, 4) . '/examples/getstarted';
         $this->port = self::freePort();
-        $this->server = new Process(
-            HttpServer::command(PHP_BINARY, '127.0.0.1', $this->port, "{$app}/public", "{$app}/public/index.php"),
+        // the server writes to files, not to pipes this test would have to drain (a full pipe
+        // blocks the server mid-request); `exec` so that stopping the process stops PHP itself
+        $command = implode(' ', array_map(escapeshellarg(...), HttpServer::command(PHP_BINARY, '127.0.0.1', $this->port, "{$app}/public", "{$app}/public/index.php")));
+        $server = Process::fromShellCommandline(
+            "exec {$command} >> " . escapeshellarg("{$this->dir}/server.out") . ' 2>> ' . escapeshellarg("{$this->dir}/server.err"),
             $app,
             [
                 'NODE_ENV' => 'production',
@@ -46,9 +49,17 @@ final class PerRequestLaneTest extends TestCase
                 'ENCRYPTION_KEY' => 'lane-encryption-key',
             ],
         );
-        $this->server->setTimeout(null);
-        $this->server->start();
-        self::waitFor($this->port, $this->server);
+        $server->setTimeout(null);
+        $server->start();
+        $this->server = $server;
+        self::waitFor($this->port, $server);
+        self::assertTrue($server->isRunning(), $this->serverOutput());
+    }
+
+    /** What the server printed: its logs (stdout) and the built-in server's own (stderr). */
+    private function serverOutput(): string
+    {
+        return (string) @file_get_contents("{$this->dir}/server.out") . (string) @file_get_contents("{$this->dir}/server.err");
     }
 
     protected function tearDown(): void
@@ -77,6 +88,16 @@ final class PerRequestLaneTest extends TestCase
         // populated by the http wrapper on every completed request
         /** @var list<string> $responseHeaders */
         $responseHeaders = $http_response_header;
+        if ($body === false && $responseHeaders === []) {
+            self::fail(sprintf(
+                "%s %s: no response (%s); server %s\n%s",
+                $method,
+                $path,
+                error_get_last()['message'] ?? 'unknown error',
+                $this->server?->isRunning() === true ? 'running' : 'exited with ' . var_export($this->server?->getExitCode(), true),
+                substr($this->serverOutput(), -4000),
+            ));
+        }
         preg_match('~^HTTP/\S+\s+(\d{3})~', $responseHeaders[0] ?? '', $m);
 
         return [(int) ($m[1] ?? 0), is_string($body) ? json_decode($body, true) : null];
@@ -85,7 +106,7 @@ final class PerRequestLaneTest extends TestCase
     public function testSettledBootsServeAdminAuthTokensTheContentApiAndGraphql(): void
     {
         // the first request settles the bootstrap
-        self::assertSame(204, $this->send('GET', '/_health')[0], $this->server?->getOutput() ?? '');
+        self::assertSame(204, $this->send('GET', '/_health')[0], $this->serverOutput());
 
         // registration is rate limited by email, and the counts outlive the run: an email of its own
         $email = 'ada-' . bin2hex(random_bytes(4)) . '@example.com';
@@ -112,7 +133,7 @@ final class PerRequestLaneTest extends TestCase
         self::assertSame([['documentId' => $documentId, 'title' => 'Per request']], $body['data']['articles'] ?? null);
 
         // only the first boot logged its startup and shutdown; settled boots log their request
-        $output = ($this->server?->getOutput() ?? '') . ($this->server?->getErrorOutput() ?? '');
+        $output = $this->serverOutput();
         self::assertSame(1, substr_count($output, 'Shutting down Strapi'), $output);
     }
 
@@ -151,6 +172,6 @@ final class PerRequestLaneTest extends TestCase
             usleep(50_000);
         }
 
-        self::fail('The built-in server did not start: ' . $server->getErrorOutput());
+        self::fail('The built-in server did not start (exit code ' . var_export($server->getExitCode(), true) . ')');
     }
 }
