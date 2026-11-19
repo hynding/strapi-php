@@ -29,11 +29,22 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
 - **GraphQL builds on first use in production.** With artifacts off (`generateArtifacts`, off
   outside development) the schema and the Apollo server are built on the first request to the
   GraphQL endpoint; development keeps upstream's eager build.
+- **A settled boot skips the re-syncs.** `Strapi::bootstrapSettled()` tells bootstrap code that
+  a completed bootstrap already ran for the same inputs on the same database (upstream syncs once
+  per process start). The admin's super admin permissions reset and permissions cleanup, and the
+  content-manager's configuration syncs, are skipped then: they read every permission and
+  configuration to find nothing to change. An orphaned permission (a role deleted by hand) waits
+  for the next unsettled boot, as it waits for a restart upstream.
+- **Rate limits count across requests.** koa2-ratelimit's memory store lives as long as the
+  process: the CLI and FrankenPHP worker mode keep it, but PHP-FPM, CGI, mod_php and the built-in
+  server start each request afresh, where it never limited (six bad admin logins in a row all
+  answered 400). Those SAPIs count in `.tmp/rate-limit/` instead (`FileStore`, one file per key
+  under `flock`), so the sixth answers 429. One server only, like the memory store.
 
-On `examples/getstarted` (SQLite, opcache), a production boot went from ~620 ms to ~250 ms,
-1,024 to 829 included files, 24 to 18 MB. What remains is mostly `register()` (~70 ms of
-config and `src/` loading), routing (~35 ms) and the admin and content-manager syncs: a boot
-cache (resolved config, schemas, routes) is the next step.
+On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
+~130 ms, 1,024 to 804 included files, 24 to 14 MB. What remains is mostly `register()` (~55 ms
+of config, plugin and `src/` loading) and routing (~30 ms): a boot cache (resolved config,
+schemas, routes) is the next step.
 
 ## Status
 
@@ -83,15 +94,11 @@ starting and after finishing (`/api-tests` in Claude Code).
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
 - PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~250 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  ~130 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
   Still to do, in order:
   - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
     resolved config, plugin list, API and component schemas, database metadata, the FastRoute
     dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
-  - skip the admin, users-permissions and content-manager syncs on a settled boot (they read
-    every permission and configuration to find nothing to change, ~100 ms);
-  - rate limiting keeps hits in a `static` array (admin, users-permissions), so under FPM it
-    never limits: back it with APCu or a table;
   - `cron:run` keeps the last run in memory and looks back one minute: persist it so a missed
     minute catches up;
   - AI metadata jobs run in a shutdown function after `destroy()`: `fastcgi_finish_request()`

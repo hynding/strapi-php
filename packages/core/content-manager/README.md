@@ -51,6 +51,7 @@ PHP shapes (see `docs/porting-feature-packages.md`):
 | --- | --- |
 | `history/**`, `preview/**` | Not ported: both directories are under Strapi's Enterprise licence (their own `LICENSE` file). `register`/`bootstrap`/`destroy` skip them; their routes, controllers and services (`history-version`, `preview`, `preview-config`) are not registered, and the `history-version` model is not created |
 | `shared/contracts/**`, `shared/index` | TypeScript types only, nothing executable |
+| `bootstrap`: the components' and content types' `syncConfigurations()` at every start | skipped on a settled boot (`Strapi::bootstrapSettled()`: a bootstrap already completed for the same inputs, schemas included, on the same database; under PHP-FPM, most requests) |
 
 ## Tests
 

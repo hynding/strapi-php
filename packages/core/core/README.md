@@ -139,7 +139,9 @@ symfony/process.
   boots race on its writes) until one has completed; `.tmp/bootstrap.settled` then records the
   inputs' fingerprint and the database's latest schema row, and boots with the same inputs on the
   same database skip the lock (under PHP-FPM, every request). `CoreStore::set` skips an update that
-  changes nothing, so a settled boot writes no row. See docs/README.md "Runtime model".
+  changes nothing, so a settled boot writes no row. `bootstrapSettled()` tells bootstrap code a
+  boot is settled, so it can skip re-syncs the completed bootstrap already ran (admin,
+  content-manager). See docs/README.md "Runtime model".
 
 ## Tests
 
