@@ -35,8 +35,16 @@ final class Strings
     {
         $value = strtr($value, self::REPLACEMENTS);
 
-        if (function_exists('transliterator_transliterate')) {
-            $converted = transliterator_transliterate('Any-Latin; Latin-ASCII', $value);
+        // ASCII is already transliterated. Most calls are identifiers (`words()` behind every
+        // snake/kebab/camel case), and building an ICU transliterator costs ~0.1 ms per call
+        if (preg_match('/[\x80-\xFF]/', $value) !== 1) {
+            return $value;
+        }
+
+        if (class_exists(\Transliterator::class)) {
+            static $transliterator = null;
+            $transliterator ??= \Transliterator::create('Any-Latin; Latin-ASCII');
+            $converted = $transliterator?->transliterate($value);
             if (is_string($converted)) {
                 return $converted;
             }
