@@ -18,6 +18,16 @@ use Strapi\Utils\Zod\ZodType;
  */
 final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
 {
+    // PHP port: each route of a content type asks for the same document and data schemas (five
+    // times, twice); schemas are immutable, so the first is reused. Building them is most of
+    // routing at boot, which under PHP-FPM is every request
+    private ?ZodObject $document = null;
+
+    private ?ZodObject $data = null;
+
+    /** @var array<string, ZodType> */
+    private array $queryParams = [];
+
     /** A validation schema for document IDs (UUIDs). */
     public function documentID(): ZodType
     {
@@ -27,6 +37,10 @@ final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
     /** A validation schema for a single document: its scalar and populatable fields (no passwords). */
     public function document(): ZodObject
     {
+        if ($this->document !== null) {
+            return $this->document;
+        }
+
         $entries = [...$this->scalarFields(), ...$this->populatableFields()];
 
         // Remove passwords from the attribute list
@@ -35,7 +49,7 @@ final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
         // Merge all attributes into a single schema
         $attributesSchema = Mappers::createAttributesSchema($this->strapi, $sanitizedAttributes);
 
-        return z::object([
+        return $this->document = z::object([
             'documentId' => $this->documentID(),
             'id' => z::union([z::string(), z::number()]),
         ])->extend($attributesSchema->shape());
@@ -125,6 +139,10 @@ final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
 
     public function data(): ZodObject
     {
+        if ($this->data !== null) {
+            return $this->data;
+        }
+
         $schema = $this->schema();
 
         $entries = [...$this->scalarFields(), ...$this->populatableFields()];
@@ -136,7 +154,7 @@ final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
             ARRAY_FILTER_USE_KEY,
         );
 
-        return Mappers::createAttributesInputSchema($this->strapi, $sanitizedAttributes);
+        return $this->data = Mappers::createAttributesInputSchema($this->strapi, $sanitizedAttributes);
     }
 
     public function query(): ZodType
@@ -182,7 +200,7 @@ final class CoreContentTypeRouteValidator extends AbstractCoreRouteValidator
                 // upstream: `map[param]()` throws a TypeError for an unknown param
                 throw new \TypeError("map[{$param}] is not a function");
             }
-            $acc[$param] = $map[$param]();
+            $acc[$param] = $this->queryParams[$param] ??= $map[$param]();
         }
 
         return $acc;
