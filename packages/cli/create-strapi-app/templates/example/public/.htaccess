@@ -5,6 +5,11 @@
 DirectoryIndex index.php
 Options -Indexes
 
+# PHP's settings for this directory (Apache only hides .ht* files)
+<Files ".user.ini">
+    Require all denied
+</Files>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
@@ -13,8 +18,9 @@ Options -Indexes
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # never run an uploaded file as PHP: uploads keep their extension
-    RewriteRule ^uploads/.*\.(php[0-9]?|phtml|phar|phps)$ - [F,L,NC]
+    # never run an uploaded file as PHP: uploads keep their extension. `(/|$)`: Apache also runs
+    # /uploads/x.php/anything (PATH_INFO); uploads/.htaccess denies the same files by name
+    RewriteRule ^uploads/.*\.(php[0-9]?|pht|phtm|phtml|phar|phps)(/|$) - [F,L,NC]
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]

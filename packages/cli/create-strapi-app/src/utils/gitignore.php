@@ -95,6 +95,7 @@ final class Gitignore
         nbproject
         public/uploads/*
         !public/uploads/.gitkeep
+        !public/uploads/.htaccess
         .tsbuildinfo
         .eslintcache
 

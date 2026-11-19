@@ -70,7 +70,7 @@ final class CreateStrapiAppTest extends TestCase
 
         foreach ([
             '.env', '.env.example', '.gitignore', 'README.md', 'composer.json', 'package.json', 'favicon.png',
-            'bin/strapi', 'public/.htaccess', 'public/.user.ini', 'public/index.php', 'public/robots.txt', 'public/uploads/.gitkeep', 'src/index.php',
+            'bin/strapi', 'public/.htaccess', 'public/.user.ini', 'public/index.php', 'public/robots.txt', 'public/uploads/.gitkeep', 'public/uploads/.htaccess', 'src/index.php',
             'src/api/.gitkeep', 'src/extensions/.gitkeep', 'src/admin/app.example.tsx', 'database/migrations/.gitkeep',
             'config/admin.php', 'config/api.php', 'config/database.php', 'config/middlewares.php', 'config/plugins.php', 'config/server.php',
         ] as $file) {
