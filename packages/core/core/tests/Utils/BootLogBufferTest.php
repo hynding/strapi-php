@@ -76,12 +76,31 @@ final class BootLogBufferTest extends TestCase
     public function testClosingLogsWhatIsStillHeld(): void
     {
         // a request that ends before bootstrap released the buffer (an exit() in a boot step):
-        // closing the logger, as Monolog does when the handler is destroyed, keeps what was held.
-        // A fatal error runs no destructor; what it reports goes to PHP's error log anyway.
+        // closing the logger, as Monolog does when the handler is destroyed, keeps what was held
+        // (a fatal error runs no destructor: testAFatalErrorLogsWhatWasHeld)
         $this->logger->warning('logged before the request ended');
         $this->logger->close();
 
         self::assertSame(['WARNING: logged before the request ended'], $this->logged());
+    }
+
+    public function testAFatalErrorLogsWhatWasHeld(): void
+    {
+        // a boot that dies of a fatal error (here memory_limit) runs no destructor
+        $autoload = dirname(__DIR__, 5) . '/vendor/autoload.php';
+        $script = <<<'PHP'
+            require $argv[1];
+            $logger = new Monolog\Logger('strapi', [new Strapi\Core\Utils\BootLogBuffer([new Monolog\Handler\StreamHandler('php://stdout')])]);
+            $logger->warning('logged before the fatal error');
+            ini_set('memory_limit', '16M');
+            $grow = [];
+            while (true) {
+                $grow[] = str_repeat('x', 1024 * 1024);
+            }
+            PHP;
+        $output = (string) shell_exec(implode(' ', array_map(escapeshellarg(...), [PHP_BINARY, '-d', 'display_errors=0', '-r', $script, $autoload])));
+
+        self::assertStringContainsString('strapi.WARNING: logged before the fatal error', $output);
     }
 
     public function testRecordsTheInnerHandlersIgnoreAreNotHeld(): void

@@ -28,6 +28,20 @@ final class BootLogBuffer extends Handler
     /** @param list<HandlerInterface> $handlers */
     public function __construct(private readonly array $handlers)
     {
+        // a fatal error (max_execution_time, memory_limit) runs no destructor, but shutdown
+        // functions: what a dying boot logged is what explains it
+        $buffer = \WeakReference::create($this);
+        register_shutdown_function(static function () use ($buffer): void {
+            $buffer->get()?->flushHeld();
+        });
+    }
+
+    /** Logs what is still held (the request ended before bootstrap released it). */
+    public function flushHeld(): void
+    {
+        if ($this->holding && $this->held !== []) {
+            $this->release(false);
+        }
     }
 
     public function isHandling(LogRecord $record): bool
@@ -81,9 +95,7 @@ final class BootLogBuffer extends Handler
 
     public function close(): void
     {
-        if ($this->holding) {
-            $this->release(false);
-        }
+        $this->flushHeld();
         foreach ($this->handlers as $handler) {
             $handler->close();
         }
