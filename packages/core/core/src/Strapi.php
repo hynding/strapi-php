@@ -715,6 +715,11 @@ final class Strapi extends Container implements StrapiContract
         // `launchedAt` is this boot's timestamp, not an input.
         $config = $this->config()->all();
         unset($config['launchedAt']);
+        // cron tasks are scheduled at bootstrap but write nothing then, and Strapi's own examples
+        // compute their dates at load (`end: new Date(Date.now() + 6000)`): a new value every boot
+        if (is_array($config['server'] ?? null)) {
+            unset($config['server']['cron']);
+        }
 
         $inputs = json_encode([
             'version' => Configuration::version(),

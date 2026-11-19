@@ -91,6 +91,19 @@ final class BootstrapSettledTest extends BootedAppTestCase
         self::assertSame($before, self::fingerprint());
     }
 
+    public function testTheFingerprintIgnoresCronTasks(): void
+    {
+        // a task's date computed when config loads (examples/getstarted/config/src/cron-tasks.php)
+        $before = self::fingerprint();
+        self::strapi()->config()->set('server.cron.tasks', ['myJob' => ['task' => static fn () => null, 'options' => ['end' => new \DateTimeImmutable()]]]);
+
+        try {
+            self::assertSame($before, self::fingerprint());
+        } finally {
+            self::strapi()->config()->set('server.cron.tasks', null);
+        }
+    }
+
     public function testChangedInputsAreNotSettled(): void
     {
         self::record(self::fingerprint());
