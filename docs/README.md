@@ -30,7 +30,9 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   nothing, and `CoreStore::set` skips updates that change nothing. A settled boot writes no row.
   A new deploy, a config change or another database takes the lock again once. Development never
   settles: code changes there in ways these inputs do not see (a package under development, the
-  body of a closure in config), so every boot runs the whole bootstrap.
+  body of a closure in config), so every boot runs the whole bootstrap. `NODE_ENV` defaults to
+  `development`: a deployment sets `NODE_ENV=production` in `.env` (PHP-FPM's `clear_env` drops
+  the server's environment).
 - **GraphQL builds on first use in production.** With artifacts off (`generateArtifacts`, off
   outside development) the schema and the Apollo server are built on the first request to the
   GraphQL endpoint; development keeps upstream's eager build.
@@ -86,6 +88,12 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   document, data and query-parameter schemas instead of building each five times; the admin's
   action schema is built once and `registerMany()` validates a list once instead of once more per
   action; the documentation plugin caches the parsed users-permissions YAML in `.tmp/cache`.
+
+Known PHP bug: PHP 8.3's function JIT (`opcache.jit=1235`) segfaults on some fresh boots of
+`examples/getstarted` (php-cgi exit code 139: no response, nothing logged), with or without the
+per-request work: 4 fresh boots in 10 on it, 1 in 15 before it, locally on 8.3.6 and on CI's
+8.3.36. `opcache.jit=disable`, `tracing` or `function` showed none in 15 boots each. Where the
+host lets you choose, use one of those.
 
 On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
 ~65 ms, 1,024 to 795 included files, 24 to 10 MB. What remains is mostly routing (~18 ms) and

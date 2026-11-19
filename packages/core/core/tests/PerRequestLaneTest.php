@@ -32,7 +32,12 @@ final class PerRequestLaneTest extends TestCase
         $this->port = self::freePort();
         // the server writes to files, not to pipes this test would have to drain (a full pipe
         // blocks the server mid-request); `exec` so that stopping the process stops PHP itself
-        $command = implode(' ', array_map(escapeshellarg(...), HttpServer::command(PHP_BINARY, '127.0.0.1', $this->port, "{$app}/public", "{$app}/public/index.php")));
+        // PHP 8.3's function JIT (`opcache.jit=1235`, setup-php's default on CI) segfaults on some
+        // fresh boots, on main too (php-cgi exit code 139; locally 4 boots in 10 here, 1 in 15 on main): a
+        // PHP bug, not what these tests check (docs/README.md, "Runtime model")
+        $command = HttpServer::command(PHP_BINARY, '127.0.0.1', $this->port, "{$app}/public", "{$app}/public/index.php");
+        array_splice($command, 1, 0, ['-d', 'opcache.jit=disable']);
+        $command = implode(' ', array_map(escapeshellarg(...), $command));
         $server = Process::fromShellCommandline(
             "exec {$command} >> " . escapeshellarg("{$this->dir}/server.out") . ' 2>> ' . escapeshellarg("{$this->dir}/server.err"),
             $app,

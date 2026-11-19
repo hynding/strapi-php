@@ -44,7 +44,7 @@ frankenphp php-server --root public/ --worker public/index.php --listen :1337
 
 Cron jobs under PHP-FPM: schedule `php bin/strapi cron:run` with system cron (every minute, or as often as your host allows: missed runs catch up).
 
-Shared hosting (Apache): make `public/` the document root (or a symlink to it, such as `public_html`), and keep the rest of the project out of it. `public/.htaccess` routes requests to `index.php`, passes the `Authorization` header that Apache otherwise drops for PHP-FPM and CGI (admin and API tokens), and never runs an uploaded file as PHP; `public/.user.ini` is the PHP-FPM / CGI side. Build the admin panel where Node is (`npm install && php bin/strapi build`) and upload `build/` with the project. Logs go to PHP's error log.
+Shared hosting (Apache): make `public/` the document root (or a symlink to it, such as `public_html`), and keep the rest of the project out of it. Set `NODE_ENV=production` in `.env`: in development every request runs the whole bootstrap under a lock, and PHP-FPM usually clears the server's environment. `public/.htaccess` routes requests to `index.php`, passes the `Authorization` header that Apache otherwise drops for PHP-FPM and CGI (admin and API tokens), and never runs an uploaded file as PHP; `public/.user.ini` is the PHP-FPM / CGI side. Build the admin panel where Node is (`npm install && php bin/strapi build`) and upload `build/` with the project. Logs go to PHP's error log.
 
 ## 📚 Learn more
 

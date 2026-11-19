@@ -37,6 +37,13 @@ final class PerRequestSapiTest extends TestCase
             putenv('FRANKENPHP_WORKER');
         }
         self::assertTrue(Sapi::isPerRequest('frankenphp'));
+        // before FrankenPHP 1.12.5 only $_SERVER has it
+        $_SERVER['FRANKENPHP_WORKER'] = '1';
+        try {
+            self::assertFalse(Sapi::isPerRequest('frankenphp'));
+        } finally {
+            unset($_SERVER['FRANKENPHP_WORKER']);
+        }
     }
 
     protected function tearDown(): void
@@ -83,7 +90,10 @@ final class PerRequestSapiTest extends TestCase
             'ENCRYPTION_KEY' => 'sapi-encryption-key',
         ];
         $process = proc_open(
-            [$phpCgi, '-d', "error_log={$this->dir}/error.log", '-d', 'log_errors=1', '-d', 'display_errors=0', "{$app}/public/index.php"],
+            // PHP 8.3's function JIT (`opcache.jit=1235`, setup-php's default on CI) segfaults on some
+        // fresh boots, on main too (php-cgi exit code 139; locally 4 boots in 10 here, 1 in 15 on main): a
+        // PHP bug, not what these tests check (docs/README.md, "Runtime model")
+            [$phpCgi, '-d', 'opcache.jit=disable', '-d', "error_log={$this->dir}/error.log", '-d', 'log_errors=1', '-d', 'display_errors=0', "{$app}/public/index.php"],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,
             $app,

@@ -83,6 +83,9 @@ while strapi::body keeps them all, as Strapi does.
 
 Shared hosting works too: a settled boot under PHP-FPM takes ~65 ms, rate limits and cron work
 without a long-lived process, and logs go to PHP's error log (docs/README.md, "Runtime model").
+Set `NODE_ENV=production` in `.env`: without it the app runs in development, where every request
+runs the whole bootstrap under a lock (PHP-FPM usually clears the server's environment, so `.env`
+is the place).
 On Apache, make `public/` the document root: `public/.htaccess` routes requests to `index.php`,
 passes the `Authorization` header Apache drops for PHP-FPM and CGI, and never runs an uploaded
 file as PHP.
