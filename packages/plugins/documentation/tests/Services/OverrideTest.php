@@ -121,4 +121,36 @@ YAML);
         self::assertSame(['2022-05-19'], $example['list']);
         self::assertEquals(new \stdClass(), $example['empty']);
     }
+
+    /** PHP port: the parsed YAML is cached in `.tmp/cache` (every PHP-FPM request registers it). */
+    public function testCachesAParsedYamlOverride(): void
+    {
+        $root = sys_get_temp_dir() . '/strapi-documentation-cache-' . bin2hex(random_bytes(6));
+        $strapi = new StrapiMock(root: $root);
+        $strapi->configGet = $this->strapi->configGet;
+        $yaml = "paths:\n  /cached:\n    get:\n      responses:\n        '200':\n          description: OK\n          example: {}\n";
+
+        try {
+            $first = new Override($strapi);
+            $first->registerOverride($yaml);
+            $files = glob($root . '/.tmp/cache/documentation-override-*.ser') ?: [];
+            self::assertCount(1, $files);
+
+            $second = new Override($strapi);
+            $second->registerOverride($yaml);
+            self::assertEquals($first->registeredOverrides, $second->registeredOverrides);
+            self::assertEquals(new \stdClass(), $second->registeredOverrides[0]['paths']['/cached']['get']['responses'][200]['example']);
+
+            // an unreadable cache entry is parsed again
+            file_put_contents($files[0], 'not serialized');
+            $third = new Override($strapi);
+            $third->registerOverride($yaml);
+            self::assertEquals($first->registeredOverrides, $third->registeredOverrides);
+        } finally {
+            array_map('unlink', glob($root . '/.tmp/cache/*') ?: []);
+            @rmdir($root . '/.tmp/cache');
+            @rmdir($root . '/.tmp');
+            @rmdir($root);
+        }
+    }
 }

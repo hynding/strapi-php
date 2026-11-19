@@ -72,7 +72,7 @@ final class Override
         $overrideToRegister = $override;
         // Parse yaml if we receive a string
         if (is_string($overrideToRegister)) {
-            $overrideToRegister = self::parseYaml($overrideToRegister);
+            $overrideToRegister = $this->parseYamlCached($overrideToRegister);
         }
         // receive an object we can register it directly
         $this->registeredOverrides[] = $overrideToRegister;
@@ -80,6 +80,40 @@ final class Override
 
     /** YAML 1.1 timestamps (symfony/yaml's `Inline::getTimestampRegex()`), plain scalars in block context. */
     private const TIMESTAMP_LINE = '/^(\s*(?:-\s+)*(?:[^\s#\'"][^:#]*:\s+)?(?:-\s+)*)([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)?)([ \t]*(?:#.*)?)$/m';
+
+    /**
+     * PHP port: {@see self::parseYaml()} through a cache in `.tmp/cache` keyed by the source. The
+     * users-permissions spec is registered at every boot, and under PHP-FPM every request boots;
+     * parsing it was ~8 ms of each. Without a writable `.tmp` it parses every time.
+     *
+     * @return array<string, mixed>
+     */
+    private function parseYamlCached(string $source): array
+    {
+        $root = method_exists($this->strapi, 'dirs') ? $this->strapi->dirs()->root : null;
+        if (!is_string($root) || $root === '') {
+            return self::parseYaml($source);
+        }
+
+        $file = $root . '/.tmp/cache/documentation-override-' . hash('sha256', $source) . '.ser';
+        $cached = @file_get_contents($file);
+        if (is_string($cached)) {
+            $parsed = @unserialize($cached, ['allowed_classes' => [\stdClass::class]]);
+            if (is_array($parsed)) {
+                return $parsed;
+            }
+        }
+
+        $parsed = self::parseYaml($source);
+        if (is_dir(dirname($file)) || @mkdir(dirname($file), 0o777, true)) {
+            $tmp = $file . '.' . getmypid();
+            if (@file_put_contents($tmp, serialize($parsed)) !== false) {
+                @rename($tmp, $file);
+            }
+        }
+
+        return $parsed;
+    }
 
     /** @return array<string, mixed> */
     private static function parseYaml(string $source): array
