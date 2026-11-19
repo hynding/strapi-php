@@ -29,15 +29,26 @@ final class RateLimit
     /**
      * koa2-ratelimit's default store is in memory, for the Node process's lifetime. In PHP that is
      * the process for the CLI and FrankenPHP worker mode, but one request for the SAPIs that start
-     * afresh, where memory would never limit: those count in `.tmp/rate-limit` of the project.
+     * afresh, where memory would never limit: those count in `.tmp/rate-limit` of the project,
+     * or, when it cannot be written, in memory with a warning (the limits are not enforced then,
+     * but the admin can still log in).
      */
     public static function defaultStore(?Strapi $strapi, string $sapi = PHP_SAPI): Store
     {
         if ($strapi !== null && Sapi::isPerRequest($sapi)) {
-            return new FileStore($strapi->dirs()->root . '/.tmp/rate-limit');
+            $dir = $strapi->dirs()->root . '/.tmp/rate-limit';
+            if (self::isWritableDirectory($dir)) {
+                return new FileStore($dir);
+            }
+            $strapi->log()->warning("Rate limits are not enforced: {$dir} cannot be written");
         }
 
         return self::$memory ??= new MemoryStore();
+    }
+
+    private static function isWritableDirectory(string $dir): bool
+    {
+        return (is_dir($dir) || @mkdir($dir, 0o777, true) || is_dir($dir)) && is_writable($dir);
     }
 
     /**

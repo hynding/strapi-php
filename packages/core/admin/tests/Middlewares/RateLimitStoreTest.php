@@ -43,8 +43,15 @@ final class RateLimitStoreTest extends TestCase
 
     protected function tearDown(): void
     {
-        array_map('unlink', glob($this->dir . '/*') ?: []);
+        array_map('unlink', [...(glob($this->dir . '/*/*') ?: []), ...(glob($this->dir . '/.sweep.lock') ?: [])]);
+        array_map('rmdir', glob($this->dir . '/*', GLOB_ONLYDIR) ?: []);
         @rmdir($this->dir);
+    }
+
+    /** @return list<string> */
+    private function files(): array
+    {
+        return glob($this->dir . '/*/*.json') ?: [];
     }
 
     private static function strapi(): Strapi
@@ -85,8 +92,60 @@ final class RateLimitStoreTest extends TestCase
 
         $store->removeExpired($nowMs);
 
-        self::assertCount(1, glob($this->dir . '/*.json') ?: []);
+        self::assertCount(1, $this->files());
         self::assertSame(2, $store->incr('current', 60_000, $nowMs)['counter']);
+    }
+
+    public function testTheFileStoreSpreadsKeysOverSubdirectoriesAndSweepsOneAtATime(): void
+    {
+        $store = new FileStore($this->dir);
+        $nowMs = (int) floor(microtime(true) * 1000);
+        $store->incr('ended', 1_000, $nowMs - 10_000);
+        $file = $this->files()[0];
+        $shard = basename(dirname($file));
+        self::assertSame(substr(hash('sha256', 'ended'), 0, 2), $shard);
+
+        $store->removeExpired($nowMs, $shard === '00' ? '01' : '00');
+        self::assertFileExists($file, 'another subdirectory');
+
+        $store->removeExpired($nowMs, $shard);
+        self::assertFileDoesNotExist($file);
+    }
+
+    public function testASweepLeavesAFileThatIsBeingCountedIn(): void
+    {
+        $store = new FileStore($this->dir);
+        $nowMs = (int) floor(microtime(true) * 1000);
+        $store->incr('k', 1_000, $nowMs - 10_000);
+        $file = $this->files()[0];
+
+        // another request holds the file: it may be starting a new window in it
+        $handle = fopen($file, 'r');
+        self::assertNotFalse($handle);
+        flock($handle, LOCK_EX);
+        try {
+            $store->removeExpired($nowMs);
+            self::assertFileExists($file);
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    public function testTheFileStoreFailsOpenWhenItCannotWrite(): void
+    {
+        // a directory that cannot be created: under a file
+        touch($this->dir);
+        try {
+            $store = new FileStore($this->dir . '/rate-limit');
+            foreach ([1_000, 2_000, 3_000] as $nowMs) {
+                self::assertSame(['counter' => 1, 'dateEnd' => $nowMs + 60_000], $store->incr('k', 60_000, $nowMs));
+            }
+            self::assertFalse((new \ReflectionMethod(RateLimit::class, 'isWritableDirectory'))->invoke(null, $this->dir . '/rate-limit'));
+            self::assertTrue((new \ReflectionMethod(RateLimit::class, 'isWritableDirectory'))->invoke(null, sys_get_temp_dir()));
+        } finally {
+            unlink($this->dir);
+        }
     }
 
     public function testTheMemoryStoreCountsWithinAWindow(): void
