@@ -159,11 +159,16 @@ final class RateLimitStoreTest extends TestCase
 
     public function testTheDefaultStoreFollowsTheSapi(): void
     {
-        foreach (['fpm-fcgi', 'cgi-fcgi', 'apache2handler', 'litespeed', 'cli-server'] as $sapi) {
+        // `frankenphp` without FRANKENPHP_WORKER: the classic mode, which boots every request
+        foreach (['fpm-fcgi', 'cgi-fcgi', 'apache2handler', 'litespeed', 'cli-server', 'frankenphp'] as $sapi) {
             self::assertInstanceOf(FileStore::class, RateLimit::defaultStore(self::strapi(), $sapi), $sapi);
         }
-        foreach (['cli', 'frankenphp'] as $sapi) {
-            self::assertInstanceOf(MemoryStore::class, RateLimit::defaultStore(self::strapi(), $sapi), $sapi);
+        self::assertInstanceOf(MemoryStore::class, RateLimit::defaultStore(self::strapi(), 'cli'));
+        putenv('FRANKENPHP_WORKER=1');
+        try {
+            self::assertInstanceOf(MemoryStore::class, RateLimit::defaultStore(self::strapi(), 'frankenphp'), 'worker mode');
+        } finally {
+            putenv('FRANKENPHP_WORKER');
         }
         self::assertInstanceOf(MemoryStore::class, RateLimit::defaultStore(null, 'fpm-fcgi'), 'no project to keep files in');
     }

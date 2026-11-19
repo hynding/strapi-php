@@ -25,9 +25,18 @@ final class PerRequestSapiTest extends TestCase
         self::assertTrue(Sapi::isPerRequest('cli-server'));
         self::assertFalse(Sapi::hasNoConsole('cli-server'));
         foreach (['cli', 'frankenphp'] as $sapi) {
-            self::assertFalse(Sapi::isPerRequest($sapi), $sapi);
+            self::assertFalse(Sapi::isPerRequest($sapi, frankenphpWorker: true), $sapi);
             self::assertFalse(Sapi::hasNoConsole($sapi), $sapi);
         }
+        // FrankenPHP's classic mode boots every request; its worker mode once
+        self::assertTrue(Sapi::isPerRequest('frankenphp', frankenphpWorker: false));
+        putenv('FRANKENPHP_WORKER=1');
+        try {
+            self::assertFalse(Sapi::isPerRequest('frankenphp'));
+        } finally {
+            putenv('FRANKENPHP_WORKER');
+        }
+        self::assertTrue(Sapi::isPerRequest('frankenphp'));
     }
 
     protected function tearDown(): void
@@ -59,6 +68,10 @@ final class PerRequestSapiTest extends TestCase
             'SERVER_NAME' => 'localhost', 'SERVER_PORT' => '80', 'SERVER_PROTOCOL' => 'HTTP/1.1', 'REMOTE_ADDR' => '127.0.0.1',
             'DATABASE_CLIENT' => 'sqlite', 'DATABASE_FILENAME' => "{$this->dir}/data.db", 'JWT_SECRET' => 'per-request-sapi-test',
             'LOG_LEVEL' => 'info', 'PATH' => (string) getenv('PATH'),
+            // development never settles
+            'NODE_ENV' => 'production', 'APP_KEYS' => 'sapi-key-1,sapi-key-2', 'API_TOKEN_SALT' => 'sapi-api-token-salt',
+            'ADMIN_JWT_SECRET' => 'sapi-admin-jwt-secret', 'TRANSFER_TOKEN_SALT' => 'sapi-transfer-token-salt',
+            'ENCRYPTION_KEY' => 'sapi-encryption-key',
         ];
         $process = proc_open(
             [$phpCgi, '-d', "error_log={$this->dir}/error.log", '-d', 'log_errors=1', '-d', 'display_errors=0', "{$app}/public/index.php"],
@@ -94,7 +107,8 @@ final class PerRequestSapiTest extends TestCase
 
         [$response, $log] = $this->request($phpCgi, '/_health');
         self::assertStringStartsWith('Status: 204', $response);
-        self::assertSame(1, count($log) - $before, implode("\n", array_slice($log, $before)));
-        self::assertMatchesRegularExpression('/strapi\.INFO: GET \/_health \(\d+ ms\) 204/', (string) end($log));
+        $added = implode("\n", array_slice($log, $before));
+        self::assertMatchesRegularExpression('/strapi\.INFO: GET \/_health \(\d+ ms\) 204/', $added);
+        self::assertStringNotContainsString('Shutting down Strapi', $added, 'a settled boot does not log its lifecycle');
     }
 }
