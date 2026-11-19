@@ -116,4 +116,33 @@ final class SettledBootTest extends TestCase
         self::assertTrue(self::hasConfiguration($strapi));
         $strapi->destroy();
     }
+
+    public function testABootstrapThatDiesLeavesNoRecordForAReCreatedDatabase(): void
+    {
+        self::boot()->destroy();
+        self::assertFileExists(self::appDir() . '/.tmp/bootstrap.settled');
+
+        // the database is dropped; the next bootstrap dies after syncing the schema (a timeout, a
+        // deploy), before the super admin's permissions and the configurations are restored
+        unlink($this->database);
+        $strapi = Core::createStrapi(['appDir' => self::appDir()]);
+        $strapi->register();
+        $strapi->hook('strapi::content-types.afterSync')->register(static function (): void {
+            throw new \RuntimeException('the bootstrap dies');
+        });
+        try {
+            $strapi->bootstrap();
+            self::fail('the bootstrap should have died');
+        } catch (\RuntimeException $error) {
+            self::assertSame('the bootstrap dies', $error->getMessage());
+        }
+        $strapi->destroy();
+        self::assertFileDoesNotExist(self::appDir() . '/.tmp/bootstrap.settled');
+
+        // so the next boot runs the whole bootstrap, which restores them
+        $strapi = self::boot();
+        self::assertFalse($strapi->bootstrapSettled());
+        self::assertTrue(self::hasConfiguration($strapi));
+        $strapi->destroy();
+    }
 }

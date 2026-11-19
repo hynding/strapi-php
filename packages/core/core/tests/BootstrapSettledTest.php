@@ -69,8 +69,18 @@ final class BootstrapSettledTest extends BootedAppTestCase
         self::record(self::fingerprint());
 
         $recorded = (string) file_get_contents(self::settledFile());
-        self::assertSame(self::fingerprint() . ':' . $latest['id'] . ':' . $latest['hash'], $recorded);
+        self::assertSame(self::fingerprint() . ':' . $latest['id'] . ':' . $latest['hash'] . ':' . $latest['time'], $recorded);
         self::assertTrue(self::isSettled(self::fingerprint()));
+    }
+
+    public function testADatabaseSyncedAgainIsNotSettled(): void
+    {
+        // dropped and synced again with the same schemas: the same id and hash, another time
+        $latest = self::strapi()->db()->schema->schemaStorage->latest();
+        self::assertNotNull($latest);
+        file_put_contents(self::settledFile(), self::fingerprint() . ":{$latest['id']}:{$latest['hash']}:1999-01-01 00:00:00");
+
+        self::assertFalse(self::isSettled(self::fingerprint()));
     }
 
     public function testTheFingerprintIgnoresTheLaunchTimestamp(): void

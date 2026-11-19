@@ -645,6 +645,9 @@ final class Strapi extends Container implements StrapiContract
         $lock = $this->acquireBootstrapLock();
 
         try {
+            // until this bootstrap completes, the record describes no database: one that dies midway
+            // (a timeout, a deploy) must not leave a re-created database matching the old record
+            @unlink($this->bootstrapSettledFile());
             $this->doBootstrap();
             if ($fingerprint !== null) {
                 $this->markBootstrapSettled($fingerprint);
@@ -740,7 +743,7 @@ final class Strapi extends Container implements StrapiContract
 
     /**
      * Whether the last completed bootstrap had the same inputs and ran on this database: its last
-     * synced schema row (id and hash) is still the latest, so the database was not reset or
+     * synced schema row (id, hash and time) is still the latest, so the database was not reset or
      * re-synced by another boot since.
      */
     private function matchesSettledRecord(string $fingerprint): bool
@@ -752,7 +755,18 @@ final class Strapi extends Container implements StrapiContract
 
         $latest = $this->db()->schema->schemaStorage->latest();
 
-        return $latest !== null && hash_equals($recorded, "{$fingerprint}:{$latest['id']}:{$latest['hash']}");
+        return $latest !== null && hash_equals($recorded, self::settledRecord($fingerprint, $latest));
+    }
+
+    /**
+     * The inputs and the database's last synced schema row: its id and hash, and its time, which
+     * tells a database dropped and synced again apart from the one recorded.
+     *
+     * @param array{id: int, hash: string, time: string} $latest
+     */
+    private static function settledRecord(string $fingerprint, array $latest): string
+    {
+        return "{$fingerprint}:{$latest['id']}:{$latest['hash']}:{$latest['time']}";
     }
 
     private function markBootstrapSettled(string $fingerprint): void
@@ -764,7 +778,7 @@ final class Strapi extends Container implements StrapiContract
 
         $file = $this->bootstrapSettledFile();
         $tmp = $file . '.' . getmypid();
-        if (@file_put_contents($tmp, "{$fingerprint}:{$latest['id']}:{$latest['hash']}") !== false) {
+        if (@file_put_contents($tmp, self::settledRecord($fingerprint, $latest)) !== false) {
             @rename($tmp, $file);
         }
     }
