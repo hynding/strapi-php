@@ -74,8 +74,9 @@ final class PerRequestLaneTest extends TestCase
             'timeout' => 30,
             'proxy' => '',
         ]]));
+        // populated by the http wrapper on every completed request
         /** @var list<string> $responseHeaders */
-        $responseHeaders = $http_response_header ?? [];
+        $responseHeaders = $http_response_header;
         preg_match('~^HTTP/\S+\s+(\d{3})~', $responseHeaders[0] ?? '', $m);
 
         return [(int) ($m[1] ?? 0), is_string($body) ? json_decode($body, true) : null];
