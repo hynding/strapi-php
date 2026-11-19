@@ -80,6 +80,12 @@ once per worker) at `examples/getstarted/public`. Turn off `enable_post_data_rea
 do): PHP's own multipart parser keeps only the last of several files uploaded under one name,
 while strapi::body keeps them all, as Strapi does.
 
+Shared hosting works too: a settled boot under PHP-FPM takes ~65 ms, rate limits and cron work
+without a long-lived process, and logs go to PHP's error log (docs/README.md, "Runtime model").
+On Apache, make `public/` the document root: `public/.htaccess` routes requests to `index.php`,
+passes the `Authorization` header Apache drops for PHP-FPM and CGI, and never runs an uploaded
+file as PHP.
+
 To serve the admin panel, install the pinned upstream bundle and build it:
 
 ```sh

@@ -86,4 +86,30 @@ final class HttpServerTest extends TestCase
         }
         self::fail('the built-in server did not start');
     }
+
+    /**
+     * Apache drops the Authorization header for PHP-FPM, FastCGI and CGI; public/.htaccess passes
+     * it as an environment variable, REDIRECT_-prefixed after the rewrite to index.php.
+     */
+    public function testTheAuthorizationHeaderIsRestoredFromTheServerVariables(): void
+    {
+        self::assertSame('Bearer a', HttpServer::authorizationFromServer(['HTTP_AUTHORIZATION' => 'Bearer a']));
+        self::assertSame('Bearer b', HttpServer::authorizationFromServer(['REDIRECT_HTTP_AUTHORIZATION' => 'Bearer b']));
+        self::assertSame('Bearer a', HttpServer::authorizationFromServer(['HTTP_AUTHORIZATION' => 'Bearer a', 'REDIRECT_HTTP_AUTHORIZATION' => 'Bearer b']));
+        self::assertSame('Basic ' . base64_encode('ada:secret'), HttpServer::authorizationFromServer(['PHP_AUTH_USER' => 'ada', 'PHP_AUTH_PW' => 'secret']));
+        self::assertSame('Digest username="ada"', HttpServer::authorizationFromServer(['PHP_AUTH_DIGEST' => 'Digest username="ada"']));
+        self::assertNull(HttpServer::authorizationFromServer(['HTTP_AUTHORIZATION' => '', 'HTTP_HOST' => 'localhost']));
+    }
+
+    public function testARequestFromGlobalsGetsTheRestoredAuthorizationHeader(): void
+    {
+        $server = $_SERVER;
+        try {
+            $_SERVER = ['REQUEST_METHOD' => 'GET', 'REQUEST_URI' => '/admin/users/me', 'HTTP_HOST' => 'localhost', 'REDIRECT_HTTP_AUTHORIZATION' => 'Bearer token'];
+
+            self::assertSame('Bearer token', HttpServer::requestFromGlobals()->getHeaderLine('Authorization'));
+        } finally {
+            $_SERVER = $server;
+        }
+    }
 }

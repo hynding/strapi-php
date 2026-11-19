@@ -13,3 +13,5 @@ php bin/strapi build            # builds the @strapi/admin bundle into build/ (n
 
 Production: point PHP-FPM or FrankenPHP at `public/index.php` (worker mode is detected automatically).
 Cron jobs under FPM: schedule `php bin/strapi cron:run` with system cron.
+Apache: `public/.htaccess` routes to `index.php`, passes the `Authorization` header to PHP-FPM / CGI
+and blocks PHP under `uploads/`.

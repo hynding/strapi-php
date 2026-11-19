@@ -53,6 +53,12 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   where every request boots, a settled boot's startup and shutdown messages repeat what the
   bootstrap that settled logged: `Utils\BootLogBuffer` holds them and drops them (errors log at
   once), so a settled request logs only the request line.
+- **Apache.** `public/.htaccess` (example app and both create-strapi-app templates) routes
+  every request that is not a file to `index.php`, passes the `Authorization` header (Apache
+  drops it for PHP-FPM, FastCGI and CGI: every admin and API token answered 401), and never runs
+  PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran). Checked on
+  Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
+  `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
 
 - **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
   the result: a settled boot skips `schema->sync()` (the settled check already matched the
@@ -124,8 +130,9 @@ starting and after finishing (`/api-tests` in Claude Code).
   - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
     shutdown function, after `destroy()` and before the response is finished; unreachable without
     an Enterprise licence (no AI metadata provider), so left as is until AI is;
-  - an `.htaccess` for Apache hosts (rewrite to `index.php`, serve `build/` statically, deny the
-    rest), a `public_html` layout, a release bundle with `vendor/`, a requirements check;
+  - admin assets are served by PHP (`build/` is outside `public/`), a boot each: serve them
+    statically on Apache too; a release bundle with `vendor/` and `build/` for hosts without
+    Composer or Node; a requirements check (extensions, writable `.tmp`);
   - a `tests/api` lane that boots once per request, as FPM does.
 
 ## Moving a project between the runtimes

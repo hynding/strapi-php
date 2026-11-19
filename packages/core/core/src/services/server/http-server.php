@@ -153,7 +153,41 @@ PHP;
         $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
         $creator = new \Nyholm\Psr7Server\ServerRequestCreator($factory, $factory, $factory, $factory);
 
-        return $creator->fromGlobals();
+        $request = $creator->fromGlobals();
+        $authorization = self::authorizationFromServer($_SERVER);
+        if (!$request->hasHeader('Authorization') && $authorization !== null) {
+            $request = $request->withHeader('Authorization', $authorization);
+        }
+
+        return $request;
+    }
+
+    /**
+     * PHP port: Apache does not hand the Authorization header to PHP-FPM, FastCGI or CGI. The
+     * rewrite in public/.htaccess passes it as an environment variable, which Apache renames
+     * REDIRECT_HTTP_AUTHORIZATION after the rewrite to index.php, and `getallheaders()` (what the
+     * request is built from) skips; Apache's own basic auth leaves PHP_AUTH_*. Without it, every
+     * admin and API token is missing.
+     *
+     * @param array<string, mixed> $server
+     */
+    public static function authorizationFromServer(array $server): ?string
+    {
+        foreach (['HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION'] as $key) {
+            if (is_string($server[$key] ?? null) && $server[$key] !== '') {
+                return $server[$key];
+            }
+        }
+        if (is_string($server['PHP_AUTH_USER'] ?? null)) {
+            $password = is_string($server['PHP_AUTH_PW'] ?? null) ? $server['PHP_AUTH_PW'] : '';
+
+            return 'Basic ' . base64_encode("{$server['PHP_AUTH_USER']}:{$password}");
+        }
+        if (is_string($server['PHP_AUTH_DIGEST'] ?? null) && $server['PHP_AUTH_DIGEST'] !== '') {
+            return $server['PHP_AUTH_DIGEST'];
+        }
+
+        return null;
     }
 
     /** Send a PSR-7 response with PHP's SAPI. */
