@@ -23,7 +23,8 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   sync, migrations, default roles, permission syncs), so it runs under a lock
   (`.tmp/bootstrap.lock`). Once a bootstrap has completed, `.tmp/bootstrap.settled` records a
   hash of its inputs (Strapi version, installed packages and the time of the last
-  `composer install`, config, content types, components, models, `database/migrations`, and the
+  `composer install`, config except `server.cron` (task dates are often computed at load),
+  content types, components, models, `database/migrations`, and the
   size and time of every PHP file under `src/` and `config/`) and the database's latest schema
   row.
   A boot with the same inputs on the same database skips the lock: its writes would change
@@ -43,7 +44,8 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   content-manager's configuration syncs, are skipped then: they read every permission and
   configuration to find nothing to change. An orphaned permission (a role deleted by hand) waits
   for the next unsettled boot, as it waits for a restart upstream. `configuration:restore`,
-  `import` and `transfer` call `Strapi::unsettle()`, so the next boot re-syncs what they changed;
+  `import` and `transfer` call `Strapi::unsettle()`, so the next boot re-syncs what they changed,
+  and so does runtime-sync when Node Strapi booted on the database since PHP's last bootstrap;
   after restoring a database backup by hand, delete `.tmp/bootstrap.settled`: the per-request
   equivalent of upstream's restart.
 - **Rate limits count across requests.** koa2-ratelimit's memory store lives as long as the
