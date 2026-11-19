@@ -58,6 +58,15 @@ final class PerRequestSapiTest extends TestCase
         return $found !== '' && is_executable($found) ? $found : null;
     }
 
+    /** What php-cgi printed to stderr on the last request, for failure messages. */
+    private string $stderr = '';
+
+    /** @param list<string> $log */
+    private function diagnostics(string $response, array $log): string
+    {
+        return sprintf("response:\n%s\nstderr:\n%s\nerror log:\n%s", substr($response, 0, 2000), substr($this->stderr, -4000), implode("\n", array_slice($log, -40)));
+    }
+
     /** @return array{0: string, 1: list<string>} the raw response and the error_log lines */
     private function request(string $phpCgi, string $uri, string $environment): array
     {
@@ -82,7 +91,7 @@ final class PerRequestSapiTest extends TestCase
         );
         self::assertIsResource($process);
         $response = (string) stream_get_contents($pipes[1]);
-        stream_get_contents($pipes[2]);
+        $this->stderr = (string) stream_get_contents($pipes[2]);
         proc_close($process);
 
         $log = is_file("{$this->dir}/error.log") ? file("{$this->dir}/error.log", FILE_IGNORE_NEW_LINES) : [];
@@ -110,12 +119,12 @@ final class PerRequestSapiTest extends TestCase
 
         [$response, $log] = $this->request($phpCgi, '/_health', $environment);
         // the CGI response starts with its headers: no log line in front of them
-        self::assertStringStartsWith('Status: 204', $response);
+        self::assertStringStartsWith('Status: 204', $response, $this->diagnostics($response, $log));
         self::assertNotEmpty(preg_grep('/strapi\.INFO: Shutting down Strapi/', $log), 'an unsettled boot logs its lifecycle');
         $before = count($log);
 
         [$response, $log] = $this->request($phpCgi, '/_health', $environment);
-        self::assertStringStartsWith('Status: 204', $response);
+        self::assertStringStartsWith('Status: 204', $response, $this->diagnostics($response, $log));
         $added = implode("\n", array_slice($log, $before));
         self::assertMatchesRegularExpression('/strapi\.INFO: GET \/_health \(\d+ ms\) 204/', $added);
         self::assertStringNotContainsString('Shutting down Strapi', $added, 'a settled boot does not log its lifecycle');
