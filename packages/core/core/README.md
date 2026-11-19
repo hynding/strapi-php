@@ -134,7 +134,9 @@ symfony/process.
   `{}`; `delete` answers 204 even for an unknown document (upstream behaviour).
 - **Custom fields**: `plugin::<p>.<name>` falls back to `global::<name>` when the plugin is not loaded.
 - **Cron**: `strapi.cron.runDue()` runs the due jobs once (`bin/strapi cron:run` from crontab under
-  FPM); `loop()` is the long-running scheduler for worker mode.
+  FPM); `loop()` is the long-running scheduler for worker mode. `cron:run` calls `persistState()`
+  first: each job's last run is kept in `.tmp/cron` (one file per job, locked while it runs), so a
+  job is due when its schedule matched since its last run, whatever the crontab's interval.
 - **Bootstrap lock**: `bootstrap()` serializes boots on `.tmp/bootstrap.lock` (concurrent first
   boots race on its writes) until one has completed; `.tmp/bootstrap.settled` then records the
   inputs' fingerprint and the database's latest schema row, and boots with the same inputs on the

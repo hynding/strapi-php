@@ -40,6 +40,12 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   server start each request afresh, where it never limited (six bad admin logins in a row all
   answered 400). Those SAPIs count in `.tmp/rate-limit/` instead (`FileStore`, one file per key
   under `flock`), so the sixth answers 429. One server only, like the memory store.
+- **Cron catches up.** `cron:run` from the system crontab is a new process every time; with the
+  last runs in memory it looked back one minute, so a crontab every 5 or 15 minutes (shared hosts
+  often allow no less) missed most jobs, two calls in a minute ran a job twice and a one-shot job
+  ran at every call. `cron:run` keeps each job's last run in `.tmp/cron` (`Cron::persistState()`):
+  a job runs once if its schedule matched since its last run (missed runs coalesce), and a job
+  still running in another call is skipped (`flock`).
 
 - **Hot spots found with a profiler** (excimer, `php -d extension=excimer`), each a no-op for
   the result: a settled boot skips `schema->sync()` (the settled check already matched the
@@ -108,8 +114,6 @@ starting and after finishing (`/api-tests` in Claude Code).
   - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
     resolved config, plugin list, API and component schemas, database metadata, the FastRoute
     dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
-  - `cron:run` keeps the last run in memory and looks back one minute: persist it so a missed
-    minute catches up;
   - AI metadata jobs run in a shutdown function after `destroy()`: `fastcgi_finish_request()`
     first, or a table drained by `cron:run`;
   - logs default to `php://stdout`, lost under FPM, and every request logs "Shutting down Strapi";
