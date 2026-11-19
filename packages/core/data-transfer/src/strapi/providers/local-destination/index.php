@@ -338,6 +338,10 @@ final class LocalDestination implements IDestinationProvider
                 }
                 // Create a .gitkeep file to ensure the directory is not empty
                 file_put_contents("{$assetsDirectory}/.gitkeep", '');
+                // PHP port: keep the directory's .htaccess (no uploaded file may run as PHP under Apache)
+                if (is_file("{$backupDirectory}/.htaccess")) {
+                    @copy("{$backupDirectory}/.htaccess", "{$assetsDirectory}/.htaccess");
+                }
                 $this->reportInfo("created assets backup directory {$backupDirectory}");
             } catch (\Throwable) {
                 throw new ProviderTransferError(

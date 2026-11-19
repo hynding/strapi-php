@@ -1,6 +1,7 @@
-# Uploaded files keep their extension: nothing here may run as PHP, whatever the URL
+# Uploaded files keep their extension, in its case: nothing here may run as PHP, whatever the URL
+# (AddHandler matches `.PHP` too, hence `(?i)`)
 # (public/.htaccess refuses these requests too; this holds where it is not read first).
-<FilesMatch "\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
+<FilesMatch "(?i)\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
     Require all denied
 </FilesMatch>
 

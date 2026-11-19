@@ -24,7 +24,8 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   (`.tmp/bootstrap.lock`). Once a bootstrap has completed, `.tmp/bootstrap.settled` records a
   hash of its inputs (Strapi version, installed packages and the time of the last
   `composer install`, config, content types, components, models, `database/migrations`, and the
-  size and time of every file under `src/` and `config/`) and the database's latest schema row.
+  size and time of every PHP file under `src/` and `config/`) and the database's latest schema
+  row.
   A boot with the same inputs on the same database skips the lock: its writes would change
   nothing, and `CoreStore::set` skips updates that change nothing. A settled boot writes no row.
   A new deploy, a config change or another database takes the lock again once. Development never
@@ -65,8 +66,9 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   every request that is not a file to `index.php`, passes the `Authorization` header (Apache
   drops it for PHP-FPM, FastCGI and CGI: every admin and API token answered 401), never runs
   PHP under `uploads/` (uploads keep their extension: an uploaded `.php` file ran, also as
-  `/uploads/x.php/anything`), and refuses `.user.ini`. `public/uploads/.htaccess` denies the same
-  files by name where the parent rules are not read first. Checked on
+  `/uploads/x.php/anything`, in any case), and refuses `.user.ini`. `public/uploads/.htaccess`
+  denies the same files by name, in any case (`AddHandler` matches `.PHP` too), where the parent
+  rules are not read first; restoring assets (`strapi import`) keeps it. Checked on
   Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
   `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
 - **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
