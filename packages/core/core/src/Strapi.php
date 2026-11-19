@@ -616,7 +616,8 @@ final class Strapi extends Container implements StrapiContract
         // Under PHP-FPM every request boots, and a lock held across the whole bootstrap would
         // serialize every request. Once a bootstrap has completed for the same inputs (schemas,
         // config, packages, migrations) on the same database, bootstrap's writes find nothing to
-        // change, so later boots skip the lock: the steady state is read-only and concurrent.
+        // change, so later boots skip the lock: the steady state is read-only and concurrent
+        // (outside development, see bootstrapFingerprint()).
         try {
             $this->settleAndBootstrap();
         } catch (\Throwable $error) {
@@ -658,19 +659,30 @@ final class Strapi extends Container implements StrapiContract
 
     /**
      * A hash of what bootstrap's database writes depend on: the Strapi version, the installed
-     * packages, the config, the content types, components and models, the user's migrations and
-     * `src/index.php` (whose bootstrap may seed). Null when it cannot be computed.
+     * packages (version, source reference, the time of the last `composer install`), the config,
+     * the content types, components and models, the user's migrations, and the size and time of
+     * every file under `src/` and `config/` (lifecycles, local plugins, a bootstrap that seeds).
+     * Null when it cannot be computed, and in development, where code changes between requests in
+     * ways no input here sees (a package under development, a closure's body): every boot there
+     * takes the lock and runs the whole bootstrap, as upstream's restart on change does.
      */
     private function bootstrapFingerprint(): ?string
     {
+        if ($this->config()->get('environment') === 'development') {
+            return null;
+        }
+
         $root = $this->dirs()->root;
         $migrations = @scandir($root . '/database/migrations') ?: [];
-        $index = is_file($root . '/src/index.php') ? (string) md5_file($root . '/src/index.php') : '';
 
         $packages = [];
         foreach (Loaders\Plugins\GetEnabledPlugins::installedPackages($this) as $name => $package) {
-            $packages[$name] = $package['info']['version'] ?? '';
+            $info = $package['info'];
+            $reference = $info['dist']['reference'] ?? $info['source']['reference'] ?? '';
+            $packages[$name] = ($info['version'] ?? '') . '@' . (is_string($reference) ? $reference : '');
         }
+        $installed = $root . '/vendor/composer/installed.json';
+        $packages[''] = is_file($installed) ? filemtime($installed) . ':' . filesize($installed) : '';
 
         // closures in config encode as `{}`: a change inside one is not seen, the rest is.
         // `launchedAt` is this boot's timestamp, not an input.
@@ -685,10 +697,37 @@ final class Strapi extends Container implements StrapiContract
             'components' => array_map(static fn (Schema $schema): array => $schema->toArray(), $this->components()),
             'models' => $this->get('models')->get(),
             'migrations' => $migrations,
-            'index' => $index,
+            'files' => self::fileStats($this->dirs()->src, $this->dirs()->src . '/admin') + self::fileStats($root . '/config'),
         ], JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
 
         return is_string($inputs) ? hash('sha256', $inputs) : null;
+    }
+
+    /**
+     * `path => mtime:size` for every file under $dir (not under $skip), sorted: stats only, from
+     * PHP's stat cache, without reading the files.
+     *
+     * @return array<string, string>
+     */
+    private static function fileStats(string $dir, ?string $skip = null): array
+    {
+        if (!is_dir($dir)) {
+            return [];
+        }
+
+        $stats = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            static fn (\SplFileInfo $file): bool => $file->getPathname() !== $skip,
+        ));
+        foreach ($files as $file) {
+            if ($file instanceof \SplFileInfo && $file->isFile()) {
+                $stats[$file->getPathname()] = $file->getMTime() . ':' . $file->getSize();
+            }
+        }
+        ksort($stats);
+
+        return $stats;
     }
 
     private function bootstrapSettledFile(): string

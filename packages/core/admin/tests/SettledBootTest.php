@@ -31,6 +31,8 @@ final class SettledBootTest extends TestCase
         $env = [
             'DATABASE_CLIENT' => 'sqlite',
             'DATABASE_FILENAME' => $this->database,
+            // development never settles (Strapi::bootstrapFingerprint())
+            'NODE_ENV' => 'production',
             'STRAPI_NO_EXIT' => '1',
             'LOG_LEVEL' => 'error',
             // set, so users-permissions does not generate one during the first bootstrap (which
@@ -45,8 +47,10 @@ final class SettledBootTest extends TestCase
 
     protected function tearDown(): void
     {
-        putenv('JWT_SECRET');
-        unset($_ENV['JWT_SECRET']);
+        foreach (['JWT_SECRET', 'NODE_ENV'] as $name) {
+            putenv($name);
+            unset($_ENV[$name]);
+        }
         putenv('DATABASE_FILENAME=:memory:');
         $_ENV['DATABASE_FILENAME'] = ':memory:';
         @unlink($this->database);

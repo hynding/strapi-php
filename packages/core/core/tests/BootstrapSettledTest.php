@@ -7,7 +7,8 @@ namespace Strapi\Core\Tests;
 /**
  * PHP port: once a bootstrap has completed for given inputs on a database, later boots with the
  * same inputs on the same database skip the bootstrap lock (`Strapi::bootstrap()`), and a
- * steady-state boot writes nothing.
+ * steady-state boot writes nothing. Outside development only. A boot that settles end to end:
+ * the admin package's SettledBootTest and PerRequestLaneTest.
  */
 final class BootstrapSettledTest extends BootedAppTestCase
 {
@@ -16,12 +17,31 @@ final class BootstrapSettledTest extends BootedAppTestCase
         return self::strapi()->dirs()->root . '/.tmp/bootstrap.settled';
     }
 
+    protected function tearDown(): void
+    {
+        @unlink(self::settledFile());
+    }
+
+    /** The fingerprint as a production boot computes it (the shared test app runs in development). */
     private static function fingerprint(): string
     {
-        $fingerprint = (new \ReflectionMethod(self::strapi(), 'bootstrapFingerprint'))->invoke(self::strapi());
+        $fingerprint = self::inEnvironment('production', static fn (): mixed => (new \ReflectionMethod(self::strapi(), 'bootstrapFingerprint'))->invoke(self::strapi()));
         self::assertIsString($fingerprint);
 
         return $fingerprint;
+    }
+
+    private static function inEnvironment(string $environment, \Closure $run): mixed
+    {
+        $config = self::strapi()->config();
+        $before = $config->get('environment');
+        $config->set('environment', $environment);
+
+        try {
+            return $run();
+        } finally {
+            $config->set('environment', $before);
+        }
     }
 
     private static function isSettled(string $fingerprint): bool
@@ -29,16 +49,28 @@ final class BootstrapSettledTest extends BootedAppTestCase
         return (bool) (new \ReflectionMethod(self::strapi(), 'matchesSettledRecord'))->invoke(self::strapi(), $fingerprint);
     }
 
-    public function testACompletedBootstrapRecordsItsInputsAndDatabase(): void
+    private static function record(string $fingerprint): void
+    {
+        (new \ReflectionMethod(self::strapi(), 'markBootstrapSettled'))->invoke(self::strapi(), $fingerprint);
+    }
+
+    public function testDevelopmentNeverSettles(): void
+    {
+        // code changes between requests in ways the fingerprint does not see: every boot bootstraps
+        self::assertSame('development', self::strapi()->config()->get('environment'));
+        self::assertNull((new \ReflectionMethod(self::strapi(), 'bootstrapFingerprint'))->invoke(self::strapi()));
+    }
+
+    public function testARecordMatchesItsInputsAndDatabase(): void
     {
         $latest = self::strapi()->db()->schema->schemaStorage->latest();
         self::assertNotNull($latest);
 
-        // the inputs as bootstrap started: bootstrap itself may change them (users-permissions sets
-        // a generated jwtSecret in config when JWT_SECRET is missing), so they are not recomputed here
+        self::record(self::fingerprint());
+
         $recorded = (string) file_get_contents(self::settledFile());
-        self::assertMatchesRegularExpression('/^[0-9a-f]{64}:' . $latest['id'] . ':' . preg_quote($latest['hash'], '/') . '$/', $recorded);
-        self::assertTrue(self::isSettled(explode(':', $recorded)[0]));
+        self::assertSame(self::fingerprint() . ':' . $latest['id'] . ':' . $latest['hash'], $recorded);
+        self::assertTrue(self::isSettled(self::fingerprint()));
     }
 
     public function testTheFingerprintIgnoresTheLaunchTimestamp(): void
@@ -51,6 +83,7 @@ final class BootstrapSettledTest extends BootedAppTestCase
 
     public function testChangedInputsAreNotSettled(): void
     {
+        self::record(self::fingerprint());
         $before = self::fingerprint();
         self::strapi()->config()->set('server.bootstrapSettledTest', true);
 
@@ -59,6 +92,26 @@ final class BootstrapSettledTest extends BootedAppTestCase
             self::assertFalse(self::isSettled(self::fingerprint()));
         } finally {
             self::strapi()->config()->set('server.bootstrapSettledTest', null);
+        }
+    }
+
+    public function testAChangedFileUnderSrcOrConfigIsNotSettled(): void
+    {
+        // a lifecycle, a policy, a local plugin: code the other inputs do not describe
+        foreach (['/src/index.php', '/config/server.php'] as $path) {
+            $file = self::strapi()->dirs()->root . $path;
+            $mtime = (int) filemtime($file);
+            $before = self::fingerprint();
+            touch($file, $mtime + 10);
+            clearstatcache();
+
+            try {
+                self::assertNotSame($before, self::fingerprint(), $path);
+            } finally {
+                touch($file, $mtime);
+                clearstatcache();
+            }
+            self::assertSame($before, self::fingerprint(), $path);
         }
     }
 

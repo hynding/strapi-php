@@ -21,11 +21,14 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
 - **The steady state is read-only and concurrent.** Bootstrap writes to the database (schema
   sync, migrations, default roles, permission syncs), so it runs under a lock
   (`.tmp/bootstrap.lock`). Once a bootstrap has completed, `.tmp/bootstrap.settled` records a
-  hash of its inputs (Strapi version, packages, config, content types, components, models,
-  `database/migrations`, `src/index.php`) and the database's latest schema row. A boot with the
-  same inputs on the same database skips the lock: its writes would change nothing, and
-  `CoreStore::set` skips updates that change nothing. A settled boot writes no row. A new deploy,
-  a config change or another database takes the lock again once.
+  hash of its inputs (Strapi version, installed packages and the time of the last
+  `composer install`, config, content types, components, models, `database/migrations`, and the
+  size and time of every file under `src/` and `config/`) and the database's latest schema row.
+  A boot with the same inputs on the same database skips the lock: its writes would change
+  nothing, and `CoreStore::set` skips updates that change nothing. A settled boot writes no row.
+  A new deploy, a config change or another database takes the lock again once. Development never
+  settles: code changes there in ways these inputs do not see (a package under development, the
+  body of a closure in config), so every boot runs the whole bootstrap.
 - **GraphQL builds on first use in production.** With artifacts off (`generateArtifacts`, off
   outside development) the schema and the Apollo server are built on the first request to the
   GraphQL endpoint; development keeps upstream's eager build.
