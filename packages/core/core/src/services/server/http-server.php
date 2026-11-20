@@ -204,7 +204,7 @@ PHP;
      * `NODE_ENV=development` set, the body carries the error and the findings. Elsewhere (CLI,
      * FrankenPHP worker mode, the built-in server's console) it rethrows.
      */
-    public static function bootFailed(\Throwable $error, string $root, ?string $sapi = null): void
+    public static function bootFailed(\Throwable $error, string $root, ?Strapi $strapi = null, ?string $sapi = null): void
     {
         $sapi ??= PHP_SAPI;
         if (!Sapi::isPerRequest($sapi) || $sapi === 'cli-server') {
@@ -215,7 +215,10 @@ PHP;
 
         // what the host lacks may be what failed (a partial vendor/): the error is logged already
         try {
-            $findings = Requirements::check(StrapiDirectories::fromRoot($root), self::configuredDatabaseClient($root));
+            // the instance, when creating it succeeded, knows the configured client and directories
+            $client = $strapi?->config()->get('database.connection.client') ?? ($_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT'));
+            $dirs = $strapi?->dirs() ?? StrapiDirectories::fromRoot($root);
+            $findings = Requirements::check($dirs, is_string($client) && $client !== '' ? $client : null);
         } catch (\Throwable $checkError) {
             $findings = [];
             error_log('[strapi] The requirements could not be checked: ' . $checkError->getMessage());
@@ -237,28 +240,6 @@ PHP;
             'data' => null,
             'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => $details],
         ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)));
-    }
-
-    /**
-     * The `database.connection.client` of a project that failed to boot: `config/database.php`
-     * evaluated on its own (null when it cannot be, and the driver goes unchecked).
-     */
-    private static function configuredDatabaseClient(string $root): ?string
-    {
-        try {
-            $config = is_file($root . '/config/database.php') ? require $root . '/config/database.php' : null;
-            if ($config instanceof \Closure) {
-                $config = $config(\Strapi\Utils\EnvHelper::fromProcess());
-            }
-            $client = is_array($config) && is_array($config['connection'] ?? null) ? ($config['connection']['client'] ?? null) : null;
-        } catch (\Throwable) {
-            $client = null;
-        }
-        if (!is_string($client) || $client === '') {
-            $client = $_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT');
-        }
-
-        return is_string($client) && $client !== '' ? $client : null;
     }
 
     /** Send a PSR-7 response with PHP's SAPI. */

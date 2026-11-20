@@ -11,6 +11,7 @@ declare(strict_types=1);
  *
  *   FrankenPHP Caddyfile:  php_server { worker ./public/index.php }
  *   nginx + FPM:           try_files $uri /index.php$is_args$args;
+ *                          (no `$uri/`: /admin/ would be the directory `strapi build` copies the admin's assets to)
  */
 
 use Strapi\Cli\Strapi;
@@ -44,12 +45,13 @@ if (PHP_SAPI === 'cli-server') {
 
 ignore_user_abort(true);
 
+$strapi = null;
 try {
-    $strapi = Strapi::createStrapi(['appDir' => $root, 'distDir' => $root, 'serveAdminPanel' => true])->load();
-    $server = $strapi->server()->mount();
+    $strapi = Strapi::createStrapi(['appDir' => $root, 'distDir' => $root, 'serveAdminPanel' => true]);
+    $server = $strapi->load()->server()->mount();
 } catch (\Throwable $error) {
     // logged to PHP's error log with what the host lacks (PHP-FPM, CGI...); rethrown elsewhere
-    HttpServer::bootFailed($error, $root);
+    HttpServer::bootFailed($error, $root, $strapi);
 
     return;
 }

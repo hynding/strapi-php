@@ -112,4 +112,39 @@ final class HttpServerTest extends TestCase
             $_SERVER = $server;
         }
     }
+
+    public function testABootFailureIsRethrownOutsideAPerRequestWebServer(): void
+    {
+        $error = new \RuntimeException('boom');
+        foreach (['cli', 'cli-server'] as $sapi) {
+            try {
+                HttpServer::bootFailed($error, sys_get_temp_dir(), null, $sapi);
+                self::fail("{$sapi}: not rethrown");
+            } catch (\RuntimeException $caught) {
+                self::assertSame($error, $caught);
+            }
+        }
+    }
+
+    public function testABootFailureUnderAWebServerAnswersStrapisErrorAndLogsIt(): void
+    {
+        $log = tempnam(sys_get_temp_dir(), 'strapi-boot-failed');
+        $previous = ini_set('error_log', (string) $log);
+        $nodeEnv = getenv('NODE_ENV');
+        putenv('NODE_ENV=production');
+        unset($_ENV['NODE_ENV']);
+        ob_start();
+        try {
+            HttpServer::bootFailed(new \RuntimeException('database is down'), sys_get_temp_dir(), null, 'fpm-fcgi');
+        } finally {
+            $body = (string) ob_get_clean();
+            ini_set('error_log', $previous === false ? '' : $previous);
+            putenv($nodeEnv === false ? 'NODE_ENV' : "NODE_ENV={$nodeEnv}");
+        }
+
+        self::assertSame(['data' => null, 'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => []]], json_decode($body, true));
+        $logged = (string) file_get_contents((string) $log);
+        @unlink((string) $log);
+        self::assertStringContainsString('[strapi] The application failed to start: RuntimeException: database is down', $logged);
+    }
 }

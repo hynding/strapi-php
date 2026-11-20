@@ -93,8 +93,10 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   behind and PHP keeps serving `build/`) and carries a `.gitignore` of `*`. `/admin/` is now a
   directory without an index, which every server checked still hands to the front controller:
   Apache + PHP-FPM (`/admin` gets `mod_dir`'s 301 to `/admin/` first; the admin works the same from
-  either), nginx + PHP-FPM with the documented `try_files`, and FrankenPHP's `php_server`, to its
-  worker in worker mode (an `index.php` in the copy would run outside the worker, a boot per load).
+  either), nginx + PHP-FPM with the documented `try_files $uri /index.php$is_args$args`, and
+  FrankenPHP's `php_server`, to its worker in worker mode (an `index.php` in the copy would run
+  outside the worker, a boot per load). nginx's common `try_files $uri $uri/ ...` takes `/admin/`
+  for that directory and answers 403: leave `$uri/` out (the front controller's comment says so).
 - **A bundle for hosts without Composer or Node.** `strapi bundle` packs the project as it runs
   locally (`vendor/`, `build/`, `public/admin/`) into a `.zip` or `.tar.gz`, without `.env`, `.tmp`,
   `.strapi`, `node_modules`, `dist`, `.git` and uploaded media, symlinks archived as their files.

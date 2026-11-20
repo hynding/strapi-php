@@ -125,7 +125,10 @@ final class Bundle extends StrapiCommand
             throw new \RuntimeException('Writing a .tar.gz needs the phar extension: install it, or write a .zip.');
         }
 
-        $skip = ($options['withoutAdmin'] ?? false) ? ['build', ...($adminDir !== '' ? ["{$public}/{$adminDir}"] : [])] : [];
+        // without the admin: build/, and the copy of it (never a directory of the project's own)
+        $skip = ($options['withoutAdmin'] ?? false)
+            ? ['build', ...($adminDir !== '' && PublicAdminAssets::isPublished("{$root}/{$public}/{$adminDir}") ? ["{$public}/{$adminDir}"] : [])]
+            : [];
         $files = self::files($root, $archive, "{$public}/uploads", $skip);
 
         if (!is_dir(dirname($archive)) && !@mkdir(dirname($archive), 0o755, true) && !is_dir(dirname($archive))) {

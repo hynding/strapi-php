@@ -724,13 +724,14 @@ final class Strapi extends Container implements StrapiContract
      * for): the web server's PHP is checked on its first request even when a CLI command
      * (`migrations:run` in a deploy script) settled the deployment, and a settled request only
      * reads that file. In development (unsettled every boot) it logs only under a web server whose
-     * requests each boot, which is usually a deployment without NODE_ENV, at most once an hour.
+     * requests each boot, which is usually a deployment without NODE_ENV, at most once an hour;
+     * in the test environment never.
      */
     private function logRequirementsOnce(): void
     {
         $key = $this->settledFingerprint;
-        if ($key === null && (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest())) {
-            return;
+        if ($this->config()->get('environment') === 'test' || ($key === null && (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest()))) {
+            return; // a test suite's boots are no deployment
         }
         $marker = $this->dirs()->tmp . '/requirements.' . PHP_SAPI;
         $recorded = @file_get_contents($marker);

@@ -89,7 +89,8 @@ is the place).
 On Apache, make `public/` the document root: `public/.htaccess` routes requests to `index.php`,
 passes the `Authorization` header Apache drops for PHP-FPM and CGI, and never runs an uploaded
 file as PHP. `strapi build` also copies the admin bundle to `public/admin/`, so the web server
-serves its assets without booting PHP for each (the admin's pages and API still go to `index.php`).
+serves its assets without booting PHP for each (the admin's pages and API still go to `index.php`;
+on nginx use `try_files $uri /index.php$is_args$args`, without `$uri/`).
 
 For a host without Composer or Node, build locally and upload one archive:
 

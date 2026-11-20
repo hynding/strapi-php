@@ -165,6 +165,20 @@ final class BundleTest extends TestCase
         self::assertCount(1, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['adminPath' => '/'])['warnings'], 'an admin at the root has no copy');
     }
 
+    public function testWithoutAdminKeepsADirectoryOfTheProject(): void
+    {
+        mkdir($this->root . '/public/admin');
+        file_put_contents($this->root . '/public/admin/help.html', 'help');
+
+        Bundle::create($this->root, $this->root . '/dist/x.zip', ['withoutAdmin' => true]);
+
+        $zip = new \ZipArchive();
+        self::assertTrue($zip->open($this->root . '/dist/x.zip'));
+        self::assertSame('help', $zip->getFromName('my-app/public/admin/help.html'));
+        self::assertFalse($zip->getFromName('my-app/build/index.html'));
+        $zip->close();
+    }
+
     public function testAnotherPublicDirectory(): void
     {
         rename($this->root . '/public', $this->root . '/static');

@@ -164,6 +164,9 @@ final class PerRequestSapiTest extends TestCase
         if ($phpCgi === null) {
             self::markTestSkipped('php-cgi is not installed');
         }
+        if (!extension_loaded('pdo_pgsql')) {
+            self::markTestSkipped('pdo_pgsql is not installed (the boot fails on its connection)');
+        }
         $this->dir = sys_get_temp_dir() . '/strapi-per-request-' . bin2hex(random_bytes(6));
         mkdir($this->dir);
 
