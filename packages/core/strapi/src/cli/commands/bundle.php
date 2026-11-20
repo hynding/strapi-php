@@ -29,6 +29,9 @@ final class Bundle extends StrapiCommand
         '.idea', '.vscode', '.phpunit.cache', '.phpunit.result.cache', '.php-cs-fixer.cache', '.DS_Store',
     ];
 
+    /** Entries never bundled, at any depth. */
+    public const array EXCLUDE_EVERYWHERE = ['.env', '.git', 'node_modules', '.DS_Store', 'Thumbs.db'];
+
     /** Files kept under `public/uploads` (the rest is the uploaded media). */
     private const array UPLOADS_KEEP = ['.gitkeep', '.htaccess'];
 
@@ -52,7 +55,12 @@ final class Bundle extends StrapiCommand
             : $root . '/dist/' . $name . (class_exists(\ZipArchive::class) ? '.zip' : '.tar.gz');
 
         try {
-            $result = self::create($root, $archive, ['name' => $name, 'withoutAdmin' => (bool) $input->getOption('without-admin')]);
+            $app = $this->createStrapi();
+            $result = self::create($root, $archive, [
+                'name' => $name,
+                'withoutAdmin' => (bool) $input->getOption('without-admin'),
+                'adminPath' => (string) $app->config()->get('admin.path', '/admin'),
+            ]);
         } catch (\RuntimeException $error) {
             $this->ctx->logger->error($error->getMessage());
 
@@ -79,7 +87,7 @@ final class Bundle extends StrapiCommand
      * Writes the archive of `$root` to `$archive` (`.zip`, or `.tar.gz` / `.tgz`), its entries under
      * `<name>/`.
      *
-     * @param array{name?: string, withoutAdmin?: bool} $options
+     * @param array{name?: string, withoutAdmin?: bool, adminPath?: string} $options `adminPath`: `admin.path`
      * @return array{files: int, bytes: int, warnings: list<string>}
      */
     public static function create(string $root, string $archive, array $options = []): array
@@ -94,8 +102,9 @@ final class Bundle extends StrapiCommand
         if (!($options['withoutAdmin'] ?? false) && !is_file($root . '/build/index.html')) {
             throw new \RuntimeException('The admin panel is not built: run `php bin/strapi build` first (or bundle with --without-admin).');
         }
-        if (!($options['withoutAdmin'] ?? false) && !PublicAdminAssets::isPublished($root . '/public/admin') && is_dir($root . '/build')) {
-            $warnings[] = 'public/admin/ was not written by `strapi build`: PHP will serve the admin assets (rebuild to have the web server serve them).';
+        $adminDir = trim($options['adminPath'] ?? '/admin', '/');
+        if (!($options['withoutAdmin'] ?? false) && $adminDir !== '' && !PublicAdminAssets::isPublished("{$root}/public/{$adminDir}")) {
+            $warnings[] = "public/{$adminDir}/ was not written by `strapi build`: PHP will serve the admin assets (rebuild to have the web server serve them).";
         }
         $devPackages = self::devPackages($root);
         if ($devPackages !== []) {
@@ -177,11 +186,12 @@ final class Bundle extends StrapiCommand
         $parts = explode('/', $relative);
         $base = end($parts);
 
-        if (count($parts) === 1 && (in_array($base, self::EXCLUDE, true) || (str_starts_with($base, '.env.') && $base !== '.env.example'))) {
+        if (count($parts) === 1 && in_array($base, self::EXCLUDE, true)) {
             return true;
         }
-        // a package installed from source (`composer install --prefer-source`) keeps its clone
-        if ($base === '.DS_Store' || $base === 'Thumbs.db' || $base === '.git') {
+        // at any depth: a package installed from source (`--prefer-source`) keeps its clone, and
+        // one from a Composer path repository (a symlink to a checkout) its node_modules and .env
+        if (in_array($base, self::EXCLUDE_EVERYWHERE, true) || (str_starts_with($base, '.env.') && $base !== '.env.example')) {
             return true;
         }
 
@@ -215,10 +225,13 @@ final class Bundle extends StrapiCommand
         $tarPath = $dir . '/bundle.tar';
         try {
             $tar = new \PharData($tarPath, 0, null, \Phar::TAR);
+            // unbuffered, Phar rewrites the whole archive after each change
+            $tar->startBuffering();
             foreach ($files as $relative => $path) {
                 $tar->addFile($path, "{$name}/{$relative}");
                 $tar["{$name}/{$relative}"]->chmod((fileperms($path) ?: 0o644) & 0o777);
             }
+            $tar->stopBuffering();
             $tar->compress(\Phar::GZ);
             unset($tar);
             if (!@rename($dir . '/bundle.tar.gz', $archive) && !(copy($dir . '/bundle.tar.gz', $archive))) {

@@ -78,9 +78,12 @@ final class RequirementsTest extends TestCase
 
     public function testEachDatabaseClientNeedsItsDriver(): void
     {
-        self::assertSame([], $this->check('better-sqlite3'));
-        self::assertSame([], $this->check('mysql2'));
-        self::assertSame(['ext-pdo_pgsql' => 'error'], self::names($this->check('postgres')));
+        foreach (['sqlite', 'sqlite3', 'better-sqlite3', 'mysql', 'mysql2', 'mariadb'] as $client) {
+            self::assertSame([], $this->check($client), $client);
+        }
+        foreach (['postgres', 'postgresql', 'pg'] as $client) {
+            self::assertSame(['ext-pdo_pgsql' => 'error'], self::names($this->check($client)), $client);
+        }
         self::assertSame(['database' => 'error'], self::names($this->check('oracle')));
         self::assertSame([], $this->check(null), 'no client known, no driver checked');
     }
@@ -130,6 +133,7 @@ final class RequirementsTest extends TestCase
     {
         self::assertSame(['NODE_ENV' => 'warning'], self::names($this->check(platform: ['env' => []])));
         self::assertStringContainsString('NODE_ENV is "development"', Requirements::format($this->check(platform: ['env' => ['NODE_ENV' => 'development']])));
+        self::assertSame([], $this->check(platform: ['env' => ['NODE_ENV' => 'staging']]), 'staging settles like production');
         self::assertSame([], $this->check(platform: ['sapi' => 'cli-server', 'env' => []]), '`strapi develop` runs in development');
 
         $findings = $this->check(platform: ['env' => ['NODE_ENV' => 'production', 'APP_KEYS' => 'toBeModified1,toBeModified2', 'JWT_SECRET' => 'tobemodified', 'ADMIN_JWT_SECRET' => 'x']]);

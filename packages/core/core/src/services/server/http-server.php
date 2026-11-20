@@ -199,9 +199,9 @@ PHP;
      * requests each boot (PHP-FPM, CGI, mod_php, LiteSpeed, FrankenPHP's classic mode) an uncaught
      * error is a bare 500, or a stack trace in the page where the host leaves `display_errors` on.
      * This logs the error, with what {@see Requirements} finds wrong with the host, to PHP's error
-     * log (the one log a shared host shows) and answers 500 with Strapi's error body; outside
-     * production the body carries the error and the findings. Elsewhere (CLI, FrankenPHP worker
-     * mode, the built-in server's console) it rethrows.
+     * log (the one log a shared host shows) and answers 500 with Strapi's error body; with
+     * `NODE_ENV=development` set, the body carries the error and the findings. Elsewhere (CLI,
+     * FrankenPHP worker mode, the built-in server's console) it rethrows.
      */
     public static function bootFailed(\Throwable $error, string $root, ?string $sapi = null): void
     {
@@ -218,8 +218,10 @@ PHP;
             error_log("[strapi] Requirements (php bin/strapi requirements:check):\n" . Requirements::format($findings));
         }
 
+        // only where development is explicit: a boot can fail before `.env` is read (a typo in it),
+        // leaving a production host's NODE_ENV unknown
         $nodeEnv = $_ENV['NODE_ENV'] ?? getenv('NODE_ENV');
-        $details = $nodeEnv === 'production' ? new \stdClass() : [
+        $details = $nodeEnv !== 'development' ? new \stdClass() : [
             'error' => $error->getMessage(),
             'requirements' => $findings,
         ];

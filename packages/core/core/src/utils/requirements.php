@@ -13,8 +13,9 @@ use Strapi\Types\Core\StrapiDirectories;
  * off, the JIT on, `.user.ini` not read, `NODE_ENV` unset, the `.env.example` secrets kept.
  *
  * {@see self::check()} lists what is wrong. It runs from `strapi requirements:check`, from the
- * bootstrap that settles a deployment (its findings are logged once, not on every request) and
- * when a boot fails under a web server (`HttpServer::bootFailed()`, logged to PHP's error log).
+ * bootstrap that settles a deployment (its findings are logged once, not on every request; in
+ * development under a web server, at most once an hour) and when a boot fails under a web server
+ * (`HttpServer::bootFailed()`, logged to PHP's error log).
  *
  * @phpstan-type Finding array{level: 'error'|'warning', name: string, message: string}
  * @phpstan-type Platform array{sapi?: string, phpVersion?: string, extensions?: list<string>, ini?: \Closure(string): (string|false), env?: array<string, string>, frankenphpWorker?: bool}
@@ -35,10 +36,13 @@ final class Requirements
     /** The PDO driver each `database.connection.client` needs. */
     public const array DRIVERS = [
         'sqlite' => 'pdo_sqlite',
+        'sqlite3' => 'pdo_sqlite',
         'better-sqlite3' => 'pdo_sqlite',
         'mysql' => 'pdo_mysql',
         'mysql2' => 'pdo_mysql',
+        'mariadb' => 'pdo_mysql',
         'postgres' => 'pdo_pgsql',
+        'postgresql' => 'pdo_pgsql',
         'pg' => 'pdo_pgsql',
     ];
 
@@ -118,7 +122,7 @@ final class Requirements
         }
 
         $nodeEnv = $env['NODE_ENV'] ?? '';
-        if ($perRequest && $sapi !== 'cli-server' && $nodeEnv !== 'production') {
+        if ($perRequest && $sapi !== 'cli-server' && ($nodeEnv === '' || $nodeEnv === 'development')) {
             $findings[] = self::finding('warning', 'NODE_ENV', 'NODE_ENV is ' . ($nodeEnv === '' ? 'not set' : "\"{$nodeEnv}\"") . ': the app runs in development, where every request runs the whole bootstrap under a lock. Set NODE_ENV=production in .env.');
         }
         if ($nodeEnv === 'production') {

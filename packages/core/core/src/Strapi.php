@@ -703,8 +703,9 @@ final class Strapi extends Container implements StrapiContract
             // until this bootstrap completes, the record describes no database: one that dies midway
             // (a timeout, a deploy) must not leave a re-created database matching the old record
             @unlink($this->bootstrapSettledFile());
-            if ($fingerprint !== null) {
-                // the bootstrap that settles a deployment reports what the host lacks, once
+            // the bootstrap that settles a deployment reports what the host lacks, once; one in
+            // development under a web server too (NODE_ENV not set there), at most once an hour
+            if ($fingerprint !== null || $this->dueDevelopmentRequirementsLog()) {
                 $this->logRequirements();
             }
             $this->doBootstrap();
@@ -717,6 +718,25 @@ final class Strapi extends Container implements StrapiContract
                 fclose($lock);
             }
         }
+    }
+
+    /**
+     * PHP port: in development every boot is unsettled; under a web server whose requests each
+     * boot (PHP-FPM...), that is usually a deployment without NODE_ENV. `.tmp/requirements.logged`
+     * keeps that warning to one an hour. The built-in server is `strapi develop`.
+     */
+    private function dueDevelopmentRequirementsLog(): bool
+    {
+        if (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest()) {
+            return false;
+        }
+        $marker = $this->dirs()->tmp . '/requirements.logged';
+        $last = @filemtime($marker);
+        if ($last !== false && $last > time() - 3600) {
+            return false;
+        }
+
+        return @touch($marker);
     }
 
     /** PHP port: logs what {@see Utils\Requirements} finds wrong with this PHP and project. */

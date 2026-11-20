@@ -50,6 +50,7 @@ final class PerRequestSapiTest extends TestCase
     {
         // what settled boots wrote to the boot cache (.strapi/cache)
         array_map('unlink', glob(dirname(__DIR__, 5) . '/examples/getstarted/.strapi/cache/*.php') ?: []);
+        @unlink(self::requirementsMarker());
         if ($this->dir !== '') {
             array_map('unlink', glob($this->dir . '/*') ?: []);
             @rmdir($this->dir);
@@ -147,7 +148,14 @@ final class PerRequestSapiTest extends TestCase
         self::assertStringNotContainsString('Shutting down Strapi', $added, 'a settled boot does not log its lifecycle');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('environments')]
+    /** @return iterable<string, array{string}> */
+    public static function allEnvironments(): iterable
+    {
+        yield from self::environments();
+        yield 'development' => ['development'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('allEnvironments')]
     public function testABootThatFailsAnswersStrapisErrorAndLogsWhatTheHostLacks(string $environment): void
     {
         $phpCgi = self::phpCgi();
@@ -165,17 +173,42 @@ final class PerRequestSapiTest extends TestCase
         self::assertIsArray($body, $this->diagnostics($response, $log));
         self::assertNull($body['data']);
         self::assertSame(['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error'], array_diff_key($body['error'], ['details' => true]));
-        if ($environment === 'production') {
-            self::assertSame([], $body['error']['details'], 'production answers no detail');
+        if ($environment !== 'development') {
+            // a boot can fail before .env is read: only an explicit development shows details
+            self::assertSame([], $body['error']['details'], 'no detail outside development');
         } else {
-            self::assertNotSame('', $body['error']['details']['error']);
+            self::assertStringContainsString('Connection refused', $body['error']['details']['error']);
             self::assertContains('NODE_ENV', array_column($body['error']['details']['requirements'], 'name'));
         }
 
         $logged = implode("\n", $log);
-        self::assertStringContainsString('[strapi] The application failed to start', $logged);
-        if ($environment !== 'production') {
-            self::assertStringContainsString('[warning] NODE_ENV is "staging"', $logged, 'what the host lacks is logged with it');
+        self::assertStringContainsString('[strapi] The application failed to start: PDOException', $logged);
+        if ($environment === 'development') {
+            self::assertStringContainsString('[warning] NODE_ENV is "development"', $logged, 'what the host lacks is logged with it');
         }
+    }
+
+    public function testDevelopmentUnderAWebServerLogsWhatTheHostLacksOnceAnHour(): void
+    {
+        $phpCgi = self::phpCgi();
+        if ($phpCgi === null) {
+            self::markTestSkipped('php-cgi is not installed');
+        }
+        $this->dir = sys_get_temp_dir() . '/strapi-per-request-' . bin2hex(random_bytes(6));
+        mkdir($this->dir);
+        @unlink(self::requirementsMarker());
+
+        [$response, $log] = $this->request($phpCgi, '/_health', 'development');
+        self::assertStringStartsWith('Status: 204', $response, $this->diagnostics($response, $log));
+        self::assertCount(1, preg_grep('/strapi\.WARNING: NODE_ENV is "development"/', $log) ?: [], $this->diagnostics($response, $log));
+
+        [$response, $log] = $this->request($phpCgi, '/_health', 'development');
+        self::assertStringStartsWith('Status: 204', $response, $this->diagnostics($response, $log));
+        self::assertCount(1, preg_grep('/strapi\.WARNING: NODE_ENV is "development"/', $log) ?: [], 'not again within the hour');
+    }
+
+    private static function requirementsMarker(): string
+    {
+        return dirname(__DIR__, 5) . '/examples/getstarted/.tmp/requirements.logged';
     }
 }

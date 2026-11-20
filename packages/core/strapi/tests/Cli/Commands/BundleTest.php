@@ -57,6 +57,15 @@ final class BundleTest extends TestCase
         // a Composer path repository: the package is a symlink out of the project
         mkdir($this->outside . '/src', 0o755, true);
         file_put_contents($this->outside . '/src/Strapi.php', '<?php // package');
+        // the checkout's own toolchain and secrets
+        mkdir($this->outside . '/node_modules/x', 0o755, true);
+        file_put_contents($this->outside . '/node_modules/x/index.js', 'js');
+        file_put_contents($this->outside . '/.env', 'SECRET=1');
+        file_put_contents($this->outside . '/.env.local', 'SECRET=1');
+        mkdir($this->outside . '/.git');
+        file_put_contents($this->outside . '/.git/HEAD', 'ref');
+        mkdir($this->outside . '/dist');
+        file_put_contents($this->outside . '/dist/lib.php', '<?php // a package\'s dist/ is code');
         mkdir($this->root . '/vendor/hynding');
         symlink($this->outside, $this->root . '/vendor/hynding/strapi-php');
         // a link to its own parent, and a dangling one
@@ -77,7 +86,7 @@ final class BundleTest extends TestCase
             '.env.example', 'bin/strapi', 'build/app-1a2b.js', 'build/index.html', 'composer.json', 'config/server.php',
             'database/migrations/.gitkeep', 'package.json', 'public/.htaccess', 'public/index.php', 'public/uploads/.gitkeep',
             'public/uploads/.htaccess', 'src/index.php', 'vendor/autoload.php', 'vendor/composer/installed.json',
-            'vendor/hynding/strapi-php/src/Strapi.php',
+            'vendor/hynding/strapi-php/dist/lib.php', 'vendor/hynding/strapi-php/src/Strapi.php',
         ], array_keys($files));
         self::assertSame(realpath($this->outside . '/src/Strapi.php'), $files['vendor/hynding/strapi-php/src/Strapi.php'], 'symlinks are archived as their files');
     }
@@ -91,7 +100,7 @@ final class BundleTest extends TestCase
 
         $result = Bundle::create($this->root, $archive);
 
-        self::assertSame(16, $result['files']);
+        self::assertSame(17, $result['files']);
         self::assertSame(filesize($archive), $result['bytes']);
         self::assertCount(2, $result['warnings']);
         self::assertStringContainsString('public/admin/ was not written by `strapi build`', $result['warnings'][0]);
@@ -133,11 +142,24 @@ final class BundleTest extends TestCase
         } catch (\RuntimeException $error) {
             self::assertStringContainsString('php bin/strapi build', $error->getMessage());
         }
-        self::assertSame(15, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['withoutAdmin' => true])['files']);
+        self::assertSame(16, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['withoutAdmin' => true])['files']);
 
         unlink($this->root . '/vendor/autoload.php');
         $this->expectExceptionMessage('composer install');
         Bundle::create($this->root, $this->root . '/dist/x.zip', ['withoutAdmin' => true]);
+    }
+
+    public function testLooksForTheAdminCopyAtTheAdminPath(): void
+    {
+        PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/dashboard', new \Strapi\Cli\Cli\Utils\Logger(silent: true));
+
+        $warnings = Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['adminPath' => '/dashboard/'])['warnings'];
+        self::assertCount(1, $warnings);
+        self::assertStringContainsString('development packages', $warnings[0]);
+
+        $warnings = Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['adminPath' => '/admin'])['warnings'];
+        self::assertStringContainsString('public/admin/ was not written', $warnings[0]);
+        self::assertCount(1, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['adminPath' => '/'])['warnings'], 'an admin at the root has no copy');
     }
 
     public function testRefusesAnUnknownFormat(): void
