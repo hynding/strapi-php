@@ -125,6 +125,9 @@ final class RequirementsTest extends TestCase
         // opcache.enable_cli is off: neither "OPcache is off" nor a JIT warning
         self::assertSame([], $this->check(platform: ['sapi' => 'cli', 'env' => []], ini: ['opcache.jit' => '1235', 'opcache.jit_buffer_size' => '64M', 'enable_post_data_reading' => '1']));
         self::assertSame(['opcache.jit' => 'warning'], self::names($this->check(platform: ['sapi' => 'cli'], ini: ['opcache.enable_cli' => '1', 'opcache.jit' => '1235', 'opcache.jit_buffer_size' => '64M'])));
+        // PHP's built-in server follows opcache.enable_cli too
+        self::assertSame(['opcache' => 'warning'], self::names($this->check(platform: ['sapi' => 'cli-server'])));
+        self::assertSame([], $this->check(platform: ['sapi' => 'cli-server'], ini: ['opcache.enable' => '0', 'opcache.enable_cli' => '1']));
         // FrankenPHP's worker mode boots once
         self::assertSame([], $this->check(platform: ['sapi' => 'frankenphp', 'frankenphpWorker' => true, 'env' => []]));
     }
@@ -134,7 +137,7 @@ final class RequirementsTest extends TestCase
         self::assertSame(['NODE_ENV' => 'warning'], self::names($this->check(platform: ['env' => []])));
         self::assertStringContainsString('NODE_ENV is "development"', Requirements::format($this->check(platform: ['env' => ['NODE_ENV' => 'development']])));
         self::assertSame([], $this->check(platform: ['env' => ['NODE_ENV' => 'staging']]), 'staging settles like production');
-        self::assertSame([], $this->check(platform: ['sapi' => 'cli-server', 'env' => []]), '`strapi develop` runs in development');
+        self::assertSame([], $this->check(platform: ['sapi' => 'cli-server', 'env' => []], ini: ['opcache.enable_cli' => '1']), '`strapi develop` runs in development');
 
         $findings = $this->check(platform: ['env' => ['NODE_ENV' => 'production', 'APP_KEYS' => 'toBeModified1,toBeModified2', 'JWT_SECRET' => 'tobemodified', 'ADMIN_JWT_SECRET' => 'x']]);
         self::assertSame(['secrets' => 'warning'], self::names($findings));

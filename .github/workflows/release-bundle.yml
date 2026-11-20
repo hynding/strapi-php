@@ -47,7 +47,7 @@ jobs:
       - name: Bundle
         working-directory: ${{ runner.temp }}/strapi-php-starter
         run: |
-          php bin/strapi bundle --output "$RUNNER_TEMP/strapi-php-starter-${GITHUB_REF_NAME}.zip"
+          php bin/strapi bundle --output "$RUNNER_TEMP/strapi-php-starter-${GITHUB_REF_NAME//\//-}.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: strapi-php-starter

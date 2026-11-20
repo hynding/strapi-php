@@ -58,6 +58,8 @@ final class PublicAdminAssetsTest extends TestCase
         self::assertSame('css', file_get_contents($target . '/style-Ef34.css'));
         self::assertSame('font', file_get_contents($target . '/sub/font.woff2'));
         self::assertFileDoesNotExist($target . '/index.html', 'the shell and the SPA routes go to index.php');
+        // /admin/ is the directory: its index hands it to the front controller
+        self::assertStringContainsString("require dirname(__DIR__, 1) . '/index.php';", (string) file_get_contents($target . '/index.php'));
         $htaccess = (string) file_get_contents($target . '/.htaccess');
         self::assertStringStartsWith(PublicAdminAssets::MARKER, $htaccess);
         self::assertStringContainsString('Header set Cache-Control "public, max-age=31536000, immutable"', $htaccess);
@@ -75,7 +77,7 @@ final class PublicAdminAssetsTest extends TestCase
 
         self::assertFileDoesNotExist($this->root . '/public/admin/index-Ab12Cd.js');
         self::assertSame('new', file_get_contents($this->root . '/public/admin/index-Zz99.js'));
-        self::assertSame(['admin'], array_values(array_diff(scandir($this->root . '/public') ?: [], ['.', '..'])), 'no staging directory left');
+        self::assertSame(['admin'], array_values(array_diff(scandir($this->root . '/public') ?: [], ['.', '..'])), 'no staging or old copy left');
     }
 
     public function testANestedAdminPath(): void
@@ -84,6 +86,20 @@ final class PublicAdminAssetsTest extends TestCase
 
         self::assertSame($this->root . '/public/cms/dashboard', $target);
         self::assertFileExists($target . '/index-Ab12Cd.js');
+        self::assertStringContainsString("require dirname(__DIR__, 2) . '/index.php';", (string) file_get_contents($target . '/index.php'));
+    }
+
+    public function testTheStubRunsTheFrontController(): void
+    {
+        file_put_contents($this->root . '/public/index.php', '<?php $GLOBALS["front"] = __DIR__;');
+        $target = PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/admin', $this->logger());
+
+        (static function (string $stub): void {
+            require $stub;
+        })($target . '/index.php');
+
+        self::assertSame($this->root . '/public', $GLOBALS['front']);
+        unset($GLOBALS['front']);
     }
 
     public function testNeverTouchesADirectoryOfTheProject(): void

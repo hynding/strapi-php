@@ -46,13 +46,13 @@ ignore_user_abort(true);
 
 try {
     $strapi = Strapi::createStrapi(['appDir' => $root, 'distDir' => $root, 'serveAdminPanel' => true])->load();
+    $server = $strapi->server()->mount();
 } catch (\Throwable $error) {
     // logged to PHP's error log with what the host lacks (PHP-FPM, CGI...); rethrown elsewhere
     HttpServer::bootFailed($error, $root);
 
     return;
 }
-$server = $strapi->server()->mount();
 
 $handle = static function () use ($server): void {
     HttpServer::emit($server->handle(HttpServer::requestFromGlobals()));

@@ -60,6 +60,7 @@ final class Bundle extends StrapiCommand
                 'name' => $name,
                 'withoutAdmin' => (bool) $input->getOption('without-admin'),
                 'adminPath' => (string) $app->config()->get('admin.path', '/admin'),
+                'publicDir' => self::relativeTo($root, $app->dirs()->public),
             ]);
         } catch (\RuntimeException $error) {
             $this->ctx->logger->error($error->getMessage());
@@ -87,7 +88,8 @@ final class Bundle extends StrapiCommand
      * Writes the archive of `$root` to `$archive` (`.zip`, or `.tar.gz` / `.tgz`), its entries under
      * `<name>/`.
      *
-     * @param array{name?: string, withoutAdmin?: bool, adminPath?: string} $options `adminPath`: `admin.path`
+     * @param array{name?: string, withoutAdmin?: bool, adminPath?: string, publicDir?: string} $options
+     *        `adminPath`: `admin.path`; `publicDir`: the public directory relative to the root
      * @return array{files: int, bytes: int, warnings: list<string>}
      */
     public static function create(string $root, string $archive, array $options = []): array
@@ -102,16 +104,17 @@ final class Bundle extends StrapiCommand
         if (!($options['withoutAdmin'] ?? false) && !is_file($root . '/build/index.html')) {
             throw new \RuntimeException('The admin panel is not built: run `php bin/strapi build` first (or bundle with --without-admin).');
         }
+        $public = trim($options['publicDir'] ?? 'public', '/');
         $adminDir = trim($options['adminPath'] ?? '/admin', '/');
-        if (!($options['withoutAdmin'] ?? false) && $adminDir !== '' && !PublicAdminAssets::isPublished("{$root}/public/{$adminDir}")) {
-            $warnings[] = "public/{$adminDir}/ was not written by `strapi build`: PHP will serve the admin assets (rebuild to have the web server serve them).";
+        if (!($options['withoutAdmin'] ?? false) && $adminDir !== '' && !PublicAdminAssets::isPublished("{$root}/{$public}/{$adminDir}")) {
+            $warnings[] = "{$public}/{$adminDir}/ was not written by `strapi build`: PHP will serve the admin assets (rebuild to have the web server serve them).";
         }
         $devPackages = self::devPackages($root);
         if ($devPackages !== []) {
             $warnings[] = 'vendor/ holds development packages (' . implode(', ', array_slice($devPackages, 0, 3)) . (count($devPackages) > 3 ? ', ...' : '') . '): `composer install --no-dev --optimize-autoloader` before bundling makes the archive smaller.';
         }
 
-        $files = self::files($root, $archive);
+        $files = self::files($root, $archive, "{$public}/uploads");
 
         if (!is_dir(dirname($archive))) {
             mkdir(dirname($archive), 0o755, true);
@@ -137,14 +140,15 @@ final class Bundle extends StrapiCommand
      *
      * @return array<string, string>
      */
-    public static function files(string $root, ?string $archive = null): array
+    public static function files(string $root, ?string $archive = null, string $uploads = 'public/uploads'): array
     {
         $root = rtrim($root, '/');
+        $uploads = trim($uploads, '/');
         $skip = $archive !== null ? (realpath($archive) ?: $archive) : null;
         $files = [];
 
         /** @param array<string, true> $ancestors */
-        $walk = static function (string $dir, string $prefix, array $ancestors) use (&$walk, &$files, $skip): void {
+        $walk = static function (string $dir, string $prefix, array $ancestors) use (&$walk, &$files, $skip, $uploads): void {
             $real = realpath($dir);
             if ($real === false || isset($ancestors[$real])) {
                 return; // a symlink to one of its own parents
@@ -161,7 +165,7 @@ final class Bundle extends StrapiCommand
                     continue;
                 }
                 $relative = $prefix === '' ? $entry : "{$prefix}/{$entry}";
-                if (self::excluded($relative)) {
+                if (self::excluded($relative, $uploads)) {
                     continue;
                 }
                 $path = "{$dir}/{$entry}";
@@ -181,7 +185,7 @@ final class Bundle extends StrapiCommand
         return $files;
     }
 
-    private static function excluded(string $relative): bool
+    private static function excluded(string $relative, string $uploads): bool
     {
         $parts = explode('/', $relative);
         $base = end($parts);
@@ -195,7 +199,14 @@ final class Bundle extends StrapiCommand
             return true;
         }
 
-        return count($parts) === 3 && $parts[0] === 'public' && $parts[1] === 'uploads' && !in_array($base, self::UPLOADS_KEEP, true);
+        return dirname($relative) === $uploads && !in_array($base, self::UPLOADS_KEEP, true);
+    }
+
+    private static function relativeTo(string $root, string $path): string
+    {
+        $root = rtrim($root, '/') . '/';
+
+        return str_starts_with($path, $root) ? substr($path, strlen($root)) : 'public';
     }
 
     /** @param array<string, string> $files */

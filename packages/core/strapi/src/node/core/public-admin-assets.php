@@ -17,28 +17,36 @@ use Strapi\Cli\Cli\Utils\Logger;
  * (`/admin/login`, ...) share the path, so they keep going to `index.php`, which sends the shell
  * with `Cache-Control: no-cache` as upstream does. The copy carries an `.htaccess` that sends the
  * hashed assets with upstream's `public, max-age=31536000, immutable` and marks the directory as
- * written by the build: a directory without it is the project's own and is never replaced.
+ * written by the build: a directory without it is the project's own and is never replaced. Its
+ * `index.php` hands `/admin/` (the directory itself) to the front controller.
  */
 final class PublicAdminAssets
 {
     /** First line of the `.htaccess` written into the copy; marks the directory as the build's. */
     public const MARKER = '# Written by `strapi build`';
 
-    /** Files of `build/` that are not copied: the shell goes through PHP (see the class comment). */
-    private const SKIP = ['index.html'];
+    /**
+     * Files of `build/` that are not copied: the shell goes through PHP (see the class comment), and
+     * `index.php` is the copy's own.
+     */
+    private const SKIP = ['index.html', 'index.php'];
 
     private const HTACCESS = <<<'HTACCESS'
         # Written by `strapi build`: a copy of build/ (the admin panel) for the web server to serve without
         # PHP. Every build replaces it; delete the directory to have PHP serve the admin assets again.
-        # index.html is not copied: the admin's pages go to index.php, which sends it with no-cache.
+        # index.html is not copied: the admin's pages go to the front controller (index.php here hands
+        # /admin/ itself to it), which sends the shell with no-cache.
 
         Options -Indexes
 
         <IfModule mod_headers.c>
-            Header set Cache-Control "public, max-age=31536000, immutable"
+            <FilesMatch "^(?!index\.php$)">
+                Header set Cache-Control "public, max-age=31536000, immutable"
+            </FilesMatch>
         </IfModule>
 
-        <FilesMatch "(?i)\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
+        # no PHP here but the index.php the build writes
+        <FilesMatch "(?i)^(?!index\.php$).*\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
             Require all denied
         </FilesMatch>
 
@@ -46,8 +54,8 @@ final class PublicAdminAssets
 
     /**
      * Copies `$buildDir` (without `index.html`) to `$publicDir/<adminPath>`, replacing an earlier
-     * copy. Returns the directory written, or null when nothing was (admin at `/`, no build, or a
-     * directory of the project's own at that path).
+     * copy. Returns the directory written, or null when nothing was (admin at `/`, no build, a
+     * directory of the project's own at that path, or a copy that failed: warned, nothing left).
      */
     public static function publish(string $buildDir, string $publicDir, string $adminPath, Logger $logger): ?string
     {
@@ -66,24 +74,42 @@ final class PublicAdminAssets
         }
 
         // build the new copy next to the old one and swap them, so a running site never sees a
-        // half-written directory
-        $suffix = '.' . getmypid() . '-' . bin2hex(random_bytes(3));
-        $staging = $target . '.new' . $suffix;
-        self::copyTree($buildDir, $staging);
-        file_put_contents($staging . '/.htaccess', self::HTACCESS);
+        // half-written directory; whatever fails, nothing is left behind under public/
+        $parent = dirname($target);
+        if (!is_dir($parent) && !@mkdir($parent, 0o755, true) && !is_dir($parent)) {
+            $logger->warn("Cannot create {$parent}: PHP serves the admin assets from build/.");
 
-        if (!is_dir(dirname($target))) {
-            mkdir(dirname($target), 0o755, true);
+            return null;
         }
+        $suffix = getmypid() . '-' . bin2hex(random_bytes(3));
+        $staging = $parent . '/.' . basename($target) . '.new-' . $suffix;
+        $old = $parent . '/.' . basename($target) . '.old-' . $suffix;
+        try {
+            self::copyTree($buildDir, $staging);
+            self::write($staging . '/.htaccess', self::HTACCESS);
+            self::write($staging . '/index.php', self::indexStub(count(explode('/', $relative))));
 
-        $old = null;
-        if (file_exists($target)) {
-            $old = $target . '.old' . $suffix;
-            rename($target, $old);
-        }
-        rename($staging, $target);
-        if ($old !== null) {
-            self::remove($old);
+            $hadOld = file_exists($target);
+            if ($hadOld && !@rename($target, $old)) {
+                throw new \RuntimeException("Cannot replace {$target}.");
+            }
+            if (!@rename($staging, $target)) {
+                if ($hadOld) {
+                    @rename($old, $target);
+                }
+                throw new \RuntimeException("Cannot move the admin assets to {$target}.");
+            }
+        } catch (\RuntimeException $error) {
+            // the build itself succeeded: PHP serves the assets from build/ as before
+            $logger->warn($error->getMessage() . ' PHP serves the admin assets from build/.');
+
+            return null;
+        } finally {
+            foreach ([$staging, $old] as $leftover) {
+                if (is_dir($leftover)) {
+                    self::remove($leftover);
+                }
+            }
         }
 
         $logger->debug("Copied the admin assets to {$target}");
@@ -107,9 +133,36 @@ final class PublicAdminAssets
         return str_starts_with($first, self::MARKER);
     }
 
+    /**
+     * `<adminPath>/` is the copy's directory: a web server that looks for its index (Apache's
+     * `DirectoryIndex index.php`, nginx's `index index.php`, where `try_files $uri` finds the
+     * directory) runs this, which hands the request to the front controller as any admin page.
+     */
+    private static function indexStub(int $depth): string
+    {
+        return <<<PHP
+            <?php
+
+            declare(strict_types=1);
+
+            // Written by `strapi build` (see .htaccess): the admin's pages are the front controller's
+            require dirname(__DIR__, {$depth}) . '/index.php';
+
+            PHP;
+    }
+
+    private static function write(string $file, string $contents): void
+    {
+        if (@file_put_contents($file, $contents) === false) {
+            throw new \RuntimeException("Cannot write {$file}.");
+        }
+    }
+
     private static function copyTree(string $from, string $to): void
     {
-        mkdir($to, 0o755, true);
+        if (!@mkdir($to, 0o755, true)) {
+            throw new \RuntimeException("Cannot create {$to}.");
+        }
         $from = rtrim($from, '/');
         $items = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($from, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
         foreach ($items as $item) {
@@ -125,7 +178,9 @@ final class PublicAdminAssets
                 }
                 continue;
             }
-            copy($item->getPathname(), $dest);
+            if (!@copy($item->getPathname(), $dest)) {
+                throw new \RuntimeException("Cannot copy {$item->getPathname()} to {$dest}.");
+            }
         }
     }
 

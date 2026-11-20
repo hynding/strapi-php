@@ -162,6 +162,18 @@ final class BundleTest extends TestCase
         self::assertCount(1, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['adminPath' => '/'])['warnings'], 'an admin at the root has no copy');
     }
 
+    public function testAnotherPublicDirectory(): void
+    {
+        rename($this->root . '/public', $this->root . '/static');
+
+        $files = array_keys(Bundle::files($this->root, null, 'static/uploads'));
+        self::assertContains('static/uploads/.htaccess', $files);
+        self::assertNotContains('static/uploads/photo.jpg', $files);
+
+        $warnings = Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['publicDir' => 'static'])['warnings'];
+        self::assertStringContainsString('static/admin/ was not written', $warnings[0]);
+    }
+
     public function testRefusesAnUnknownFormat(): void
     {
         $this->expectExceptionMessage('use .zip or .tar.gz');

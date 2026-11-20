@@ -89,8 +89,11 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   pages and its API share the path (`/admin/content-manager/...`, `/admin/login`) and the shell
   is sent with `no-cache`. The copy's `.htaccess` gives the assets upstream's
   `public, max-age=31536000, immutable` and marks the directory as the build's: a build replaces
-  only a directory it wrote, swapping the new copy in whole. Apache answers `/admin` with a 301 to
-  `/admin/` (`mod_dir`, now that the directory exists); the admin works the same from either.
+  only a directory it wrote, swapping the new copy in whole (a copy that fails leaves nothing
+  behind and PHP keeps serving `build/`). `/admin/` is now a directory: its `index.php` hands it
+  to the front controller, for servers that look for a directory index. Checked on Apache +
+  PHP-FPM, nginx + PHP-FPM and FrankenPHP's `php-server`; Apache and Caddy answer `/admin` with a
+  redirect to `/admin/`, and the admin works the same from either.
 - **A bundle for hosts without Composer or Node.** `strapi bundle` packs the project as it runs
   locally (`vendor/`, `build/`, `public/admin/`) into a `.zip` or `.tar.gz`, without `.env`, `.tmp`,
   `.strapi`, `node_modules`, `dist`, `.git` and uploaded media, symlinks archived as their files.
@@ -103,12 +106,17 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   `.tmp` (errors), and the recommended extensions (`intl`, `gd`, `fileinfo`, `zlib`), writable
   `public/uploads` and `.strapi`, opcache off or its JIT on, `enable_post_data_reading` on (the
   `.user.ini` not read), `NODE_ENV` unset, and the `.env.example` secrets kept in production
-  (warnings). `strapi requirements:check` runs it from the command line; the bootstrap that
-  settles a deployment logs it from the web server's PHP, once; and the front controller catches a
-  boot that throws under a per-request web server (`HttpServer::bootFailed()`): the error and the
-  findings go to PHP's error log, the client gets Strapi's 500 error body (with the error and the
-  findings outside production) instead of a bare 500 or, where the host leaves `display_errors`
-  on, a stack trace. A missing `vendor/` is logged and answered 500 too.
+  (warnings). `strapi requirements:check` runs it from the command line; every boot logs it once
+  per server API and deployment (`.tmp/requirements.<sapi>` holds the settled inputs it was
+  logged for), so the web server's PHP is checked on its first request even when a deploy
+  script's CLI command settled the deployment; in development, only under a per-request web server
+  (a deployment without `NODE_ENV`), once an hour. The front controller catches a boot that
+  throws under a per-request web server (`HttpServer::bootFailed()`): the error and the findings
+  go to PHP's error log, the client gets Strapi's 500 error body instead of a bare 500 or, where
+  the host leaves `display_errors` on, a stack trace. The body carries the error and the findings
+  only with `NODE_ENV=development` set explicitly: a boot can fail before `.env` is read, and a
+  host without `NODE_ENV` runs in a development it never chose (`Configuration::nodeEnvDefaulted()`).
+  A missing `vendor/` is logged and answered 500 too.
 - **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
   callbacks in the worker between requests), so `PerRequestLaneTest` (core) serves the example
   app from PHP's built-in server in production, one boot per request: admin auth, API tokens,

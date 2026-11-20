@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Utils;
 
+use Strapi\Core\Configuration\Configuration;
 use Strapi\Types\Core\StrapiDirectories;
 
 /**
@@ -12,9 +13,9 @@ use Strapi\Types\Core\StrapiDirectories;
  * machine that ran `composer install`: a PDO driver or `intl` missing, `.tmp` not writable, opcache
  * off, the JIT on, `.user.ini` not read, `NODE_ENV` unset, the `.env.example` secrets kept.
  *
- * {@see self::check()} lists what is wrong. It runs from `strapi requirements:check`, from the
- * bootstrap that settles a deployment (its findings are logged once, not on every request; in
- * development under a web server, at most once an hour) and when a boot fails under a web server
+ * {@see self::check()} lists what is wrong. It runs from `strapi requirements:check`, from a boot
+ * once per server API and deployment (`Strapi::logRequirementsOnce()`; in development under a
+ * web server, at most once an hour) and when a boot fails under a web server
  * (`HttpServer::bootFailed()`, logged to PHP's error log).
  *
  * @phpstan-type Finding array{level: 'error'|'warning', name: string, message: string}
@@ -109,10 +110,12 @@ final class Requirements
         }
 
         $perRequest = Sapi::isPerRequest($sapi, $platform['frankenphpWorker'] ?? null);
-        $opcacheOn = $loaded('zend opcache') && self::flag($ini($sapi === 'cli' ? 'opcache.enable_cli' : 'opcache.enable'));
+        // PHP's built-in server and phpdbg follow opcache.enable_cli, like the CLI
+        $opcacheSetting = in_array($sapi, ['cli', 'cli-server', 'phpdbg'], true) ? 'opcache.enable_cli' : 'opcache.enable';
+        $opcacheOn = $loaded('zend opcache') && self::flag($ini($opcacheSetting));
 
         if ($perRequest && !$opcacheOn) {
-            $findings[] = self::finding('warning', 'opcache', 'OPcache is off: every request compiles Strapi again (several times slower). Enable it (opcache.enable=1).');
+            $findings[] = self::finding('warning', 'opcache', "OPcache is off: every request compiles Strapi again (several times slower). Enable it ({$opcacheSetting}=1).");
         }
         if ($opcacheOn && self::jitOn($ini)) {
             $findings[] = self::finding('warning', 'opcache.jit', 'The OPcache JIT is on: PHP 8.3\'s JIT has crashed some first boots of Strapi (segmentation fault). Set opcache.jit=disable.');
@@ -201,6 +204,9 @@ final class Requirements
             if (is_string($value)) {
                 $env[$name] = $value;
             }
+        }
+        if (Configuration::nodeEnvDefaulted()) {
+            unset($env['NODE_ENV']); // "not set": loading the config defaulted it to development
         }
 
         return $env;

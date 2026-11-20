@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Services\Server;
 
+use Strapi\Core\Configuration\Configuration;
 use Strapi\Core\Strapi;
 use Strapi\Core\Utils\Requirements;
 use Strapi\Core\Utils\Sapi;
@@ -219,9 +220,10 @@ PHP;
         }
 
         // only where development is explicit: a boot can fail before `.env` is read (a typo in it),
-        // leaving a production host's NODE_ENV unknown
+        // leaving a production host's NODE_ENV unknown, and a host that sets none runs in a
+        // development it never asked for
         $nodeEnv = $_ENV['NODE_ENV'] ?? getenv('NODE_ENV');
-        $details = $nodeEnv !== 'development' ? new \stdClass() : [
+        $details = $nodeEnv !== 'development' || Configuration::nodeEnvDefaulted() ? new \stdClass() : [
             'error' => $error->getMessage(),
             'requirements' => $findings,
         ];

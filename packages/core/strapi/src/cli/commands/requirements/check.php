@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Exits 1 when something Strapi cannot run without is missing.
  *
  * The web server's PHP can differ from the command line's (another version, other extensions,
- * its own php.ini): the bootstrap that settles a deployment logs the same check from there.
+ * its own php.ini): its first request after a deploy logs the same check from there.
  */
 final class Check extends StrapiCommand
 {
@@ -41,7 +41,7 @@ final class Check extends StrapiCommand
         if ($findings === []) {
             $output->writeln('<fg=green>✔ PHP ' . PHP_VERSION . ' and this project meet Strapi\'s requirements.</>');
         }
-        $output->writeln('<fg=gray>This is the command line\'s PHP (' . (php_ini_loaded_file() ?: 'no php.ini') . '); the web server\'s may differ: the first request after a deploy logs the same check from there.</>');
+        $output->writeln('<fg=gray>This is the command line\'s PHP (' . (php_ini_loaded_file() ?: 'no php.ini') . '); the web server\'s may differ: its first request after a deploy logs the same check to PHP\'s error log.</>');
 
         return Requirements::hasErrors($findings) ? Command::FAILURE : Command::SUCCESS;
     }

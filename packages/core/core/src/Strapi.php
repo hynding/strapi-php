@@ -670,6 +670,9 @@ final class Strapi extends Container implements StrapiContract
         // what a settled boot logged, the bootstrap that settled logged already (BootLogBuffer)
         $this->bootLogBuffer?->release($this->bootstrapSettled);
 
+        // after the release: a settled boot's held warnings are dropped
+        $this->logRequirementsOnce();
+
         return $this;
     }
 
@@ -703,11 +706,6 @@ final class Strapi extends Container implements StrapiContract
             // until this bootstrap completes, the record describes no database: one that dies midway
             // (a timeout, a deploy) must not leave a re-created database matching the old record
             @unlink($this->bootstrapSettledFile());
-            // the bootstrap that settles a deployment reports what the host lacks, once; one in
-            // development under a web server too (NODE_ENV not set there), at most once an hour
-            if ($fingerprint !== null || $this->dueDevelopmentRequirementsLog()) {
-                $this->logRequirements();
-            }
             $this->doBootstrap();
             if ($fingerprint !== null) {
                 $this->markBootstrapSettled($fingerprint);
@@ -721,22 +719,27 @@ final class Strapi extends Container implements StrapiContract
     }
 
     /**
-     * PHP port: in development every boot is unsettled; under a web server whose requests each
-     * boot (PHP-FPM...), that is usually a deployment without NODE_ENV. `.tmp/requirements.logged`
-     * keeps that warning to one an hour. The built-in server is `strapi develop`.
+     * PHP port: logs what {@see Utils\Requirements} finds wrong with this PHP and project, once per
+     * server API and deployment (`.tmp/requirements.<sapi>` holds the settled inputs it was logged
+     * for): the web server's PHP is checked on its first request even when a CLI command
+     * (`migrations:run` in a deploy script) settled the deployment, and a settled request only
+     * reads that file. In development (unsettled every boot) it logs only under a web server whose
+     * requests each boot, which is usually a deployment without NODE_ENV, at most once an hour.
      */
-    private function dueDevelopmentRequirementsLog(): bool
+    private function logRequirementsOnce(): void
     {
-        if (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest()) {
-            return false;
+        $key = $this->settledFingerprint;
+        if ($key === null && (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest())) {
+            return;
         }
-        $marker = $this->dirs()->tmp . '/requirements.logged';
-        $last = @filemtime($marker);
-        if ($last !== false && $last > time() - 3600) {
-            return false;
+        $marker = $this->dirs()->tmp . '/requirements.' . PHP_SAPI;
+        $recorded = @file_get_contents($marker);
+        if ($key !== null ? $recorded === $key : ($recorded === 'development' && (int) @filemtime($marker) > time() - 3600)) {
+            return;
         }
-
-        return @touch($marker);
+        // where .tmp cannot be written, every boot logs: the check says so
+        @file_put_contents($marker, $key ?? 'development');
+        $this->logRequirements();
     }
 
     /** PHP port: logs what {@see Utils\Requirements} finds wrong with this PHP and project. */

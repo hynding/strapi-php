@@ -104,8 +104,8 @@ Extract it on the host, point the document root at its `public/`, and create `.e
 Each GitHub release also carries `strapi-php-starter-<version>.zip`, a new project bundled the
 same way. `php bin/strapi requirements:check` checks PHP's version and extensions, the database
 driver, writable directories and the settings Strapi needs; the web server's PHP can differ from
-the command line's, so the first boot after a deploy logs the same check to PHP's error log, and a
-boot that fails logs it with the error (and answers Strapi's 500 error body).
+the command line's, so its first request after a deploy logs the same check to PHP's error log,
+and a boot that fails logs it with the error (and answers Strapi's 500 error body).
 
 To serve the admin panel, install the pinned upstream bundle and build it:
 

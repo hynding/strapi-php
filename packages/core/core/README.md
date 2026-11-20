@@ -145,9 +145,10 @@ symfony/process.
 - **Requirements** (`Utils\Requirements`, not upstream): `check($dirs, $client)` lists what this
   PHP and project lack (PHP version, required and recommended extensions, the client's PDO driver,
   writable `.tmp` / `public/uploads` / `.strapi`, opcache and the JIT, `enable_post_data_reading`,
-  `NODE_ENV`, the `.env.example` secrets in production). The bootstrap that settles a deployment
-  logs the findings; `HttpServer::bootFailed()` (the front controller's catch) logs them with the
-  error to PHP's error log and answers 500 with Strapi's error body (details outside production).
+  `NODE_ENV`, the `.env.example` secrets in production). A boot logs the findings once per server
+  API and deployment (`.tmp/requirements.<sapi>`); `HttpServer::bootFailed()` (the front
+  controller's catch) logs them with the error to PHP's error log and answers 500 with Strapi's
+  error body (details only with an explicit `NODE_ENV=development`).
 - **Bootstrap lock**: `bootstrap()` serializes boots on `.tmp/bootstrap.lock` (concurrent first
   boots race on its writes) until one has completed; `.tmp/bootstrap.settled` then records the
   inputs' fingerprint and the database's latest schema row, and boots with the same inputs on the

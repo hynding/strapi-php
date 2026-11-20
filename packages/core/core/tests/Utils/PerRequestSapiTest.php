@@ -153,6 +153,8 @@ final class PerRequestSapiTest extends TestCase
     {
         yield from self::environments();
         yield 'development' => ['development'];
+        // the host sets none: Strapi defaults to development, which is no reason to answer details
+        yield 'not set' => [''];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('allEnvironments')]
@@ -186,6 +188,9 @@ final class PerRequestSapiTest extends TestCase
         if ($environment === 'development') {
             self::assertStringContainsString('[warning] NODE_ENV is "development"', $logged, 'what the host lacks is logged with it');
         }
+        if ($environment === '') {
+            self::assertStringContainsString('[warning] NODE_ENV is not set', $logged);
+        }
     }
 
     public function testDevelopmentUnderAWebServerLogsWhatTheHostLacksOnceAnHour(): void
@@ -209,6 +214,6 @@ final class PerRequestSapiTest extends TestCase
 
     private static function requirementsMarker(): string
     {
-        return dirname(__DIR__, 5) . '/examples/getstarted/.tmp/requirements.logged';
+        return dirname(__DIR__, 5) . '/examples/getstarted/.tmp/requirements.cgi-fcgi';
     }
 }
