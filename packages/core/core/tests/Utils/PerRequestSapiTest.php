@@ -48,6 +48,8 @@ final class PerRequestSapiTest extends TestCase
 
     protected function tearDown(): void
     {
+        // what settled boots wrote to the boot cache (.strapi/cache)
+        array_map('unlink', glob(dirname(__DIR__, 5) . '/examples/getstarted/.strapi/cache/*.php') ?: []);
         if ($this->dir !== '') {
             array_map('unlink', glob($this->dir . '/*') ?: []);
             @rmdir($this->dir);
@@ -91,8 +93,8 @@ final class PerRequestSapiTest extends TestCase
         ];
         $process = proc_open(
             // PHP 8.3's function JIT (`opcache.jit=1235`, setup-php's default on CI) segfaults on some
-        // fresh boots, on main too (php-cgi exit code 139; locally 4 boots in 10 here, 1 in 15 on main): a
-        // PHP bug, not what these tests check (docs/README.md, "Runtime model")
+            // fresh boots, on main too (php-cgi exit code 139; locally 4 boots in 10 here, 1 in 15 on main): a
+            // PHP bug, not what these tests check (docs/README.md, "Runtime model")
             [$phpCgi, '-d', 'opcache.jit=disable', '-d', "error_log={$this->dir}/error.log", '-d', 'log_errors=1', '-d', 'display_errors=0', "{$app}/public/index.php"],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,

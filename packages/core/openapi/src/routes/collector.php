@@ -6,6 +6,7 @@ namespace Strapi\Openapi\Routes;
 
 use Strapi\Openapi\Routes\Providers\RoutesProvider;
 use Strapi\Openapi\Utils\Debug;
+use Strapi\Utils\Zod\ZodLazy;
 
 /** Port of packages/core/openapi/src/routes/collector.ts: collects and filters routes from multiple providers. */
 final class RouteCollector
@@ -38,6 +39,7 @@ final class RouteCollector
                 $routes[] = $route;
             }
         }
+        self::buildDeferredSchemas($routes);
         $sanitizedRoutes = $this->filter($routes);
 
         Debug::createDebugger('routes:collector')(
@@ -49,6 +51,37 @@ final class RouteCollector
         );
 
         return $sanitizedRoutes;
+    }
+
+    /**
+     * PHP port: a settled boot defers the core routes' request and response schemas (`z.lazy()`,
+     * Strapi\Core\CoreApi\Routes\Routes). They are built here, every route's in the order an
+     * unsettled boot builds them at route registration (the providers' order, then `request` before
+     * `response`), so that the content API's schema registry, which decides what becomes a
+     * component, fills as it does upstream, and the document comes out the same.
+     *
+     * @param list<array<string, mixed>> $routes
+     */
+    private static function buildDeferredSchemas(array $routes): void
+    {
+        foreach ($routes as $route) {
+            $request = $route['request'] ?? null;
+            if (is_array($request)) {
+                foreach ($request as $part) {
+                    if (!is_array($part)) {
+                        continue;
+                    }
+                    foreach ($part as $schema) {
+                        if ($schema instanceof ZodLazy) {
+                            $schema->unwrap();
+                        }
+                    }
+                }
+            }
+            if (($route['response'] ?? null) instanceof ZodLazy) {
+                $route['response']->unwrap();
+            }
+        }
     }
 
     /**

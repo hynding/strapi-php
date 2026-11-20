@@ -9,6 +9,7 @@ use FastRoute\Dispatcher;
 use FastRoute\Dispatcher\GroupCountBased as GroupDispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std as RouteParser;
+use Strapi\Core\Utils\BootCache;
 
 /**
  * Not an upstream file: stands in for `@koa/router`. Routes are collected with their Koa-style
@@ -26,10 +27,14 @@ final class Router
     /** @var list<RouteEntry> */
     private array $stack = [];
 
-    /** @var list<array{regex: string, method: string, handler: callable, route: array<string, mixed>}> */
+    /** @var list<array{regex: string, method: string, index: int}> stack indexes */
     private array $regexRoutes = [];
 
     private ?Dispatcher $dispatcher = null;
+
+    private ?BootCache $cache = null;
+
+    private string $cacheKey = '';
 
     public function __construct(private readonly string $prefix = '')
     {
@@ -38,6 +43,18 @@ final class Router
     public function prefix(): string
     {
         return $this->prefix;
+    }
+
+    /**
+     * PHP port: keep the compiled route table in the boot cache (`routes`), keyed on `$key` (the
+     * code that compiles it: Strapi::bootCacheKey()) and every route's method and path in order (what
+     * it is compiled from). Set on the server's root router on a settled boot, where compiling it
+     * was a twentieth of the boot.
+     */
+    public function useCache(?BootCache $cache, string $key = ''): void
+    {
+        $this->cache = $cache;
+        $this->cacheKey = $key;
     }
 
     /** @param array<string, mixed> $route */
@@ -92,6 +109,33 @@ final class Router
 
     private function compile(): Dispatcher
     {
+        if ($this->cache === null) {
+            return $this->dispatcher = $this->compileTable()['dispatcher'];
+        }
+
+        $key = $this->cacheKey . "\n";
+        foreach ($this->stack as $entry) {
+            $key .= $entry['method'] . ' ' . $entry['path'] . "\n";
+        }
+
+        $cached = $this->cache->get('routes', $key);
+        if ($cached !== null && is_array($cached['data'] ?? null) && is_array($cached['regexRoutes'] ?? null)) {
+            /** @var list<array{regex: string, method: string, index: int}> $regexRoutes */
+            $regexRoutes = $cached['regexRoutes'];
+            $this->regexRoutes = $regexRoutes;
+
+            return $this->dispatcher = new GroupDispatcher($cached['data']);
+        }
+
+        ['dispatcher' => $dispatcher, 'data' => $data] = $this->compileTable();
+        $this->cache->set('routes', $key, ['data' => $data, 'regexRoutes' => $this->regexRoutes]);
+
+        return $this->dispatcher = $dispatcher;
+    }
+
+    /** @return array{dispatcher: Dispatcher, data: array<array-key, mixed>} */
+    private function compileTable(): array
+    {
         $collector = new RouteCollector(new RouteParser(), new DataGenerator());
         $this->regexRoutes = [];
         $seen = [];
@@ -102,7 +146,7 @@ final class Router
                 // koa-router's `:name(regex)` params become named groups
                 $regex = preg_replace('~:([A-Za-z_][A-Za-z0-9_]*)\(~', '(?P<$1>', $entry['path']) ?? $entry['path'];
                 foreach ($methods as $method) {
-                    $this->regexRoutes[] = ['regex' => '~^' . $regex . '$~', 'method' => $method, 'handler' => $entry['handler'], 'route' => $entry['route']];
+                    $this->regexRoutes[] = ['regex' => '~^' . $regex . '$~', 'method' => $method, 'index' => $index];
                 }
                 continue;
             }
@@ -122,9 +166,9 @@ final class Router
             }
         }
 
-        $this->dispatcher = new GroupDispatcher($collector->getData());
+        $data = $collector->getData();
 
-        return $this->dispatcher;
+        return ['dispatcher' => new GroupDispatcher($data), 'data' => $data];
     }
 
     /**
@@ -185,7 +229,9 @@ final class Router
                     }
                 }
 
-                return ['found' => ['handler' => $regexRoute['handler'], 'params' => $params, 'route' => $regexRoute['route']], 'allowed' => []];
+                $entry = $this->stack[$regexRoute['index']];
+
+                return ['found' => ['handler' => $entry['handler'], 'params' => $params, 'route' => $entry['route']], 'allowed' => []];
             }
             $allowed[] = $regexRoute['method'];
         }

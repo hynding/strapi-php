@@ -102,9 +102,44 @@ per-request work: 4 fresh boots in 10 on it, 1 in 15 before it, locally on 8.3.6
 host lets you choose, use one of those.
 
 On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
-~65 ms, 1,024 to 795 included files, 24 to 10 MB. What remains is mostly routing (~18 ms) and
-the plugins' remaining bootstraps; a boot cache (resolved config, schemas, routes) would take
-most of the rest.
+~65 ms, 1,024 to 795 included files, 24 to 10 MB.
+
+- **A settled boot defers what no request needs, and caches what it computes the same way every
+  time.** Profiled per request (PHP's built-in server, opcache in shared memory, as under FPM),
+  a settled boot and request of `examples/getstarted` took ~44–50 ms: loading config, plugins and
+  schemas was ~5 ms of it, the rest was CPU in bootstrap. Now ~24 ms (`/_health`) to ~28 ms
+  (`/api/articles`) on the same machine:
+  - Endpoints are composed when their route first matches (`ComposeEndpoint`): composing all of
+    them (resolving and validating every route's policies, instantiating every controller) was
+    ~5 ms. Route middlewares are still resolved at bootstrap (a factory may extend the app), and
+    actions are still bound to their route type for the content-API permission map.
+  - The core routes' response schemas and each query param's schema are `z.lazy()` stand-ins
+    (`CoreApi\Routes\Routes`), ~6 ms. They describe routes for OpenAPI documents; query params
+    keep their names, so `contentAPI.addQueryParams` joins them as before, and body schemas stay
+    eager because `addInputParams` merges into them. The OpenAPI route collector builds the
+    stand-ins first, in registration order, so the schema registry fills as on an unsettled boot
+    and the document is the same (`SettledRoutesTest`).
+  - Admin actions are not validated again (`Domain\Action\Provider`), ~6 ms: the bootstrap that
+    settled validated the same actions from the same code.
+  - The boot cache, `.strapi/cache/<name>.<key hash>.php` (`Utils\BootCache`): `var_export`ed
+    arrays that opcache serves from shared memory as immutable arrays. `db-metadata` (~4 ms) is
+    keyed on the settled fingerprint, which holds every model; its callables (the `documentId`
+    and `publishedAt` defaults, the `localizations` join condition) are shared instances of
+    `SchemaFactory::callable()` that the entry names, and models' lifecycles are put back from
+    the models; metadata holding another closure is built every time. `routes` (the compiled
+    FastRoute table, ~1.5 ms) is keyed on the settled fingerprint and every route's method and path. The key is in the file
+    name because production opcache often runs with `validate_timestamps=0`, where a file
+    rewritten in place keeps its old contents; writing an entry removes its other files. The
+    first settled boot writes the entries; an unwritable `.strapi` leaves the cache empty. Used
+    only where opcache keeps scripts in shared memory (`BootCache::supported()`): without it, or
+    with `opcache.file_cache_only`, including the 450 KB metadata entry costs what building it
+    does, so the CLI (`opcache.enable_cli` off by default) builds as before.
+
+  Config, the plugin list and the API and component schemas are not cached: they are the inputs
+  the settled check hashes, they load in ~5 ms with opcache, and config and plugins hold closures.
+  What remains of a settled boot: the settled check itself (fingerprint and the database's latest
+  schema row, ~4 ms), the plugins' bootstraps (~4 ms, mostly reads of the core store), register
+  (~5 ms) and the request (~3 ms).
 
 ## Status
 
@@ -154,11 +189,8 @@ starting and after finishing (`/api-tests` in Claude Code).
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
 - PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~65 ms on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  ~24–28 ms with its request on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
   Still to do, in order:
-  - a boot cache for production (`.strapi/cache/*.php`, `var_export`ed and served from opcache):
-    resolved config, plugin list, API and component schemas, database metadata, the FastRoute
-    dispatcher; keyed on `composer.lock`, `src/**` and `config/**`;
   - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
     shutdown function, after `destroy()` and before the response is finished; unreachable without
     an Enterprise licence (no AI metadata provider), so left as is until AI is;

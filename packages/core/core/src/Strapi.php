@@ -33,12 +33,11 @@ use Strapi\Core\Utils\IsInitialized;
 use Strapi\Core\Utils\StartupLogger;
 use Strapi\Database\Database;
 use Strapi\Logger\Logger;
-use Strapi\Types\Core\StrapiDirectories;
 use Strapi\Types\Core\Strapi as StrapiContract;
+use Strapi\Types\Core\StrapiDirectories;
 use Strapi\Types\Modules\Documents\Repository;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\AuthScope;
-use Strapi\Utils\ContentTypes as ContentTypesUtils;
 use Strapi\Utils\EnvHelper;
 use Strapi\Utils\Hooks\Hook;
 
@@ -70,6 +69,11 @@ final class Strapi extends Container implements StrapiContract
     private bool $bootstrapSettled = false;
 
     private ?Utils\BootLogBuffer $bootLogBuffer = null;
+
+    /** The inputs' hash this boot's bootstrap was settled for (see bootstrapFingerprint()). */
+    private ?string $settledFingerprint = null;
+
+    private ?Utils\BootCache $bootCache = null;
 
     /** @var array<string, mixed> */
     public array $internal_config = [];
@@ -446,6 +450,32 @@ final class Strapi extends Container implements StrapiContract
     }
 
     /**
+     * PHP port: the production boot cache (`.strapi/cache`, see {@see Utils\BootCache}), on a
+     * settled boot only: the inputs it was settled for are what the entries are keyed on, and
+     * development, where no boot settles, never reads stale entries. Null otherwise, and where
+     * opcache does not keep scripts in shared memory (the CLI by default).
+     */
+    public function bootCache(): ?Utils\BootCache
+    {
+        if (!$this->bootstrapSettled || $this->settledFingerprint === null || !Utils\BootCache::supported()) {
+            return null;
+        }
+
+        return $this->bootCache ??= new Utils\BootCache($this->dirs()->root . '/.strapi/cache');
+    }
+
+    /**
+     * PHP port: what boot cache entries are keyed on besides their own inputs: the inputs this
+     * boot was settled for (the Strapi version, every installed package, config, schemas and code
+     * stats), so that an upgrade never reads an entry the previous code wrote. Null when there is
+     * no boot cache ({@see bootCache()}).
+     */
+    public function bootCacheKey(): ?string
+    {
+        return $this->bootCache() !== null ? $this->settledFingerprint : null;
+    }
+
+    /**
      * PHP port: the next boot runs the whole bootstrap, as upstream's next start does. For what
      * changes the database outside a bootstrap and leaves its schema as it was (a configuration
      * restore, an import): a settled boot would skip the re-syncs that repair it. Deleting
@@ -647,6 +677,7 @@ final class Strapi extends Container implements StrapiContract
     {
         $fingerprint = $this->bootstrapFingerprint();
         $this->bootstrapSettled = $fingerprint !== null && $this->matchesSettledRecord($fingerprint);
+        $this->settledFingerprint = $fingerprint;
         if ($this->bootstrapSettled) {
             $this->doBootstrap();
 
@@ -841,9 +872,8 @@ final class Strapi extends Container implements StrapiContract
     private function doBootstrap(): static
     {
         // content types + components (Schema objects) and the raw models (core store, webhooks)
-        $models = [...array_values($this->contentTypes()), ...array_values($this->components()), ...$this->get('models')->get()];
         $db = $this->db();
-        $db->init($models);
+        $this->initDatabase($db);
 
         $oldContentTypes = null;
         if ($db->getSchemaConnection()->tablesExist([CoreStore::coreStoreModel()['tableName']])) {
@@ -893,6 +923,46 @@ final class Strapi extends Container implements StrapiContract
         $this->runUserLifecycles(Utils\Lifecycles::BOOTSTRAP);
 
         return $this;
+    }
+
+    /**
+     * `db.init()` with every content type, component and raw model. A settled boot reads the
+     * metadata from the boot cache (keyed on the settled inputs, which hold every model), where
+     * the first settled boot wrote it: building it was a tenth of a settled boot.
+     */
+    private function initDatabase(Database $db): void
+    {
+        $rawModels = $this->get('models')->get();
+        $cache = $this->bootCache();
+        $key = (string) $this->bootCacheKey();
+
+        if ($cache !== null) {
+            $entry = $cache->get('db-metadata', $key);
+            if ($entry !== null) {
+                $lifecycles = [];
+                foreach ([...array_values($this->contentTypes()), ...array_values($this->components())] as $schema) {
+                    $schemaLifecycles = $schema->config['lifecycles'] ?? null;
+                    if (is_array($schemaLifecycles) && $schemaLifecycles !== []) {
+                        $lifecycles[$schema->uid] = $schemaLifecycles;
+                    }
+                }
+                foreach ($rawModels as $model) {
+                    if (is_array($model['lifecycles'] ?? null) && $model['lifecycles'] !== [] && is_string($model['uid'] ?? null)) {
+                        $lifecycles[$model['uid']] = $model['lifecycles'];
+                    }
+                }
+                if ($db->initFromCache($entry, $lifecycles)) {
+                    return;
+                }
+            }
+        }
+
+        $db->init([...array_values($this->contentTypes()), ...array_values($this->components()), ...$rawModels]);
+
+        $metadata = $cache !== null ? $db->metadata->toCache() : null;
+        if ($metadata !== null) {
+            $cache?->set('db-metadata', $key, $metadata);
+        }
     }
 
     public function destroy(): void

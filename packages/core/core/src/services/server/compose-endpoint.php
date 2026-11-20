@@ -90,22 +90,73 @@ final class ComposeEndpoint
 
             $middlewares = Middleware::resolveRouteMiddlewares($route, $this->strapi);
 
-            $action = $this->getAction($route);
+            if ($this->strapi->bootstrapSettled()) {
+                $router->add($method, $path, $this->deferredHandler($route, $middlewares), $route);
 
-            $routeHandler = Compose::compose([
-                self::createRouteInfoMiddleware($route),
-                $this->authenticate,
-                $this->authorize,
-                Policy::createPoliciesMiddleware($route, $this->strapi),
-                ...$middlewares,
-                self::returnBodyMiddleware(),
-                ...$action,
-            ]);
+                return;
+            }
 
-            $router->add($method, $path, $routeHandler, $route);
+            $router->add($method, $path, $this->composeHandler($route, $middlewares, $this->getAction($route)), $route);
         } catch (\Throwable $error) {
             throw new \RuntimeException("Error creating endpoint {$route['method']} {$route['path']}: {$error->getMessage()}", 0, $error);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $route
+     * @param list<callable> $middlewares
+     * @param list<callable> $action
+     */
+    private function composeHandler(array $route, array $middlewares, array $action): \Closure
+    {
+        return Compose::compose([
+            self::createRouteInfoMiddleware($route),
+            $this->authenticate,
+            $this->authorize,
+            Policy::createPoliciesMiddleware($route, $this->strapi),
+            ...$middlewares,
+            self::returnBodyMiddleware(),
+            ...$action,
+        ]);
+    }
+
+    /**
+     * PHP port: on a settled boot (Strapi::bootstrapSettled(); under PHP-FPM, most requests) the
+     * endpoint is composed when its route first matches. A boot serves one request, and composing
+     * every endpoint (resolving and validating each route's policies, instantiating every
+     * controller) was an eighth of a settled boot; the bootstrap that settled composed the same
+     * routes from the same code without an error. The route's middlewares are still resolved
+     * above (a middleware factory may extend the app), and its action is still bound to the route
+     * type for the content-API permission map, which bootstrap reads next.
+     *
+     * @param array<string, mixed> $route
+     * @param list<callable> $middlewares
+     */
+    private function deferredHandler(array $route, array $middlewares): \Closure
+    {
+        $handler = $route['handler'] ?? null;
+        if (is_string($handler)) {
+            $info = is_array($route['info'] ?? null) ? $route['info'] : [];
+            ['controllerName' => $controllerName, 'actionName' => $actionName] = self::extractHandlerParts(trim($handler));
+            $pluginName = is_string($info['pluginName'] ?? null) ? $info['pluginName'] : null;
+            $apiName = is_string($info['apiName'] ?? null) ? $info['apiName'] : null;
+            $type = $info['type'] ?? null;
+            $this->strapi->contentAPI()->permissions->registerBoundAction($this->controllerUid($controllerName, $pluginName, $apiName), $actionName, is_string($type) ? $type : '');
+        }
+
+        $composed = null;
+
+        return function (Context $ctx, ?callable $next = null) use (&$composed, $route, $middlewares): mixed {
+            if ($composed === null) {
+                try {
+                    $composed = $this->composeHandler($route, $middlewares, $this->getAction($route, false));
+                } catch (\Throwable $error) {
+                    throw new \RuntimeException("Error creating endpoint {$route['method']} {$route['path']}: {$error->getMessage()}", 0, $error);
+                }
+            }
+
+            return $composed($ctx, $next);
+        };
     }
 
     /** @param array{pluginName?: string|null, apiName?: string|null, type?: string|null} $info */
@@ -146,9 +197,10 @@ final class ComposeEndpoint
      * (closure, invokable or `[$object, 'method']`) is used as is, a list of callables is chained.
      *
      * @param array<string, mixed> $route
+     * @param bool $bind whether to bind the action to the route type (a deferred endpoint did already)
      * @return list<callable>
      */
-    private function getAction(array $route): array
+    private function getAction(array $route, bool $bind = true): array
     {
         $handler = $route['handler'];
         $info = $route['info'] ?? [];
@@ -181,8 +233,10 @@ final class ComposeEndpoint
         }
 
         // upstream tags the action with the route type (`__type__` symbol) for the content-API permission map
-        $controllerUid = $this->controllerUid($controllerName, $pluginName, $apiName);
-        $this->strapi->contentAPI()->permissions->registerBoundAction($controllerUid, $actionName, (string) $type);
+        if ($bind) {
+            $controllerUid = $this->controllerUid($controllerName, $pluginName, $apiName);
+            $this->strapi->contentAPI()->permissions->registerBoundAction($controllerUid, $actionName, (string) $type);
+        }
 
         $action = ActionMap::action($controller, $actionName);
 

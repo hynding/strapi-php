@@ -70,6 +70,7 @@ final class PerRequestLaneTest extends TestCase
     protected function tearDown(): void
     {
         $this->server?->stop(0);
+        array_map('unlink', glob(self::cacheDir() . '/*.php') ?: []);
         array_map('unlink', glob($this->dir . '/*') ?: []);
         @rmdir($this->dir);
     }
@@ -165,6 +166,18 @@ final class PerRequestLaneTest extends TestCase
         // only the first boot logged its startup and shutdown; settled boots log their request
         $output = $this->serverOutput();
         self::assertSame(1, substr_count($output, 'Shutting down Strapi'), $output);
+
+        // settled boots keep the database metadata and the route table in the boot cache, where
+        // opcache keeps scripts in shared memory (the built-in server: `opcache.enable`)
+        if (function_exists('opcache_get_status') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOL) && !filter_var(ini_get('opcache.file_cache_only'), FILTER_VALIDATE_BOOL)) {
+            self::assertCount(1, glob(self::cacheDir() . '/db-metadata.*.php') ?: [], $output);
+            self::assertCount(1, glob(self::cacheDir() . '/routes.*.php') ?: [], $output);
+        }
+    }
+
+    private static function cacheDir(): string
+    {
+        return dirname(__DIR__, 4) . '/examples/getstarted/.strapi/cache';
     }
 
     public function testRateLimitsCountAcrossRequests(): void

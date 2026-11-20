@@ -6,6 +6,7 @@ namespace Strapi\Plugin\I18n;
 
 use Strapi\Core\Strapi;
 use Strapi\Database\Utils\Identifiers\Identifiers;
+use Strapi\Database\Utils\SchemaFactory;
 use Strapi\Plugin\I18n\Controllers\ValidateLocaleCreation;
 use Strapi\Plugin\I18n\Models\AiLocalizationJob;
 use Strapi\Plugin\I18n\Utils\Utils;
@@ -107,11 +108,7 @@ final class Register
                     'referencedColumn' => 'document_id',
                     'referencedTable' => Identifiers::global()->getTableName($contentType->collectionName),
                     // ensure the population will not include the results we already loaded
-                    'on' => static fn (array $ctx): array => [
-                        'id' => [
-                            '$notIn' => array_map(static fn (array $r): mixed => $r['id'] ?? null, is_array($ctx['results'] ?? null) ? $ctx['results'] : []),
-                        ],
-                    ],
+                    'on' => SchemaFactory::callable(SchemaFactory::NOT_IN_RESULTS),
                 ],
             ];
 
