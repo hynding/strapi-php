@@ -249,7 +249,7 @@ final class LandingPage
             $configForEncoding = $config;
             unset($configForEncoding['precomputedNonce']);
 
-            if (($config['embed'] ?? false) !== false && $config['embed'] !== null) {
+            if (($config['embed'] ?? false) !== false) {
                 if (array_key_exists('graphRef', $config) && $config['graphRef']) {
                     $body = self::getEmbeddedExplorerHTML($explorerVersion, $config, $apolloServerVersion, $nonce);
                 } elseif (!array_key_exists('graphRef', $config)) {
