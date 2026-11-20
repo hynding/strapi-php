@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Strapi\Cli\Node\Vite;
 
+use Strapi\Cli\Node\Core\PublicAdminAssets;
 use Symfony\Component\Process\Process;
 
 /**
  * Port of packages/core/strapi/src/node/vite/build.ts: writes the generated Vite config next to
  * the client entry and runs `vite build` with the project's Node toolchain (`node_modules/.bin/vite`,
- * or `npx vite` as a fallback).
+ * or `npx vite` as a fallback), then copies the bundle under `public/` ({@see PublicAdminAssets}).
  *
  * @phpstan-import-type BuildContext from \Strapi\Cli\Node\CreateBuildContext
  */
@@ -37,6 +38,9 @@ final class Build
         if (!$process->isSuccessful()) {
             throw new \RuntimeException('vite build failed (exit code ' . $process->getExitCode() . '): ' . trim($process->getErrorOutput() ?: $process->getOutput()));
         }
+
+        // PHP edition: a copy under public/ for the web server to serve without a boot per asset
+        PublicAdminAssets::publish($ctx['distPath'], $ctx['strapi']->dirs()->public, $ctx['adminPath'], $ctx['logger']);
     }
 
     /** `node_modules/.bin/<name>` up the directory tree. */

@@ -1,0 +1,59 @@
+name: Release bundle
+
+# A starter project ready for a host without Composer or Node (shared hosting): the vanilla
+# create-strapi-app project of the tag, with vendor/ (no dev packages) and the built admin panel,
+# packed by `php bin/strapi bundle` and attached to the tag's GitHub release.
+# Upload it, extract it, point the document root at strapi-php-starter/public and create .env
+# from .env.example (README, "Shared hosting").
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, fileinfo, zip
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: composer install --no-interaction --prefer-dist --no-dev
+      - name: Create the starter project
+        run: |
+          php packages/cli/create-strapi-app/bin/create-strapi-app "$RUNNER_TEMP/strapi-php-starter" \
+            --non-interactive --no-example --dbclient sqlite --no-install --no-git-init --no-run --skip-cloud
+      - name: Install strapi-php from this commit (the files git tracks, copied)
+        working-directory: ${{ runner.temp }}/strapi-php-starter
+        run: |
+          mkdir "$RUNNER_TEMP/strapi-php-src"
+          git -C "$GITHUB_WORKSPACE" archive HEAD | tar -x -C "$RUNNER_TEMP/strapi-php-src"
+          composer config repositories.strapi-php "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/strapi-php-src\", \"options\": {\"symlink\": false}}"
+          composer install --no-interaction --no-dev --optimize-autoloader
+      - name: Build the admin panel
+        working-directory: ${{ runner.temp }}/strapi-php-starter
+        run: |
+          npm install --no-audit --no-fund
+          php bin/strapi build
+      - name: Bundle
+        working-directory: ${{ runner.temp }}/strapi-php-starter
+        run: |
+          php bin/strapi bundle --output "$RUNNER_TEMP/strapi-php-starter-${GITHUB_REF_NAME}.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: strapi-php-starter
+          path: ${{ runner.temp }}/strapi-php-starter-*.zip
+      - if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ runner.temp }}/strapi-php-starter-*.zip
+          prerelease: ${{ contains(github.ref_name, '-') }}

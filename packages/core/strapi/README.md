@@ -37,7 +37,7 @@ HttpServer::emit($server->handle(HttpServer::requestFromGlobals()));
 | --- | --- | --- |
 | `start` | `start.ts` | `createStrapi({appDir, distDir}).start()` — PHP's built-in server runs `public/index.php` (`HttpServer`). A production deployment serves that file with FPM or FrankenPHP instead. |
 | `develop` (`dev`) | `develop.ts` | Checks the admin dependencies, builds the admin once (`--no-build-admin` skips), loads and starts the server. No cluster/worker restart (PHP re-reads the sources per request) and no Vite middleware mode: `--watch-admin` is accepted and ignored. |
-| `build` | `build.ts` | `EnsureAdminDependencies` (VERSIONING.md check: `package.json` must pin `@strapi/admin` and `@strapi/strapi` to this package's version, installed copy must match), `CreateBuildContext`, `StaticFiles::writeStaticClientFiles()` (`.strapi/client/app.js`, `index.html`), `Vite\Build` (writes `.strapi/client/vite.config.mjs` and runs `node_modules/.bin/vite build`). `--bundler webpack` is refused. |
+| `build` | `build.ts` | `EnsureAdminDependencies` (VERSIONING.md check: `package.json` must pin `@strapi/admin` and `@strapi/strapi` to this package's version, installed copy must match), `CreateBuildContext`, `StaticFiles::writeStaticClientFiles()` (`.strapi/client/app.js`, `index.html`), `Vite\Build` (writes `.strapi/client/vite.config.mjs` and runs `node_modules/.bin/vite build`), then — PHP addition — `PublicAdminAssets` copies `build/` without `index.html` to `public/<admin.path>/` for the web server to serve. `--bundler webpack` is refused. |
 | `console` | `console.ts` | readline/eval REPL with `$strapi` (and `$app`) loaded; expressions are echoed as JSON. |
 | `version` | `version.ts` | Prints `Strapi\Cli\Strapi::version()`. |
 | `routes:list` | `routes/list.ts` | Table with Method, Path and — PHP addition — Handler, Policies, Auth. |
@@ -57,6 +57,8 @@ HttpServer::emit($server->handle(HttpServer::requestFromGlobals()));
 | `telemetry:enable`, `telemetry:disable` | `telemetry/*.ts` | No-ops writing `extra.strapi.telemetryDisabled` into `composer.json`; nothing is ever sent. |
 | `cron:run` | — | PHP addition: runs the due cron tasks once (crontab under FPM), `--loop` polls, `--list` prints the jobs. |
 | `migrations:run` | — | PHP addition: loads the app (which runs pending migrations) and confirms the state. |
+| `requirements:check` | — | PHP addition: checks this PHP and project (`Strapi\Core\Utils\Requirements`: PHP version, extensions, the database client's PDO driver, writable `.tmp` / `public/uploads` / `.strapi`, the JIT, the `.env.example` secrets in production); exits 1 on an error. |
+| `bundle [-o <archive>] [--without-admin]` | — | PHP addition: packs the project with `vendor/` and the built admin (`build/`, `public/admin/`) into a `.zip` or `.tar.gz` (default `dist/<name>.zip`) for a host without Composer or Node; leaves out `.env`, `.tmp`, `.strapi`, `node_modules`, `dist`, `.git` and uploaded media, and archives symlinks as their files. |
 
 Every command accepts `--debug` / `--silent` like upstream; `runAction` refuses to run outside a
 Strapi project (a `composer.json` requiring `strapi/strapi` or `strapi/core`).
@@ -82,6 +84,7 @@ Strapi project (a `composer.json` requiring `strapi/strapi` or `strapi/core`).
 | `node/vite/config.ts`, `node/vite/build.ts` | `src/node/vite/config.php`, `src/node/vite/build.php` | `Config::resolveProductionConfig($ctx)` (the Vite config as an ES module: same `define`, `optimizeDeps.include`, `resolve.dedupe`/`alias`, the `strapi/server/build-files` plugin; a user `src/admin/vite.config.*` is applied), `Build::build($ctx)`. |
 | `node/core/plugins.ts` | `src/node/core/plugins.php` | `Plugins::getEnabledPlugins()`, `getMapOfPluginsWithAdmin()`, `getModule()`. |
 | `node/core/env.ts`, `files.ts`, `errors.ts`, `timer.ts`, `admin-customisations.ts`, `ensure-admin-dependencies.ts` | `src/node/core/*.php` | `Env`, `Files`, `Errors::handleUnexpectedError()`, `Timer`, `AdminCustomisations::loadUserAppFile()`, `EnsureAdminDependencies::handleAdminDependencies()` / `assertVersionsMatch()`, `MissingAdminPeerDepsError`. |
+| — | `src/node/core/public-admin-assets.php` | `PublicAdminAssets::publish($buildDir, $publicDir, $adminPath, $logger)`: the copy of the admin bundle under `public/` (without `index.html`, with an `.htaccess` for immutable caching that marks it as the build's), swapped in whole; a directory of the project's own at that path is left alone. `isPublished()`. |
 | `bin/strapi.js` | `bin/strapi` | The Composer binary. |
 | — | `templates/index.php` | The `public/index.php` front controller (FPM + FrankenPHP worker mode + built-in server static files). |
 

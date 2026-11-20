@@ -2,6 +2,7 @@
 .tmp/
 .strapi/
 build/
+public/admin/
 dist/
 node_modules/
 vendor/

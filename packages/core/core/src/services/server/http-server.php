@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Strapi\Core\Services\Server;
 
 use Strapi\Core\Strapi;
+use Strapi\Core\Utils\Requirements;
+use Strapi\Core\Utils\Sapi;
+use Strapi\Types\Core\StrapiDirectories;
 use Symfony\Component\Process\Process;
 
 /**
@@ -189,6 +192,42 @@ PHP;
         }
 
         return null;
+    }
+
+    /**
+     * PHP port: the front controller's answer to a boot that throws. Under a web server whose
+     * requests each boot (PHP-FPM, CGI, mod_php, LiteSpeed, FrankenPHP's classic mode) an uncaught
+     * error is a bare 500, or a stack trace in the page where the host leaves `display_errors` on.
+     * This logs the error, with what {@see Requirements} finds wrong with the host, to PHP's error
+     * log (the one log a shared host shows) and answers 500 with Strapi's error body; outside
+     * production the body carries the error and the findings. Elsewhere (CLI, FrankenPHP worker
+     * mode, the built-in server's console) it rethrows.
+     */
+    public static function bootFailed(\Throwable $error, string $root, ?string $sapi = null): void
+    {
+        $sapi ??= PHP_SAPI;
+        if (!Sapi::isPerRequest($sapi) || $sapi === 'cli-server') {
+            throw $error;
+        }
+
+        $client = $_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT');
+        $findings = Requirements::check(StrapiDirectories::fromRoot($root), is_string($client) && $client !== '' ? $client : null);
+
+        error_log("[strapi] The application failed to start: {$error}");
+        if ($findings !== []) {
+            error_log("[strapi] Requirements (php bin/strapi requirements:check):\n" . Requirements::format($findings));
+        }
+
+        $nodeEnv = $_ENV['NODE_ENV'] ?? getenv('NODE_ENV');
+        $details = $nodeEnv === 'production' ? new \stdClass() : [
+            'error' => $error->getMessage(),
+            'requirements' => $findings,
+        ];
+
+        self::emit(new \Nyholm\Psr7\Response(500, ['Content-Type' => 'application/json; charset=utf-8'], (string) json_encode([
+            'data' => null,
+            'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => $details],
+        ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)));
     }
 
     /** Send a PSR-7 response with PHP's SAPI. */

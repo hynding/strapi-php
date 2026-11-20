@@ -26,6 +26,14 @@ foreach ($autoloads as $autoload) {
     }
 }
 
+if (!class_exists(Strapi::class)) {
+    // no vendor/: run `composer install`, or upload the bundle `php bin/strapi bundle` makes
+    error_log('[strapi] vendor/autoload.php is missing: run `composer install` in ' . $root . ', or upload the bundle of `php bin/strapi bundle`.');
+    http_response_code(500);
+
+    return;
+}
+
 // Static files when running under the built-in server (`php -S ... public/index.php`)
 if (PHP_SAPI === 'cli-server') {
     $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -36,7 +44,14 @@ if (PHP_SAPI === 'cli-server') {
 
 ignore_user_abort(true);
 
-$strapi = Strapi::createStrapi(['appDir' => $root, 'distDir' => $root, 'serveAdminPanel' => true])->load();
+try {
+    $strapi = Strapi::createStrapi(['appDir' => $root, 'distDir' => $root, 'serveAdminPanel' => true])->load();
+} catch (\Throwable $error) {
+    // logged to PHP's error log with what the host lacks (PHP-FPM, CGI...); rethrown elsewhere
+    HttpServer::bootFailed($error, $root);
+
+    return;
+}
 $server = $strapi->server()->mount();
 
 $handle = static function () use ($server): void {

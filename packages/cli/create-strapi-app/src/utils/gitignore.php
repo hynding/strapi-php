@@ -6,7 +6,8 @@ namespace Strapi\CreateStrapiApp\Utils;
 
 /**
  * Port of packages/cli/create-strapi-app/src/utils/gitignore.ts, plus a "PHP" section (Composer's
- * `vendor`, PHPUnit and php-cs-fixer caches).
+ * `vendor`, PHPUnit and php-cs-fixer caches) and `public/admin`, the copy of `build` that `strapi build`
+ * writes for the web server.
  */
 final class Gitignore
 {
@@ -149,6 +150,7 @@ final class Gitignore
         .strapi
         dist
         build
+        public/admin
         .strapi-updater.json
         .strapi-cloud.json
         GITIGNORE;

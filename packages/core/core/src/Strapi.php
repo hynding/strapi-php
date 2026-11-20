@@ -703,6 +703,10 @@ final class Strapi extends Container implements StrapiContract
             // until this bootstrap completes, the record describes no database: one that dies midway
             // (a timeout, a deploy) must not leave a re-created database matching the old record
             @unlink($this->bootstrapSettledFile());
+            if ($fingerprint !== null) {
+                // the bootstrap that settles a deployment reports what the host lacks, once
+                $this->logRequirements();
+            }
             $this->doBootstrap();
             if ($fingerprint !== null) {
                 $this->markBootstrapSettled($fingerprint);
@@ -712,6 +716,15 @@ final class Strapi extends Container implements StrapiContract
                 flock($lock, LOCK_UN);
                 fclose($lock);
             }
+        }
+    }
+
+    /** PHP port: logs what {@see Utils\Requirements} finds wrong with this PHP and project. */
+    private function logRequirements(): void
+    {
+        $client = $this->config()->get('database.connection.client');
+        foreach (Utils\Requirements::check($this->dirs(), is_string($client) ? $client : null) as $finding) {
+            $finding['level'] === 'error' ? $this->log()->error($finding['message']) : $this->log()->warning($finding['message']);
         }
     }
 
