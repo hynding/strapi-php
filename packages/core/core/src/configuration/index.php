@@ -62,6 +62,8 @@ final class Configuration
             $_ENV['NODE_ENV'] = $_SERVER['NODE_ENV'] = 'development';
             putenv('NODE_ENV=development');
             self::$nodeEnvDefaulted = true;
+        } elseif (getenv('NODE_ENV') !== 'development') {
+            self::$nodeEnvDefaulted = false;
         }
 
         return EnvHelper::fromProcess();

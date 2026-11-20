@@ -30,7 +30,7 @@ final class Bundle extends StrapiCommand
     ];
 
     /** Entries never bundled, at any depth. */
-    public const array EXCLUDE_EVERYWHERE = ['.env', '.git', 'node_modules', '.DS_Store', 'Thumbs.db'];
+    public const array EXCLUDE_EVERYWHERE = ['.env', '.git', '.tmp', '.strapi', 'node_modules', '.DS_Store', 'Thumbs.db'];
 
     /** Files kept under `public/uploads` (the rest is the uploaded media). */
     private const array UPLOADS_KEEP = ['.gitkeep', '.htaccess'];
@@ -62,7 +62,7 @@ final class Bundle extends StrapiCommand
                 'adminPath' => (string) $app->config()->get('admin.path', '/admin'),
                 'publicDir' => self::relativeTo($root, $app->dirs()->public),
             ]);
-        } catch (\RuntimeException|\PharException $error) {
+        } catch (\Throwable $error) {
             $this->ctx->logger->error($error->getMessage());
 
             return Command::FAILURE;
@@ -205,7 +205,8 @@ final class Bundle extends StrapiCommand
             return true;
         }
         // at any depth: a package installed from source (`--prefer-source`) keeps its clone, and
-        // one from a Composer path repository (a symlink to a checkout) its node_modules and .env
+        // one from a Composer path repository (a symlink to a checkout) its node_modules, .env and
+        // the data of its own projects (.tmp, .strapi)
         if (in_array($base, self::EXCLUDE_EVERYWHERE, true) || (str_starts_with($base, '.env.') && $base !== '.env.example')) {
             return true;
         }

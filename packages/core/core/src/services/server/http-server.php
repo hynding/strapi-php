@@ -211,9 +211,15 @@ PHP;
             throw $error;
         }
 
-        $findings = Requirements::check(StrapiDirectories::fromRoot($root), self::configuredDatabaseClient($root));
-
         error_log("[strapi] The application failed to start: {$error}");
+
+        // what the host lacks may be what failed (a partial vendor/): the error is logged already
+        try {
+            $findings = Requirements::check(StrapiDirectories::fromRoot($root), self::configuredDatabaseClient($root));
+        } catch (\Throwable $checkError) {
+            $findings = [];
+            error_log('[strapi] The requirements could not be checked: ' . $checkError->getMessage());
+        }
         if ($findings !== []) {
             error_log("[strapi] Requirements (php bin/strapi requirements:check):\n" . Requirements::format($findings));
         }

@@ -17,36 +17,32 @@ use Strapi\Cli\Cli\Utils\Logger;
  * (`/admin/login`, ...) share the path, so they keep going to `index.php`, which sends the shell
  * with `Cache-Control: no-cache` as upstream does. The copy carries an `.htaccess` that sends the
  * hashed assets with upstream's `public, max-age=31536000, immutable` and marks the directory as
- * written by the build: a directory without it is the project's own and is never replaced. Its
- * `index.php` hands `/admin/` (the directory itself) to the front controller.
+ * written by the build: a directory without it is the project's own and is never replaced. With
+ * no index in it, `/admin/` (the directory itself) still reaches `index.php`: Apache's rewrite,
+ * nginx's `try_files $uri /index.php...` and Caddy's `php_server` all pass it on, the latter to
+ * the worker in worker mode (an `index.php` here would run outside it, a boot per admin load).
  */
 final class PublicAdminAssets
 {
     /** First line of the `.htaccess` written into the copy; marks the directory as the build's. */
     public const MARKER = '# Written by `strapi build`';
 
-    /**
-     * Files of `build/` that are not copied: the shell goes through PHP (see the class comment), and
-     * `index.php` is the copy's own.
-     */
-    private const SKIP = ['index.html', 'index.php'];
+    /** Files of `build/` that are not copied: the shell goes through PHP (see the class comment). */
+    private const SKIP = ['index.html'];
 
     private const HTACCESS = <<<'HTACCESS'
         # Written by `strapi build`: a copy of build/ (the admin panel) for the web server to serve without
         # PHP. Every build replaces it; delete the directory to have PHP serve the admin assets again.
-        # index.html is not copied: the admin's pages go to the front controller (index.php here hands
-        # /admin/ itself to it), which sends the shell with no-cache.
+        # index.html is not copied: the admin's pages go to the front controller, which sends the shell
+        # with no-cache.
 
         Options -Indexes
 
         <IfModule mod_headers.c>
-            <FilesMatch "^(?!index\.php$)">
-                Header set Cache-Control "public, max-age=31536000, immutable"
-            </FilesMatch>
+            Header set Cache-Control "public, max-age=31536000, immutable"
         </IfModule>
 
-        # no PHP here but the index.php the build writes
-        <FilesMatch "(?i)^(?!index\.php$).*\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
+        <FilesMatch "(?i)\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
             Require all denied
         </FilesMatch>
 
@@ -94,7 +90,6 @@ final class PublicAdminAssets
             self::write($staging . '/.htaccess', self::HTACCESS);
             // a build output, wherever admin.path puts it
             self::write($staging . '/.gitignore', "*\n");
-            self::write($staging . '/index.php', self::indexStub(count(explode('/', $relative))));
 
             $hadOld = file_exists($target);
             if ($hadOld && !@rename($target, $old)) {
@@ -140,24 +135,6 @@ final class PublicAdminAssets
         fclose($handle);
 
         return str_starts_with($first, self::MARKER);
-    }
-
-    /**
-     * `<adminPath>/` is the copy's directory: a web server that looks for its index (Apache's
-     * `DirectoryIndex index.php`, nginx's `index index.php`, where `try_files $uri` finds the
-     * directory) runs this, which hands the request to the front controller as any admin page.
-     */
-    private static function indexStub(int $depth): string
-    {
-        return <<<PHP
-            <?php
-
-            declare(strict_types=1);
-
-            // Written by `strapi build` (see .htaccess): the admin's pages are the front controller's
-            require dirname(__DIR__, {$depth}) . '/index.php';
-
-            PHP;
     }
 
     private static function write(string $file, string $contents): void

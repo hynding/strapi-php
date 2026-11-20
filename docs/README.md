@@ -90,10 +90,11 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   is sent with `no-cache`. The copy's `.htaccess` gives the assets upstream's
   `public, max-age=31536000, immutable` and marks the directory as the build's: a build replaces
   only a directory it wrote, swapping the new copy in whole (a copy that fails leaves nothing
-  behind and PHP keeps serving `build/`). `/admin/` is now a directory: its `index.php` hands it
-  to the front controller, for servers that look for a directory index. Checked on Apache +
-  PHP-FPM, nginx + PHP-FPM and FrankenPHP's `php-server`; Apache and Caddy answer `/admin` with a
-  redirect to `/admin/`, and the admin works the same from either.
+  behind and PHP keeps serving `build/`) and carries a `.gitignore` of `*`. `/admin/` is now a
+  directory without an index, which every server checked still hands to the front controller:
+  Apache + PHP-FPM (`/admin` gets `mod_dir`'s 301 to `/admin/` first; the admin works the same from
+  either), nginx + PHP-FPM with the documented `try_files`, and FrankenPHP's `php_server`, to its
+  worker in worker mode (an `index.php` in the copy would run outside the worker, a boot per load).
 - **A bundle for hosts without Composer or Node.** `strapi bundle` packs the project as it runs
   locally (`vendor/`, `build/`, `public/admin/`) into a `.zip` or `.tar.gz`, without `.env`, `.tmp`,
   `.strapi`, `node_modules`, `dist`, `.git` and uploaded media, symlinks archived as their files.
