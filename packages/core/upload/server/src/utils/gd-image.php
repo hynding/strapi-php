@@ -104,7 +104,8 @@ final class GdImage
     /** Whether GD can decode and re-encode this sharp format. */
     public static function canProcess(string $format): bool
     {
-        return in_array($format, self::PROCESSABLE, true) && match ($format) {
+        // without GD (a host that lacks it) images are stored as uploaded, with no formats
+        return extension_loaded('gd') && in_array($format, self::PROCESSABLE, true) && match ($format) {
             'webp' => function_exists('imagecreatefromwebp'),
             'heif' => function_exists('imagecreatefromavif'),
             default => true,

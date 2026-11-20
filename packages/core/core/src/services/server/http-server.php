@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Strapi\Core\Services\Server;
 
+use Strapi\Core\Configuration\Configuration;
 use Strapi\Core\Strapi;
+use Strapi\Core\Utils\Requirements;
+use Strapi\Core\Utils\Sapi;
+use Strapi\Types\Core\StrapiDirectories;
 use Symfony\Component\Process\Process;
 
 /**
@@ -189,6 +193,53 @@ PHP;
         }
 
         return null;
+    }
+
+    /**
+     * PHP port: the front controller's answer to a boot that throws. Under a web server whose
+     * requests each boot (PHP-FPM, CGI, mod_php, LiteSpeed, FrankenPHP's classic mode) an uncaught
+     * error is a bare 500, or a stack trace in the page where the host leaves `display_errors` on.
+     * This logs the error, with what {@see Requirements} finds wrong with the host, to PHP's error
+     * log (the one log a shared host shows) and answers 500 with Strapi's error body; with
+     * `NODE_ENV=development` set, the body carries the error and the findings. Elsewhere (CLI,
+     * FrankenPHP worker mode, the built-in server's console) it rethrows.
+     */
+    public static function bootFailed(\Throwable $error, string $root, ?Strapi $strapi = null, ?string $sapi = null): void
+    {
+        $sapi ??= PHP_SAPI;
+        if (!Sapi::isPerRequest($sapi) || $sapi === 'cli-server') {
+            throw $error;
+        }
+
+        error_log("[strapi] The application failed to start: {$error}");
+
+        // what the host lacks may be what failed (a partial vendor/): the error is logged already
+        try {
+            // the instance, when creating it succeeded, knows the configured client and directories
+            $client = $strapi?->config()->get('database.connection.client') ?? ($_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT'));
+            $dirs = $strapi?->dirs() ?? StrapiDirectories::fromRoot($root);
+            $findings = Requirements::check($dirs, is_string($client) && $client !== '' ? $client : null, ['sapi' => $sapi]);
+        } catch (\Throwable $checkError) {
+            $findings = [];
+            error_log('[strapi] The requirements could not be checked: ' . $checkError->getMessage());
+        }
+        if ($findings !== []) {
+            error_log("[strapi] Requirements (php bin/strapi requirements:check):\n" . Requirements::format($findings));
+        }
+
+        // only where development is explicit: a boot can fail before `.env` is read (a typo in it),
+        // leaving a production host's NODE_ENV unknown, and a host that sets none runs in a
+        // development it never asked for
+        $nodeEnv = $_ENV['NODE_ENV'] ?? getenv('NODE_ENV');
+        $details = $nodeEnv !== 'development' || Configuration::nodeEnvDefaulted() ? new \stdClass() : [
+            'error' => $error->getMessage(),
+            'requirements' => $findings,
+        ];
+
+        self::emit(new \Nyholm\Psr7\Response(500, ['Content-Type' => 'application/json; charset=utf-8'], (string) json_encode([
+            'data' => null,
+            'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => $details],
+        ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)));
     }
 
     /** Send a PSR-7 response with PHP's SAPI. */

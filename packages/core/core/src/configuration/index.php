@@ -20,6 +20,8 @@ use Strapi\Utils\Primitives\Strings;
  */
 final class Configuration
 {
+    private static bool $nodeEnvDefaulted = false;
+
     private static ?string $version = null;
 
     /** The Strapi version this package mirrors (packages/core/core/composer.json). */
@@ -59,9 +61,22 @@ final class Configuration
         if (!is_string(getenv('NODE_ENV')) || getenv('NODE_ENV') === '') {
             $_ENV['NODE_ENV'] = $_SERVER['NODE_ENV'] = 'development';
             putenv('NODE_ENV=development');
+            self::$nodeEnvDefaulted = true;
+        } elseif (getenv('NODE_ENV') !== 'development') {
+            self::$nodeEnvDefaulted = false;
         }
 
         return EnvHelper::fromProcess();
+    }
+
+    /**
+     * PHP port: whether `NODE_ENV` is `development` only because {@see self::loadEnv()} defaulted
+     * it (neither the process nor `.env` set one): a deployment that forgot it, which the
+     * requirements check and a failed boot's answer must not take for an explicit development.
+     */
+    public static function nodeEnvDefaulted(): bool
+    {
+        return self::$nodeEnvDefaulted && getenv('NODE_ENV') === 'development';
     }
 
     /**

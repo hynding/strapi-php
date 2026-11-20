@@ -79,6 +79,50 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   rules are not read first; restoring assets (`strapi import`) keeps it. Checked on
   Apache 2.4 with PHP-FPM; `HttpServer::requestFromGlobals()` also restores the header from
   `REDIRECT_HTTP_AUTHORIZATION` and `PHP_AUTH_*`.
+- **The web server serves the admin's assets.** `build/` (the upstream admin bundle, ~290 hashed
+  files) is outside the document root, so PHP served each asset with a boot: opening the admin
+  under PHP-FPM booted Strapi for every chunk it loads. `strapi build` and `strapi develop` now
+  also copy the bundle, without `index.html`, to `public/<admin.path>/`
+  (`Strapi\Cli\Node\Core\PublicAdminAssets`), where Apache, LiteSpeed, nginx's
+  `try_files $uri`, Caddy and PHP's built-in server serve them as files: 40 assets took 250 ms on
+  Apache + PHP-FPM instead of 1.5 s. The shell keeps going to `index.php`, because the admin's
+  pages and its API share the path (`/admin/content-manager/...`, `/admin/login`) and the shell
+  is sent with `no-cache`. The copy's `.htaccess` gives the assets upstream's
+  `public, max-age=31536000, immutable` and marks the directory as the build's: a build replaces
+  only a directory it wrote, swapping the new copy in whole (a copy that fails leaves nothing
+  behind and PHP keeps serving `build/`) and carries a `.gitignore` of `*`. `/admin/` is now a
+  directory without an index, which every server checked still hands to the front controller:
+  Apache + PHP-FPM (`/admin` gets `mod_dir`'s 301 to `/admin/` first; the admin works the same from
+  either), nginx + PHP-FPM with the documented `try_files $uri /index.php$is_args$args`, and
+  FrankenPHP's `php_server`, to its worker in worker mode (an `index.php` in the copy would run
+  outside the worker, a boot per load). nginx's common `try_files $uri $uri/ ...` takes `/admin/`
+  for that directory and answers 403: leave `$uri/` out (the front controller's comment says so).
+- **A bundle for hosts without Composer or Node.** `strapi bundle` packs the project as it runs
+  locally (`vendor/`, `build/`, `public/admin/`) into a `.zip` or `.tar.gz`, without `.env`, `.tmp`,
+  `.strapi`, `node_modules`, `dist`, `.git` and uploaded media, symlinks archived as their files.
+  `.github/workflows/release-bundle.yml` attaches a bundled starter project
+  (create-strapi-app's vanilla template, no dev packages) to each release. Rehearsed end to end:
+  the starter extracted on Apache + PHP-FPM, `.env` written, admin registered and signed in.
+- **Requirements are checked where they bite.** A shared host's PHP is not the one that ran
+  `composer install`. `Utils\Requirements` checks the PHP version, the required extensions
+  (`ctype`, `json`, `mbstring`, `openssl`, `pdo`) and the database client's PDO driver, a writable
+  `.tmp` (errors), and the recommended extensions (`intl`, `gd`, `fileinfo`, `zlib`), writable
+  `public/uploads` and `.strapi`, opcache off or its JIT on, `enable_post_data_reading` on (the
+  `.user.ini` not read), `NODE_ENV` unset, and the `.env.example` secrets kept in production
+  (warnings). `strapi requirements:check` runs it from the command line; every boot logs it once
+  per server API and deployment (`.tmp/requirements.<sapi>` holds the settled inputs it was
+  logged for), so the web server's PHP is checked on its first request even when a deploy
+  script's CLI command settled the deployment; in development, only under a per-request web server
+  (a deployment without `NODE_ENV`), once an hour. The front controller catches a boot that
+  throws under a per-request web server (`HttpServer::bootFailed()`): the error and the findings
+  go to PHP's error log, the client gets Strapi's 500 error body instead of a bare 500 or, where
+  the host leaves `display_errors` on, a stack trace. The body carries the error and the findings
+  only with `NODE_ENV=development` set explicitly: a boot can fail before `.env` is read, and a
+  host without `NODE_ENV` runs in a development it never chose (`Configuration::nodeEnvDefaulted()`).
+  A missing `vendor/` is logged and answered 500 too. Found while writing the warnings: without
+  GD every JPEG or PNG upload was refused as a faulty image (`GdImage::canProcess()` now says no,
+  and the file is stored as uploaded), and `strapi::compression` without zlib was a fatal error
+  (it now leaves the response uncompressed).
 - **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
   callbacks in the worker between requests), so `PerRequestLaneTest` (core) serves the example
   app from PHP's built-in server in production, one boot per request: admin auth, API tokens,
@@ -188,15 +232,11 @@ starting and after finishing (`/api-tests` in Claude Code).
   `5.0.0-discard-drafts`, `serialize-json-columns`, database internal migrations `5.0.0-01…06`.
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
-- PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~24–28 ms with its request on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
-  Still to do, in order:
-  - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
-    shutdown function, after `destroy()` and before the response is finished; unreachable without
-    an Enterprise licence (no AI metadata provider), so left as is until AI is;
-  - admin assets are served by PHP (`build/` is outside `public/`), a boot each: serve them
-    statically on Apache too; a release bundle with `vendor/` and `build/` for hosts without
-    Composer or Node; a requirements check (extensions, writable `.tmp`);
+- PHP-FPM and shared hosting: done ("Runtime model": settled boots ~24–28 ms, admin assets served
+  by the web server, `strapi bundle`, requirements check); FrankenPHP worker mode stays the fast
+  path. Left: AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a shutdown function, after
+  `destroy()` and before the response is finished; unreachable without an Enterprise licence (no
+  AI metadata provider), so left as is until AI is.
 
 ## Moving a project between the runtimes
 

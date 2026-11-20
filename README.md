@@ -81,14 +81,32 @@ once per worker; without `worker` it boots per request, as under PHP-FPM) at
 do): PHP's own multipart parser keeps only the last of several files uploaded under one name,
 while strapi::body keeps them all, as Strapi does.
 
-Shared hosting works too: a settled boot under PHP-FPM takes ~65 ms, rate limits and cron work
+Shared hosting works too: a settled boot under PHP-FPM takes ~25 ms, rate limits and cron work
 without a long-lived process, and logs go to PHP's error log (docs/README.md, "Runtime model").
 Set `NODE_ENV=production` in `.env`: without it the app runs in development, where every request
 runs the whole bootstrap under a lock (PHP-FPM usually clears the server's environment, so `.env`
 is the place).
 On Apache, make `public/` the document root: `public/.htaccess` routes requests to `index.php`,
 passes the `Authorization` header Apache drops for PHP-FPM and CGI, and never runs an uploaded
-file as PHP.
+file as PHP. `strapi build` also copies the admin bundle to `public/admin/`, so the web server
+serves its assets without booting PHP for each (the admin's pages and API still go to `index.php`;
+on nginx use `try_files $uri /index.php$is_args$args`, without `$uri/`).
+
+For a host without Composer or Node, build locally and upload one archive:
+
+```sh
+composer install --no-dev --optimize-autoloader && npm install && php bin/strapi build
+php bin/strapi bundle                # dist/<name>.zip: the project with vendor/, build/ and public/admin/
+```
+
+Extract it on the host, point the document root at its `public/`, and create `.env` from
+`.env.example` (`NODE_ENV=production`, the database, new secrets). The archive leaves out `.env`,
+`.tmp` (the SQLite database) and uploaded media, so uploading a new one keeps the host's data.
+Each GitHub release also carries `strapi-php-starter-<version>.zip`, a new project bundled the
+same way. `php bin/strapi requirements:check` checks PHP's version and extensions, the database
+driver, writable directories and the settings Strapi needs; the web server's PHP can differ from
+the command line's, so its first request after a deploy logs the same check to PHP's error log,
+and a boot that fails logs it with the error (and answers Strapi's 500 error body).
 
 To serve the admin panel, install the pinned upstream bundle and build it:
 

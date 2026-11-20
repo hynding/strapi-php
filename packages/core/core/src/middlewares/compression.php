@@ -33,7 +33,8 @@ final class Compression
                 return;
             }
             $raw = is_string($body) ? $body : (string) json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            if (strlen($raw) < $threshold || $ctx->responseHeader('Content-Encoding') !== null) {
+            // without zlib (a PHP built without it) the response goes uncompressed
+            if (strlen($raw) < $threshold || $ctx->responseHeader('Content-Encoding') !== null || !function_exists('gzencode')) {
                 return;
             }
 

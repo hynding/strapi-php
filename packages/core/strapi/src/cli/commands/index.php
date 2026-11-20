@@ -43,6 +43,7 @@ final class Commands
             static fn (CliContext $ctx): Command => new Templates\Generate($ctx),
             static fn (CliContext $ctx): Command => new Version($ctx),
             static fn (CliContext $ctx): Command => new Build($ctx),
+            static fn (CliContext $ctx): Command => new Bundle($ctx),
             static fn (CliContext $ctx): Command => new Develop($ctx),
             static fn (CliContext $ctx): Command => new Export\Command($ctx),
             static fn (CliContext $ctx): Command => new Import\Command($ctx),
@@ -50,6 +51,7 @@ final class Commands
             static fn (CliContext $ctx): Command => new Openapi\Openapi($ctx),
             static fn (CliContext $ctx): Command => new Cron\Run($ctx),
             static fn (CliContext $ctx): Command => new Migrations\Run($ctx),
+            static fn (CliContext $ctx): Command => new Requirements\Check($ctx),
             static fn (CliContext $ctx): Command => new Transfer\Serve($ctx),
         ];
     }
