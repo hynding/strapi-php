@@ -105,7 +105,7 @@ final class Bundle extends StrapiCommand
             throw new \RuntimeException('The admin panel is not built: run `php bin/strapi build` first (or bundle with --without-admin).');
         }
         $public = trim($options['publicDir'] ?? 'public', '/');
-        $adminDir = trim($options['adminPath'] ?? '/admin', '/');
+        $adminDir = PublicAdminAssets::relativePath($options['adminPath'] ?? '/admin');
         if (!($options['withoutAdmin'] ?? false) && $adminDir !== '' && !PublicAdminAssets::isPublished("{$root}/{$public}/{$adminDir}")) {
             $warnings[] = "{$public}/{$adminDir}/ was not written by `strapi build`: PHP will serve the admin assets (rebuild to have the web server serve them).";
         }
@@ -121,8 +121,8 @@ final class Bundle extends StrapiCommand
         if (!$tar && !class_exists(\ZipArchive::class)) {
             throw new \RuntimeException('Writing a .zip needs the zip extension: install it, or write a .tar.gz (--output <name>.tar.gz).');
         }
-        if ($tar && !class_exists(\PharData::class)) {
-            throw new \RuntimeException('Writing a .tar.gz needs the phar extension: install it, or write a .zip.');
+        if ($tar && (!class_exists(\PharData::class) || !extension_loaded('zlib'))) {
+            throw new \RuntimeException('Writing a .tar.gz needs the phar and zlib extensions: install them, or write a .zip.');
         }
 
         // without the admin: build/, and the copy of it (never a directory of the project's own)

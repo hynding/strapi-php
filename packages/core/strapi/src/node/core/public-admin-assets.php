@@ -40,6 +40,10 @@ final class PublicAdminAssets
 
         <IfModule mod_headers.c>
             Header set Cache-Control "public, max-age=31536000, immutable"
+            # what the build adds besides the shell is not hashed
+            <FilesMatch "(?i)\.html?$">
+                Header set Cache-Control "no-cache"
+            </FilesMatch>
         </IfModule>
 
         <FilesMatch "(?i)\.(php[0-9]?|pht|phtm|phtml|phar|phps)$">
@@ -55,8 +59,7 @@ final class PublicAdminAssets
      */
     public static function publish(string $buildDir, string $publicDir, string $adminPath, Logger $logger): ?string
     {
-        // `/cms//admin/` and `/./admin` name the same directory as `/cms/admin` and `/admin`
-        $relative = implode('/', array_filter(explode('/', str_replace('\\', '/', $adminPath)), static fn (string $part): bool => $part !== '' && $part !== '.'));
+        $relative = self::relativePath($adminPath);
         if ($relative === '' || in_array('..', explode('/', $relative), true) || !is_dir($buildDir) || !is_dir($publicDir)) {
             // the admin at the site root would take public/ over: PHP keeps serving it
             return null;
@@ -154,6 +157,12 @@ final class PublicAdminAssets
         }
 
         return $found;
+    }
+
+    /** `admin.path` as a directory under public/: `/cms//admin/` and `/./admin` name `cms/admin` and `admin`. */
+    public static function relativePath(string $adminPath): string
+    {
+        return implode('/', array_filter(explode('/', str_replace('\\', '/', $adminPath)), static fn (string $part): bool => $part !== '' && $part !== '.'));
     }
 
     /** Whether `$dir` is a copy written by {@see self::publish()}. */
