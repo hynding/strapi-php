@@ -65,6 +65,18 @@ final class PublicAdminAssetsTest extends TestCase
         self::assertStringContainsString('Header set Cache-Control "public, max-age=31536000, immutable"', $htaccess);
         self::assertStringContainsString('Options -Indexes', $htaccess);
         self::assertTrue(PublicAdminAssets::isPublished($target));
+        self::assertSame("*\n", file_get_contents($target . '/.gitignore'), 'git ignores the copy wherever admin.path puts it');
+    }
+
+    public function testRemovesWhatAKilledBuildLeft(): void
+    {
+        mkdir($this->root . '/public/.admin.new-123-abcdef');
+        file_put_contents($this->root . '/public/.admin.new-123-abcdef/x.js', 'x');
+        mkdir($this->root . '/public/.admin.old-123-abcdef');
+
+        PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/admin', $this->logger());
+
+        self::assertSame(['admin'], array_values(array_diff(scandir($this->root . '/public') ?: [], ['.', '..'])));
     }
 
     public function testABuildReplacesTheEarlierCopy(): void

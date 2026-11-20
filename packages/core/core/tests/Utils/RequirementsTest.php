@@ -78,13 +78,14 @@ final class RequirementsTest extends TestCase
 
     public function testEachDatabaseClientNeedsItsDriver(): void
     {
-        foreach (['sqlite', 'sqlite3', 'better-sqlite3', 'mysql', 'mysql2', 'mariadb'] as $client) {
+        foreach (['sqlite', 'mysql', 'mysql2', 'mariadb'] as $client) {
             self::assertSame([], $this->check($client), $client);
         }
         foreach (['postgres', 'postgresql', 'pg'] as $client) {
             self::assertSame(['ext-pdo_pgsql' => 'error'], self::names($this->check($client)), $client);
         }
         self::assertSame(['database' => 'error'], self::names($this->check('oracle')));
+        self::assertSame(['database' => 'error'], self::names($this->check('better-sqlite3')), 'what the database package cannot connect');
         self::assertSame([], $this->check(null), 'no client known, no driver checked');
     }
 
@@ -141,6 +142,8 @@ final class RequirementsTest extends TestCase
 
         $findings = $this->check(platform: ['env' => ['NODE_ENV' => 'production', 'APP_KEYS' => 'toBeModified1,toBeModified2', 'JWT_SECRET' => 'tobemodified', 'ADMIN_JWT_SECRET' => 'x']]);
         self::assertSame(['secrets' => 'warning'], self::names($findings));
+        self::assertSame(['secrets' => 'warning'], self::names($this->check(platform: ['env' => ['NODE_ENV' => 'staging', 'JWT_SECRET' => 'tobemodified']])), 'staging is deployed too');
+        self::assertSame([], $this->check(platform: ['sapi' => 'cli', 'env' => ['NODE_ENV' => 'test', 'JWT_SECRET' => 'tobemodified']]));
         self::assertStringStartsWith('[warning] APP_KEYS, JWT_SECRET still have the example values', Requirements::format($findings));
     }
 

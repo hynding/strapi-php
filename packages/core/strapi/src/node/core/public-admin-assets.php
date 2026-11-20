@@ -81,12 +81,19 @@ final class PublicAdminAssets
 
             return null;
         }
+        // what a build killed midway left (the assets themselves, nothing secret)
+        $leftovers = [...(glob($parent . '/.' . basename($target) . '.new-*', GLOB_ONLYDIR) ?: []), ...(glob($parent . '/.' . basename($target) . '.old-*', GLOB_ONLYDIR) ?: [])];
+        foreach ($leftovers as $leftover) {
+            self::remove($leftover);
+        }
         $suffix = getmypid() . '-' . bin2hex(random_bytes(3));
         $staging = $parent . '/.' . basename($target) . '.new-' . $suffix;
         $old = $parent . '/.' . basename($target) . '.old-' . $suffix;
         try {
             self::copyTree($buildDir, $staging);
             self::write($staging . '/.htaccess', self::HTACCESS);
+            // a build output, wherever admin.path puts it
+            self::write($staging . '/.gitignore', "*\n");
             self::write($staging . '/index.php', self::indexStub(count(explode('/', $relative))));
 
             $hadOld = file_exists($target);
@@ -105,10 +112,12 @@ final class PublicAdminAssets
 
             return null;
         } finally {
-            foreach ([$staging, $old] as $leftover) {
-                if (is_dir($leftover)) {
-                    self::remove($leftover);
-                }
+            if (is_dir($staging)) {
+                self::remove($staging);
+            }
+            // the previous copy goes once the new one (or, failing that, itself) is back in place
+            if (is_dir($old) && is_dir($target)) {
+                self::remove($old);
             }
         }
 

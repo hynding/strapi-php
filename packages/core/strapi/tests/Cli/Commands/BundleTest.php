@@ -142,7 +142,10 @@ final class BundleTest extends TestCase
         } catch (\RuntimeException $error) {
             self::assertStringContainsString('php bin/strapi build', $error->getMessage());
         }
-        self::assertSame(16, Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['withoutAdmin' => true])['files']);
+        PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/admin', new \Strapi\Cli\Cli\Utils\Logger(silent: true));
+        $withoutAdmin = Bundle::create($this->root, $this->root . '/dist/x.tar.gz', ['withoutAdmin' => true]);
+        self::assertSame(15, $withoutAdmin['files'], 'neither build/ nor public/admin/');
+        self::assertCount(1, $withoutAdmin['warnings'], 'no admin warning without the admin');
 
         unlink($this->root . '/vendor/autoload.php');
         $this->expectExceptionMessage('composer install');
@@ -174,9 +177,24 @@ final class BundleTest extends TestCase
         self::assertStringContainsString('static/admin/ was not written', $warnings[0]);
     }
 
-    public function testRefusesAnUnknownFormat(): void
+    public function testRefusesAnUnknownFormatWithoutTouchingTheFile(): void
     {
-        $this->expectExceptionMessage('use .zip or .tar.gz');
-        Bundle::create($this->root, $this->root . '/dist/x.rar');
+        try {
+            Bundle::create($this->root, $this->root . '/composer.json');
+            self::fail('not an archive');
+        } catch (\RuntimeException $error) {
+            self::assertStringContainsString('use .zip or .tar.gz', $error->getMessage());
+        }
+        self::assertSame('{}', file_get_contents($this->root . '/composer.json'));
+    }
+
+    public function testABundleReplacesTheArchiveWhole(): void
+    {
+        file_put_contents($this->root . '/dist/site.tar.gz', 'old');
+
+        Bundle::create($this->root, $this->root . '/dist/site.tar.gz');
+
+        self::assertNotSame('old', file_get_contents($this->root . '/dist/site.tar.gz'));
+        self::assertSame(['old.zip', 'site.tar.gz'], array_values(array_diff(scandir($this->root . '/dist') ?: [], ['.', '..'])), 'no partial file left');
     }
 }

@@ -211,8 +211,7 @@ PHP;
             throw $error;
         }
 
-        $client = $_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT');
-        $findings = Requirements::check(StrapiDirectories::fromRoot($root), is_string($client) && $client !== '' ? $client : null);
+        $findings = Requirements::check(StrapiDirectories::fromRoot($root), self::configuredDatabaseClient($root));
 
         error_log("[strapi] The application failed to start: {$error}");
         if ($findings !== []) {
@@ -232,6 +231,28 @@ PHP;
             'data' => null,
             'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => $details],
         ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)));
+    }
+
+    /**
+     * The `database.connection.client` of a project that failed to boot: `config/database.php`
+     * evaluated on its own (null when it cannot be, and the driver goes unchecked).
+     */
+    private static function configuredDatabaseClient(string $root): ?string
+    {
+        try {
+            $config = is_file($root . '/config/database.php') ? require $root . '/config/database.php' : null;
+            if ($config instanceof \Closure) {
+                $config = $config(\Strapi\Utils\EnvHelper::fromProcess());
+            }
+            $client = is_array($config) && is_array($config['connection'] ?? null) ? ($config['connection']['client'] ?? null) : null;
+        } catch (\Throwable) {
+            $client = null;
+        }
+        if (!is_string($client) || $client === '') {
+            $client = $_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT');
+        }
+
+        return is_string($client) && $client !== '' ? $client : null;
     }
 
     /** Send a PSR-7 response with PHP's SAPI. */

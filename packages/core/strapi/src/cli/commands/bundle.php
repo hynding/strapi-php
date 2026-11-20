@@ -41,7 +41,7 @@ final class Bundle extends StrapiCommand
         $this
             ->setName('bundle')
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'The archive to write (.zip or .tar.gz)', null)
-            ->addOption('without-admin', null, InputOption::VALUE_NONE, 'Bundle without a built admin panel (API only)')
+            ->addOption('without-admin', null, InputOption::VALUE_NONE, 'Bundle without the admin panel (API only): no build/, no public/<admin.path>/')
             ->setDescription('Pack the project with vendor/ and the built admin panel, to upload to a host without Composer or Node');
     }
 
@@ -62,7 +62,7 @@ final class Bundle extends StrapiCommand
                 'adminPath' => (string) $app->config()->get('admin.path', '/admin'),
                 'publicDir' => self::relativeTo($root, $app->dirs()->public),
             ]);
-        } catch (\RuntimeException $error) {
+        } catch (\RuntimeException|\PharException $error) {
             $this->ctx->logger->error($error->getMessage());
 
             return Command::FAILURE;
@@ -114,22 +114,32 @@ final class Bundle extends StrapiCommand
             $warnings[] = 'vendor/ holds development packages (' . implode(', ', array_slice($devPackages, 0, 3)) . (count($devPackages) > 3 ? ', ...' : '') . '): `composer install --no-dev --optimize-autoloader` before bundling makes the archive smaller.';
         }
 
-        $files = self::files($root, $archive, "{$public}/uploads");
-
-        if (!is_dir(dirname($archive))) {
-            mkdir(dirname($archive), 0o755, true);
-        }
-        @unlink($archive);
-
-        if (preg_match('/\.(tar\.gz|tgz)$/i', $archive) === 1) {
-            self::writeTar($archive, $name, $files);
-        } elseif (preg_match('/\.zip$/i', $archive) === 1) {
-            if (!class_exists(\ZipArchive::class)) {
-                throw new \RuntimeException('Writing a .zip needs the zip extension: install it, or write a .tar.gz (--output <name>.tar.gz).');
-            }
-            self::writeZip($archive, $name, $files);
-        } else {
+        $tar = preg_match('/\.(tar\.gz|tgz)$/i', $archive) === 1;
+        if (!$tar && preg_match('/\.zip$/i', $archive) !== 1) {
             throw new \RuntimeException("Unsupported archive {$archive}: use .zip or .tar.gz.");
+        }
+        if (!$tar && !class_exists(\ZipArchive::class)) {
+            throw new \RuntimeException('Writing a .zip needs the zip extension: install it, or write a .tar.gz (--output <name>.tar.gz).');
+        }
+        if ($tar && !class_exists(\PharData::class)) {
+            throw new \RuntimeException('Writing a .tar.gz needs the phar extension: install it, or write a .zip.');
+        }
+
+        $skip = ($options['withoutAdmin'] ?? false) ? ['build', ...($adminDir !== '' ? ["{$public}/{$adminDir}"] : [])] : [];
+        $files = self::files($root, $archive, "{$public}/uploads", $skip);
+
+        if (!is_dir(dirname($archive)) && !@mkdir(dirname($archive), 0o755, true) && !is_dir(dirname($archive))) {
+            throw new \RuntimeException('Cannot create ' . dirname($archive) . '.');
+        }
+        // written next to the archive and renamed over it: a failed bundle leaves the old one
+        $partial = dirname($archive) . '/.' . basename($archive) . '.' . getmypid() . '.partial';
+        try {
+            $tar ? self::writeTar($partial, $name, $files) : self::writeZip($partial, $name, $files);
+            if (!@rename($partial, $archive)) {
+                throw new \RuntimeException("Cannot write {$archive}.");
+            }
+        } finally {
+            @unlink($partial);
         }
 
         return ['files' => count($files), 'bytes' => (int) filesize($archive), 'warnings' => $warnings];
@@ -138,17 +148,18 @@ final class Bundle extends StrapiCommand
     /**
      * The files to bundle: archive path (relative to the root) → file on disk (symlinks resolved).
      *
+     * @param list<string> $skip paths (relative to the root) left out as well
      * @return array<string, string>
      */
-    public static function files(string $root, ?string $archive = null, string $uploads = 'public/uploads'): array
+    public static function files(string $root, ?string $archive = null, string $uploads = 'public/uploads', array $skip = []): array
     {
         $root = rtrim($root, '/');
         $uploads = trim($uploads, '/');
-        $skip = $archive !== null ? (realpath($archive) ?: $archive) : null;
+        $skipFile = $archive !== null ? (realpath($archive) ?: $archive) : null;
         $files = [];
 
         /** @param array<string, true> $ancestors */
-        $walk = static function (string $dir, string $prefix, array $ancestors) use (&$walk, &$files, $skip, $uploads): void {
+        $walk = static function (string $dir, string $prefix, array $ancestors) use (&$walk, &$files, $skipFile, $uploads, $skip): void {
             $real = realpath($dir);
             if ($real === false || isset($ancestors[$real])) {
                 return; // a symlink to one of its own parents
@@ -165,7 +176,7 @@ final class Bundle extends StrapiCommand
                     continue;
                 }
                 $relative = $prefix === '' ? $entry : "{$prefix}/{$entry}";
-                if (self::excluded($relative, $uploads)) {
+                if (self::excluded($relative, $uploads) || in_array($relative, $skip, true)) {
                     continue;
                 }
                 $path = "{$dir}/{$entry}";
@@ -173,7 +184,7 @@ final class Bundle extends StrapiCommand
                     $walk($path, $relative, $ancestors);
                 } elseif (is_file($path)) {
                     $resolved = realpath($path) ?: $path;
-                    if ($resolved !== $skip) {
+                    if ($resolved !== $skipFile) {
                         $files[$relative] = $resolved;
                     }
                 }
@@ -218,7 +229,9 @@ final class Bundle extends StrapiCommand
         }
         foreach ($files as $relative => $path) {
             $entry = "{$name}/{$relative}";
-            $zip->addFile($path, $entry);
+            if (!$zip->addFile($path, $entry)) {
+                throw new \RuntimeException("Cannot add {$path} to {$archive}.");
+            }
             // keep the mode (bin/strapi stays executable)
             $zip->setExternalAttributesName($entry, \ZipArchive::OPSYS_UNIX, ((fileperms($path) ?: 0o100644) & 0xFFFF) << 16);
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Core\Utils;
 
 use Strapi\Core\Configuration\Configuration;
+use Strapi\Database\Connection;
 use Strapi\Types\Core\StrapiDirectories;
 
 /**
@@ -34,18 +35,8 @@ final class Requirements
         'pdo' => 'the database',
     ];
 
-    /** The PDO driver each `database.connection.client` needs. */
-    public const array DRIVERS = [
-        'sqlite' => 'pdo_sqlite',
-        'sqlite3' => 'pdo_sqlite',
-        'better-sqlite3' => 'pdo_sqlite',
-        'mysql' => 'pdo_mysql',
-        'mysql2' => 'pdo_mysql',
-        'mariadb' => 'pdo_mysql',
-        'postgres' => 'pdo_pgsql',
-        'postgresql' => 'pdo_pgsql',
-        'pg' => 'pdo_pgsql',
-    ];
+    /** The PDO driver each `database.connection.client` needs: the clients the database package connects. */
+    public const array DRIVERS = Connection::CLIENT_MAP;
 
     /** Extensions Strapi runs without, with what goes missing. */
     public const array RECOMMENDED = [
@@ -55,7 +46,7 @@ final class Requirements
         'zlib' => 'responses are not compressed',
     ];
 
-    /** The variables of `.env.example` whose example value must be replaced before going live. */
+    /** The variables of `.env.example` whose example value must be replaced before going live (outside development and test). */
     public const array SECRETS = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'JWT_SECRET', 'ENCRYPTION_KEY'];
 
     /**
@@ -128,7 +119,8 @@ final class Requirements
         if ($perRequest && $sapi !== 'cli-server' && ($nodeEnv === '' || $nodeEnv === 'development')) {
             $findings[] = self::finding('warning', 'NODE_ENV', 'NODE_ENV is ' . ($nodeEnv === '' ? 'not set' : "\"{$nodeEnv}\"") . ': the app runs in development, where every request runs the whole bootstrap under a lock. Set NODE_ENV=production in .env.');
         }
-        if ($nodeEnv === 'production') {
+        // every deployed environment: staging is as reachable as production
+        if (!in_array($nodeEnv, ['', 'development', 'test'], true)) {
             $kept = array_values(array_filter(self::SECRETS, static fn (string $name): bool => isset($env[$name]) && stripos($env[$name], 'tobemodified') !== false));
             if ($kept !== []) {
                 $findings[] = self::finding('warning', 'secrets', implode(', ', $kept) . ' still have the example values of .env.example: anyone can sign admin and API tokens. Generate new ones.');
