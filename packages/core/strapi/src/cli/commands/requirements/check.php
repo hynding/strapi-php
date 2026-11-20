@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Not an upstream command: checks that this PHP and project can run Strapi
- * ({@see Requirements}): PHP version, extensions, the database client's PDO driver, writable
+ * ({@see Requirements}; the PHP version is Composer's platform check): extensions, the database client's PDO driver, writable
  * `.tmp`, `public/uploads` and `.strapi`, the JIT, the `.env.example` secrets in production.
  * Exits 1 when something Strapi cannot run without is missing.
  *

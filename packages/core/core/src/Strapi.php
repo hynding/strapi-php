@@ -720,18 +720,20 @@ final class Strapi extends Container implements StrapiContract
 
     /**
      * PHP port: logs what {@see Utils\Requirements} finds wrong with this PHP and project, once per
-     * server API and deployment (`.tmp/requirements.<sapi>` holds the settled inputs it was logged
-     * for): the web server's PHP is checked on its first request even when a CLI command
+     * web server API and deployment (`.tmp/requirements.<sapi>` holds the settled inputs it was
+     * logged for): the web server's PHP is checked on its first request even when a CLI command
      * (`migrations:run` in a deploy script) settled the deployment, and a settled request only
-     * reads that file. In development (unsettled every boot) it logs only under a web server whose
+     * reads that file. Not from the CLI, whose own check is `strapi requirements:check`. In development (unsettled every boot) it logs only under a web server whose
      * requests each boot, which is usually a deployment without NODE_ENV, at most once an hour;
      * in the test environment never.
      */
     private function logRequirementsOnce(): void
     {
         $key = $this->settledFingerprint;
-        if ($this->config()->get('environment') === 'test' || ($key === null && (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest()))) {
-            return; // a test suite's boots are no deployment
+        // a test suite's boots are no deployment, and a command's stdout is its output
+        // (`configuration:dump > config.json`): `requirements:check` is the command line's check
+        if ($this->config()->get('environment') === 'test' || PHP_SAPI === 'cli' || ($key === null && (PHP_SAPI === 'cli-server' || !Utils\Sapi::isPerRequest()))) {
+            return;
         }
         $marker = $this->dirs()->tmp . '/requirements.' . PHP_SAPI;
         $recorded = @file_get_contents($marker);

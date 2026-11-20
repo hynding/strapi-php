@@ -115,8 +115,10 @@ final class Requirements
         if ($perRequest && $sapi !== 'cli-server' && ($nodeEnv === '' || $nodeEnv === 'development')) {
             $findings[] = self::finding('warning', 'NODE_ENV', 'NODE_ENV is ' . ($nodeEnv === '' ? 'not set' : "\"{$nodeEnv}\"") . ': the app runs in development, where every request runs the whole bootstrap under a lock. Set NODE_ENV=production in .env.');
         }
-        // every deployed environment: staging is as reachable as production
-        if (!in_array($nodeEnv, ['', 'development', 'test'], true)) {
+        // every deployed environment: staging is as reachable as production, and so is a web
+        // server's that never set NODE_ENV
+        $deployed = !in_array($nodeEnv, ['', 'development', 'test'], true) || ($nodeEnv === '' && $perRequest && $sapi !== 'cli-server');
+        if ($deployed) {
             $kept = array_values(array_filter(self::SECRETS, static fn (string $name): bool => isset($env[$name]) && stripos($env[$name], 'tobemodified') !== false));
             if ($kept !== []) {
                 $findings[] = self::finding('warning', 'secrets', implode(', ', $kept) . ' still have the example values of .env.example: anyone can sign admin and API tokens. Generate new ones.');

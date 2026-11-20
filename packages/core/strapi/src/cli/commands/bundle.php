@@ -51,7 +51,7 @@ final class Bundle extends StrapiCommand
         $name = self::projectName($root);
         $option = $input->getOption('output');
         $archive = is_string($option) && $option !== ''
-            ? (str_starts_with($option, '/') ? $option : getcwd() . '/' . $option)
+            ? (preg_match('#^(/|\\\\|[A-Za-z]:[/\\\\])#', $option) === 1 ? $option : getcwd() . '/' . $option)
             : $root . '/dist/' . $name . (class_exists(\ZipArchive::class) ? '.zip' : '.tar.gz');
 
         try {
@@ -211,6 +211,10 @@ final class Bundle extends StrapiCommand
         // one from a Composer path repository (a symlink to a checkout) its node_modules, .env and
         // the data of its own projects (.tmp, .strapi)
         if (in_array($base, self::EXCLUDE_EVERYWHERE, true) || (str_starts_with($base, '.env.') && $base !== '.env.example')) {
+            return true;
+        }
+        // what a killed `strapi bundle` left beside its archive
+        if (preg_match('/^\..+\.\d+\.partial$/', $base) === 1) {
             return true;
         }
         // a package's own vendor/ (a path repository's checkout): Composer autoloads the project's

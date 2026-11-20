@@ -55,7 +55,8 @@ final class PublicAdminAssets
      */
     public static function publish(string $buildDir, string $publicDir, string $adminPath, Logger $logger): ?string
     {
-        $relative = trim(str_replace('\\', '/', $adminPath), '/');
+        // `/cms//admin/` and `/./admin` name the same directory as `/cms/admin` and `/admin`
+        $relative = implode('/', array_filter(explode('/', str_replace('\\', '/', $adminPath)), static fn (string $part): bool => $part !== '' && $part !== '.'));
         if ($relative === '' || in_array('..', explode('/', $relative), true) || !is_dir($buildDir) || !is_dir($publicDir)) {
             // the admin at the site root would take public/ over: PHP keeps serving it
             return null;
