@@ -33,12 +33,11 @@ use Strapi\Core\Utils\IsInitialized;
 use Strapi\Core\Utils\StartupLogger;
 use Strapi\Database\Database;
 use Strapi\Logger\Logger;
-use Strapi\Types\Core\StrapiDirectories;
 use Strapi\Types\Core\Strapi as StrapiContract;
+use Strapi\Types\Core\StrapiDirectories;
 use Strapi\Types\Modules\Documents\Repository;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\AuthScope;
-use Strapi\Utils\ContentTypes as ContentTypesUtils;
 use Strapi\Utils\EnvHelper;
 use Strapi\Utils\Hooks\Hook;
 
@@ -463,6 +462,17 @@ final class Strapi extends Container implements StrapiContract
         }
 
         return $this->bootCache ??= new Utils\BootCache($this->dirs()->root . '/.strapi/cache');
+    }
+
+    /**
+     * PHP port: what boot cache entries are keyed on besides their own inputs: the inputs this
+     * boot was settled for (the Strapi version, every installed package, config, schemas and code
+     * stats), so that an upgrade never reads an entry the previous code wrote. Null when there is
+     * no boot cache ({@see bootCache()}).
+     */
+    public function bootCacheKey(): ?string
+    {
+        return $this->bootCache() !== null ? $this->settledFingerprint : null;
     }
 
     /**
@@ -924,7 +934,7 @@ final class Strapi extends Container implements StrapiContract
     {
         $rawModels = $this->get('models')->get();
         $cache = $this->bootCache();
-        $key = (string) $this->settledFingerprint;
+        $key = (string) $this->bootCacheKey();
 
         if ($cache !== null) {
             $entry = $cache->get('db-metadata', $key);

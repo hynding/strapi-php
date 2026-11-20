@@ -54,7 +54,7 @@ final class Routes
                 'handler' => "{$uid}.update",
                 'request' => [
                     'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
-                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->partialBody())],
+                    'body' => ['application/json' => $validator->partialBody()],
                 ],
                 'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
@@ -108,7 +108,7 @@ final class Routes
                 'handler' => "{$uid}.create",
                 'request' => [
                     'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
-                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->body())],
+                    'body' => ['application/json' => $validator->body()],
                 ],
                 'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
@@ -120,7 +120,7 @@ final class Routes
                 'request' => [
                     'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
                     'params' => ['id' => $validator->documentID()],
-                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->partialBody())],
+                    'body' => ['application/json' => $validator->partialBody()],
                 ],
                 'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
             ],
@@ -138,11 +138,12 @@ final class Routes
     }
 
     /**
-     * PHP port: the route's request and response schemas are built on first use on a settled boot
+     * PHP port: the route's query and response schemas are built on first use on a settled boot
      * (Strapi::bootstrapSettled(); under PHP-FPM, most requests). They describe the routes for
-     * OpenAPI documents and the extra params (`contentAPI.addQueryParams`), which no request needs;
-     * building them for every content type was a fifth of a settled boot. A `z.lazy()` stands in
-     * (the documents unwrap it); the query params keep their names.
+     * OpenAPI documents; building them for every content type was a fifth of a settled boot. A
+     * `z.lazy()` stands in (the documents unwrap it, and it parses as what it wraps); the query
+     * params keep their names, which requests read (`ContentApiRouteParams`). The body schema is
+     * built as before: requests read its shape (the extra input params' root keys).
      *
      * @param \Closure(): ZodType $build
      */

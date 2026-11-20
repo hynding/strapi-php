@@ -51,7 +51,10 @@ final class MetadataCacheTest extends TestCase
         return ['api::thing.thing' => $thing] + GetstartedDatabase::schemas();
     }
 
-    /** @return array<string, array<string, callable>> */
+    /**
+     * @param array<string, Schema> $schemas
+     * @return array<string, array<string, callable>>
+     */
     private static function lifecycles(array $schemas): array
     {
         $lifecycles = [];

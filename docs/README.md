@@ -107,16 +107,18 @@ On `examples/getstarted` (SQLite, opcache), a settled production boot went from 
 - **A settled boot defers what no request needs, and caches what it computes the same way every
   time.** Profiled per request (PHP's built-in server, opcache in shared memory, as under FPM),
   a settled boot and request of `examples/getstarted` took ~44–50 ms: loading config, plugins and
-  schemas was ~5 ms of it, the rest was CPU in bootstrap. Now ~24 ms on the same machine:
+  schemas was ~5 ms of it, the rest was CPU in bootstrap. Now ~24 ms (`/_health`) to ~28 ms
+  (`/api/articles`) on the same machine:
   - Endpoints are composed when their route first matches (`ComposeEndpoint`): composing all of
     them (resolving and validating every route's policies, instantiating every controller) was
     ~5 ms. Route middlewares are still resolved at bootstrap (a factory may extend the app), and
     actions are still bound to their route type for the content-API permission map.
-  - The core routes' request and response Zod schemas are `z.lazy()` stand-ins
-    (`CoreApi\Routes\Routes`), ~8 ms. They describe routes for OpenAPI documents and the extra
-    params (`contentAPI.addQueryParams` / `addInputParams`, which merge into them lazily); the
-    OpenAPI route collector builds them first, in registration order, so the schema registry
-    fills as on an unsettled boot and the document is the same (`SettledRoutesTest`).
+  - The core routes' response schemas and each query param's schema are `z.lazy()` stand-ins
+    (`CoreApi\Routes\Routes`), ~6 ms. They describe routes for OpenAPI documents; query params
+    keep their names, so `contentAPI.addQueryParams` joins them as before, and body schemas stay
+    eager because `addInputParams` merges into them. The OpenAPI route collector builds the
+    stand-ins first, in registration order, so the schema registry fills as on an unsettled boot
+    and the document is the same (`SettledRoutesTest`).
   - Admin actions are not validated again (`Domain\Action\Provider`), ~6 ms: the bootstrap that
     settled validated the same actions from the same code.
   - The boot cache, `.strapi/cache/<name>.<key hash>.php` (`Utils\BootCache`): `var_export`ed
@@ -125,7 +127,7 @@ On `examples/getstarted` (SQLite, opcache), a settled production boot went from 
     and `publishedAt` defaults, the `localizations` join condition) are shared instances of
     `SchemaFactory::callable()` that the entry names, and models' lifecycles are put back from
     the models; metadata holding another closure is built every time. `routes` (the compiled
-    FastRoute table, ~1.5 ms) is keyed on every route's method and path. The key is in the file
+    FastRoute table, ~1.5 ms) is keyed on the settled fingerprint and every route's method and path. The key is in the file
     name because production opcache often runs with `validate_timestamps=0`, where a file
     rewritten in place keeps its old contents; writing an entry removes its other files. The
     first settled boot writes the entries; an unwritable `.strapi` leaves the cache empty. Used
@@ -187,7 +189,7 @@ starting and after finishing (`/api-tests` in Claude Code).
   Needed only to upgrade a Strapi v4 database.
 - Strapi Cloud login in create-strapi-app (`--skip-cloud` is always on).
 - PHP-FPM and shared hosting. A per-request boot is now read-only, lock-free once settled and
-  ~24 ms with its request on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
+  ~24–28 ms with its request on `examples/getstarted` ("Runtime model"); FrankenPHP worker mode stays the fast path.
   Still to do, in order:
   - AI metadata jobs (`POST /upload/ai-metadata-jobs`) run in a
     shutdown function, after `destroy()` and before the response is finished; unreachable without

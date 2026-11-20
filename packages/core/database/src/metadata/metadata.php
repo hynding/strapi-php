@@ -271,7 +271,8 @@ class Metadata implements \IteratorAggregate, \Countable
     /**
      * PHP port: what loadModels() would build from the models a cache entry was taken for
      * ({@see toCache()}), with the models' lifecycles and the shared callables put back. False
-     * (and nothing loaded) when the entry was taken with another identifier length.
+     * (and nothing loaded) when the entry does not fit: another identifier length, a callable this
+     * code does not have.
      *
      * @param array<array-key, mixed> $cache
      * @param array<string, array<string, callable>> $lifecycles by model uid
@@ -289,7 +290,13 @@ class Metadata implements \IteratorAggregate, \Countable
             if (!is_array($named) || !is_array($named[0] ?? null) || !is_string($named[1] ?? null)) {
                 return false;
             }
-            $metas = self::withValueAt($metas, array_values(array_map('strval', $named[0])), $named[1] === self::EMPTY_OBJECT ? new \stdClass() : SchemaFactory::callable($named[1]));
+            try {
+                $value = $named[1] === self::EMPTY_OBJECT ? new \stdClass() : SchemaFactory::callable($named[1]);
+            } catch (\InvalidArgumentException) {
+                // a callable this code no longer has (an entry from other code with the same inputs)
+                return false;
+            }
+            $metas = self::withValueAt($metas, array_values(array_map('strval', $named[0])), $value);
         }
 
         foreach ($cache['nameMap'] as $short => $full) {

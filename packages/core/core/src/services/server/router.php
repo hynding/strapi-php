@@ -34,6 +34,8 @@ final class Router
 
     private ?BootCache $cache = null;
 
+    private string $cacheKey = '';
+
     public function __construct(private readonly string $prefix = '')
     {
     }
@@ -44,13 +46,15 @@ final class Router
     }
 
     /**
-     * PHP port: keep the compiled route table in the boot cache (`routes`), keyed on every route's
-     * method and path in order: what the table is computed from. Set on the server's root router on
-     * a settled boot, where compiling it was a twentieth of the boot.
+     * PHP port: keep the compiled route table in the boot cache (`routes`), keyed on `$key` (the
+     * code that compiles it: Strapi::bootCacheKey()) and every route's method and path in order (what
+     * it is compiled from). Set on the server's root router on a settled boot, where compiling it
+     * was a twentieth of the boot.
      */
-    public function useCache(?BootCache $cache): void
+    public function useCache(?BootCache $cache, string $key = ''): void
     {
         $this->cache = $cache;
+        $this->cacheKey = $key;
     }
 
     /** @param array<string, mixed> $route */
@@ -109,7 +113,7 @@ final class Router
             return $this->dispatcher = $this->compileTable()['dispatcher'];
         }
 
-        $key = '';
+        $key = $this->cacheKey . "\n";
         foreach ($this->stack as $entry) {
             $key .= $entry['method'] . ' ' . $entry['path'] . "\n";
         }

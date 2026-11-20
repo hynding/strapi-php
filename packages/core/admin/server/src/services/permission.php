@@ -35,7 +35,7 @@ final class Permission
     {
         $isLoaded = static fn (): bool => $strapi->isLoaded();
 
-        $this->actionProvider = ActionProvider::createActionProvider([], $isLoaded);
+        $this->actionProvider = ActionProvider::createActionProvider([], $isLoaded, static fn (): bool => $strapi->bootstrapSettled());
         $this->conditionProvider = ConditionProvider::createConditionProvider($isLoaded);
         $this->sectionsBuilder = SectionsBuilder::createDefaultSectionBuilder();
         $this->engine = new Engine($strapi, [

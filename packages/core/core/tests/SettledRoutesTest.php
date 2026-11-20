@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Strapi\Core\Core;
 use Strapi\Core\Strapi;
 use Strapi\Openapi\Exports;
+use Strapi\Utils\ContentApiRouteParams;
 use Strapi\Utils\Zod\ZodLazy;
 
 /**
@@ -110,6 +111,31 @@ final class SettledRoutesTest extends TestCase
         return $permission->actionProvider->keys();
     }
 
+    /**
+     * What requests read of the article routes' schemas: the extra query and body keys, and what
+     * the extra params' validators make of a bad and a good value.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function routeParams(Strapi $strapi): array
+    {
+        $out = [];
+        foreach ($strapi->api('article')->routes()['article']['routes'] ?? [] as $route) {
+            $shape = ContentApiRouteParams::routeBodyShape($route) ?? [];
+            $query = ContentApiRouteParams::routeQuery($route) ?? [];
+            $out[] = [
+                'route' => $route['method'] . ' ' . $route['path'],
+                'queryKeys' => ContentApiRouteParams::getExtraQueryKeysFromRoute($route),
+                'bodyKeys' => ContentApiRouteParams::getExtraRootKeysFromRouteBody($route),
+                'extraParam' => isset($query['extraParam']) ? [ContentApiRouteParams::runValidator($query['extraParam'], 5)[0], ContentApiRouteParams::runValidator($query['extraParam'], 'ok')] : null,
+                'clientMutationId' => isset($shape['clientMutationId']) ? [ContentApiRouteParams::runValidator($shape['clientMutationId'], 5)[0], ContentApiRouteParams::runValidator($shape['clientMutationId'], 'ok')] : null,
+                'locale' => isset($query['locale']) ? ContentApiRouteParams::runValidator($query['locale'], 'en')[0] : null,
+            ];
+        }
+
+        return $out;
+    }
+
     /** The content API's OpenAPI document, without what changes at every generation. */
     private static function openapi(Strapi $strapi): string
     {
@@ -128,6 +154,10 @@ final class SettledRoutesTest extends TestCase
         $responses = self::responses($strapi);
         $actions = self::actions($strapi);
         $openapi = self::openapi($strapi);
+        $routeParams = self::routeParams($strapi);
+        $create = array_values(array_filter($routeParams, static fn (array $r): bool => $r['route'] === 'POST /articles'))[0] ?? null;
+        self::assertIsArray($create);
+        self::assertContains('clientMutationId', $create['bodyKeys'], 'addInputParams joined the body');
         $find = $strapi->api('article')->routes()['article']['routes'][0] ?? null;
         self::assertIsArray($find);
         self::assertNotInstanceOf(ZodLazy::class, $find['response']);
@@ -147,6 +177,7 @@ final class SettledRoutesTest extends TestCase
         unset($query['extraParam']);
         self::assertContainsOnlyInstancesOf(ZodLazy::class, $query);
 
+        self::assertSame($routeParams, self::routeParams($strapi), 'requests read the same params, and they validate the same');
         self::assertSame($responses, self::responses($strapi));
         self::assertSame($actions, self::actions($strapi));
         // the deferred schemas are built before the document is assembled, in registration order

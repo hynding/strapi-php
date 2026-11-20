@@ -83,7 +83,12 @@ final class RouterTest extends TestCase
         $outcomes = [];
         foreach ([['GET', '/api/articles/42'], ['DELETE', '/api/articles/42'], ['PUT', '/api/articles'], ['GET', '/api/v1.2.3'], ['GET', '/api/anything'], ['GET', '/elsewhere'], ['HEAD', '/api/articles/1/']] as [$method, $path]) {
             $match = $router->match($method, $path);
-            $outcomes[] = is_array($match) && isset($match['route']) ? ['handler' => (string) $match['route']['handler'], 'params' => $match['params']] : $match;
+            if (is_array($match) && isset($match['route'])) {
+                $handler = $match['route']['handler'] ?? null;
+                $outcomes[] = ['handler' => is_string($handler) ? $handler : '', 'params' => $match['params']];
+            } else {
+                $outcomes[] = $match;
+            }
         }
 
         return $outcomes;
@@ -121,7 +126,8 @@ final class RouterTest extends TestCase
             self::assertSame($expected, self::outcomes($second));
             $match = $second->match('POST', '/api/articles');
             self::assertIsArray($match);
-            self::assertSame('create', $match['handler']());
+            self::assertArrayHasKey('handler', $match);
+            self::assertSame('create', ($match['handler'])());
 
             // another route: another key, the old table removed
             $changed = self::router('/posts/:id');

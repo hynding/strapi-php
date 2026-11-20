@@ -32,10 +32,21 @@ final class Provider
     private readonly \Closure $isLoaded;
 
     /**
+     * PHP port: whether the owning Strapi's bootstrap is settled (Strapi::bootstrapSettled(); under
+     * PHP-FPM, most requests). Then a completed bootstrap registered the same actions, from the
+     * same code, and validated them: register() and registerMany() do not validate them again
+     * (most of a boot's action registration time). An unsettled boot validates as upstream does.
+     *
+     * @var \Closure(): bool
+     */
+    private readonly \Closure $settled;
+
+    /**
      * @param array{throwOnDuplicates?: bool} $options
      * @param (callable(): bool)|null $isLoaded
+     * @param (callable(): bool)|null $settled whether the owning Strapi's bootstrap is settled (see settled())
      */
-    public function __construct(array $options = [], ?callable $isLoaded = null)
+    public function __construct(array $options = [], ?callable $isLoaded = null, ?callable $settled = null)
     {
         /** @var ProviderFactory<array<string, mixed>> $provider */
         $provider = new ProviderFactory($options);
@@ -47,12 +58,18 @@ final class Provider
         $this->isLoaded = $isLoaded !== null
             ? $isLoaded(...)
             : static fn (): bool => Core::instance()?->isLoaded() ?? false;
+        $this->settled = $settled !== null
+            ? $settled(...)
+            : static fn (): bool => Core::instance()?->bootstrapSettled() ?? false;
     }
 
-    /** @param array{throwOnDuplicates?: bool} $options */
-    public static function createActionProvider(array $options = [], ?callable $isLoaded = null): self
+    /**
+     * @param array{throwOnDuplicates?: bool} $options
+     * @param (callable(): bool)|null $settled
+     */
+    public static function createActionProvider(array $options = [], ?callable $isLoaded = null, ?callable $settled = null): self
     {
-        return new self($options, $isLoaded);
+        return new self($options, $isLoaded, $settled);
     }
 
     /**
@@ -65,7 +82,7 @@ final class Provider
             throw new \RuntimeException("You can't register new actions outside of the bootstrap function.");
         }
 
-        if (!self::settled()) {
+        if (!($this->settled)()) {
             ActionProviderValidation::validateRegisterProviderAction([$actionAttributes]);
         }
 
@@ -92,7 +109,7 @@ final class Provider
      */
     public function registerMany(array $actionsAttributes): static
     {
-        if (!self::settled()) {
+        if (!($this->settled)()) {
             ActionProviderValidation::validateRegisterProviderAction($actionsAttributes);
         }
 
@@ -104,17 +121,6 @@ final class Provider
         }
 
         return $this;
-    }
-
-    /**
-     * PHP port: on a settled boot (Strapi::bootstrapSettled(); under PHP-FPM, most requests) a
-     * completed bootstrap registered the same actions, from the same code, and validated them; the
-     * validation is most of a boot's action registration time and cannot fail now. An unsettled
-     * boot (any change to code, config or schemas) validates as upstream does.
-     */
-    private static function settled(): bool
-    {
-        return Core::instance()?->bootstrapSettled() ?? false;
     }
 
     public function appliesToProperty(string $property, string $actionId, ?string $subject = null): bool

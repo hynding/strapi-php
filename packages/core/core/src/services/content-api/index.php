@@ -173,13 +173,6 @@ final class ContentApi
                 }
                 $body = $route['request']['body'] ?? [];
                 $existing = $body['application/json'] ?? null;
-                // a settled boot defers a core route's body schema (core-api/routes/index.php): the
-                // param joins it when it is built
-                if ($existing instanceof \Strapi\Utils\Zod\ZodLazy) {
-                    $body['application/json'] = self::deferredInput($existing, $param, $schema, $route);
-                    $route['request'] = [...($route['request'] ?? []), 'body' => $body];
-                    continue;
-                }
                 // a route's own body schema is a ZodObject (e.g. plugin::email's POST /email)
                 $shape = $existing instanceof \Strapi\Utils\Zod\ZodObject ? $existing->shape() : (is_array($existing) ? ($existing['shape'] ?? []) : []);
                 if (array_key_exists($param, $shape)) {
@@ -191,23 +184,6 @@ final class ContentApi
             }
         }
         unset($route);
-    }
-
-    /**
-     * @param array<string, mixed> $route
-     */
-    private static function deferredInput(\Strapi\Utils\Zod\ZodLazy $existing, string $param, mixed $schema, array $route): \Strapi\Utils\Zod\ZodLazy
-    {
-        return \Strapi\Utils\Zod::lazy(static function () use ($existing, $param, $schema, $route): \Strapi\Utils\Zod\ZodType {
-            $inner = $existing->unwrap();
-            $shape = $inner instanceof \Strapi\Utils\Zod\ZodObject ? $inner->shape() : [];
-            if (array_key_exists($param, $shape)) {
-                throw new \RuntimeException("contentAPI.addInputParams: param \"{$param}\" already exists on route {$route['method']} {$route['path']}");
-            }
-            $shape[$param] = $schema instanceof \Strapi\Utils\Zod\ZodType ? $schema : \Strapi\Utils\Zod::unknown()->optional();
-
-            return \Strapi\Utils\Zod::object($shape);
-        });
     }
 
     /**
