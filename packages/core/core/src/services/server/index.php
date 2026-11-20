@@ -141,6 +141,7 @@ final class Server
                 $api->mount($router);
             }
             $router->use($this->router);
+            $router->useCache($this->strapi->bootCache());
             $this->mountedRouter = $router;
         }
 

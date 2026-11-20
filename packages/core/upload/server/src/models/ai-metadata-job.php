@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Strapi\Upload\Models;
 
+use Strapi\Database\Utils\SchemaFactory;
+
 /** Port of server/src/models/ai-metadata-job.ts: a raw database model (no content type). */
 final class AiMetadataJob
 {
@@ -27,7 +29,7 @@ final class AiMetadataJob
                 ],
                 'createdAt' => [
                     'type' => 'datetime',
-                    'default' => static fn (): \DateTimeImmutable => new \DateTimeImmutable(),
+                    'default' => SchemaFactory::callable(SchemaFactory::NOW),
                 ],
                 'completedAt' => [
                     'type' => 'datetime',

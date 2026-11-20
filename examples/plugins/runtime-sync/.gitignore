@@ -1,5 +1,6 @@
 /.tmp/
 tests/php/app/.tmp/
+tests/php/app/.strapi/
 /dist/
 /node_modules/
 tests/php/app/.env

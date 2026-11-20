@@ -48,6 +48,8 @@ final class PerRequestSapiTest extends TestCase
 
     protected function tearDown(): void
     {
+        // what settled boots wrote to the boot cache (.strapi/cache)
+        array_map('unlink', glob(dirname(__DIR__, 5) . '/examples/getstarted/.strapi/cache/*.php') ?: []);
         if ($this->dir !== '') {
             array_map('unlink', glob($this->dir . '/*') ?: []);
             @rmdir($this->dir);

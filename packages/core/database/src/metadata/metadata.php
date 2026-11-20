@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strapi\Database\Metadata;
 
 use Strapi\Database\Utils\Identifiers\Identifiers;
+use Strapi\Database\Utils\SchemaFactory;
 use Strapi\Database\Utils\Types;
 
 /**
@@ -25,6 +26,9 @@ use Strapi\Database\Utils\Types;
  */
 class Metadata implements \IteratorAggregate, \Countable
 {
+    /** The boot cache's name for an empty `\stdClass` ({@see toCache()}). */
+    private const EMPTY_OBJECT = '{}';
+
     /** @var array<string, Meta> */
     private array $metas = [];
 
@@ -203,6 +207,118 @@ class Metadata implements \IteratorAggregate, \Countable
         }
 
         $this->validate();
+    }
+
+    /**
+     * PHP port: the loaded metadata as plain data for the boot cache (Strapi\Core\Utils\BootCache):
+     * every meta without its lifecycles (the caller puts them back), the shared callables of
+     * {@see SchemaFactory::callable()} and the `{}` JSON defaults replaced by their names, and the
+     * identifiers' shortened names. Null when a meta holds another object (a model's own default
+     * function): such metadata is built every time.
+     *
+     * @return array{metas: array<string, array<string, mixed>>, callables: list<array{0: list<string>, 1: string}>, nameMap: array<string, string>, maxLength: int}|null
+     */
+    public function toCache(): ?array
+    {
+        $metas = [];
+        $callables = [];
+        foreach ($this->metas as $uid => $meta) {
+            $meta['lifecycles'] = [];
+            if (!self::nameCallables($meta, [$uid], $callables)) {
+                return null;
+            }
+            $metas[$uid] = $meta;
+        }
+
+        return [
+            'metas' => $metas,
+            'callables' => $callables,
+            'nameMap' => Identifiers::global()->nameMap,
+            'maxLength' => Identifiers::global()->getMaxLength(),
+        ];
+    }
+
+    /**
+     * @param array<array-key, mixed> $value
+     * @param list<string> $path
+     * @param list<array{0: list<string>, 1: string}> $callables
+     */
+    private static function nameCallables(array &$value, array $path, array &$callables): bool
+    {
+        foreach ($value as $key => &$item) {
+            if (is_array($item)) {
+                if (!self::nameCallables($item, [...$path, (string) $key], $callables)) {
+                    return false;
+                }
+            } elseif ($item instanceof \stdClass && get_object_vars($item) === []) {
+                // a JSON attribute's `{}` default
+                $callables[] = [[...$path, (string) $key], self::EMPTY_OBJECT];
+                $item = null;
+            } elseif (is_object($item)) {
+                $name = SchemaFactory::callableName($item);
+                if ($name === null) {
+                    return false;
+                }
+                $callables[] = [[...$path, (string) $key], $name];
+                $item = null;
+            }
+        }
+        unset($item);
+
+        return true;
+    }
+
+    /**
+     * PHP port: what loadModels() would build from the models a cache entry was taken for
+     * ({@see toCache()}), with the models' lifecycles and the shared callables put back. False
+     * (and nothing loaded) when the entry was taken with another identifier length.
+     *
+     * @param array<array-key, mixed> $cache
+     * @param array<string, array<string, callable>> $lifecycles by model uid
+     */
+    public function loadCache(array $cache, array $lifecycles): bool
+    {
+        $identifiers = Identifiers::global();
+        if (($cache['maxLength'] ?? null) !== $identifiers->getMaxLength() || !is_array($cache['metas'] ?? null)
+            || !is_array($cache['nameMap'] ?? null) || !is_array($cache['callables'] ?? null)) {
+            return false;
+        }
+
+        $metas = $cache['metas'];
+        foreach ($cache['callables'] as $named) {
+            if (!is_array($named) || !is_array($named[0] ?? null) || !is_string($named[1] ?? null)) {
+                return false;
+            }
+            $metas = self::withValueAt($metas, array_values(array_map('strval', $named[0])), $named[1] === self::EMPTY_OBJECT ? new \stdClass() : SchemaFactory::callable($named[1]));
+        }
+
+        foreach ($cache['nameMap'] as $short => $full) {
+            $identifiers->nameMap[(string) $short] = (string) $full;
+        }
+        foreach ($metas as $uid => $meta) {
+            /** @var Meta $meta a meta toCache() took, with its callables back */
+            $this->metas[(string) $uid] = [...$meta, 'lifecycles' => $lifecycles[$uid] ?? []];
+        }
+
+        return true;
+    }
+
+    /**
+     * `$array` with `$value` at `$path` (`['api::a.a', 'attributes', 'documentId', 'default']`).
+     *
+     * @param array<array-key, mixed> $array
+     * @param list<string> $path
+     * @return array<array-key, mixed>
+     */
+    private static function withValueAt(array $array, array $path, mixed $value): array
+    {
+        $key = array_shift($path);
+        if ($key === null) {
+            return $array;
+        }
+        $array[$key] = $path === [] ? $value : self::withValueAt(is_array($array[$key] ?? null) ? $array[$key] : [], $path, $value);
+
+        return $array;
     }
 
     /** @param Attribute $attribute */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Strapi\Plugin\I18n\Models;
 
+use Strapi\Database\Utils\SchemaFactory;
+
 /** Port of server/src/models/ai-localization-job.ts: a raw database model (no content type). */
 final class AiLocalizationJob
 {
@@ -43,11 +45,11 @@ final class AiLocalizationJob
                 ],
                 'createdAt' => [
                     'type' => 'datetime',
-                    'default' => static fn (): \DateTimeImmutable => new \DateTimeImmutable(),
+                    'default' => SchemaFactory::callable(SchemaFactory::NOW),
                 ],
                 'updatedAt' => [
                     'type' => 'datetime',
-                    'default' => static fn (): \DateTimeImmutable => new \DateTimeImmutable(),
+                    'default' => SchemaFactory::callable(SchemaFactory::NOW),
                 ],
             ],
         ];

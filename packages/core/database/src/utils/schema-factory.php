@@ -19,6 +19,52 @@ use Strapi\Utils\Cuid2;
  */
 final class SchemaFactory
 {
+    /** `publishedAt`'s default: the current time. */
+    public const NOW = 'now';
+
+    /** `documentId`'s default: a new cuid2. */
+    public const DOCUMENT_ID = 'documentId';
+
+    /** `localizations`' join condition: none of the results already loaded. */
+    public const NOT_IN_RESULTS = 'notInResults';
+
+    /** @var array<string, \Closure> */
+    private static array $callables = [];
+
+    /**
+     * PHP port: the callables the schemas and models carry (attribute defaults, join conditions),
+     * one shared instance each, so that the database metadata can name them in the boot cache
+     * ({@see \Strapi\Database\Metadata\Metadata::toCache()}) and get them back by name.
+     */
+    public static function callable(string $name): \Closure
+    {
+        return self::$callables[$name] ??= match ($name) {
+            self::NOW => static fn (): \DateTimeImmutable => new \DateTimeImmutable(),
+            self::DOCUMENT_ID => static fn (): string => Cuid2::createId(),
+            self::NOT_IN_RESULTS => static fn (array $ctx): array => [
+                'id' => [
+                    '$notIn' => array_map(static fn (mixed $r): mixed => is_array($r) ? ($r['id'] ?? null) : null, is_array($ctx['results'] ?? null) ? $ctx['results'] : []),
+                ],
+            ],
+            default => throw new \InvalidArgumentException("Unknown model callable \"{$name}\""),
+        };
+    }
+
+    /** The name of a callable {@see callable()} returned, or null for any other value. */
+    public static function callableName(mixed $value): ?string
+    {
+        if (!$value instanceof \Closure) {
+            return null;
+        }
+        foreach (self::$callables as $name => $callable) {
+            if ($callable === $value) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Loads an API content type: `api::<apiName>.<singularName>`.
      *
@@ -100,7 +146,7 @@ final class SchemaFactory
             'configurable' => false,
             'writable' => true,
             'visible' => true,
-            'default' => static fn (): \DateTimeImmutable => new \DateTimeImmutable(),
+            'default' => self::callable(self::NOW),
         ];
 
         // addCreatorFields
@@ -141,7 +187,7 @@ final class SchemaFactory
                 'referencedColumn' => 'document_id',
                 'referencedTable' => Identifiers::global()->getTableName($collectionName),
                 // ensure the population will not include the results we already loaded
-                'on' => static fn (array $ctx): array => ['id' => ['$notIn' => array_map(static fn (array $r) => $r['id'], $ctx['results'] ?? [])]],
+                'on' => self::callable(self::NOT_IN_RESULTS),
             ],
         ];
 
@@ -223,7 +269,7 @@ final class SchemaFactory
             }
 
             $documentIdAttribute = $contentType->modelType === 'contentType'
-                ? ['documentId' => ['type' => 'string', 'default' => static fn (): string => Cuid2::createId()]]
+                ? ['documentId' => ['type' => 'string', 'default' => self::callable(self::DOCUMENT_ID)]]
                 : [];
 
             // Prevent user from creating a documentId attribute

@@ -9,6 +9,7 @@ use Strapi\Core\Strapi;
 use Strapi\Types\Schema\Schema;
 use Strapi\Utils\ContentTypes;
 use Strapi\Utils\Zod as z;
+use Strapi\Utils\Zod\ZodType;
 
 /**
  * Port of core-api/routes/index.ts (`createRoutes`): the default REST routes of a content type,
@@ -42,9 +43,9 @@ final class Routes
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.find",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', 'filters', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', 'filters', ...$conditional]),
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
             ],
             'update' => [
@@ -52,10 +53,10 @@ final class Routes
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.update",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
-                    'body' => ['application/json' => $validator->partialBody()],
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
+                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->partialBody())],
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
             ],
             'delete' => [
@@ -63,9 +64,9 @@ final class Routes
                 'path' => "/{$singularName}",
                 'handler' => "{$uid}.delete",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
             ],
         ];
@@ -86,9 +87,9 @@ final class Routes
                 'path' => "/{$pluralName}",
                 'handler' => "{$uid}.find",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'filters', '_q', 'pagination', 'sort', 'populate', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'filters', '_q', 'pagination', 'sort', 'populate', ...$conditional]),
                 ],
-                'response' => z::object(['data' => $validator->documents()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->documents()])),
                 'config' => [],
             ],
             'findOne' => [
@@ -97,19 +98,19 @@ final class Routes
                 'handler' => "{$uid}.findOne",
                 'request' => [
                     'params' => ['id' => $validator->documentID()],
-                    'query' => $validator->queryParams(['fields', 'populate', 'filters', 'sort', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', 'filters', 'sort', ...$conditional]),
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
             ],
             'create' => [
                 'method' => 'POST',
                 'path' => "/{$pluralName}",
                 'handler' => "{$uid}.create",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
-                    'body' => ['application/json' => $validator->body()],
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
+                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->body())],
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
                 'config' => [],
             ],
             'update' => [
@@ -117,23 +118,55 @@ final class Routes
                 'path' => "/{$pluralName}/:id",
                 'handler' => "{$uid}.update",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', ...$conditional]),
                     'params' => ['id' => $validator->documentID()],
-                    'body' => ['application/json' => $validator->partialBody()],
+                    'body' => ['application/json' => self::defer($strapi, static fn (): ZodType => $validator->partialBody())],
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
             ],
             'delete' => [
                 'method' => 'DELETE',
                 'path' => "/{$pluralName}/:id",
                 'handler' => "{$uid}.delete",
                 'request' => [
-                    'query' => $validator->queryParams(['fields', 'populate', 'filters', ...$conditional]),
+                    'query' => self::queryParams($strapi, $validator, ['fields', 'populate', 'filters', ...$conditional]),
                     'params' => ['id' => $validator->documentID()],
                 ],
-                'response' => z::object(['data' => $validator->document()]),
+                'response' => self::defer($strapi, static fn (): ZodType => z::object(['data' => $validator->document()])),
             ],
         ];
+    }
+
+    /**
+     * PHP port: the route's request and response schemas are built on first use on a settled boot
+     * (Strapi::bootstrapSettled(); under PHP-FPM, most requests). They describe the routes for
+     * OpenAPI documents and the extra params (`contentAPI.addQueryParams`), which no request needs;
+     * building them for every content type was a fifth of a settled boot. A `z.lazy()` stands in
+     * (the documents unwrap it); the query params keep their names.
+     *
+     * @param \Closure(): ZodType $build
+     */
+    private static function defer(Strapi $strapi, \Closure $build): ZodType
+    {
+        return $strapi->bootstrapSettled() ? z::lazy($build) : $build();
+    }
+
+    /**
+     * @param list<string> $params
+     * @return array<string, ZodType>
+     */
+    private static function queryParams(Strapi $strapi, CoreContentTypeRouteValidator $validator, array $params): array
+    {
+        if (!$strapi->bootstrapSettled()) {
+            return $validator->queryParams($params);
+        }
+
+        $query = [];
+        foreach ($params as $param) {
+            $query[$param] = z::lazy(static fn (): ZodType => $validator->queryParams([$param])[$param]);
+        }
+
+        return $query;
     }
 
     /**

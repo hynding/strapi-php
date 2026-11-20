@@ -135,6 +135,25 @@ final class Database implements DatabaseContract
         return $this;
     }
 
+    /**
+     * PHP port: init() from a boot cache entry ({@see Metadata::toCache()}) taken from the same
+     * models, which init() validated then. Returns false (and loads nothing) when the entry does
+     * not fit; the caller runs init().
+     *
+     * @param array<array-key, mixed> $cache
+     * @param array<string, array<string, callable>> $lifecycles each model's lifecycles, by uid
+     */
+    public function initFromCache(array $cache, array $lifecycles): bool
+    {
+        if (!$this->metadata->loadCache($cache, $lifecycles)) {
+            return false;
+        }
+
+        $this->schema->invalidate();
+
+        return true;
+    }
+
     public function query(string $uid): EntityRepository
     {
         if (!$this->metadata->has($uid)) {
