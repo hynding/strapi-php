@@ -20,13 +20,14 @@ use Strapi\Types\Core\StrapiDirectories;
  * (`HttpServer::bootFailed()`, logged to PHP's error log).
  *
  * @phpstan-type Finding array{level: 'error'|'warning', name: string, message: string}
- * @phpstan-type Platform array{sapi?: string, phpVersion?: string, extensions?: list<string>, ini?: \Closure(string): (string|false), env?: array<string, string>, frankenphpWorker?: bool}
+ * @phpstan-type Platform array{sapi?: string, extensions?: list<string>, ini?: \Closure(string): (string|false), env?: array<string, string>, frankenphpWorker?: bool}
  */
 final class Requirements
 {
-    public const string PHP_VERSION = '8.3.0';
-
-    /** Extensions without which Strapi does not run (Composer's platform check knows only `php`). */
+    /**
+     * Extensions without which Strapi does not run. The PHP version is Composer's platform check
+     * (`vendor/composer/platform_check.php` stops an older PHP before any of this code is parsed).
+     */
     public const array EXTENSIONS = [
         'ctype' => 'string checks of the validators',
         'json' => 'every request and response body',
@@ -41,9 +42,9 @@ final class Requirements
     /** Extensions Strapi runs without, with what goes missing. */
     public const array RECOMMENDED = [
         'intl' => 'schema tables are sorted by byte instead of as Node sorts them (a database shared with Node Strapi re-syncs at each switch), and upload names are not Unicode-normalized',
-        'gd' => 'uploaded images get no thumbnails, responsive formats or dimensions',
+        'gd' => 'uploaded images are stored as they are, with no thumbnail, responsive formats or optimization',
         'fileinfo' => 'files under public/ are typed by their extension only',
-        'zlib' => 'responses are not compressed',
+        'zlib' => 'strapi::compression leaves responses uncompressed, and compressed export / import archives cannot be read or written',
     ];
 
     /** The variables of `.env.example` whose example value must be replaced before going live (outside development and test). */
@@ -57,17 +58,12 @@ final class Requirements
     public static function check(StrapiDirectories $dirs, ?string $databaseClient, array $platform = []): array
     {
         $sapi = $platform['sapi'] ?? PHP_SAPI;
-        $phpVersion = $platform['phpVersion'] ?? PHP_VERSION;
         $extensions = array_map('strtolower', $platform['extensions'] ?? get_loaded_extensions());
         $ini = $platform['ini'] ?? static fn (string $name): string|false => ini_get($name);
         $env = $platform['env'] ?? self::environment();
         $loaded = static fn (string $extension): bool => in_array($extension, $extensions, true);
 
         $findings = [];
-
-        if (version_compare($phpVersion, self::PHP_VERSION, '<')) {
-            $findings[] = self::finding('error', 'php', "PHP {$phpVersion} is too old: Strapi needs PHP " . self::PHP_VERSION . ' or later.');
-        }
 
         foreach (self::EXTENSIONS as $extension => $usedFor) {
             if (!$loaded($extension)) {

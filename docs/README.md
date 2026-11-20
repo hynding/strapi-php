@@ -119,7 +119,10 @@ What keeps a per-request boot (PHP-FPM, shared hosting) cheap and safe:
   the host leaves `display_errors` on, a stack trace. The body carries the error and the findings
   only with `NODE_ENV=development` set explicitly: a boot can fail before `.env` is read, and a
   host without `NODE_ENV` runs in a development it never chose (`Configuration::nodeEnvDefaulted()`).
-  A missing `vendor/` is logged and answered 500 too.
+  A missing `vendor/` is logged and answered 500 too. Found while writing the warnings: without
+  GD every JPEG or PNG upload was refused as a faulty image (`GdImage::canProcess()` now says no,
+  and the file is stored as uploaded), and `strapi::compression` without zlib was a fatal error
+  (it now leaves the response uncompressed).
 - **Tested per request.** Upstream's suite cannot run under PHP-FPM (its bridge keeps spies and
   callbacks in the worker between requests), so `PerRequestLaneTest` (core) serves the example
   app from PHP's built-in server in production, one boot per request: admin auth, API tokens,

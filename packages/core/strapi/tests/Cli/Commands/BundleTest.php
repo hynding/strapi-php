@@ -64,6 +64,8 @@ final class BundleTest extends TestCase
         file_put_contents($this->outside . '/.env.local', 'SECRET=1');
         mkdir($this->outside . '/.git');
         file_put_contents($this->outside . '/.git/HEAD', 'ref');
+        mkdir($this->outside . '/vendor/phpunit', 0o755, true);
+        file_put_contents($this->outside . '/vendor/phpunit/x.php', '<?php // the checkout\'s dev vendor');
         mkdir($this->outside . '/dist');
         file_put_contents($this->outside . '/dist/lib.php', '<?php // a package\'s dist/ is code');
         mkdir($this->root . '/vendor/hynding');

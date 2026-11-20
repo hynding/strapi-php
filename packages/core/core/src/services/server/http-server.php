@@ -218,7 +218,7 @@ PHP;
             // the instance, when creating it succeeded, knows the configured client and directories
             $client = $strapi?->config()->get('database.connection.client') ?? ($_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT'));
             $dirs = $strapi?->dirs() ?? StrapiDirectories::fromRoot($root);
-            $findings = Requirements::check($dirs, is_string($client) && $client !== '' ? $client : null);
+            $findings = Requirements::check($dirs, is_string($client) && $client !== '' ? $client : null, ['sapi' => $sapi]);
         } catch (\Throwable $checkError) {
             $findings = [];
             error_log('[strapi] The requirements could not be checked: ' . $checkError->getMessage());

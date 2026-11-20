@@ -6,6 +6,7 @@ namespace Strapi\Cli\Cli\Commands\Requirements;
 
 use Strapi\Cli\Cli\Commands\StrapiCommand;
 use Strapi\Core\Utils\Requirements;
+use Strapi\Types\Core\StrapiDirectories;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,9 +32,18 @@ final class Check extends StrapiCommand
 
     protected function action(InputInterface $input, OutputInterface $output): int
     {
-        $app = $this->createStrapi();
-        $client = $app->config()->get('database.connection.client');
-        $findings = Requirements::check($app->dirs(), is_string($client) ? $client : null);
+        // a project that cannot even be created is what this command diagnoses: check without it
+        $createError = null;
+        try {
+            $app = $this->createStrapi();
+            $client = $app->config()->get('database.connection.client');
+            $dirs = $app->dirs();
+        } catch (\Throwable $error) {
+            $createError = $error;
+            $client = $_ENV['DATABASE_CLIENT'] ?? getenv('DATABASE_CLIENT');
+            $dirs = StrapiDirectories::fromRoot($this->ctx->cwd);
+        }
+        $findings = Requirements::check($dirs, is_string($client) && $client !== '' ? $client : null);
 
         foreach ($findings as $finding) {
             $output->writeln($finding['level'] === 'error' ? "<fg=red>✖ {$finding['message']}</>" : "<fg=yellow>⚠ {$finding['message']}</>");
@@ -43,6 +53,10 @@ final class Check extends StrapiCommand
         }
         $output->writeln('<fg=gray>This is the command line\'s PHP (' . (php_ini_loaded_file() ?: 'no php.ini') . '); the web server\'s may differ: its first request after a deploy logs the same check to PHP\'s error log.</>');
 
-        return Requirements::hasErrors($findings) ? Command::FAILURE : Command::SUCCESS;
+        if ($createError !== null) {
+            $output->writeln("<fg=red>✖ The project cannot be loaded: {$createError->getMessage()}</>");
+        }
+
+        return $createError !== null || Requirements::hasErrors($findings) ? Command::FAILURE : Command::SUCCESS;
     }
 }

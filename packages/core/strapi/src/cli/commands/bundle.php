@@ -213,6 +213,10 @@ final class Bundle extends StrapiCommand
         if (in_array($base, self::EXCLUDE_EVERYWHERE, true) || (str_starts_with($base, '.env.') && $base !== '.env.example')) {
             return true;
         }
+        // a package's own vendor/ (a path repository's checkout): Composer autoloads the project's
+        if (count($parts) === 4 && $parts[0] === 'vendor' && $base === 'vendor') {
+            return true;
+        }
 
         return dirname($relative) === $uploads && !in_array($base, self::UPLOADS_KEEP, true);
     }

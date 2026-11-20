@@ -77,10 +77,13 @@ final class PublicAdminAssets
 
             return null;
         }
-        // what a build killed midway left (the assets themselves, nothing secret)
+        // what a build killed midway left (the assets themselves, nothing secret); a build running
+        // now has written to its own within the hour
         $leftovers = [...(glob($parent . '/.' . basename($target) . '.new-*', GLOB_ONLYDIR) ?: []), ...(glob($parent . '/.' . basename($target) . '.old-*', GLOB_ONLYDIR) ?: [])];
         foreach ($leftovers as $leftover) {
-            self::remove($leftover);
+            if ((int) @filemtime($leftover) < time() - 3600) {
+                self::remove($leftover);
+            }
         }
         $suffix = getmypid() . '-' . bin2hex(random_bytes(3));
         $staging = $parent . '/.' . basename($target) . '.new-' . $suffix;
@@ -116,9 +119,40 @@ final class PublicAdminAssets
             }
         }
 
+        // a copy at an earlier admin.path is stale: the web server would keep serving it
+        foreach (self::copiesUnder(rtrim($publicDir, '/')) as $stale) {
+            if ($stale !== $target) {
+                self::remove($stale);
+                $logger->debug("Removed the admin assets of an earlier admin.path: {$stale}");
+            }
+        }
+
         $logger->debug("Copied the admin assets to {$target}");
 
         return $target;
+    }
+
+    /**
+     * The copies {@see self::publish()} wrote under `$publicDir`, three levels deep at most (an
+     * `admin.path` such as `/cms/admin`), uploads left out.
+     *
+     * @return list<string>
+     */
+    public static function copiesUnder(string $publicDir, int $depth = 3): array
+    {
+        $found = [];
+        foreach (glob($publicDir . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
+            if (basename($dir) === 'uploads' || is_link($dir)) {
+                continue;
+            }
+            if (self::isPublished($dir)) {
+                $found[] = $dir;
+            } elseif ($depth > 1) {
+                array_push($found, ...self::copiesUnder($dir, $depth - 1));
+            }
+        }
+
+        return $found;
     }
 
     /** Whether `$dir` is a copy written by {@see self::publish()}. */

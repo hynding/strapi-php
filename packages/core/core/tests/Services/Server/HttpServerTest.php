@@ -131,6 +131,7 @@ final class HttpServerTest extends TestCase
         $log = tempnam(sys_get_temp_dir(), 'strapi-boot-failed');
         $previous = ini_set('error_log', (string) $log);
         $nodeEnv = getenv('NODE_ENV');
+        $nodeEnvVar = $_ENV['NODE_ENV'] ?? null;
         putenv('NODE_ENV=production');
         unset($_ENV['NODE_ENV']);
         ob_start();
@@ -140,6 +141,9 @@ final class HttpServerTest extends TestCase
             $body = (string) ob_get_clean();
             ini_set('error_log', $previous === false ? '' : $previous);
             putenv($nodeEnv === false ? 'NODE_ENV' : "NODE_ENV={$nodeEnv}");
+            if ($nodeEnvVar !== null) {
+                $_ENV['NODE_ENV'] = $nodeEnvVar;
+            }
         }
 
         self::assertSame(['data' => null, 'error' => ['status' => 500, 'name' => 'InternalServerError', 'message' => 'Internal Server Error', 'details' => []]], json_decode($body, true));

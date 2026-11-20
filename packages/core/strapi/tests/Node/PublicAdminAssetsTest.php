@@ -72,10 +72,26 @@ final class PublicAdminAssetsTest extends TestCase
         mkdir($this->root . '/public/.admin.new-123-abcdef');
         file_put_contents($this->root . '/public/.admin.new-123-abcdef/x.js', 'x');
         mkdir($this->root . '/public/.admin.old-123-abcdef');
+        touch($this->root . '/public/.admin.new-123-abcdef', time() - 7200);
+        touch($this->root . '/public/.admin.old-123-abcdef', time() - 7200);
+        // another build's, running now
+        mkdir($this->root . '/public/.admin.new-456-abcdef');
 
         PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/admin', $this->logger());
 
-        self::assertSame(['admin'], array_values(array_diff(scandir($this->root . '/public') ?: [], ['.', '..'])));
+        self::assertSame(['.admin.new-456-abcdef', 'admin'], array_values(array_diff(scandir($this->root . '/public') ?: [], ['.', '..'])));
+    }
+
+    public function testRemovesTheCopyOfAnEarlierAdminPath(): void
+    {
+        PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/admin', $this->logger());
+        mkdir($this->root . '/public/docs');
+
+        PublicAdminAssets::publish($this->root . '/build', $this->root . '/public', '/cms/dashboard', $this->logger());
+
+        self::assertDirectoryDoesNotExist($this->root . '/public/admin');
+        self::assertDirectoryExists($this->root . '/public/docs', 'the project\'s own directories stay');
+        self::assertSame([$this->root . '/public/cms/dashboard'], PublicAdminAssets::copiesUnder($this->root . '/public'));
     }
 
     public function testABuildReplacesTheEarlierCopy(): void

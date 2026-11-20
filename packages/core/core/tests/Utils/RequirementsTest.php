@@ -31,7 +31,6 @@ final class RequirementsTest extends TestCase
     /** A host with everything, as a web server runs it. */
     private const array HEALTHY = [
         'sapi' => 'fpm-fcgi',
-        'phpVersion' => '8.3.6',
         'extensions' => ['Core', 'ctype', 'json', 'mbstring', 'openssl', 'PDO', 'pdo_sqlite', 'pdo_mysql', 'intl', 'gd', 'fileinfo', 'zlib', 'Zend OPcache'],
         'env' => ['NODE_ENV' => 'production', 'APP_KEYS' => 'a,b', 'JWT_SECRET' => 'secret'],
     ];
@@ -67,11 +66,11 @@ final class RequirementsTest extends TestCase
         self::assertFalse(Requirements::hasErrors([]));
     }
 
-    public function testThePhpVersionAndRequiredExtensionsAreErrors(): void
+    public function testRequiredExtensionsAreErrors(): void
     {
-        $findings = $this->check('mysql', ['phpVersion' => '8.2.20', 'extensions' => ['json', 'PDO', 'pdo_sqlite', 'intl', 'gd', 'fileinfo', 'zlib', 'Zend OPcache']]);
+        $findings = $this->check('mysql', ['extensions' => ['json', 'PDO', 'pdo_sqlite', 'intl', 'gd', 'fileinfo', 'zlib', 'Zend OPcache']]);
 
-        self::assertSame(['php' => 'error', 'ext-ctype' => 'error', 'ext-mbstring' => 'error', 'ext-openssl' => 'error', 'ext-pdo_mysql' => 'error'], self::names($findings));
+        self::assertSame(['ext-ctype' => 'error', 'ext-mbstring' => 'error', 'ext-openssl' => 'error', 'ext-pdo_mysql' => 'error'], self::names($findings));
         self::assertTrue(Requirements::hasErrors($findings));
         self::assertStringContainsString('the mysql database client needs it', Requirements::format($findings));
     }
