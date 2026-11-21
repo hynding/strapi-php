@@ -32,7 +32,7 @@ The package column is each part's name inside `hynding/strapi-php` (the director
 | Permission engine (CASL + sift semantics) | `strapi/permissions` | ported, 88 tests |
 | Database (Doctrine DBAL): metadata, schema sync, query builder, entity manager, migrations | `strapi/database` | ported, 166 tests; schema and hash byte-identical to Node |
 | Runtime: container, registries, loaders, PSR-7 server, core API, document service, entity validator | `strapi/core` | ported (MCP server with content-manager/upload tools; AI providers stubbed); MCP API 140/144 |
-| CLI: `strapi start / develop / build / console / routes:list / *:list / report / cron:run / migrations:run` | `strapi/strapi` | ported |
+| CLI: `strapi start / develop / build / console / generate / routes:list / *:list / report / cron:run / migrations:run / admin:* / configuration:* / openapi:generate / bundle / requirements:check` | `strapi/strapi` | ported |
 | Admin API: users, roles, permissions, sessions, API/admin/transfer tokens, webhooks, project settings | `strapi/admin` | ported (non-EE); 331/333 |
 | Content Manager | `strapi/content-manager` | ported (history/preview are EE-licensed, not ported); 759/781 |
 | Content-Type Builder | `strapi/content-type-builder` | ported; 61/63 |
@@ -73,6 +73,14 @@ Like upstream, the content API is closed by default: grant the Public role acces
 admin panel (Settings → Users & Permissions → Roles), or call it with an API token
 (Settings → API Tokens), e.g. `curl -H "Authorization: Bearer <token>" localhost:1337/api/articles`.
 
+To serve the admin panel, install the pinned upstream bundle and build it:
+
+```sh
+cd examples/getstarted && npm install && php bin/strapi build   # needs Node 20+
+```
+
+## Deploying
+
 `strapi start` uses PHP's built-in server for development. For production, point
 PHP-FPM or [FrankenPHP](https://frankenphp.dev) (worker mode, `public/index.php` boots
 once per worker; without `worker` it boots per request, as under PHP-FPM) at
@@ -81,16 +89,24 @@ once per worker; without `worker` it boots per request, as under PHP-FPM) at
 do): PHP's own multipart parser keeps only the last of several files uploaded under one name,
 while strapi::body keeps them all, as Strapi does.
 
-Shared hosting works too: a settled boot under PHP-FPM takes ~25 ms, rate limits and cron work
-without a long-lived process, and logs go to PHP's error log (docs/README.md, "Runtime model").
-Set `NODE_ENV=production` in `.env`: without it the app runs in development, where every request
-runs the whole bootstrap under a lock (PHP-FPM usually clears the server's environment, so `.env`
-is the place).
+Set `NODE_ENV=production` in `.env` for every deployment: without it the app runs in development,
+where every request runs the whole bootstrap under a lock (PHP-FPM usually clears the server's
+environment, so `.env` is the place). PHP 8.3's function JIT (`opcache.jit=1235`) segfaults on
+some fresh boots; where the host lets you choose, use `opcache.jit=tracing`, `function` or
+`disable` (docs/README.md, "Runtime model").
+
+### Shared hosting
+
+A settled boot under PHP-FPM takes ~25 ms, rate limits and cron work without a long-lived
+process (`php bin/strapi cron:run` from the host's crontab), and logs go to PHP's error log
+(docs/README.md, "Runtime model").
+
 On Apache, make `public/` the document root: `public/.htaccess` routes requests to `index.php`,
 passes the `Authorization` header Apache drops for PHP-FPM and CGI, and never runs an uploaded
-file as PHP. `strapi build` also copies the admin bundle to `public/admin/`, so the web server
-serves its assets without booting PHP for each (the admin's pages and API still go to `index.php`;
-on nginx use `try_files $uri /index.php$is_args$args`, without `$uri/`).
+file as PHP. `strapi build` also copies the admin bundle to `public/<admin.path>/` (`public/admin/`
+by default), so the web server serves its assets without booting PHP for each (the admin's pages
+and API still go to `index.php`). On nginx use `try_files $uri /index.php$is_args$args`, without
+`$uri/`: with it, `/admin/` matches the asset directory and answers 403.
 
 For a host without Composer or Node, build locally and upload one archive:
 
@@ -102,17 +118,12 @@ php bin/strapi bundle                # dist/<name>.zip: the project with vendor/
 Extract it on the host, point the document root at its `public/`, and create `.env` from
 `.env.example` (`NODE_ENV=production`, the database, new secrets). The archive leaves out `.env`,
 `.tmp` (the SQLite database) and uploaded media, so uploading a new one keeps the host's data.
-Each GitHub release also carries `strapi-php-starter-<version>.zip`, a new project bundled the
-same way. `php bin/strapi requirements:check` checks PHP's version and extensions, the database
-driver, writable directories and the settings Strapi needs; the web server's PHP can differ from
-the command line's, so its first request after a deploy logs the same check to PHP's error log,
-and a boot that fails logs it with the error (and answers Strapi's 500 error body).
-
-To serve the admin panel, install the pinned upstream bundle and build it:
-
-```sh
-cd examples/getstarted && npm install && php bin/strapi build   # needs Node 20+
-```
+Each GitHub release also carries `strapi-php-starter-<tag>.zip`, a new project bundled the
+same way (`.github/workflows/release-bundle.yml`). `php bin/strapi requirements:check` checks
+PHP's version and extensions, the database driver, writable directories and the settings Strapi
+needs; the web server's PHP can differ from the command line's, so its first request after a
+deploy logs the same check to PHP's error log, and a boot that fails logs it with the error (and
+answers Strapi's 500 error body).
 
 ## Docker
 
@@ -142,13 +153,19 @@ for running the test suites against a real server.
 
 ```
 packages/core/*        ↔ strapi/strapi packages/core/*      (each a strapi/* package; published together)
+packages/cli/*         ↔ packages/cli/*                     (create-strapi-app, published on its own; create-strapi)
 packages/plugins/*     ↔ packages/plugins/*
 packages/providers/*   ↔ packages/providers/*
+packages/generators/*  ↔ packages/generators/*
+packages/utils/*       ↔ packages/utils/*                   (logger, upgrade, api-tests, phpstan-config)
 examples/getstarted    ↔ examples/getstarted (PHP edition)
 examples/plugins/*     plugins that run on both Strapi and strapi-php (announcements: the pattern;
                        runtime-sync: moves a project between the two runtimes on one database)
 tests/php              integration suite: boots the example, hits the content API over PSR-7
-scripts/               version sync, parity map, upstream release watch, offline dev manifest
+tests/api              upstream's Jest API suite, run against this backend (see its README)
+scripts/               version and bundle sync, parity map, upstream release watch, offline dev manifest
+docker/                the FrankenPHP image used by docker-compose.dev.yml
+.github/workflows/     CI, release watch, create-strapi-app split, release bundle
 ```
 
 Every PHP file sits at the path of the TypeScript file it ports, with `.php` for `.ts`
@@ -159,11 +176,19 @@ naming rules and `VERSIONING.md` for how releases track upstream.
 
 ```sh
 composer test            # phpunit, all suites
-composer analyse         # phpstan level 8
+composer analyse         # phpstan level 8 (src/ of every package)
+composer lint            # php-cs-fixer, PSR-12 (dry run; lint:fix applies it)
 composer version:check   # every package at the same version
 composer bundle:check    # root composer.json (hynding/strapi-php) in sync with packages/*
 composer parity          # regenerate parity.json (needs ../strapi checkout)
+cd tests/api && npm test # upstream's API suite against this backend (tests/api/README.md)
 ```
+
+Move `examples/getstarted/.env` aside before `composer test`, as CI has none: some tests read the
+example's environment. Running as root skips one test (it needs a directory root can't be denied).
+`PerRequestSapiTest` runs only where `php-cgi` is installed. CI (`.github/workflows/ci.yml`)
+runs `version:check`, `bundle:check`, `analyse` and `test` on PHP 8.3 and 8.4, boots the example
+on SQLite and MySQL (`tests/php/smoke.php`), and checks the announcements plugin on Node.
 
 If Packagist is unreachable but GitHub is (sandboxes), `php scripts/dev-offline-manifest.php`
 writes `composer.dev.json` that resolves every dependency from its GitHub mirror; run Composer

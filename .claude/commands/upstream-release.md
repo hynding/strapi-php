@@ -29,11 +29,13 @@ AGENTS.md (CLAUDE.md) has the file-for-file rules. Work on a branch `port/$ARGUM
    `grep -rn '"@strapi/' --include=package.json . | grep -v node_modules`; create-strapi-app
    derives its pins from the package version, nothing to edit there.
 
-5. **Check.** `composer test`, `composer analyse`, `composer bundle:check`, `composer version:check`,
+5. **Check.** `composer test` (with `examples/getstarted/.env` moved aside, as on CI),
+   `composer analyse`, `composer lint`, `composer bundle:check`, `composer version:check`,
    then the upstream API suite at the new tag: point `STRAPI_UPSTREAM` at the checkout and run
    `cd tests/api && npm test -- --name v$ARGUMENTS`. Compare with the previous run (the runner
    does it) and explain every test that no longer passes.
 
-6. **Wrap up.** Update the status numbers in README.md, commit, push, open a PR titled
-   "Port Strapi $ARGUMENTS". Remind me to tag `v$ARGUMENTS` (or the beta) after merging; the tag
-   is what publishes `hynding/strapi-php` and `hynding/create-strapi-app`.
+6. **Wrap up.** Update the status numbers in README.md and docs/README.md, commit, push, open a
+   PR titled "Port Strapi $ARGUMENTS". Remind me to tag `v$ARGUMENTS` (or the beta) after merging;
+   the tag is what publishes `hynding/strapi-php` (Packagist), `hynding/create-strapi-app`
+   (`split.yml`) and the release's `strapi-php-starter-<tag>.zip` (`release-bundle.yml`).
