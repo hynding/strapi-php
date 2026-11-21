@@ -19,6 +19,7 @@ Port upstream's **$ARGUMENTS** following AGENTS.md (CLAUDE.md) exactly.
 4. **Test**: port the upstream `__tests__` cases to PHPUnit in the package's `tests/`
    (`__tests__/cors.test.ts` → `tests/CorsTest.php`). Jest mocks become small test doubles.
 5. **Wire up**: `composer dump-autoload`; if you added a dependency or autoload path, `composer bundle:fix`.
-   Run the package's tests, `composer analyse` (PHPStan level 8), and
-   `php scripts/parity-map.php` to confirm the file now counts as ported.
+   Run the package's tests, `composer analyse` (PHPStan level 8), `composer lint`, and
+   `php scripts/parity-map.php` to confirm the file now counts as ported. If the file changes
+   runtime behaviour, run the matching directories of the API suite (`/api-tests <dirs>`).
 6. Tell me anything you could not port faithfully, and why, in one short list.

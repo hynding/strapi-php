@@ -3,10 +3,14 @@
 Each package's `README.md` carries its own ported / stubbed / skipped tables and the
 deviations from upstream. This folder is for cross-cutting notes.
 
-- [`../AGENTS.md`](../AGENTS.md) — naming conventions and code style.
+- [`../AGENTS.md`](../AGENTS.md) (`CLAUDE.md` links to it) — naming conventions, code style,
+  what to check before calling work done.
 - [`../VERSIONING.md`](../VERSIONING.md) — how releases track Strapi's weekly releases.
 - [`../parity.json`](../parity.json) — upstream file → PHP file map; regenerate with
   `php scripts/parity-map.php --upstream=<strapi checkout>`.
+- [`porting-feature-packages.md`](porting-feature-packages.md) — how a feature package's server
+  half (services, controllers, routes, content types) maps to PHP.
+- [`empty-json-objects.md`](empty-json-objects.md) — how a JSON `{}` survives decoding.
 
 ## Runtime model
 
@@ -145,8 +149,9 @@ per-request work: 4 fresh boots in 10 on it, 1 in 15 before it, locally on 8.3.6
 8.3.36. `opcache.jit=disable`, `tracing` or `function` showed none in 15 boots each. Where the
 host lets you choose, use one of those.
 
-On `examples/getstarted` (SQLite, opcache), a settled production boot went from ~620 ms to
-~65 ms, 1,024 to 795 included files, 24 to 10 MB.
+On `examples/getstarted` (SQLite, opcache), the work above took a settled production boot from
+~620 ms to ~65 ms, 1,024 to 795 included files, 24 to 10 MB. That was measured
+before, and differently from, the boot cache work below, whose numbers are per request.
 
 - **A settled boot defers what no request needs, and caches what it computes the same way every
   time.** Profiled per request (PHP's built-in server, opcache in shared memory, as under FPM),
@@ -198,9 +203,12 @@ Ordered by tests unlocked per effort. Counts are from a full `npm test` run; rer
 starting and after finishing (`/api-tests` in Claude Code).
 
 **Release**
-- Tag `v5.56.0-beta.1`, then submit `hynding/strapi-php` and `hynding/strapi-php-create-strapi-app`
-  on packagist.org with their GitHub hooks (README "Install"; split.yml fills the second repo).
-  Delete this item once done.
+- Tag `v5.56.0-beta.1`. The tag runs `split.yml` (pushes `packages/cli/create-strapi-app` to the
+  `strapi-php-create-strapi-app` repository; needs the `SPLIT_TOKEN` secret and that repository)
+  and `release-bundle.yml` (attaches `strapi-php-starter-v5.56.0-beta.1.zip` to the release).
+- Submit both repositories on packagist.org with their GitHub hooks: `hynding/strapi-php` (this
+  repository) and `hynding/create-strapi-app` (the split repository), so README "Install" works.
+  Delete these items once done.
 
 **API suite failures (45), by cause**
 1. **Test-process state the bridge cannot share (8).** The bridge now carries functions,

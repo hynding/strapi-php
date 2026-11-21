@@ -17,8 +17,13 @@ Run upstream Strapi's API suite (tests/api/README.md) and report.
    (`npm test -- <file> --name <run>-recheck`). Known flaky ones are listed in docs/README.md
    ("Open work"): `basic-pagination` (rows created in parallel) and an occasional socket hang-up in
    `content-type-builder/schema`. Anything else is a regression: find the cause.
-5. Report: the per-directory table, regressions with their cause, newly passing tests. If the
-   numbers changed for good, update the status table and totals in README.md.
+5. Report: the per-directory table, regressions with their cause, newly passing tests. The
+   reference is 3,358 of 3,403. If the numbers changed for good, update the totals in README.md
+   ("Status") and docs/README.md ("Status", and the counts in "Open work").
+
+In a cloud container without direct DNS, the two size-limit tests of
+`core/upload/admin/file-upload-and-url-import` fail with "Could not resolve hostname: example.com";
+that is the sandbox, not a regression.
 
 Never use `pkill -f <pattern>` to stop stray servers: the pattern matches your own shell.
 Kill by PID (`pgrep -af '[f]rankenphp'`).
